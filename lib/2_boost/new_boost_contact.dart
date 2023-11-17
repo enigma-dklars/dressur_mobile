@@ -1,0 +1,786 @@
+// ignore_for_file: use_build_context_synchronously
+
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:whatsperson/components/delayed_animation.dart';
+import 'package:whatsperson/components/constant.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert' as convert;
+import 'package:whatsperson/components/sql_helper.dart';
+import 'package:select_form_field/select_form_field.dart';
+import 'package:whatsperson/components/noti.dart';
+
+class NewBoostContactPage extends StatefulWidget {
+  @override
+  State<NewBoostContactPage> createState() => _NewBoostContactPageState();
+}
+
+class _NewBoostContactPageState extends State<NewBoostContactPage> {
+  bool load = false;
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        elevation: 0,
+        backgroundColor: primaryColor,
+        title: Text(
+          (langUserPhone == "fr")
+              ? "Nouveau Boost Contact"
+              : "New Boost Contact",
+          style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+        ),
+        leading: IconButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          icon: const Icon(
+            Icons.arrow_back,
+            size: 30,
+          ),
+        ),
+      ),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            const SizedBox(height: 5),
+            Card(
+              margin:
+                  const EdgeInsets.only(left: 10, top: 5, right: 10, bottom: 5),
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(5),
+                  gradient: const LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Colors.red,
+                      Color.fromARGB(255, 85, 3, 3),
+                    ],
+                  ),
+                ),
+                padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    const SizedBox(height: 10),
+                    Text(
+                      (langUserPhone == "fr")
+                          ? "NB: Les Boosts Gratuit sont beaucoup plus mis en avant! Il est donc conseillé de faire des Boosts Gratuit plutôt que Payant. Il n'est pas possible de connaitre à l'avance le nombre de contacts après boost ni la tranche rapproché. Vous pouvez programmer plusieurs Boosts Gratuit contrairement au Payant. Parrainé des utilisateurs pour avoir des bonus et ainsi faire des Boosts Gratuit."
+                          : "NB: The Free Boosts are much more highlighted! It is therefore advisable to make Boosts Free rather than Paid. It is not possible to know in advance the number of contacts after boost nor the close range. You can schedule several Free Boosts unlike the Paid. Sponsored users to have bonuses and thus make Free Boosts.",
+                      style: GoogleFonts.poppins(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 10,
+                        color: Colors.white,
+                      ),
+                      textAlign: TextAlign.justify,
+                    ),
+                    const SizedBox(height: 15),
+                  ],
+                ),
+              ),
+            ),
+            Container(
+              margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  const SizedBox(height: 20),
+                  DelayedAnimation(
+                    delay: 0, // 1000,
+                    child: Text(
+                      (langUserPhone == "fr")
+                          ? "Après BOOST, votre numéro sera visible dans les pays que vous avez choisie au niveau de vos préférences pendant un certain temps."
+                          : "After BOOST, your number will be visible in the countries you have chosen in your preferences for a certain time.",
+                      style: GoogleFonts.poppins(
+                        fontSize: 16,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        (langUserPhone == "fr")
+                            ? 'Boost Gratuit'
+                            : 'Free Boost',
+                        style: GoogleFonts.poppins(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w800,
+                          color: Colors.green,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      Switch(
+                          activeColor: Colors.red,
+                          activeTrackColor: primaryColor,
+                          inactiveThumbColor: Colors.green,
+                          inactiveTrackColor: primaryColor,
+                          value: load,
+                          onChanged: (bool? newValue) {
+                            setState(() {
+                              // affUserName = newValue!;
+                              if (newValue == true) {
+                                load = true;
+                                //updateUserPreferenceNom("true");
+                              } else {
+                                load = false;
+                                //updateUserPreferenceNom("false");
+                              }
+                            });
+                          }),
+                      Text(
+                        (langUserPhone == "fr") ? 'Boost Payant' : 'Paid Boost',
+                        style: GoogleFonts.poppins(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w800,
+                          color: Colors.red,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 20),
+                  // Formulaire
+                  load ? RegisterForm2() : RegisterForm(),
+
+                  const SizedBox(height: 10),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class RegisterForm extends StatefulWidget {
+  @override
+  State<RegisterForm> createState() => _RegisterFormState();
+}
+
+class _RegisterFormState extends State<RegisterForm> {
+  bool _desactive = false;
+  var _message = "";
+  dynamic data;
+  dynamic idFormulBoost = 1;
+  List<Map<String, dynamic>> listeFormulBoost = [];
+  String? boostId;
+
+  void listeFormuleBoost() async {
+    dynamic youHaveNetWork = "";
+    youHaveConnexion();
+    youHaveNetWork = await SQLHelper.getYouHaveConnexion();
+    while (youHaveNetWork.length == 0) {
+      youHaveNetWork = await SQLHelper.getYouHaveConnexion();
+    }
+    if (youHaveNetWork[0]['youHaveConnexion'] == "oui") {
+      setState(() {
+        _desactive = true;
+      });
+
+      var request = http.MultipartRequest(
+          'POST', Uri.parse('$generalRouteForApi/listeFormuleBoost'));
+      request.fields.addAll({});
+
+      http.StreamedResponse response = await request.send();
+
+      if (response.statusCode == 200) {
+        var data1 = await response.stream.bytesToString();
+        var data = convert.jsonDecode(data1);
+        if (data["error"] == false) {
+          SQLHelper.delete('listeFormulBoost');
+          for (var listeFormulBoost in data["listeFormulBoost"]) {
+            SQLHelper.insert({
+              'tableName': "listeFormulBoost",
+              'value': listeFormulBoost['id'],
+              'label': listeFormulBoost['label'],
+              'prix': listeFormulBoost['prix'],
+              'jours': listeFormulBoost['jours']
+            });
+          }
+          final dataElements = await SQLHelper.getAll("listeFormulBoost");
+          setState(() {
+            _desactive = false;
+            listeFormulBoost = dataElements;
+            onChangeFormulBoost(1);
+          });
+        }
+      }
+    } else {
+      if (langUserPhone != "fr") {
+        dangerNoti(
+            "Mistake!", "You are not connected to the internet.", context);
+      } else {
+        dangerNoti("Erreur!", "Vous n'ètes pas connecté a internet.", context);
+      }
+      setState(() {
+        _desactive = false;
+      });
+    }
+  }
+
+  void newBoost() async {
+    if (telIsVerified == true) {
+      dynamic youHaveNetWork = "";
+      youHaveConnexion();
+      youHaveNetWork = await SQLHelper.getYouHaveConnexion();
+      while (youHaveNetWork.length == 0) {
+        youHaveNetWork = await SQLHelper.getYouHaveConnexion();
+      }
+      if (youHaveNetWork[0]['youHaveConnexion'] == "oui") {
+        setState(() {
+          _desactive = true;
+        });
+
+        var request = http.MultipartRequest(
+            'POST', Uri.parse('$generalRouteForApi/newBoost'));
+        request.fields.addAll({
+          'uid': uidUser,
+          'langUserPhone': langUserPhone.toString(),
+          'idFormulBoost': idFormulBoost.toString()
+        });
+
+        http.StreamedResponse response = await request.send();
+
+        if (response.statusCode == 200) {
+          var data1 = await response.stream.bytesToString();
+          var data = convert.jsonDecode(data1);
+          if (data["error"] == false) {
+            setState(() {
+              _desactive = false;
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                content: Text(
+                  (langUserPhone == "fr")
+                      ? 'Votre poste a déjà démarré.'
+                      : 'Your post has already started.',
+                ),
+              ));
+            });
+          } else {
+            dangerNoti(data["titre"], data["message"], context);
+            setState(() {
+              _desactive = false;
+            });
+          }
+        }
+      } else {
+        if (langUserPhone != "fr") {
+          dangerNoti(
+              "Mistake!", "You are not connected to the internet.", context);
+        } else {
+          dangerNoti(
+              "Erreur!", "Vous n'ètes pas connecté a internet.", context);
+        }
+        setState(() {
+          _desactive = false;
+        });
+      }
+    } else {
+      if (langUserPhone != "fr") {
+        dangerNoti("Access denied !",
+            "Please confirm your WhatsApp number first.", context);
+      } else {
+        dangerNoti("Accès Refusé !",
+            "Veuillez d'abord confirmer votre numéro WhatsApp.", context);
+      }
+    }
+  }
+
+  onChangeFormulBoost(val) async {
+    var prix = (await SQLHelper.getFormulBoostWhithId(val))[0]['prix'];
+    var jours = (await SQLHelper.getFormulBoostWhithId(val))[0]['jours'];
+    setState(() {
+      idFormulBoost = val;
+      _message = (langUserPhone != "fr")
+          ? "Cette formule vous offre un boost de $jours jour(s) pour $prix WP qui seront déduit de votre solde WP."
+          : "This formula gives you a boost of $jours day(s) for WP $prix which will be deducted from your WP balance.";
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    listeFormuleBoost(); // Loading the diary when the app starts
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      child: Column(
+        children: [
+          DelayedAnimation(
+            delay: 0, // 1500,
+            child: SelectFormField(
+              decoration: const InputDecoration(
+                labelText: 'Formules de Boost',
+                border: const OutlineInputBorder(),
+              ),
+              type: SelectFormFieldType.dropdown,
+              initialValue: '1',
+              labelText: 'Formules de Boost',
+              items: listeFormulBoost,
+              onChanged: (val) => onChangeFormulBoost(val),
+              onSaved: (val) => print(val),
+            ),
+          ),
+          const SizedBox(height: 20),
+          DelayedAnimation(
+            delay: 0, // 1000,
+            child: Text(
+              _message,
+              style: GoogleFonts.poppins(
+                fontSize: 16,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+          const SizedBox(height: 20),
+          DelayedAnimation(
+              delay: 0,
+              child: SizedBox(
+                width: MediaQuery.of(context).size.width * 0.95,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: primaryColor,
+                    shape: const StadiumBorder(),
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 13,
+                    ),
+                  ),
+                  child: _desactive
+                      ? const Text("Wait...")
+                      : const Text("BOOSTER"),
+                  onPressed: () {
+                    if (!telIsVerified) {
+                      warningNoti(
+                          "Configuration du compte",
+                          "Patientez encore svp. Votre numéro WhatsApp n'a pas encore été confirmé par un administrateur. Il le sera dans les plus brefs délais.",
+                          context);
+                    } else if (!mailIsVerified) {
+                      warningNoti(
+                          "Configuration du compte",
+                          "Veuillez d'abord confirmer votre adresse mail...\n\nVous trouverez sur notre chaine YouTube des vidéos qui peuvent vous aider...",
+                          context);
+                    } else {
+                      _desactive ? null : newBoost();
+                    }
+                  },
+                ),
+              )),
+        ],
+      ),
+    );
+  }
+}
+
+class RegisterForm2 extends StatefulWidget {
+  @override
+  State<RegisterForm2> createState() => _RegisterForm2State();
+}
+
+class _RegisterForm2State extends State<RegisterForm2> {
+  bool _desactive2 = false;
+  var _message = "";
+  dynamic data;
+  dynamic idFormulBoost = 1;
+  dynamic valueMethodePaiement = "mtn";
+  List<Map<String, dynamic>> listeFormulBoost = [];
+  List<Map<String, dynamic>> listeMethodePaiement = [
+    {
+      'value': 'mtn',
+      'label': 'MTN Mobile Money Bénin',
+    },
+    {
+      'value': 'moov',
+      'label': 'MOOV Flooz Bénin',
+    },
+    {
+      'value': 'mtn_ci',
+      'label': "MTN Mobile Money Côte d'Ivoire",
+    },
+    {
+      'value': 'moov_tg',
+      'label': 'MOOV Flooz Togo',
+    },
+    {
+      'value': 'orange_ci',
+      'label': "Orange Côte d'Ivoire",
+    },
+    {
+      'value': 'orange_sn',
+      'label': 'Orange Sénégal',
+    },
+    {
+      'value': 'free_sn',
+      'label': 'Free Sénégal',
+    },
+    {
+      'value': 'airtel_ne',
+      'label': 'Airtel Niger',
+    },
+    {
+      'value': 'togocel',
+      'label': 'TOGOCEL T-Money',
+    },
+    {
+      'value': 'orange_ml',
+      'label': 'Orange Mali',
+    },
+    {
+      'value': 'mtn_gn',
+      'label': 'MTN Mobile Money Guinée',
+    },
+  ];
+  String? boostId;
+  final telController = TextEditingController(text: tel);
+
+  void listeFormuleBoost() async {
+    dynamic youHaveNetWork = "";
+    youHaveConnexion();
+    youHaveNetWork = await SQLHelper.getYouHaveConnexion();
+    while (youHaveNetWork.length == 0) {
+      youHaveNetWork = await SQLHelper.getYouHaveConnexion();
+    }
+    if (youHaveNetWork[0]['youHaveConnexion'] == "oui") {
+      setState(() {
+        _desactive2 = true;
+      });
+
+      var request = http.MultipartRequest(
+          'POST', Uri.parse('$generalRouteForApi/listeFormuleBoost'));
+      request.fields.addAll({});
+
+      http.StreamedResponse response = await request.send();
+
+      if (response.statusCode == 200) {
+        var data1 = await response.stream.bytesToString();
+        var data = convert.jsonDecode(data1);
+        if (data["error"] == false) {
+          SQLHelper.delete('listeFormulBoost');
+          for (var listeFormulBoost in data["listeFormulBoost"]) {
+            SQLHelper.insert({
+              'tableName': "listeFormulBoost",
+              'value': listeFormulBoost['id'],
+              'label': listeFormulBoost['label'] +
+                  " à " +
+                  (listeFormulBoost['prix']).toString() +
+                  " FCFA",
+              'prix': listeFormulBoost['prix'],
+              'jours': listeFormulBoost['jours']
+            });
+          }
+          final dataElements = await SQLHelper.getAll("listeFormulBoost");
+          setState(() {
+            _desactive2 = false;
+            listeFormulBoost = dataElements;
+            onChangeFormulBoost(1);
+          });
+        }
+      }
+    } else {
+      if (langUserPhone != "fr") {
+        dangerNoti(
+            "Mistake!", "You are not connected to the internet.", context);
+      } else {
+        dangerNoti("Erreur!", "Vous n'ètes pas connecté a internet.", context);
+      }
+      setState(() {
+        _desactive2 = false;
+      });
+    }
+  }
+
+  onChangeFormulBoost(val) async {
+    var prix = (await SQLHelper.getFormulBoostWhithId(val))[0]['prix'];
+    var jours = (await SQLHelper.getFormulBoostWhithId(val))[0]['jours'];
+    setState(() {
+      idFormulBoost = val;
+      _message = (langUserPhone != "fr")
+          ? "Cette formule vous offre un boost de $jours jour(s) pour $prix FCFA."
+          : "This formula offers you a boost of $jours day(s) for $prix FCFA.";
+    });
+  }
+
+  onChangeMethodePaiement(val) async {
+    setState(() {
+      valueMethodePaiement = val;
+    });
+  }
+
+  void newBoostPayant() async {
+    if (telIsVerified == true) {
+      dynamic youHaveNetWork = "";
+      youHaveConnexion();
+      youHaveNetWork = await SQLHelper.getYouHaveConnexion();
+      while (youHaveNetWork.length == 0) {
+        youHaveNetWork = await SQLHelper.getYouHaveConnexion();
+      }
+      if (youHaveNetWork[0]['youHaveConnexion'] == "oui") {
+        setState(() {
+          _desactive2 = true;
+        });
+
+        var request = http.MultipartRequest(
+            'POST', Uri.parse('$generalRouteForApi/newBoostPayant'));
+        request.fields.addAll({
+          'uid': uidUser,
+          'langUserPhone': langUserPhone.toString(),
+          'idFormulBoost': idFormulBoost.toString(),
+          'valueMethodePaiement': valueMethodePaiement,
+          'tel': telController.text
+        });
+
+        http.StreamedResponse response = await request.send();
+
+        if (response.statusCode == 200) {
+          var data1 = await response.stream.bytesToString();
+          var data = convert.jsonDecode(data1);
+          if (data["error"] == false) {
+            // var idTransaction = data["idTransaction"];
+            setState(() {
+              _desactive2 = false;
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                content: Text(
+                  (langUserPhone == "fr")
+                      ? 'Actualiser la liste de vos boosts...'
+                      : 'Refresh the list of your boosts...',
+                ),
+              ));
+            });
+          } else {
+            dangerNoti(data["titre"], data["message"], context);
+            setState(() {
+              _desactive2 = false;
+            });
+          }
+        }
+      } else {
+        if (langUserPhone != "fr") {
+          dangerNoti(
+              "Mistake!", "You are not connected to the internet.", context);
+        } else {
+          dangerNoti(
+              "Erreur!", "Vous n'ètes pas connecté a internet.", context);
+        }
+        setState(() {
+          _desactive2 = false;
+        });
+      }
+    } else {
+      if (langUserPhone != "fr") {
+        dangerNoti("Access denied !",
+            "Please confirm your WhatsApp number first.", context);
+      } else {
+        dangerNoti("Accès Refusé !",
+            "Veuillez d'abord confirmer votre numéro WhatsApp.", context);
+      }
+      setState(() {
+        _desactive2 = false;
+      });
+    }
+  }
+
+  void checkTransaction(idTransaction) async {
+    if (telIsVerified == true) {
+      dynamic youHaveNetWork = "";
+      youHaveConnexion();
+      youHaveNetWork = await SQLHelper.getYouHaveConnexion();
+      while (youHaveNetWork.length == 0) {
+        youHaveNetWork = await SQLHelper.getYouHaveConnexion();
+      }
+      if (youHaveNetWork[0]['youHaveConnexion'] == "oui") {
+        setState(() {
+          _desactive2 = true;
+        });
+
+        var request = http.MultipartRequest(
+            'POST', Uri.parse('$generalRouteForApi/checkTransaction'));
+        request.fields.addAll({
+          'uid': uidUser,
+          'langUserPhone': langUserPhone.toString(),
+          'idTransaction': idTransaction.toString()
+        });
+
+        http.StreamedResponse response = await request.send();
+
+        if (response.statusCode == 200) {
+          var data1 = await response.stream.bytesToString();
+          var data = convert.jsonDecode(data1);
+          if (data["error"] == false) {
+            if (data["transaction"] == false) {
+              dangerNoti(data["titre"], data["message"], context);
+
+              setState(() {
+                _desactive2 = false;
+              });
+            } else if (data["transaction"] == true) {
+              successNoti(data["titre"], data["message"], context);
+
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                content: Text(data["message"]),
+              ));
+
+              setState(() {
+                _desactive2 = false;
+              });
+            }
+          } else {
+            dangerNoti(data["titre"], data["message"], context);
+            setState(() {
+              _desactive2 = false;
+            });
+          }
+        }
+      } else {
+        if (langUserPhone != "fr") {
+          dangerNoti(
+              "Mistake!", "You are not connected to the internet.", context);
+        } else {
+          dangerNoti(
+              "Erreur!", "Vous n'ètes pas connecté a internet.", context);
+        }
+        setState(() {
+          _desactive2 = false;
+        });
+      }
+    } else {
+      if (langUserPhone != "fr") {
+        dangerNoti("Access denied !",
+            "Please confirm your WhatsApp number first.", context);
+      } else {
+        dangerNoti("Accès Refusé !",
+            "Veuillez d'abord confirmer votre numéro WhatsApp.", context);
+      }
+      setState(() {
+        _desactive2 = false;
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState(); // Loading the diary when the app starts
+    listeFormuleBoost();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      child: Column(
+        children: [
+          DelayedAnimation(
+            delay: 0, // 1500,
+            child: SelectFormField(
+              decoration: const InputDecoration(
+                labelText: 'Formules de Boost Payant',
+                border: OutlineInputBorder(),
+              ),
+              type: SelectFormFieldType.dropdown,
+              initialValue: '1',
+              labelText: 'Formules de Boost Payant',
+              items: listeFormulBoost,
+              onChanged: (val) => onChangeFormulBoost(val),
+              onSaved: (val) => print(val),
+            ),
+          ),
+          const SizedBox(height: 10),
+          DelayedAnimation(
+            delay: 0, // 1500,
+            child: SelectFormField(
+              decoration: const InputDecoration(
+                labelText: 'Methode de paiement mobile',
+                border: OutlineInputBorder(),
+              ),
+              type: SelectFormFieldType.dropdown,
+              initialValue: 'mtn',
+              labelText: 'Methode de paiement mobile',
+              items: listeMethodePaiement,
+              onChanged: (val) => onChangeMethodePaiement(val),
+              onSaved: (val) => print(val),
+            ),
+          ),
+          const SizedBox(height: 10),
+          DelayedAnimation(
+            delay: 0, // 1500,
+            child: TextField(
+              controller: telController,
+              decoration: InputDecoration(
+                labelStyle: TextStyle(color: Colors.grey[400]),
+                labelText: 'Indicatif + Numéro du paiement',
+                border: const OutlineInputBorder(),
+              ),
+            ),
+          ),
+          const SizedBox(height: 10),
+          DelayedAnimation(
+            delay: 0,
+            child: SizedBox(
+              width: MediaQuery.of(context).size.width * 0.95,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: primaryColor,
+                  shape: const StadiumBorder(),
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 13,
+                  ),
+                ),
+                child: _desactive2
+                    ? const Text("Wait...")
+                    : const Text("PAYER & BOOSTER"),
+                onPressed: () {
+                  if (!telIsVerified) {
+                    warningNoti(
+                        "Configuration du compte",
+                        "Patientez encore svp. Votre numéro WhatsApp n'a pas encore été confirmé par un administrateur. Il le sera dans les plus brefs délais.",
+                        context);
+                  } else if (!mailIsVerified) {
+                    warningNoti(
+                        "Configuration du compte",
+                        "Veuillez d'abord confirmer votre adresse mail...\n\nVous trouverez sur notre chaine YouTube des vidéos qui peuvent vous aider...",
+                        context);
+                  } else {
+                    _desactive2 ? null : newBoostPayant();
+                  }
+                },
+              ),
+            ),
+          ),
+          const SizedBox(height: 20),
+          DelayedAnimation(
+            delay: 0, // 1000,
+            child: Text(
+              _message,
+              style: GoogleFonts.poppins(
+                color: Colors.blue[400],
+                fontWeight: FontWeight.w600,
+                fontSize: 12,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+          const SizedBox(height: 10),
+          DelayedAnimation(
+            delay: 0, // 1500,
+            child: Text(
+              (langUserPhone != "fr")
+                  ? "Pour payer par Wave ou Carte Bancaire, veuillez contacter l'Assistance WhatsPerson par WhatsApp. Merci..."
+                  : "To pay by Wave or Credit Card, please contact WhatsPerson Support by WhatsApp. THANKS...",
+              style: GoogleFonts.poppins(
+                fontWeight: FontWeight.w600,
+                fontSize: 12,
+                color: Colors.red[400],
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
