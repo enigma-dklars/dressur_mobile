@@ -12,10 +12,13 @@ const nowDataBaseName = 'deux_dressur.db';
 const generalRouteForApi = '$generalApiDomaine/api';
 const generalRouteForPromotionImage = '$generalApiDomaine/promotion/';
 
-const facebookDS = "https://www.facebook.com/dressurDS";
+const facebookDS = "https://www.facebook.com/dressurds";
 const facebookBLT = "https://www.facebook.com/bluelife.tech";
+const facebookELTCS = "https://www.facebook.com/eliticscore";
 const tiktokBLT = "https://www.tiktok.com/@bluelife.tech";
+const tiktokELTCS = "https://www.tiktok.com/@eliticscore1";
 const instagramBLT = "https://www.instagram.com/bluelife.tech";
+const instagramELTCS = "https://www.instagram.com/eliticscore";
 const youtubeBLT = "https://www.youtube.com/@bluelife-tech";
 const whatsappDSURL = "https://wa.me/22960330478";
 const dressurConditionUtilisation = "https://dressur.online/condition.html";

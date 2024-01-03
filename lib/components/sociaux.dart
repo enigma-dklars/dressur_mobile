@@ -60,7 +60,7 @@ class _SociauxPageState extends State<SociauxPage> {
           Column(
             children: [
               ProfileMenuReseauBlanc(
-                text: "Facebook DS",
+                text: "Facebook Dressur",
                 press: () async {
                   final Uri url3 = Uri.parse(facebookDS);
                   if (!await launchUrl(url3,
@@ -69,45 +69,82 @@ class _SociauxPageState extends State<SociauxPage> {
                   }
                 },
               ),
-              ProfileMenuReseauBlanc(
-                text: "Facebook BLT",
-                press: () async {
-                  final Uri url2 = Uri.parse(facebookBLT);
-                  if (!await launchUrl(url2,
-                      mode: LaunchMode.externalApplication)) {
-                    throw 'Could not launch $url2';
-                  }
-                },
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  SizedBox(
+                    child: ProfileMenuReseauBlanc(
+                      text: "TikTok BLT",
+                      press: () async {
+                        final Uri url2 = Uri.parse(tiktokBLT);
+                        if (!await launchUrl(url2,
+                            mode: LaunchMode.externalApplication)) {
+                          throw 'Could not launch $url2';
+                        }
+                      },
+                    ),
+                  ),
+                  ProfileMenuReseauBlanc(
+                    text: "TikTok ELTCS",
+                    press: () async {
+                      final Uri url2 = Uri.parse(tiktokELTCS);
+                      if (!await launchUrl(url2,
+                          mode: LaunchMode.externalApplication)) {
+                        throw 'Could not launch $url2';
+                      }
+                    },
+                  ),
+                ],
               ),
-              ProfileMenuReseauBlanc(
-                text: "Tiktok BLT",
-                press: () async {
-                  final Uri url1 = Uri.parse(tiktokBLT);
-                  if (!await launchUrl(url1,
-                      mode: LaunchMode.externalApplication)) {
-                    throw 'Could not launch $url1';
-                  }
-                },
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  ProfileMenuReseauBlanc(
+                    text: "Facebook BLT",
+                    press: () async {
+                      final Uri url2 = Uri.parse(facebookBLT);
+                      if (!await launchUrl(url2,
+                          mode: LaunchMode.externalApplication)) {
+                        throw 'Could not launch $url2';
+                      }
+                    },
+                  ),
+                  ProfileMenuReseauBlanc(
+                    text: "Facebook ELTCS",
+                    press: () async {
+                      final Uri url2 = Uri.parse(facebookELTCS);
+                      if (!await launchUrl(url2,
+                          mode: LaunchMode.externalApplication)) {
+                        throw 'Could not launch $url2';
+                      }
+                    },
+                  ),
+                ],
               ),
-              ProfileMenuReseauBlanc(
-                text: "Instagram BLT",
-                press: () async {
-                  final Uri url0 = Uri.parse(instagramBLT);
-                  if (!await launchUrl(url0,
-                      mode: LaunchMode.externalApplication)) {
-                    throw 'Could not launch $url0';
-                  }
-                },
-              ),
-              ProfileMenuReseauBlanc(
-                text: "Youtube BLT",
-                press: () async {
-                  final Uri url = Uri.parse(youtubeBLT);
-                  if (!await launchUrl(url,
-                      mode: LaunchMode.externalApplication)) {
-                    throw 'Could not launch $url';
-                  }
-                },
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  ProfileMenuReseauBlanc(
+                    text: "Instagram BLT",
+                    press: () async {
+                      final Uri url2 = Uri.parse(instagramBLT);
+                      if (!await launchUrl(url2,
+                          mode: LaunchMode.externalApplication)) {
+                        throw 'Could not launch $url2';
+                      }
+                    },
+                  ),
+                  ProfileMenuReseauBlanc(
+                    text: "Instagram ELTCS",
+                    press: () async {
+                      final Uri url2 = Uri.parse(instagramELTCS);
+                      if (!await launchUrl(url2,
+                          mode: LaunchMode.externalApplication)) {
+                        throw 'Could not launch $url2';
+                      }
+                    },
+                  ),
+                ],
               ),
             ],
           ),
