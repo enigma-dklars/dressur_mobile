@@ -47,12 +47,12 @@ class _SociauxPageState extends State<SociauxPage> {
           const SizedBox(height: 10),
           Text(
             (langUserPhone == "fr")
-                ? "Vous serez donc informé de toutes les opportunités, astuces, bourses de formations, promotions, etc. que vous ne devez pas manquer. Vos réactions aux postes sont également les bienvenus. Merci. 🙏🙏🙏"
-                : "You will therefore be informed of all the opportunities, tips, training grants, promotions, etc. that you should not miss. Your reactions to the posts are also welcome. THANKS. 🙏🙏🙏",
+                ? "Sur les pages ci-dessous, seront dissimulés des codes promos dans les postes, abonnez-vous pour ne rien manquer. Vous serez également informé de toutes les opportunités, astuces, bourses de formations, promotions, etc. que vous ne devez pas manquer. Vos réactions aux postes sont aussi les bienvenus. Merci. 🙏🙏🙏"
+                : "On the pages below, promotional codes will be hidden in the posts, subscribe so you don't miss anything. You will also be informed of all opportunities, tips, training scholarships, promotions, etc. that you must not miss. Your reactions to the posts are also welcome. THANKS. 🙏🙏🙏",
             style: GoogleFonts.poppins(
               color: Colors.white,
-              fontSize: 12,
-              fontWeight: FontWeight.w400,
+              fontSize: 10,
+              fontWeight: FontWeight.w500,
             ),
             textAlign: TextAlign.justify,
           ),
@@ -73,6 +73,7 @@ class _SociauxPageState extends State<SociauxPage> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   SizedBox(
+                    width: MediaQuery.of(context).size.width * 0.40,
                     child: ProfileMenuReseauBlanc(
                       text: "TikTok BLT",
                       press: () async {
@@ -84,65 +85,80 @@ class _SociauxPageState extends State<SociauxPage> {
                       },
                     ),
                   ),
-                  ProfileMenuReseauBlanc(
-                    text: "TikTok ELTCS",
-                    press: () async {
-                      final Uri url2 = Uri.parse(tiktokELTCS);
-                      if (!await launchUrl(url2,
-                          mode: LaunchMode.externalApplication)) {
-                        throw 'Could not launch $url2';
-                      }
-                    },
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width * 0.40,
+                    child: ProfileMenuReseauBlanc(
+                      text: "TikTok ELTCS",
+                      press: () async {
+                        final Uri url2 = Uri.parse(tiktokELTCS);
+                        if (!await launchUrl(url2,
+                            mode: LaunchMode.externalApplication)) {
+                          throw 'Could not launch $url2';
+                        }
+                      },
+                    ),
                   ),
                 ],
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  ProfileMenuReseauBlanc(
-                    text: "Facebook BLT",
-                    press: () async {
-                      final Uri url2 = Uri.parse(facebookBLT);
-                      if (!await launchUrl(url2,
-                          mode: LaunchMode.externalApplication)) {
-                        throw 'Could not launch $url2';
-                      }
-                    },
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width * 0.40,
+                    child: ProfileMenuReseauBlanc(
+                      text: "Facebook BLT",
+                      press: () async {
+                        final Uri url2 = Uri.parse(facebookBLT);
+                        if (!await launchUrl(url2,
+                            mode: LaunchMode.externalApplication)) {
+                          throw 'Could not launch $url2';
+                        }
+                      },
+                    ),
                   ),
-                  ProfileMenuReseauBlanc(
-                    text: "Facebook ELTCS",
-                    press: () async {
-                      final Uri url2 = Uri.parse(facebookELTCS);
-                      if (!await launchUrl(url2,
-                          mode: LaunchMode.externalApplication)) {
-                        throw 'Could not launch $url2';
-                      }
-                    },
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width * 0.40,
+                    child: ProfileMenuReseauBlanc(
+                      text: "Facebook ELTCS",
+                      press: () async {
+                        final Uri url2 = Uri.parse(facebookELTCS);
+                        if (!await launchUrl(url2,
+                            mode: LaunchMode.externalApplication)) {
+                          throw 'Could not launch $url2';
+                        }
+                      },
+                    ),
                   ),
                 ],
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  ProfileMenuReseauBlanc(
-                    text: "Instagram BLT",
-                    press: () async {
-                      final Uri url2 = Uri.parse(instagramBLT);
-                      if (!await launchUrl(url2,
-                          mode: LaunchMode.externalApplication)) {
-                        throw 'Could not launch $url2';
-                      }
-                    },
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width * 0.40,
+                    child: ProfileMenuReseauBlanc(
+                      text: "Instagram BLT",
+                      press: () async {
+                        final Uri url2 = Uri.parse(instagramBLT);
+                        if (!await launchUrl(url2,
+                            mode: LaunchMode.externalApplication)) {
+                          throw 'Could not launch $url2';
+                        }
+                      },
+                    ),
                   ),
-                  ProfileMenuReseauBlanc(
-                    text: "Instagram ELTCS",
-                    press: () async {
-                      final Uri url2 = Uri.parse(instagramELTCS);
-                      if (!await launchUrl(url2,
-                          mode: LaunchMode.externalApplication)) {
-                        throw 'Could not launch $url2';
-                      }
-                    },
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width * 0.40,
+                    child: ProfileMenuReseauBlanc(
+                      text: "Instagram ELTCS",
+                      press: () async {
+                        final Uri url2 = Uri.parse(instagramELTCS);
+                        if (!await launchUrl(url2,
+                            mode: LaunchMode.externalApplication)) {
+                          throw 'Could not launch $url2';
+                        }
+                      },
+                    ),
                   ),
                 ],
               ),
