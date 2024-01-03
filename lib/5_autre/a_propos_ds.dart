@@ -39,7 +39,7 @@ class AproposPage extends StatelessWidget {
                     delay: 0, // 500,
                     child: SizedBox(
                       height: 200,
-                      child: Image.asset("images/new_logo_wp.png"),
+                      child: Image.asset("images/dressur_logo.png"),
                     ),
                   ),
                   DelayedAnimation(
@@ -69,7 +69,7 @@ class AproposPage extends StatelessWidget {
                         style: GoogleFonts.poppins(
                           fontSize: 16,
                         ),
-                        textAlign: TextAlign.justify,
+                        textAlign: TextAlign.left,
                       ),
                     ),
                   ),
@@ -117,7 +117,7 @@ class AproposPage extends StatelessWidget {
                   DelayedAnimation(
                     delay: 0, // 500,
                     child: Text(
-                      "2022",
+                      "2022 - ${getCurrentYear()}",
                       style: GoogleFonts.poppins(
                         color: Colors.grey,
                         fontSize: 16,
@@ -182,6 +182,48 @@ class AproposPage extends StatelessWidget {
                             delay: 0, // 500,
                             child: Text(
                               "Blue Life Tech",
+                              style: GoogleFonts.poppins(
+                                fontSize: 27,
+                                fontWeight: FontWeight.w600,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  DelayedAnimation(
+                    delay: 0, // 500,
+                    child: Text(
+                      "&",
+                      style: GoogleFonts.poppins(
+                          color: Colors.grey,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Column(
+                        children: [
+                          DelayedAnimation(
+                            delay: 0, // 500,
+                            child: SizedBox(
+                              height: 45,
+                              child: Image.asset("images/eltc_dark.png"),
+                            ),
+                          ),
+                        ],
+                      ),
+                      Column(
+                        children: [
+                          DelayedAnimation(
+                            delay: 0, // 500,
+                            child: Text(
+                              "Elitics Core",
                               style: GoogleFonts.poppins(
                                 fontSize: 27,
                                 fontWeight: FontWeight.w600,

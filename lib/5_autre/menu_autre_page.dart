@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:dressur/5_autre/admin.dart';
-import 'package:dressur/5_autre/a_propos_wp.dart';
+import 'package:dressur/5_autre/a_propos_ds.dart';
 import 'package:dressur/5_autre/liste_bonus_recu.dart';
 import 'package:dressur/5_autre/delete_compte_user.dart';
 import 'package:dressur/5_autre/invitez_vos_amis.dart';
@@ -196,8 +196,8 @@ class _SettingPageState extends State<SettingPage> {
               ),
               ProfileMenu(
                 text: (langUserPhone == "fr")
-                    ? "Supprimer tous vos contacts WP"
-                    : "Delete all your WP contacts",
+                    ? "Supprimer tous vos contacts DS"
+                    : "Delete all your DS contacts",
                 Myicon: const Icon(Icons.contacts),
                 press: () async {
                   ArtDialogResponse response = await ArtSweetAlert.show(
@@ -208,8 +208,8 @@ class _SettingPageState extends State<SettingPage> {
                             ? "Cette action est irréversible"
                             : "This action is irreversible",
                         text: (langUserPhone == "fr")
-                            ? "Voulez vous vraiment supprimer tous vos contacts WP ?"
-                            : "Are you sure you want to delete all your WP contacts?",
+                            ? "Voulez vous vraiment supprimer tous vos contacts DS ?"
+                            : "Are you sure you want to delete all your DS contacts?",
                         confirmButtonText:
                             (langUserPhone == "fr") ? "Oui" : "Yes",
                         denyButtonText: (langUserPhone == "fr") ? "Non" : "No",
@@ -221,8 +221,8 @@ class _SettingPageState extends State<SettingPage> {
                       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                         content: Text(
                           (langUserPhone == "fr")
-                              ? "Dressur vas parcourir vos contacts un a un et supprimer les contacts WP.\n\nPatientez tous le long du processus.\n\nCe processus peut durée plusieurs minutes."
-                              : "Dressur will go through your contacts one by one and delete WP contacts.\n\nWait all the way through the process.\n\nThis process may take several minutes.",
+                              ? "Dressur vas parcourir vos contacts un a un et supprimer les contacts DS.\n\nPatientez tous le long du processus.\n\nCe processus peut durée plusieurs minutes."
+                              : "Dressur will go through your contacts one by one and delete DS contacts.\n\nWait all the way through the process.\n\nThis process may take several minutes.",
                         ),
                         duration: const Duration(minutes: 1),
                       ));
@@ -249,16 +249,16 @@ class _SettingPageState extends State<SettingPage> {
                       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                         content: Text(
                           (langUserPhone == "fr")
-                              ? "${contactsEnregistrer.length} contact(s) WP supprimer."
-                              : "${contactsEnregistrer.length} WP contact(s) delete.",
+                              ? "${contactsEnregistrer.length} contact(s) DS supprimer."
+                              : "${contactsEnregistrer.length} DS contact(s) delete.",
                         ),
                       ));
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                         content: Text(
                           (langUserPhone == "fr")
-                              ? "Vous n'avez aucun contact WP actuellement. Faite un boost pour en avoir."
-                              : "You don't currently have any WP Contacts. Boost to get some.",
+                              ? "Vous n'avez aucun contact DS actuellement. Faite un boost pour en avoir."
+                              : "You don't currently have any DS Contacts. Boost to get some.",
                         ),
                       ));
                     }

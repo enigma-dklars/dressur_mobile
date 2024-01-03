@@ -105,7 +105,7 @@ class _DeletecompteFormState extends State<DeletecompteForm> {
       });
 
       var request = http.MultipartRequest(
-          'POST', Uri.parse('$generalRouteForApi/deleteCompteWP'));
+          'POST', Uri.parse('$generalRouteForApi/deleteCompteDS'));
       request.fields.addAll({
         'uid': uidUser,
         'langUserPhone': langUserPhone.toString(),

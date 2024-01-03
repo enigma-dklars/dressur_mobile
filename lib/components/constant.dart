@@ -1,35 +1,33 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:dressur/components/111_generalApiDomaine.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:dressur/components/sql_helper.dart';
 
-const versionApp = '1.10.0';
+const versionApp = '1.0.0';
 const oldDatabaseName = 'un_dressur.db';
 const nowDataBaseName = 'deux_dressur.db';
 // const generalApiDomaine = 'http://dressur.rf.gd/public';
-// const generalApiDomaine = 'http://192.168.100.14:8000';
-const generalApiDomaine = 'http://192.168.100.14:8000';
 const generalRouteForApi = '$generalApiDomaine/api';
 const generalRouteForPromotionImage = '$generalApiDomaine/promotion/';
 
-const facebookWP = "https://www.facebook.com/dressurWP";
+const facebookDS = "https://www.facebook.com/dressurDS";
 const facebookBLT = "https://www.facebook.com/bluelife.tech";
 const tiktokBLT = "https://www.tiktok.com/@bluelife.tech";
 const instagramBLT = "https://www.instagram.com/bluelife.tech";
 const youtubeBLT = "https://www.youtube.com/@bluelife-tech";
-const whatsappWPURL = "https://wa.me/22960330478";
+const whatsappDSURL = "https://wa.me/22960330478";
 const dressurConditionUtilisation = "https://dressur.online/condition.html";
-const dressurPolitiqueConfidentialite =
-    "https://dressur.online/politique.html";
+const dressurPolitiqueConfidentialite = "https://dressur.online/politique.html";
 const dressurUrlPlaystore =
     "https://play.google.com/store/apps/details?id=com.ds.dressur";
 
-const primaryColor = Colors.indigo;
+const primaryColor = Color(0xFF2a4b9a);
 const secondaryColor = Colors.indigoAccent;
 const databaseSqlCode = """
   CREATE TABLE userInfos(
-    idWP INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+    idDS INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
     tableName TEXT,
     id INTEGER,
     uid TEXT,
@@ -43,7 +41,7 @@ const databaseSqlCode = """
   )
 """;
 
-List<dynamic> contactsUserBeforeWP = [];
+List<dynamic> contactsUserBeforeDS = [];
 List<dynamic> contactsEnregistrer = [];
 String? langUserPhone = "en";
 String preferencePaysText = "";
@@ -166,7 +164,7 @@ void insertDressurContact() async {
       ..phones = [Phone("+22960330478")]
       ..emails = [Email("dressur@gmail.com")]
       ..websites = [
-        Website(facebookWP),
+        Website(facebookDS),
         Website(facebookBLT),
         Website(tiktokBLT),
         Website(instagramBLT),
@@ -412,3 +410,13 @@ Map<String, String> countryCodes = {
   '260': 'Zambie',
   '263': 'Zimbabwe',
 };
+
+String getCurrentYear() {
+  // Obtenez la date actuelle
+  DateTime now = DateTime.now();
+
+  // Obtenez l'année à partir de la date actuelle
+  String currentYear = now.year.toString();
+
+  return currentYear;
+}

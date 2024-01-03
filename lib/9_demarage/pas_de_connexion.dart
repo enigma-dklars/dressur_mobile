@@ -51,7 +51,7 @@ class _PageDepartState extends State<PageDepart> {
                 delay: 3000,
                 child: SizedBox(
                   height: MediaQuery.of(context).size.height * 0.25,
-                  child: Image.asset("images/wp_img_11.png"),
+                  child: Image.asset("images/ds_img_11.png"),
                 ),
               ),
               const SizedBox(height: 20),

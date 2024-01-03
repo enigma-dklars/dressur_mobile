@@ -58,7 +58,7 @@ class SQLHelper {
     try {
       await db.delete("userInfos",
           where: "tableName != ?", whereArgs: ["numsTelUser"]);
-      // await db.delete("userInfos", where: "idWP >= ?", whereArgs: [0]);
+      // await db.delete("userInfos", where: "idDS >= ?", whereArgs: [0]);
     } catch (err) {
       debugPrint("Something went wrong when deleting an item: $err");
     }
@@ -69,7 +69,7 @@ class SQLHelper {
     try {
       await db.delete("userInfos",
           where: "tableName == ?", whereArgs: ["numsTelUser"]);
-      // await db.delete("userInfos", where: "idWP >= ?", whereArgs: [0]);
+      // await db.delete("userInfos", where: "idDS >= ?", whereArgs: [0]);
     } catch (err) {
       debugPrint("Something went wrong when deleting an item: $err");
     }
@@ -128,10 +128,10 @@ class SQLHelper {
         where: "tableName = ?", whereArgs: ["youHaveConnexion"], orderBy: "id");
   }
 
-  static Future<void> removeInLocalDataBase(idWP) async {
+  static Future<void> removeInLocalDataBase(idDS) async {
     final db = await SQLHelper.db();
     try {
-      await db.delete("userInfos", where: "idWP = ?", whereArgs: [idWP]);
+      await db.delete("userInfos", where: "idDS = ?", whereArgs: [idDS]);
     } catch (err) {
       debugPrint("Something went wrong when deleting an item: $err");
     }

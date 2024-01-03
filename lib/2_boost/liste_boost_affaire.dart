@@ -553,8 +553,9 @@ class _PaymentGratuitPageState extends State<PaymentGratuitPage> {
     var jours = (await SQLHelper.getFormulBoostWhithId(val))[0]['jours'];
     setState(() {
       idFormulBoost = val;
-      _message =
-          "Cette formule vous offre une promotion de $jours jour(s) pour $prix WP qui seront déduit de votre solde WP.";
+      _message = (langUserPhone != "fr")
+          ? "Cette formule vous offre une promotion de $jours jour(s) pour $prix Points qui seront déduit de votre solde bonus."
+          : "This formula offers you a promotion of $jours day(s) for $prix Points which will be deducted from your bonus balance.";
     });
   }
 

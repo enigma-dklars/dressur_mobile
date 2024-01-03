@@ -144,7 +144,7 @@ class _ListeContactAAddPageState extends State<ListeContactAAddPage> {
   void insertContact(ContactsDispo contact) async {
     if ((await SQLHelper.getOneNumsTelUser(contact.tel)).isEmpty) {
       final newContact = Contact()
-        ..name.first = "${contact.pseudo} #WP"
+        ..name.first = "${contact.pseudo} #DS"
         ..phones = [Phone(contact.tel)];
       await newContact.insert();
       await insertNumTelUserIntoDataBase(contact.tel);

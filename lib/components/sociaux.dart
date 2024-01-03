@@ -60,9 +60,9 @@ class _SociauxPageState extends State<SociauxPage> {
           Column(
             children: [
               ProfileMenuReseauBlanc(
-                text: "Facebook WP",
+                text: "Facebook DS",
                 press: () async {
-                  final Uri url3 = Uri.parse(facebookWP);
+                  final Uri url3 = Uri.parse(facebookDS);
                   if (!await launchUrl(url3,
                       mode: LaunchMode.externalApplication)) {
                     throw 'Could not launch $url3';
