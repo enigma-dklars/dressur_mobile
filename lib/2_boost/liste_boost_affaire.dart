@@ -553,7 +553,7 @@ class _PaymentGratuitPageState extends State<PaymentGratuitPage> {
     var jours = (await SQLHelper.getFormulBoostWhithId(val))[0]['jours'];
     setState(() {
       idFormulBoost = val;
-      _message = (langUserPhone != "fr")
+      _message = (langUserPhone == "fr")
           ? "Cette formule vous offre une promotion de $jours jour(s) pour $prix Points qui seront déduit de votre solde bonus."
           : "This formula offers you a promotion of $jours day(s) for $prix Points which will be deducted from your bonus balance.";
     });
@@ -608,7 +608,7 @@ class _PaymentGratuitPageState extends State<PaymentGratuitPage> {
                   width: MediaQuery.of(context).size.width * 0.95,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      primary: primaryColor,
+                      backgroundColor: primaryColor,
                       shape: const StadiumBorder(),
                       padding: const EdgeInsets.symmetric(
                         vertical: 13,
@@ -657,52 +657,6 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
   dynamic idFormulBoost = 1;
   dynamic valueMethodePaiement = "mtn";
   List<Map<String, dynamic>> listeFormulBoost = [];
-  List<Map<String, dynamic>> listeMethodePaiement = [
-    {
-      'value': 'mtn',
-      'label': 'MTN Mobile Money Bénin',
-    },
-    {
-      'value': 'moov',
-      'label': 'MOOV Flooz Bénin',
-    },
-    {
-      'value': 'mtn_ci',
-      'label': "MTN Mobile Money Côte d'Ivoire",
-    },
-    {
-      'value': 'moov_tg',
-      'label': 'MOOV Flooz Togo',
-    },
-    {
-      'value': 'orange_ci',
-      'label': "Orange Côte d'Ivoire",
-    },
-    {
-      'value': 'orange_sn',
-      'label': 'Orange Sénégal',
-    },
-    {
-      'value': 'free_sn',
-      'label': 'Free Sénégal',
-    },
-    {
-      'value': 'airtel_ne',
-      'label': 'Airtel Niger',
-    },
-    {
-      'value': 'togocel',
-      'label': 'TOGOCEL T-Money',
-    },
-    {
-      'value': 'orange_ml',
-      'label': 'Orange Mali',
-    },
-    {
-      'value': 'mtn_gn',
-      'label': 'MTN Mobile Money Guinée',
-    },
-  ];
   String? boostId;
   final telController = TextEditingController(text: tel);
 

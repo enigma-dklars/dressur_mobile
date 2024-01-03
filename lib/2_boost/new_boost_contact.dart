@@ -297,7 +297,7 @@ class _RegisterFormState extends State<RegisterForm> {
     var jours = (await SQLHelper.getFormulBoostWhithId(val))[0]['jours'];
     setState(() {
       idFormulBoost = val;
-      _message = (langUserPhone != "fr")
+      _message = (langUserPhone == "fr")
           ? "Cette formule vous offre un boost contact de $jours jour(s) pour $prix Points qui seront déduit de votre solde bonus."
           : "This formula gives you a boost contact of $jours day(s) for Points $prix which will be deducted from your bonus balance.";
     });
@@ -391,52 +391,6 @@ class _RegisterForm2State extends State<RegisterForm2> {
   dynamic idFormulBoost = 1;
   dynamic valueMethodePaiement = "mtn";
   List<Map<String, dynamic>> listeFormulBoost = [];
-  List<Map<String, dynamic>> listeMethodePaiement = [
-    {
-      'value': 'mtn',
-      'label': 'MTN Mobile Money Bénin',
-    },
-    {
-      'value': 'moov',
-      'label': 'MOOV Flooz Bénin',
-    },
-    {
-      'value': 'mtn_ci',
-      'label': "MTN Mobile Money Côte d'Ivoire",
-    },
-    {
-      'value': 'moov_tg',
-      'label': 'MOOV Flooz Togo',
-    },
-    {
-      'value': 'orange_ci',
-      'label': "Orange Côte d'Ivoire",
-    },
-    {
-      'value': 'orange_sn',
-      'label': 'Orange Sénégal',
-    },
-    {
-      'value': 'free_sn',
-      'label': 'Free Sénégal',
-    },
-    {
-      'value': 'airtel_ne',
-      'label': 'Airtel Niger',
-    },
-    {
-      'value': 'togocel',
-      'label': 'TOGOCEL T-Money',
-    },
-    {
-      'value': 'orange_ml',
-      'label': 'Orange Mali',
-    },
-    {
-      'value': 'mtn_gn',
-      'label': 'MTN Mobile Money Guinée',
-    },
-  ];
   String? boostId;
   final telController = TextEditingController(text: tel);
 
@@ -501,7 +455,7 @@ class _RegisterForm2State extends State<RegisterForm2> {
     var jours = (await SQLHelper.getFormulBoostWhithId(val))[0]['jours'];
     setState(() {
       idFormulBoost = val;
-      _message = (langUserPhone != "fr")
+      _message = (langUserPhone == "fr")
           ? "Cette formule vous offre un boost de $jours jour(s) pour $prix FCFA."
           : "This formula offers you a boost of $jours day(s) for $prix FCFA.";
     });
@@ -768,7 +722,7 @@ class _RegisterForm2State extends State<RegisterForm2> {
           DelayedAnimation(
             delay: 0, // 1500,
             child: Text(
-              (langUserPhone != "fr")
+              (langUserPhone == "fr")
                   ? "Pour payer par Wave ou Carte Bancaire, veuillez contacter l'Assistance Dressur par WhatsApp. Merci..."
                   : "To pay by Wave or Credit Card, please contact Dressur Support by WhatsApp. THANKS...",
               style: GoogleFonts.poppins(
