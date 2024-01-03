@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:dressur/components/111_generalApiDomaine.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:dressur/components/sql_helper.dart';
@@ -8,8 +9,6 @@ const versionApp = '1.0.0';
 const oldDatabaseName = 'un_dressur.db';
 const nowDataBaseName = 'deux_dressur.db';
 // const generalApiDomaine = 'http://dressur.rf.gd/public';
-// const generalApiDomaine = 'http://192.168.100.14:8000';
-const generalApiDomaine = 'http://192.168.100.14:8000';
 const generalRouteForApi = '$generalApiDomaine/api';
 const generalRouteForPromotionImage = '$generalApiDomaine/promotion/';
 
