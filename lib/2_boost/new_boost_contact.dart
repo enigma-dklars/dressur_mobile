@@ -298,8 +298,8 @@ class _RegisterFormState extends State<RegisterForm> {
     setState(() {
       idFormulBoost = val;
       _message = (langUserPhone != "fr")
-          ? "Cette formule vous offre un boost de $jours jour(s) pour $prix DS qui seront déduit de votre solde DS."
-          : "This formula gives you a boost of $jours day(s) for DS $prix which will be deducted from your DS balance.";
+          ? "Cette formule vous offre un boost contact de $jours jour(s) pour $prix Points qui seront déduit de votre solde bonus."
+          : "This formula gives you a boost contact of $jours day(s) for Points $prix which will be deducted from your bonus balance.";
     });
   }
 
