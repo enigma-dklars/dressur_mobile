@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:dressur/components/sql_helper.dart';
 
-const versionApp = '1.10.0';
+const versionApp = '1.0.0';
 const oldDatabaseName = 'un_dressur.db';
 const nowDataBaseName = 'deux_dressur.db';
 // const generalApiDomaine = 'http://dressur.rf.gd/public';
@@ -411,3 +411,13 @@ Map<String, String> countryCodes = {
   '260': 'Zambie',
   '263': 'Zimbabwe',
 };
+
+String getCurrentYear() {
+  // Obtenez la date actuelle
+  DateTime now = DateTime.now();
+
+  // Obtenez l'année à partir de la date actuelle
+  String currentYear = now.year.toString();
+
+  return currentYear;
+}
