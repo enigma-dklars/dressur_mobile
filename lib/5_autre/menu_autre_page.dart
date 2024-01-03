@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:dressur/5_autre/admin.dart';
-import 'package:dressur/5_autre/a_propos_wp.dart';
+import 'package:dressur/5_autre/a_propos_ds.dart';
 import 'package:dressur/5_autre/liste_bonus_recu.dart';
 import 'package:dressur/5_autre/delete_compte_user.dart';
 import 'package:dressur/5_autre/invitez_vos_amis.dart';

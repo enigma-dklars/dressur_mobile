@@ -52,7 +52,7 @@ class SupportPage extends StatelessWidget {
                     delay: 0, // 500,
                     child: SizedBox(
                       height: 200,
-                      child: Image.asset("images/wp_img_10.png"),
+                      child: Image.asset("images/ds_img_10.png"),
                     ),
                   ),
                   const SizedBox(height: 30),

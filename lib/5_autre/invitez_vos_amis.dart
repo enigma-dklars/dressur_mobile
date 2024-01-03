@@ -434,7 +434,7 @@ class _AddFriendPageState extends State<AddFriendPage> {
                 delay: 0, // 500,
                 child: SizedBox(
                   height: 200,
-                  child: Image.asset("images/wp_img_9.png"),
+                  child: Image.asset("images/ds_img_9.png"),
                 ),
               ),
               const SizedBox(height: 20),

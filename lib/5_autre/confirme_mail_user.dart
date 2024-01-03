@@ -254,7 +254,7 @@ class _ConfirmeFormeState extends State<ConfirmeForme> {
             delay: 0, // 500,
             child: SizedBox(
               height: MediaQuery.of(context).size.height * 0.20,
-              child: Image.asset("images/wp_img_6.png"),
+              child: Image.asset("images/ds_img_6.png"),
             ),
           ),
           const SizedBox(height: 20),
