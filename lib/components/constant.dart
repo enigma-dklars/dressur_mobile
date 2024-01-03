@@ -13,12 +13,12 @@ const generalApiDomaine = 'http://192.168.100.14:8000';
 const generalRouteForApi = '$generalApiDomaine/api';
 const generalRouteForPromotionImage = '$generalApiDomaine/promotion/';
 
-const facebookWP = "https://www.facebook.com/dressurWP";
+const facebookDS = "https://www.facebook.com/dressurDS";
 const facebookBLT = "https://www.facebook.com/bluelife.tech";
 const tiktokBLT = "https://www.tiktok.com/@bluelife.tech";
 const instagramBLT = "https://www.instagram.com/bluelife.tech";
 const youtubeBLT = "https://www.youtube.com/@bluelife-tech";
-const whatsappWPURL = "https://wa.me/22960330478";
+const whatsappDSURL = "https://wa.me/22960330478";
 const dressurConditionUtilisation = "https://dressur.online/condition.html";
 const dressurPolitiqueConfidentialite = "https://dressur.online/politique.html";
 const dressurUrlPlaystore =
@@ -28,7 +28,7 @@ const primaryColor = Color(0xFF2a4b9a);
 const secondaryColor = Colors.indigoAccent;
 const databaseSqlCode = """
   CREATE TABLE userInfos(
-    idWP INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+    idDS INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
     tableName TEXT,
     id INTEGER,
     uid TEXT,
@@ -42,7 +42,7 @@ const databaseSqlCode = """
   )
 """;
 
-List<dynamic> contactsUserBeforeWP = [];
+List<dynamic> contactsUserBeforeDS = [];
 List<dynamic> contactsEnregistrer = [];
 String? langUserPhone = "en";
 String preferencePaysText = "";
@@ -165,7 +165,7 @@ void insertDressurContact() async {
       ..phones = [Phone("+22960330478")]
       ..emails = [Email("dressur@gmail.com")]
       ..websites = [
-        Website(facebookWP),
+        Website(facebookDS),
         Website(facebookBLT),
         Website(tiktokBLT),
         Website(instagramBLT),

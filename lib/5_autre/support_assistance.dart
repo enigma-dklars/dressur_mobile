@@ -90,7 +90,7 @@ class SupportPage extends StatelessWidget {
                             : "Contact us on WhatsApp",
                       ),
                       onPressed: () async {
-                        final Uri _url = Uri.parse(whatsappWPURL);
+                        final Uri _url = Uri.parse(whatsappDSURL);
                         if (!await launchUrl(_url,
                             mode: LaunchMode.externalApplication)) {
                           throw 'Could not launch $_url';

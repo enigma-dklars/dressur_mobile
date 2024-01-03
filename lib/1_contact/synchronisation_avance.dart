@@ -35,14 +35,14 @@ class _PageDepartState extends State<PageDepart> {
     setState(() {
       _enCour = true;
       if (langUserPhone != "fr") {
-        textChargementEvolution = "Finding your WP Contacts.";
+        textChargementEvolution = "Finding your DS Contacts.";
       } else {
-        textChargementEvolution = "Recherche de vos Contacts WP.";
+        textChargementEvolution = "Recherche de vos Contacts DS.";
       }
     });
 
     final url =
-        Uri.parse('$generalRouteForApi/listContactWP/$uidUser/$langUserPhone');
+        Uri.parse('$generalRouteForApi/listContactDS/$uidUser/$langUserPhone');
     final response = await http.get(url);
     if (response.statusCode == 200) {
       final jsonData = jsonDecode(response.body) as List<dynamic>;
@@ -106,30 +106,30 @@ class _PageDepartState extends State<PageDepart> {
         setState(() {
           countContacts == 0;
           if (langUserPhone != "fr") {
-            textChargementEvolution = "Missing WP contact record ...";
+            textChargementEvolution = "Missing DS contact record ...";
           } else {
             textChargementEvolution =
-                "Enregistrement des contacts WP manquant ...";
+                "Enregistrement des contacts DS manquant ...";
           }
         });
 
-        int contactsWPExistant = 0;
+        int contactsDSExistant = 0;
         for (var contact in jsonData) {
           if ((await SQLHelper.getOneNumsTelUser(contact['tel'])).isEmpty) {
             final newContact = Contact()
-              ..name.first = contact["pseudo"] + " #WP"
+              ..name.first = contact["pseudo"] + " #DS"
               ..phones = [Phone(contact["tel"])];
             await newContact.insert();
             await insertNumTelUserIntoDataBase(contact["tel"]);
           }
           setState(() {
-            contactsWPExistant++;
+            contactsDSExistant++;
             if (langUserPhone != "fr") {
               textChargementEvolution =
-                  "Missing WP contact record ...\n$contactsWPExistant / ${jsonData.length}";
+                  "Missing DS contact record ...\n$contactsDSExistant / ${jsonData.length}";
             } else {
               textChargementEvolution =
-                  "Enregistrement des contacts WP manquant ...\n$contactsWPExistant / ${jsonData.length}";
+                  "Enregistrement des contacts DS manquant ...\n$contactsDSExistant / ${jsonData.length}";
             }
           });
         }
@@ -147,10 +147,10 @@ class _PageDepartState extends State<PageDepart> {
           _enCour = false;
           if (langUserPhone != "fr") {
             textChargementEvolution =
-                "You don't have any WP contacts, so an advanced synchronization cannot be done.";
+                "You don't have any DS contacts, so an advanced synchronization cannot be done.";
           } else {
             textChargementEvolution =
-                "Vous n'avez aucun contact WP, une synchronisation avancée ne peut donc pas se faire.";
+                "Vous n'avez aucun contact DS, une synchronisation avancée ne peut donc pas se faire.";
           }
         });
       }

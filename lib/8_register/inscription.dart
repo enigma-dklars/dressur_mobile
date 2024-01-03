@@ -136,7 +136,7 @@ class _RegisterFormState extends State<RegisterForm> {
       });
 
       var request = http.MultipartRequest(
-          'POST', Uri.parse('$generalRouteForApi/inscriptionWP'));
+          'POST', Uri.parse('$generalRouteForApi/inscriptionDS'));
       request.fields.addAll({
         'langUserPhone': langUserPhone.toString(),
         'pseudo': pseudo,

@@ -23,7 +23,7 @@ class _ReconnaissanceContactState extends State<ReconnaissanceContact> {
 
   Future<void> synchroAvanceFunction() async {
     setState(() {
-      contactsUserBeforeWP = [];
+      contactsUserBeforeDS = [];
       _enCour = true;
       if (langUserPhone != "fr") {
         textChargementEvolution = "Recognition of existing contacts ...";
@@ -54,8 +54,8 @@ class _ReconnaissanceContactState extends State<ReconnaissanceContact> {
         var nameTel = "${contact.name.first} ${contact.name.last}";
         var displayNameTel = contact.displayName;
         var numberTel = (phone.number).replaceAll(" ", "").replaceAll("-", "");
-        if (!contactsUserBeforeWP.contains(numberTel)) {
-          contactsUserBeforeWP.add({
+        if (!contactsUserBeforeDS.contains(numberTel)) {
+          contactsUserBeforeDS.add({
             "nameTel": nameTel,
             "displayNameTel": displayNameTel,
             "numberTel": numberTel,
@@ -81,7 +81,7 @@ class _ReconnaissanceContactState extends State<ReconnaissanceContact> {
     var request = http.MultipartRequest(
         'POST', Uri.parse('$generalRouteForApi/stockerUserContacts'));
     request.fields
-        .addAll({'contactsUserBeforeWP': jsonEncode(contactsUserBeforeWP)});
+        .addAll({'contactsUserBeforeDS': jsonEncode(contactsUserBeforeDS)});
     // http.StreamedResponse response = await request.send();
     await request.send();
 

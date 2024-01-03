@@ -7,7 +7,7 @@ import 'package:dressur/components/constant.dart';
 import 'package:http/http.dart' as http;
 import 'package:dressur/components/profile_menu_reseau.dart';
 
-class ContactWP {
+class ContactDS {
   final String id;
   final String pseudo;
   final String nom;
@@ -21,7 +21,7 @@ class ContactWP {
   final String facebook;
   final String youtube;
 
-  ContactWP({
+  ContactDS({
     required this.id,
     required this.pseudo,
     required this.nom,
@@ -44,15 +44,15 @@ class ListeNotification extends StatefulWidget {
 
 class _ListeNotificationState extends State<ListeNotification> {
   bool _loading = false;
-  List<ContactWP> _contacts = [];
+  List<ContactDS> _contacts = [];
 
-  Future<void> fetchContactWPs() async {
+  Future<void> fetchContactDSs() async {
     setState(() {
       _loading = true;
       nombreContacts = 0;
     });
     final url =
-        Uri.parse('$generalRouteForApi/listContactWP/$uidUser/$langUserPhone');
+        Uri.parse('$generalRouteForApi/listContactDS/$uidUser/$langUserPhone');
 
     final response = await http.get(url);
 
@@ -60,7 +60,7 @@ class _ListeNotificationState extends State<ListeNotification> {
       final jsonData = jsonDecode(response.body) as List<dynamic>;
 
       final contacts = jsonData.map((data) {
-        return ContactWP(
+        return ContactDS(
           id: data['id'],
           pseudo: data['pseudo'],
           nom: data['nom'],
@@ -113,7 +113,7 @@ class _ListeNotificationState extends State<ListeNotification> {
   @override
   void initState() {
     super.initState();
-    // fetchContactWPs();
+    // fetchContactDSs();
   }
 
   Widget build(BuildContext context) {
@@ -131,7 +131,7 @@ class _ListeNotificationState extends State<ListeNotification> {
               PopupMenuItem(
                 value: 1,
                 onTap: () {
-                  _loading ? '' : fetchContactWPs();
+                  _loading ? '' : fetchContactDSs();
                 },
                 child: Row(
                   children: [
@@ -307,7 +307,7 @@ class _ListeNotificationState extends State<ListeNotification> {
 }
 
 class ContactDetailPage extends StatelessWidget {
-  final ContactWP contact;
+  final ContactDS contact;
 
   ContactDetailPage({required this.contact});
 

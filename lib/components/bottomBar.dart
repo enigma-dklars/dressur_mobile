@@ -21,12 +21,12 @@ class _BottomBarState extends State<BottomBar> {
   int _selectedIndex = 2;
   bool lang_en = false;
   dynamic screens = [];
-  Future<void> fetchContactWPs() async {
+  Future<void> fetchContactDSs() async {
     setState(() {
       contactsEnregistrer = [];
     });
     final url =
-        Uri.parse('$generalRouteForApi/listContactWP/$uidUser/$langUserPhone');
+        Uri.parse('$generalRouteForApi/listContactDS/$uidUser/$langUserPhone');
     final response = await http.get(url);
     if (response.statusCode == 200) {
       final jsonData = jsonDecode(response.body) as List<dynamic>;
@@ -40,7 +40,7 @@ class _BottomBarState extends State<BottomBar> {
           }
           if ((await SQLHelper.getOneNumsTelUser(contact['tel'])).isEmpty) {
             final newContact = Contact()
-              ..name.first = contact["pseudo"] + " #WP"
+              ..name.first = contact["pseudo"] + " #DS"
               ..phones = [Phone(contact["tel"])];
             await newContact.insert();
             await insertNumTelUserIntoDataBase(contact["tel"]);
@@ -65,7 +65,7 @@ class _BottomBarState extends State<BottomBar> {
     super.initState();
     // SQLHelper.viderLaBaseDeDonneeLocalTelUser();
     initNavigationTitle();
-    fetchContactWPs();
+    fetchContactDSs();
   }
 
   @override

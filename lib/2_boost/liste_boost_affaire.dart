@@ -554,7 +554,7 @@ class _PaymentGratuitPageState extends State<PaymentGratuitPage> {
     setState(() {
       idFormulBoost = val;
       _message =
-          "Cette formule vous offre une promotion de $jours jour(s) pour $prix WP qui seront déduit de votre solde WP.";
+          "Cette formule vous offre une promotion de $jours jour(s) pour $prix DS qui seront déduit de votre solde DS.";
     });
   }
 

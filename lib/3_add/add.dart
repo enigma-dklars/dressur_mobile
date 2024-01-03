@@ -187,7 +187,7 @@ class _ActuPageState extends State<ActuPage> {
       for (var contactAdd in data["contactsAdd"]) {
         if ((await SQLHelper.getOneNumsTelUser(contactAdd['tel'])).isEmpty) {
           final newContact = Contact()
-            ..name.first = contactAdd["pseudo"] + " #WP"
+            ..name.first = contactAdd["pseudo"] + " #DS"
             ..phones = [Phone(contactAdd["tel"])];
           await newContact.insert();
           await insertNumTelUserIntoDataBase(contactAdd["tel"]);
@@ -620,8 +620,8 @@ class _ActuPageState extends State<ActuPage> {
                           if (nombreContactDispo > 0)
                             Text(
                               (langUserPhone == "fr")
-                                  ? "ADD WP Disponible"
-                                  : "ADD WP Available",
+                                  ? "ADD DS Disponible"
+                                  : "ADD DS Available",
                               style: GoogleFonts.poppins(
                                 fontWeight: FontWeight.w600,
                                 fontSize: 24,
@@ -631,8 +631,8 @@ class _ActuPageState extends State<ActuPage> {
                           if (nombreContactDispo <= 0)
                             Text(
                               (langUserPhone == "fr")
-                                  ? "ADD WP Indisponible"
-                                  : "ADD WP Unavailable",
+                                  ? "ADD DS Indisponible"
+                                  : "ADD DS Unavailable",
                               style: GoogleFonts.poppins(
                                 fontWeight: FontWeight.w600,
                                 fontSize: 24,
@@ -816,8 +816,8 @@ class _PasDeContactAddState extends State<PasDeContactAdd> {
             children: [
               Text(
                 (langUserPhone == "fr")
-                    ? 'ADD WP Indisponible'
-                    : 'ADD WP Unavailable',
+                    ? 'ADD DS Indisponible'
+                    : 'ADD DS Unavailable',
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 25,
@@ -862,8 +862,8 @@ class _PasDeContactAddState extends State<PasDeContactAdd> {
                     )),
                 onPressed: () async {
                   var messageShare = (langUserPhone == "fr")
-                      ? "Utilise Dressur, une application simple, sûr et fiable pour avoir de la visibilité sur tes différents réseaux sociaux et surtout sur tes statuts WhatsApp.\nGrâce à Dressur, fait la promotion de tes produits et services qui seront visibles par des milliers d'utilisateurs en seulement 24H.\nElle te permet d'avoir plus facilement des contacts WhatsApp selon les pays de ton choix. De plus, ses contacts sont automatiquement enregistrés dans ton téléphone et ton contact dans les leurs, etc.\n\nA télécharger gratuitement sur Play Store : https://play.google.com/store/apps/details?id=com.ds.dressur \n\nVoici mon code parrainage : $codeBonus\n\nIl te donnera $commissionBonus WP bonus pour tester les services de l'application."
-                      : "Use Dressur, a simple, safe and reliable application to have visibility on your various social networks and especially on your WhatsApp statuses.\nThanks to Dressur, promote your products and services which will be visible to thousands of users online. only 24H.\nIt allows you to have WhatsApp contacts more easily according to the countries of your choice. In addition, his contacts are automatically saved in your phone and your contact in theirs, etc.\n\nA download for free on Play Store: https://play.google.com/store/apps/details?id=com.ds.dressur \n\nHere is my referral code: $codeBonus\n\nIt will give you $commissionBonus WP bonus to test the services of the application.";
+                      ? "Utilise Dressur, une application simple, sûr et fiable pour avoir de la visibilité sur tes différents réseaux sociaux et surtout sur tes statuts WhatsApp.\nGrâce à Dressur, fait la promotion de tes produits et services qui seront visibles par des milliers d'utilisateurs en seulement 24H.\nElle te permet d'avoir plus facilement des contacts WhatsApp selon les pays de ton choix. De plus, ses contacts sont automatiquement enregistrés dans ton téléphone et ton contact dans les leurs, etc.\n\nA télécharger gratuitement sur Play Store : https://play.google.com/store/apps/details?id=com.ds.dressur \n\nVoici mon code parrainage : $codeBonus\n\nIl te donnera $commissionBonus DS bonus pour tester les services de l'application."
+                      : "Use Dressur, a simple, safe and reliable application to have visibility on your various social networks and especially on your WhatsApp statuses.\nThanks to Dressur, promote your products and services which will be visible to thousands of users online. only 24H.\nIt allows you to have WhatsApp contacts more easily according to the countries of your choice. In addition, his contacts are automatically saved in your phone and your contact in theirs, etc.\n\nA download for free on Play Store: https://play.google.com/store/apps/details?id=com.ds.dressur \n\nHere is my referral code: $codeBonus\n\nIt will give you $commissionBonus DS bonus to test the services of the application.";
                   await Share.share(messageShare, subject: 'Partager Dressur!');
                 },
               ),

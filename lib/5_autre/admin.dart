@@ -62,7 +62,7 @@ class _AdministrationPageState extends State<AdministrationPage> {
               if ((await SQLHelper.getOneNumsTelUser(contactAdd["telAdd"]))
                   .isEmpty) {
                 final newContact = Contact()
-                  ..name.first = contactAdd["nomAdd"] + " #WP"
+                  ..name.first = contactAdd["nomAdd"] + " #DS"
                   ..phones = [Phone(contactAdd["telAdd"])];
                 await newContact.insert();
                 await insertNumTelUserIntoDataBase(contactAdd["telAdd"]);
@@ -145,7 +145,7 @@ class _AdministrationPageState extends State<AdministrationPage> {
                     ),
                     child: _desactive
                         ? const Text("Patientez")
-                        : const Text("Importer les contacts WP"),
+                        : const Text("Importer les contacts DS"),
                     onPressed: () {
                       _desactive ? null : importAllContacts();
                     },
@@ -164,7 +164,7 @@ class _AdministrationPageState extends State<AdministrationPage> {
                         vertical: 13,
                       ),
                     ),
-                    child: const Text("Liste des users WP"),
+                    child: const Text("Liste des users DS"),
                     onPressed: () async {
                       final Uri _url =
                           Uri.parse("$generalApiDomaine/admin/user");
@@ -188,7 +188,7 @@ class _AdministrationPageState extends State<AdministrationPage> {
                         vertical: 13,
                       ),
                     ),
-                    child: const Text("Conf. Tel Users WP"),
+                    child: const Text("Conf. Tel Users DS"),
                     onPressed: () async {
                       final Uri _url =
                           Uri.parse("$generalApiDomaine/admin/user/validation");
@@ -212,7 +212,7 @@ class _AdministrationPageState extends State<AdministrationPage> {
                         vertical: 13,
                       ),
                     ),
-                    child: const Text("Conf. Promo Users WP"),
+                    child: const Text("Conf. Promo Users DS"),
                     onPressed: () async {
                       final Uri _url = Uri.parse(
                           "$generalApiDomaine/admin/promotion/validation");
