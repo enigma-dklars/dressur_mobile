@@ -2,29 +2,28 @@ import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
-import 'package:whatsperson/components/sql_helper.dart';
+import 'package:dressur/components/sql_helper.dart';
 
 const versionApp = '1.10.0';
-const oldDatabaseName = 'un_whatsperson.db';
-const nowDataBaseName = 'deux_whatsperson.db';
-// const generalApiDomaine = 'http://whatsperson.rf.gd/public';
+const oldDatabaseName = 'un_dressur.db';
+const nowDataBaseName = 'deux_dressur.db';
+// const generalApiDomaine = 'http://dressur.rf.gd/public';
 // const generalApiDomaine = 'http://192.168.100.14:8000';
-const generalApiDomaine = 'http://192.168.100.14:8001';
+const generalApiDomaine = 'http://192.168.100.14:8000';
 const generalRouteForApi = '$generalApiDomaine/api';
 const generalRouteForPromotionImage = '$generalApiDomaine/promotion/';
 
-const facebookWP = "https://www.facebook.com/whatspersonWP";
+const facebookWP = "https://www.facebook.com/dressurWP";
 const facebookBLT = "https://www.facebook.com/bluelife.tech";
 const tiktokBLT = "https://www.tiktok.com/@bluelife.tech";
 const instagramBLT = "https://www.instagram.com/bluelife.tech";
 const youtubeBLT = "https://www.youtube.com/@bluelife-tech";
 const whatsappWPURL = "https://wa.me/22960330478";
-const whatsPersonConditionUtilisation =
-    "https://whatsperson.online/condition.html";
-const whatsPersonPolitiqueConfidentialite =
-    "https://whatsperson.online/politique.html";
-const whatsPersonUrlPlaystore =
-    "https://play.google.com/store/apps/details?id=com.wp.whatsperson";
+const dressurConditionUtilisation = "https://dressur.online/condition.html";
+const dressurPolitiqueConfidentialite =
+    "https://dressur.online/politique.html";
+const dressurUrlPlaystore =
+    "https://play.google.com/store/apps/details?id=com.ds.dressur";
 
 const primaryColor = Colors.indigo;
 const secondaryColor = Colors.indigoAccent;
@@ -159,13 +158,13 @@ Future<void> initUserInformations(userInfos) async {
   });
 }
 
-void insertWhatsPersonContact() async {
+void insertDressurContact() async {
   if ((await SQLHelper.getOneNumsTelUser("+22960330478")).isEmpty) {
     final newContact = Contact()
       ..isStarred = true
-      ..name.first = "WhatsPerson Assistance ✅"
+      ..name.first = "Dressur Assistance ✅"
       ..phones = [Phone("+22960330478")]
-      ..emails = [Email("whatsperson@gmail.com")]
+      ..emails = [Email("dressur@gmail.com")]
       ..websites = [
         Website(facebookWP),
         Website(facebookBLT),

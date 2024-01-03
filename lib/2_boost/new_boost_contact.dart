@@ -2,13 +2,13 @@
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:whatsperson/components/delayed_animation.dart';
-import 'package:whatsperson/components/constant.dart';
+import 'package:dressur/components/delayed_animation.dart';
+import 'package:dressur/components/constant.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
-import 'package:whatsperson/components/sql_helper.dart';
+import 'package:dressur/components/sql_helper.dart';
 import 'package:select_form_field/select_form_field.dart';
-import 'package:whatsperson/components/noti.dart';
+import 'package:dressur/components/noti.dart';
 
 class NewBoostContactPage extends StatefulWidget {
   @override
@@ -769,8 +769,8 @@ class _RegisterForm2State extends State<RegisterForm2> {
             delay: 0, // 1500,
             child: Text(
               (langUserPhone != "fr")
-                  ? "Pour payer par Wave ou Carte Bancaire, veuillez contacter l'Assistance WhatsPerson par WhatsApp. Merci..."
-                  : "To pay by Wave or Credit Card, please contact WhatsPerson Support by WhatsApp. THANKS...",
+                  ? "Pour payer par Wave ou Carte Bancaire, veuillez contacter l'Assistance Dressur par WhatsApp. Merci..."
+                  : "To pay by Wave or Credit Card, please contact Dressur Support by WhatsApp. THANKS...",
               style: GoogleFonts.poppins(
                 fontWeight: FontWeight.w600,
                 fontSize: 12,

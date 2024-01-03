@@ -2,15 +2,15 @@
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:whatsperson/components/delayed_animation.dart';
-import 'package:whatsperson/components/constant.dart';
+import 'package:dressur/components/delayed_animation.dart';
+import 'package:dressur/components/constant.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
-import 'package:whatsperson/components/sql_helper.dart';
+import 'package:dressur/components/sql_helper.dart';
 import 'package:flutter/services.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:whatsperson/components/noti.dart';
-import 'package:whatsperson/5_autre/support_assistance.dart';
+import 'package:dressur/components/noti.dart';
+import 'package:dressur/5_autre/support_assistance.dart';
 
 class AddFriendPage extends StatefulWidget {
   AddFriendPage({Key? key}) : super(key: key);
@@ -572,10 +572,9 @@ class _FormParrainState extends State<FormParrain> {
                 ),
                 onPressed: () async {
                   var messageShare = (langUserPhone == "fr")
-                      ? "Utilise WhatsPerson, une application simple, sûr et fiable pour avoir de la visibilité sur tes différents réseaux sociaux et surtout sur tes statuts WhatsApp.\nGrâce à WhatsPerson, fait la promotion de tes produits et services qui seront visibles par des milliers d'utilisateurs en seulement 24H.\nElle te permet d'avoir plus facilement des contacts WhatsApp selon les pays de ton choix. De plus, ses contacts sont automatiquement enregistrés dans ton téléphone et ton contact dans les leurs, etc.\n\nA télécharger gratuitement sur Play Store : https://play.google.com/store/apps/details?id=com.wp.whatsperson\n\nVoici mon code parrainage : $codeBonus\n\nIl te donnera $commissionBonus WP bonus pour tester les services de l'application."
-                      : "Use WhatsPerson, a simple, safe and reliable application to have visibility on your various social networks and especially on your WhatsApp statuses.\nThanks to WhatsPerson, promote your products and services which will be visible to thousands of users in just 24 hours.\nIt makes it easier for you to have WhatsApp contacts according to the countries of your choice. In addition, its contacts are automatically saved in your phone and your contact in theirs, etc.\n\nA download for free on Play Store: https://play.google.com/store/apps/details?id=com.wp.whatsperson\n\nHere is my referral code: $codeBonus\n\nIt will give you $commissionBonus WP bonus to test the services of the app.";
-                  await Share.share(messageShare,
-                      subject: 'Partager WhatsPerson!');
+                      ? "Utilise Dressur, une application simple, sûr et fiable pour avoir de la visibilité sur tes différents réseaux sociaux et surtout sur tes statuts WhatsApp.\nGrâce à Dressur, fait la promotion de tes produits et services qui seront visibles par des milliers d'utilisateurs en seulement 24H.\nElle te permet d'avoir plus facilement des contacts WhatsApp selon les pays de ton choix. De plus, ses contacts sont automatiquement enregistrés dans ton téléphone et ton contact dans les leurs, etc.\n\nA télécharger gratuitement sur Play Store : https://play.google.com/store/apps/details?id=com.ds.dressur\n\nVoici mon code parrainage : $codeBonus\n\nIl te donnera $commissionBonus WP bonus pour tester les services de l'application."
+                      : "Use Dressur, a simple, safe and reliable application to have visibility on your various social networks and especially on your WhatsApp statuses.\nThanks to Dressur, promote your products and services which will be visible to thousands of users in just 24 hours.\nIt makes it easier for you to have WhatsApp contacts according to the countries of your choice. In addition, its contacts are automatically saved in your phone and your contact in theirs, etc.\n\nA download for free on Play Store: https://play.google.com/store/apps/details?id=com.ds.dressur\n\nHere is my referral code: $codeBonus\n\nIt will give you $commissionBonus WP bonus to test the services of the app.";
+                  await Share.share(messageShare, subject: 'Partager Dressur!');
                 },
               ),
             ),

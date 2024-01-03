@@ -1,4 +1,4 @@
-import 'package:whatsperson/components/constant.dart';
+import 'package:dressur/components/constant.dart';
 import 'package:flutter/foundation.dart';
 import 'package:sqflite/sqflite.dart' as sql;
 

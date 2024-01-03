@@ -2,8 +2,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:whatsperson/5_autre/support_assistance.dart';
-import 'package:whatsperson/components/constant.dart';
+import 'package:dressur/5_autre/support_assistance.dart';
+import 'package:dressur/components/constant.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
 

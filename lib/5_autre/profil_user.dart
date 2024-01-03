@@ -2,12 +2,12 @@
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:whatsperson/components/delayed_animation.dart';
-import 'package:whatsperson/components/constant.dart';
+import 'package:dressur/components/delayed_animation.dart';
+import 'package:dressur/components/constant.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
-import 'package:whatsperson/components/sql_helper.dart';
-import 'package:whatsperson/components/noti.dart';
+import 'package:dressur/components/sql_helper.dart';
+import 'package:dressur/components/noti.dart';
 
 class ProfilPage extends StatelessWidget {
   @override
@@ -45,7 +45,9 @@ class ProfilPage extends StatelessWidget {
                   ),
                   const SizedBox(height: 10),
                   Text(
-                    (langUserPhone == "fr") ? "Modifiez et complétez vos informations." : "Edit and complete your information.",
+                    (langUserPhone == "fr")
+                        ? "Modifiez et complétez vos informations."
+                        : "Edit and complete your information.",
                     style: GoogleFonts.poppins(
                       color: Colors.grey,
                       fontSize: 16,
@@ -249,7 +251,9 @@ class _RegisterFormState extends State<RegisterForm> {
             controller: nameController,
             decoration: InputDecoration(
               labelStyle: TextStyle(color: Colors.grey[400]),
-              labelText: (langUserPhone == "fr") ? 'Nom & Prénom(s)' : "Last name and First Name",
+              labelText: (langUserPhone == "fr")
+                  ? 'Nom & Prénom(s)'
+                  : "Last name and First Name",
               border: const OutlineInputBorder(),
             ),
           ),
@@ -258,7 +262,8 @@ class _RegisterFormState extends State<RegisterForm> {
             controller: tiktokController,
             decoration: InputDecoration(
               labelStyle: TextStyle(color: Colors.grey[400]),
-              labelText: (langUserPhone == "fr") ? 'Lien TikTok' :  'TikTok Link',
+              labelText:
+                  (langUserPhone == "fr") ? 'Lien TikTok' : 'TikTok Link',
               border: const OutlineInputBorder(),
             ),
           ),
@@ -267,7 +272,8 @@ class _RegisterFormState extends State<RegisterForm> {
             controller: instagramController,
             decoration: InputDecoration(
               labelStyle: TextStyle(color: Colors.grey[400]),
-              labelText: (langUserPhone == "fr") ? 'Lien Instagram' : 'Instagram Link',
+              labelText:
+                  (langUserPhone == "fr") ? 'Lien Instagram' : 'Instagram Link',
               border: const OutlineInputBorder(),
             ),
           ),
@@ -276,7 +282,8 @@ class _RegisterFormState extends State<RegisterForm> {
             controller: facebookController,
             decoration: InputDecoration(
               labelStyle: TextStyle(color: Colors.grey[400]),
-              labelText: (langUserPhone == "fr") ? 'Lien FaceBook' : 'FaceBook Link',
+              labelText:
+                  (langUserPhone == "fr") ? 'Lien FaceBook' : 'FaceBook Link',
               border: const OutlineInputBorder(),
             ),
           ),
@@ -285,7 +292,8 @@ class _RegisterFormState extends State<RegisterForm> {
             controller: youtubeController,
             decoration: InputDecoration(
               labelStyle: TextStyle(color: Colors.grey[400]),
-              labelText: (langUserPhone == "fr") ? 'Lien Youtube' : 'Youtube Link',
+              labelText:
+                  (langUserPhone == "fr") ? 'Lien Youtube' : 'Youtube Link',
               border: const OutlineInputBorder(),
             ),
           ),
@@ -295,7 +303,8 @@ class _RegisterFormState extends State<RegisterForm> {
             controller: aproposController,
             decoration: InputDecoration(
               labelStyle: TextStyle(color: Colors.grey[400]),
-              labelText: (langUserPhone == "fr") ? 'A propos de vous' : 'About you',
+              labelText:
+                  (langUserPhone == "fr") ? 'A propos de vous' : 'About you',
               border: const OutlineInputBorder(),
             ),
           ),
@@ -314,7 +323,7 @@ class _RegisterFormState extends State<RegisterForm> {
                 ),
                 child: _desactive
                     ? const Text("Wait...")
-                    :  Text((langUserPhone == "fr") ? "ENREGISTRER" : "SAVED"),
+                    : Text((langUserPhone == "fr") ? "ENREGISTRER" : "SAVED"),
                 onPressed: () {
                   _desactive
                       ? null

@@ -4,18 +4,18 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:whatsperson/5_autre/confirme_mail_user.dart';
-import 'package:whatsperson/6_notification/liste_notification.dart';
-import 'package:whatsperson/components/advertisements.dart';
-import 'package:whatsperson/components/constant.dart';
-import 'package:whatsperson/components/noti.dart';
+import 'package:dressur/5_autre/confirme_mail_user.dart';
+import 'package:dressur/6_notification/liste_notification.dart';
+import 'package:dressur/components/advertisements.dart';
+import 'package:dressur/components/constant.dart';
+import 'package:dressur/components/noti.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:whatsperson/components/sociaux.dart';
-import 'package:whatsperson/components/sql_helper.dart';
-import 'package:whatsperson/5_autre/support_assistance.dart';
+import 'package:dressur/components/sociaux.dart';
+import 'package:dressur/components/sql_helper.dart';
+import 'package:dressur/5_autre/support_assistance.dart';
 import 'liste_contact_add_disponible.dart';
 
 class ActuPage extends StatefulWidget {
@@ -415,8 +415,8 @@ class _ActuPageState extends State<ActuPage> {
                               const SizedBox(height: 10),
                               Text(
                                 (langUserPhone == "fr")
-                                    ? "NB: WhatsPerson ne peut garantir la bonne volonté et l'intégrité de tous ses utilisateurs, nous souhaitons attirer votre attention sur la question importante de la sécurité en ligne.\nMalheureusement, il existe des individus malveillants qui cherchent à arnaquer les utilisateurs innocents. Ensemble, nous pouvons prévenir les arnaques. Soyez vigilants, restez en sécurité. Signalez tous comportements que vous trouvez suspect."
-                                    : "NB: WhatsPerson cannot guarantee the goodwill and integrity of all of its users, we would like to draw your attention to the important issue of online security.\nUnfortunately, there are malicious individuals out there who seek to scam innocent users. Together we can prevent scams. Be vigilant, stay safe. Report any behavior you find suspicious.",
+                                    ? "NB: Dressur ne peut garantir la bonne volonté et l'intégrité de tous ses utilisateurs, nous souhaitons attirer votre attention sur la question importante de la sécurité en ligne.\nMalheureusement, il existe des individus malveillants qui cherchent à arnaquer les utilisateurs innocents. Ensemble, nous pouvons prévenir les arnaques. Soyez vigilants, restez en sécurité. Signalez tous comportements que vous trouvez suspect."
+                                    : "NB: Dressur cannot guarantee the goodwill and integrity of all of its users, we would like to draw your attention to the important issue of online security.\nUnfortunately, there are malicious individuals out there who seek to scam innocent users. Together we can prevent scams. Be vigilant, stay safe. Report any behavior you find suspicious.",
                                 style: GoogleFonts.poppins(
                                   fontWeight: FontWeight.w600,
                                   fontSize: 16,
@@ -837,8 +837,8 @@ class _PasDeContactAddState extends State<PasDeContactAdd> {
               const SizedBox(height: 10),
               Text(
                 (langUserPhone == "fr")
-                    ? "Partager votre code de parrainage pour avoir plus de filleuls et surtout accompagner ses derniers durant tout le long du processus. Assurez-vous que vos filleuls ont utilisé votre code de parrainage et qu'ils ont compris comment fonctionne l'application WhatsPerson."
-                    : "Share your sponsorship code to have more referrals and above all to accompany them throughout the process. Make sure your referrals have used your referral code and understood how the WhatsPerson app works.",
+                    ? "Partager votre code de parrainage pour avoir plus de filleuls et surtout accompagner ses derniers durant tout le long du processus. Assurez-vous que vos filleuls ont utilisé votre code de parrainage et qu'ils ont compris comment fonctionne l'application Dressur."
+                    : "Share your sponsorship code to have more referrals and above all to accompany them throughout the process. Make sure your referrals have used your referral code and understood how the Dressur app works.",
                 style: const TextStyle(
                   color: Colors.white,
                   fontSize: 16,
@@ -862,10 +862,9 @@ class _PasDeContactAddState extends State<PasDeContactAdd> {
                     )),
                 onPressed: () async {
                   var messageShare = (langUserPhone == "fr")
-                      ? "Utilise WhatsPerson, une application simple, sûr et fiable pour avoir de la visibilité sur tes différents réseaux sociaux et surtout sur tes statuts WhatsApp.\nGrâce à WhatsPerson, fait la promotion de tes produits et services qui seront visibles par des milliers d'utilisateurs en seulement 24H.\nElle te permet d'avoir plus facilement des contacts WhatsApp selon les pays de ton choix. De plus, ses contacts sont automatiquement enregistrés dans ton téléphone et ton contact dans les leurs, etc.\n\nA télécharger gratuitement sur Play Store : https://play.google.com/store/apps/details?id=com.wp.whatsperson \n\nVoici mon code parrainage : $codeBonus\n\nIl te donnera $commissionBonus WP bonus pour tester les services de l'application."
-                      : "Use WhatsPerson, a simple, safe and reliable application to have visibility on your various social networks and especially on your WhatsApp statuses.\nThanks to WhatsPerson, promote your products and services which will be visible to thousands of users online. only 24H.\nIt allows you to have WhatsApp contacts more easily according to the countries of your choice. In addition, his contacts are automatically saved in your phone and your contact in theirs, etc.\n\nA download for free on Play Store: https://play.google.com/store/apps/details?id=com.wp.whatsperson \n\nHere is my referral code: $codeBonus\n\nIt will give you $commissionBonus WP bonus to test the services of the application.";
-                  await Share.share(messageShare,
-                      subject: 'Partager WhatsPerson!');
+                      ? "Utilise Dressur, une application simple, sûr et fiable pour avoir de la visibilité sur tes différents réseaux sociaux et surtout sur tes statuts WhatsApp.\nGrâce à Dressur, fait la promotion de tes produits et services qui seront visibles par des milliers d'utilisateurs en seulement 24H.\nElle te permet d'avoir plus facilement des contacts WhatsApp selon les pays de ton choix. De plus, ses contacts sont automatiquement enregistrés dans ton téléphone et ton contact dans les leurs, etc.\n\nA télécharger gratuitement sur Play Store : https://play.google.com/store/apps/details?id=com.ds.dressur \n\nVoici mon code parrainage : $codeBonus\n\nIl te donnera $commissionBonus WP bonus pour tester les services de l'application."
+                      : "Use Dressur, a simple, safe and reliable application to have visibility on your various social networks and especially on your WhatsApp statuses.\nThanks to Dressur, promote your products and services which will be visible to thousands of users online. only 24H.\nIt allows you to have WhatsApp contacts more easily according to the countries of your choice. In addition, his contacts are automatically saved in your phone and your contact in theirs, etc.\n\nA download for free on Play Store: https://play.google.com/store/apps/details?id=com.ds.dressur \n\nHere is my referral code: $codeBonus\n\nIt will give you $commissionBonus WP bonus to test the services of the application.";
+                  await Share.share(messageShare, subject: 'Partager Dressur!');
                 },
               ),
             ],

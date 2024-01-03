@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:whatsperson/7_login/connexion.dart';
-import 'package:whatsperson/8_register/inscription.dart';
-import 'package:whatsperson/components/constant.dart';
+import 'package:dressur/7_login/connexion.dart';
+import 'package:dressur/8_register/inscription.dart';
+import 'package:dressur/components/constant.dart';
 
 class PresentationPage extends StatefulWidget {
   @override
@@ -208,8 +208,7 @@ class AutrePage extends StatelessWidget {
                 children: [
                   GestureDetector(
                     onTap: () async {
-                      final Uri _url =
-                          Uri.parse(whatsPersonConditionUtilisation);
+                      final Uri _url = Uri.parse(dressurConditionUtilisation);
                       if (!await launchUrl(_url,
                           mode: LaunchMode.externalApplication)) {
                         throw 'Could not launch $_url';
@@ -230,7 +229,7 @@ class AutrePage extends StatelessWidget {
                   GestureDetector(
                     onTap: () async {
                       final Uri _url =
-                          Uri.parse(whatsPersonPolitiqueConfidentialite);
+                          Uri.parse(dressurPolitiqueConfidentialite);
                       if (!await launchUrl(_url,
                           mode: LaunchMode.externalApplication)) {
                         throw 'Could not launch $_url';

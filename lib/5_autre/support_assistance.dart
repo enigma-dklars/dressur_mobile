@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:whatsperson/components/delayed_animation.dart';
-import 'package:whatsperson/components/constant.dart';
+import 'package:dressur/components/delayed_animation.dart';
+import 'package:dressur/components/constant.dart';
 
 class SupportPage extends StatelessWidget {
   @override
@@ -64,8 +64,8 @@ class SupportPage extends StatelessWidget {
                         padding: const EdgeInsets.all(5.0),
                         child: Text(
                           (langUserPhone == "fr")
-                              ? "Nous simplifions votre quête de visibilité sur vos différents réseaux sociaux et surtout sur vos statuts WhatsApp. Grâce à WhatsPerson, faite la promotion de vos produits et services qui seront visibles par des milliers d'utilisateurs en seulement 24H.\n\nAvez-vous des questions ?"
-                              : "We simplify your quest for visibility on your various social networks and especially on your WhatsApp statuses. Thanks to WhatsPerson, promote your products and services which will be visible to thousands of users in just 24 hours.\n\nHave you questions ?",
+                              ? "Nous simplifions votre quête de visibilité sur vos différents réseaux sociaux et surtout sur vos statuts WhatsApp. Grâce à Dressur, faite la promotion de vos produits et services qui seront visibles par des milliers d'utilisateurs en seulement 24H.\n\nAvez-vous des questions ?"
+                              : "We simplify your quest for visibility on your various social networks and especially on your WhatsApp statuses. Thanks to Dressur, promote your products and services which will be visible to thousands of users in just 24 hours.\n\nHave you questions ?",
                           style: GoogleFonts.poppins(
                             fontSize: 16,
                           ),

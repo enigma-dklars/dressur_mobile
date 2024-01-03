@@ -2,15 +2,15 @@
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:whatsperson/7_login/mot_de_passe_oublier.dart';
-import 'package:whatsperson/components/delayed_animation.dart';
-import 'package:whatsperson/components/constant.dart';
-import 'package:whatsperson/components/sql_helper.dart';
+import 'package:dressur/7_login/mot_de_passe_oublier.dart';
+import 'package:dressur/components/delayed_animation.dart';
+import 'package:dressur/components/constant.dart';
+import 'package:dressur/components/sql_helper.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
-import 'package:whatsperson/components/noti.dart';
-import 'package:whatsperson/components/bottomBar.dart';
-import 'package:whatsperson/5_autre/support_assistance.dart';
+import 'package:dressur/components/noti.dart';
+import 'package:dressur/components/bottomBar.dart';
+import 'package:dressur/5_autre/support_assistance.dart';
 
 class LoginPage extends StatelessWidget {
   @override

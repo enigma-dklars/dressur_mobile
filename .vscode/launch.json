@@ -5,18 +5,18 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "whatsperson",
+            "name": "dressur",
             "request": "launch",
             "type": "dart"
         },
         {
-            "name": "whatsperson (profile mode)",
+            "name": "dressur (profile mode)",
             "request": "launch",
             "type": "dart",
             "flutterMode": "profile"
         },
         {
-            "name": "whatsperson (release mode)",
+            "name": "dressur (release mode)",
             "request": "launch",
             "type": "dart",
             "flutterMode": "release"

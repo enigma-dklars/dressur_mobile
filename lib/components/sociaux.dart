@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:whatsperson/components/constant.dart';
-import 'package:whatsperson/components/profile_menu_reseau_blanc.dart';
+import 'package:dressur/components/constant.dart';
+import 'package:dressur/components/profile_menu_reseau_blanc.dart';
 
 class SociauxPage extends StatefulWidget {
   @override

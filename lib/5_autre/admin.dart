@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:whatsperson/components/constant.dart';
+import 'package:dressur/components/constant.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
-import 'package:whatsperson/components/sql_helper.dart';
-import 'package:whatsperson/components/noti.dart';
+import 'package:dressur/components/sql_helper.dart';
+import 'package:dressur/components/noti.dart';
 
 class AdministrationPage extends StatefulWidget {
   AdministrationPage({Key? key}) : super(key: key);

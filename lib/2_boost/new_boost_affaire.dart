@@ -9,8 +9,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 import 'package:image/image.dart' as img;
-import 'package:whatsperson/components/constant.dart';
-import 'package:whatsperson/components/noti.dart';
+import 'package:dressur/components/constant.dart';
+import 'package:dressur/components/noti.dart';
 
 class PromotionFormPage extends StatefulWidget {
   @override
@@ -250,8 +250,8 @@ class _PromotionFormPageState extends State<PromotionFormPage> {
                     const SizedBox(height: 10),
                     Text(
                       (langUserPhone == "fr")
-                          ? "NB: Après avoir rempli et envoyer votre promotion, elle sera analyser par les administrateurs de WhatsPerson.\nSi votre promotion est acceptée, vous passerez au paiement et ainsi votre promotion sera visible par des milliers d'utilisateurs correspondants à vos préférences pays."
-                          : "NB: After completing and sending your promotion, it will be analyzed by the WhatsPerson administrators.\nIf your promotion is accepted, you will proceed to payment and your promotion will thus be visible to thousands of users corresponding to your country preferences.",
+                          ? "NB: Après avoir rempli et envoyer votre promotion, elle sera analyser par les administrateurs de Dressur.\nSi votre promotion est acceptée, vous passerez au paiement et ainsi votre promotion sera visible par des milliers d'utilisateurs correspondants à vos préférences pays."
+                          : "NB: After completing and sending your promotion, it will be analyzed by the Dressur administrators.\nIf your promotion is accepted, you will proceed to payment and your promotion will thus be visible to thousands of users corresponding to your country preferences.",
                       style: GoogleFonts.poppins(
                         fontWeight: FontWeight.w600,
                         color: Colors.white,

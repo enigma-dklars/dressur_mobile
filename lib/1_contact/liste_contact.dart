@@ -4,12 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:whatsperson/1_contact/synchronisation_avance.dart';
-import 'package:whatsperson/5_autre/support_assistance.dart';
-import 'package:whatsperson/6_notification/liste_notification.dart';
-import 'package:whatsperson/components/constant.dart';
+import 'package:dressur/1_contact/synchronisation_avance.dart';
+import 'package:dressur/5_autre/support_assistance.dart';
+import 'package:dressur/6_notification/liste_notification.dart';
+import 'package:dressur/components/constant.dart';
 import 'package:http/http.dart' as http;
-import 'package:whatsperson/components/profile_menu_reseau.dart';
+import 'package:dressur/components/profile_menu_reseau.dart';
 
 class ContactWP {
   final String id;

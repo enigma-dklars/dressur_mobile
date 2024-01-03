@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
-import 'package:whatsperson/components/constant.dart';
+import 'package:dressur/components/constant.dart';
 
 class Advertisement {
   final String uidUser;
@@ -171,8 +171,8 @@ class AdvertisementDetailPage extends StatelessWidget {
 
   void openWhatsAppChat() async {
     String text = (langUserPhone == "fr")
-        ? "Bonjour/Bonsoir *${advertisement.pseudoAnnonceur}*, j'ai une question concernant la promotion ci-dessous: \n\n<<${advertisement.description.substring(0, 100)}...>>\n\n*Depuis WhatsPerson.*"
-        : "Good morning or Good evening *${advertisement.pseudoAnnonceur}*, I have a question regarding the promotion below: \n\n<<${advertisement.description.substring(0, 100)}...>>\n\n*From WhatsPerson.*";
+        ? "Bonjour/Bonsoir *${advertisement.pseudoAnnonceur}*, j'ai une question concernant la promotion ci-dessous: \n\n<<${advertisement.description.substring(0, 100)}...>>\n\n*Depuis Dressur.*"
+        : "Good morning or Good evening *${advertisement.pseudoAnnonceur}*, I have a question regarding the promotion below: \n\n<<${advertisement.description.substring(0, 100)}...>>\n\n*From Dressur.*";
 
     String encodedText = Uri.encodeComponent(text);
 

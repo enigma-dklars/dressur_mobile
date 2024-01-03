@@ -3,9 +3,9 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:whatsperson/components/bottomBar.dart';
-import 'package:whatsperson/components/constant.dart';
-import 'package:whatsperson/components/sql_helper.dart';
+import 'package:dressur/components/bottomBar.dart';
+import 'package:dressur/components/constant.dart';
+import 'package:dressur/components/sql_helper.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:http/http.dart' as http;
 

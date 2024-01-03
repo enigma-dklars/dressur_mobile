@@ -2,13 +2,13 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
-import 'package:whatsperson/1_contact/liste_contact.dart';
-import 'package:whatsperson/2_boost/boost_contact_affaire.dart';
-import 'package:whatsperson/3_add/add.dart';
-import 'package:whatsperson/4_preference/preference.dart';
-import 'package:whatsperson/5_autre/menu_autre_page.dart';
-import 'package:whatsperson/components/constant.dart';
-import 'package:whatsperson/components/sql_helper.dart';
+import 'package:dressur/1_contact/liste_contact.dart';
+import 'package:dressur/2_boost/boost_contact_affaire.dart';
+import 'package:dressur/3_add/add.dart';
+import 'package:dressur/4_preference/preference.dart';
+import 'package:dressur/5_autre/menu_autre_page.dart';
+import 'package:dressur/components/constant.dart';
+import 'package:dressur/components/sql_helper.dart';
 
 class BottomBar extends StatefulWidget {
   const BottomBar({Key? key}) : super(key: key);

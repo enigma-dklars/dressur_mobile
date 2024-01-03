@@ -1,4 +1,4 @@
-package com.wp.whatsperson
+package com.ds.dressur
 
 import io.flutter.embedding.android.FlutterActivity
 

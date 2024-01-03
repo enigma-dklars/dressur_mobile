@@ -2,10 +2,10 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:whatsperson/components/delayed_animation.dart';
-import 'package:whatsperson/components/constant.dart';
-import 'package:whatsperson/components/sql_helper.dart';
-import 'package:whatsperson/components/noti.dart';
+import 'package:dressur/components/delayed_animation.dart';
+import 'package:dressur/components/constant.dart';
+import 'package:dressur/components/sql_helper.dart';
+import 'package:dressur/components/noti.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_contacts/flutter_contacts.dart';
 
@@ -160,7 +160,7 @@ class _PageDepartState extends State<PageDepart> {
   Future<void> _askPermissions([String? routeName]) async {
     PermissionStatus permissionStatus = await _getContactPermission();
     if (permissionStatus == PermissionStatus.granted) {
-      insertWhatsPersonContact();
+      insertDressurContact();
     } else {
       _handleInvalidPermissions(permissionStatus);
     }
@@ -182,12 +182,12 @@ class _PageDepartState extends State<PageDepart> {
       if (langUserPhone != "fr") {
         warningNoti(
             "Attention !",
-            "Please allow WhatsPerson to automatically save contacts to your phone.\nThis authorization is necessary to take full advantage of our features.",
+            "Please allow Dressur to automatically save contacts to your phone.\nThis authorization is necessary to take full advantage of our features.",
             context);
       } else {
         warningNoti(
             "Attention !",
-            "Veuillez autoriser WhatsPerson a enregistrer automatiquement les contacts dans votre téléphone.\nCette autorisation est nécéssaire pour profiter pleinement de nos fonctionnalités.",
+            "Veuillez autoriser Dressur a enregistrer automatiquement les contacts dans votre téléphone.\nCette autorisation est nécéssaire pour profiter pleinement de nos fonctionnalités.",
             context);
       }
     }

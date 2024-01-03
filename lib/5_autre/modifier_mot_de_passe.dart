@@ -2,13 +2,13 @@
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:whatsperson/7_login/connexion.dart';
-import 'package:whatsperson/components/delayed_animation.dart';
-import 'package:whatsperson/components/constant.dart';
+import 'package:dressur/7_login/connexion.dart';
+import 'package:dressur/components/delayed_animation.dart';
+import 'package:dressur/components/constant.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
-import 'package:whatsperson/components/sql_helper.dart';
-import 'package:whatsperson/components/noti.dart';
+import 'package:dressur/components/sql_helper.dart';
+import 'package:dressur/components/noti.dart';
 
 class ModifierMdpPage extends StatelessWidget {
   @override

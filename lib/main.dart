@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:whatsperson/9_demarage/welcome_page.dart';
-import 'package:whatsperson/components/constant.dart';
+import 'package:dressur/9_demarage/welcome_page.dart';
+import 'package:dressur/components/constant.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -20,7 +20,7 @@ class MyApp extends StatelessWidget {
       builder: (_, ThemeMode currentMode, __) {
         return MaterialApp(
           debugShowCheckedModeBanner: false,
-          title: 'WhatsPerson',
+          title: 'Dressur',
           darkTheme: ThemeData.dark(),
           themeMode: currentMode,
           home: const WelcomePage(),

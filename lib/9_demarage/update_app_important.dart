@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:whatsperson/components/constant.dart';
-import 'package:whatsperson/components/delayed_animation.dart';
+import 'package:dressur/components/constant.dart';
+import 'package:dressur/components/delayed_animation.dart';
 
 class ImportantUpdate extends StatelessWidget {
   const ImportantUpdate({Key? key}) : super(key: key);
@@ -56,7 +56,9 @@ class _PageDepartState extends State<PageDepart> {
               child: SizedBox(
                 width: MediaQuery.of(context).size.width * 0.90,
                 child: Text(
-                  (langUserPhone == "fr") ? "Une nouvelle version de WhatsPerson est disponible.\nFaite sa mise à jour pour continuer à profiter de ses merveilleux avantages.\n\n\nCliquer sur le bouton ci-dessous pour télécharger la nouvel version." : "A new version of WhatsPerson is available.\nUpdate to continue enjoying its wonderful benefits.\n\n\nClick the button below to download the new version.",
+                  (langUserPhone == "fr")
+                      ? "Une nouvelle version de Dressur est disponible.\nFaite sa mise à jour pour continuer à profiter de ses merveilleux avantages.\n\n\nCliquer sur le bouton ci-dessous pour télécharger la nouvel version."
+                      : "A new version of Dressur is available.\nUpdate to continue enjoying its wonderful benefits.\n\n\nClick the button below to download the new version.",
                   style: GoogleFonts.poppins(
                     fontWeight: FontWeight.w600,
                   ),
@@ -85,8 +87,7 @@ class _PageDepartState extends State<PageDepart> {
                       ),
                     ),
                     onPressed: () async {
-                      final Uri _url =
-                          Uri.parse(whatsPersonUrlPlaystore);
+                      final Uri _url = Uri.parse(dressurUrlPlaystore);
                       if (!await launchUrl(_url,
                           mode: LaunchMode.externalApplication)) {
                         throw 'Could not launch $_url';

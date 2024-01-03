@@ -4,14 +4,14 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:whatsperson/1_contact/reconnaissance_contact.dart';
-import 'package:whatsperson/9_demarage/update_app_important.dart';
-import 'package:whatsperson/9_demarage/pas_de_connexion.dart';
-import 'package:whatsperson/9_demarage/presentation_wp.dart';
-import 'package:whatsperson/components/constant.dart';
-import 'package:whatsperson/components/sql_helper.dart';
-import 'package:whatsperson/components/noti.dart';
-import 'package:whatsperson/components/bottomBar.dart';
+import 'package:dressur/1_contact/reconnaissance_contact.dart';
+import 'package:dressur/9_demarage/update_app_important.dart';
+import 'package:dressur/9_demarage/pas_de_connexion.dart';
+import 'package:dressur/9_demarage/presentation_wp.dart';
+import 'package:dressur/components/constant.dart';
+import 'package:dressur/components/sql_helper.dart';
+import 'package:dressur/components/noti.dart';
+import 'package:dressur/components/bottomBar.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
 
@@ -58,7 +58,6 @@ class _PageDepartState extends State<PageDepart> {
         if (data["error"] == false) {
           if (data["importantUpdate"] == true) {
             if (data["versionApp"] != versionApp) {
-              
               return Navigator.of(context).push(MaterialPageRoute(
                   builder: (context) => const ImportantUpdate()));
             }
@@ -66,7 +65,6 @@ class _PageDepartState extends State<PageDepart> {
         }
       }
     } catch (e) {
-      
       return Navigator.of(context).push(
           MaterialPageRoute(builder: (context) => const NoConnexionPage()));
     }
@@ -124,10 +122,9 @@ class _PageDepartState extends State<PageDepart> {
         return Navigator.of(context)
             .push(MaterialPageRoute(builder: (context) => const BottomBar()));
       }
-      
     } else {
       _askPermissions();
-      
+
       return Navigator.of(context)
           .push(MaterialPageRoute(builder: (context) => PresentationPage()));
     }
@@ -165,7 +162,7 @@ class _PageDepartState extends State<PageDepart> {
     // permission contact
     PermissionStatus permissionStatus = await _getContactPermission();
     if (permissionStatus == PermissionStatus.granted) {
-      insertWhatsPersonContact();
+      insertDressurContact();
     } else {
       _handleInvalidPermissions(permissionStatus);
     }
@@ -208,12 +205,12 @@ class _PageDepartState extends State<PageDepart> {
       if (langUserPhone != "fr") {
         warningNoti(
             "Attention !",
-            "Please allow WhatsPerson to automatically save contacts to your phone.\nThis authorization is necessary to take full advantage of our features.",
+            "Please allow Dressur to automatically save contacts to your phone.\nThis authorization is necessary to take full advantage of our features.",
             context);
       } else {
         warningNoti(
             "Attention !",
-            "Veuillez autoriser WhatsPerson a enregistrer automatiquement les contacts dans votre téléphone.\nCette autorisation est nécéssaire pour profiter pleinement de nos fonctionnalités.",
+            "Veuillez autoriser Dressur a enregistrer automatiquement les contacts dans votre téléphone.\nCette autorisation est nécéssaire pour profiter pleinement de nos fonctionnalités.",
             context);
       }
     }
@@ -225,12 +222,12 @@ class _PageDepartState extends State<PageDepart> {
       if (langUserPhone != "fr") {
         warningNoti(
             "Attention !",
-            "Please allow WhatsPerson has accessed your images from your phone for your future deal boosts.\nThis authorization is necessary to take full advantage of our features.",
+            "Please allow Dressur has accessed your images from your phone for your future deal boosts.\nThis authorization is necessary to take full advantage of our features.",
             context);
       } else {
         warningNoti(
             "Attention !",
-            "Veuillez autoriser WhatsPerson a accédé à vos images de votre téléphone pour vos futurs boosts affaire.\nCette autorisation est nécéssaire pour profiter pleinement de nos fonctionnalités.",
+            "Veuillez autoriser Dressur a accédé à vos images de votre téléphone pour vos futurs boosts affaire.\nCette autorisation est nécéssaire pour profiter pleinement de nos fonctionnalités.",
             context);
       }
     }

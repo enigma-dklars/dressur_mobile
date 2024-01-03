@@ -2,14 +2,14 @@
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:whatsperson/5_autre/support_assistance.dart';
-import 'package:whatsperson/components/bottomBar.dart';
-import 'package:whatsperson/components/delayed_animation.dart';
-import 'package:whatsperson/components/constant.dart';
+import 'package:dressur/5_autre/support_assistance.dart';
+import 'package:dressur/components/bottomBar.dart';
+import 'package:dressur/components/delayed_animation.dart';
+import 'package:dressur/components/constant.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
-import 'package:whatsperson/components/sql_helper.dart';
-import 'package:whatsperson/components/noti.dart';
+import 'package:dressur/components/sql_helper.dart';
+import 'package:dressur/components/noti.dart';
 
 class CodeMailConfirmePage extends StatelessWidget {
   @override
@@ -284,8 +284,8 @@ class _ConfirmeFormeState extends State<ConfirmeForme> {
             delay: 0, // 1000,
             child: Text(
               (langUserPhone == "fr")
-                  ? "Vous n'avez pas reçu le code par mail ? Cliquez sur le bouton bleu ci-dessus pour recevoir un nouveau code de confirmation de votre adresse mail ($mail). Contactez simplement l'Assistance WhatsPerson après 2H d'attente..."
-                  : "Didn't receive the code by email? Click on the blue button above to receive a new confirmation code from your email address ($mail). Simply contact WhatsPerson Assistance after 2 hours of waiting...",
+                  ? "Vous n'avez pas reçu le code par mail ? Cliquez sur le bouton bleu ci-dessus pour recevoir un nouveau code de confirmation de votre adresse mail ($mail). Contactez simplement l'Assistance Dressur après 2H d'attente..."
+                  : "Didn't receive the code by email? Click on the blue button above to receive a new confirmation code from your email address ($mail). Simply contact Dressur Assistance after 2 hours of waiting...",
               style: GoogleFonts.poppins(
                 fontSize: 16,
               ),

@@ -5,21 +5,21 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
-import 'package:whatsperson/5_autre/admin.dart';
-import 'package:whatsperson/5_autre/a_propos_wp.dart';
-import 'package:whatsperson/5_autre/liste_bonus_recu.dart';
-import 'package:whatsperson/5_autre/delete_compte_user.dart';
-import 'package:whatsperson/5_autre/invitez_vos_amis.dart';
-import 'package:whatsperson/5_autre/modifier_mot_de_passe.dart';
-import 'package:whatsperson/5_autre/profil_user.dart';
-import 'package:whatsperson/5_autre/signaler_user.dart';
-import 'package:whatsperson/6_notification/liste_notification.dart';
-import 'package:whatsperson/7_login/connexion.dart';
-import 'package:whatsperson/components/profile_menu.dart';
-import 'package:whatsperson/5_autre/support_assistance.dart';
+import 'package:dressur/5_autre/admin.dart';
+import 'package:dressur/5_autre/a_propos_wp.dart';
+import 'package:dressur/5_autre/liste_bonus_recu.dart';
+import 'package:dressur/5_autre/delete_compte_user.dart';
+import 'package:dressur/5_autre/invitez_vos_amis.dart';
+import 'package:dressur/5_autre/modifier_mot_de_passe.dart';
+import 'package:dressur/5_autre/profil_user.dart';
+import 'package:dressur/5_autre/signaler_user.dart';
+import 'package:dressur/6_notification/liste_notification.dart';
+import 'package:dressur/7_login/connexion.dart';
+import 'package:dressur/components/profile_menu.dart';
+import 'package:dressur/5_autre/support_assistance.dart';
 import 'package:art_sweetalert/art_sweetalert.dart';
-import 'package:whatsperson/components/constant.dart';
-import 'package:whatsperson/components/sql_helper.dart';
+import 'package:dressur/components/constant.dart';
+import 'package:dressur/components/sql_helper.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class SettingPage extends StatefulWidget {
@@ -221,8 +221,8 @@ class _SettingPageState extends State<SettingPage> {
                       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                         content: Text(
                           (langUserPhone == "fr")
-                              ? "WhatsPerson vas parcourir vos contacts un a un et supprimer les contacts WP.\n\nPatientez tous le long du processus.\n\nCe processus peut durée plusieurs minutes."
-                              : "WhatsPerson will go through your contacts one by one and delete WP contacts.\n\nWait all the way through the process.\n\nThis process may take several minutes.",
+                              ? "Dressur vas parcourir vos contacts un a un et supprimer les contacts WP.\n\nPatientez tous le long du processus.\n\nCe processus peut durée plusieurs minutes."
+                              : "Dressur will go through your contacts one by one and delete WP contacts.\n\nWait all the way through the process.\n\nThis process may take several minutes.",
                         ),
                         duration: const Duration(minutes: 1),
                       ));

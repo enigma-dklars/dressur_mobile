@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:whatsperson/components/constant.dart';
+import 'package:dressur/components/constant.dart';
 
 class ProfileMenu extends StatelessWidget {
   const ProfileMenu({

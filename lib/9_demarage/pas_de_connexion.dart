@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:whatsperson/components/constant.dart';
-import 'package:whatsperson/components/delayed_animation.dart';
-import 'package:whatsperson/9_demarage/welcome_page.dart';
+import 'package:dressur/components/constant.dart';
+import 'package:dressur/components/delayed_animation.dart';
+import 'package:dressur/9_demarage/welcome_page.dart';
 
 class NoConnexionPage extends StatelessWidget {
   const NoConnexionPage({Key? key}) : super(key: key);
@@ -59,7 +59,9 @@ class _PageDepartState extends State<PageDepart> {
                 delay: 3000,
                 child: SizedBox(
                   child: Text(
-                    (langUserPhone == "fr") ? "Vous n'ètes pas connecté à internet." : "You are not connected to the internet.",
+                    (langUserPhone == "fr")
+                        ? "Vous n'ètes pas connecté à internet."
+                        : "You are not connected to the internet.",
                     style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
                   ),
                 ),
@@ -80,7 +82,9 @@ class _PageDepartState extends State<PageDepart> {
                         minimumSize: const Size.fromHeight(50),
                       ),
                       child: Text(
-                        (langUserPhone == "fr") ? "Réessayer..." : "Try again...",
+                        (langUserPhone == "fr")
+                            ? "Réessayer..."
+                            : "Try again...",
                         style: GoogleFonts.poppins(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,

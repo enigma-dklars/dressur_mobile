@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:whatsperson/components/delayed_animation.dart';
-import 'package:whatsperson/components/constant.dart';
-import 'package:whatsperson/components/profile_menu_web.dart';
+import 'package:dressur/components/delayed_animation.dart';
+import 'package:dressur/components/constant.dart';
+import 'package:dressur/components/profile_menu_web.dart';
 
 class AproposPage extends StatelessWidget {
   @override
@@ -45,7 +45,7 @@ class AproposPage extends StatelessWidget {
                   DelayedAnimation(
                     delay: 0, // 500,
                     child: Text(
-                      "WhatsPerson",
+                      "Dressur",
                       style: GoogleFonts.poppins(
                           color: primaryColor,
                           fontSize: 30,
@@ -64,8 +64,8 @@ class AproposPage extends StatelessWidget {
                       ),
                       child: Text(
                         (langUserPhone == "fr")
-                            ? "Nous simplifions votre quête de visibilité sur vos différents réseaux sociaux et surtout sur vos statuts WhatsApp. \nGrâce à WhatsPerson, faite la promotion de vos produits et services qui seront visibles par des milliers d'utilisateurs en seulement 24H. \nNous vous permettons d'avoir plus facilement des contacts WhatsApp selon les pays de votre choix. De plus, ses contacts sont automatiquement enregistrés dans votre téléphone et votre contact dans les leurs. \nNous vous permettons également de récupérer ses contacts en cas de perte. Rejoignez la communauté WhatsPerson."
-                            : "We simplify your quest for visibility on your various social networks and especially on your WhatsApp statuses. \nThanks to WhatsPerson, promote your products and services that will be visible to thousands of users in just 24 hours. \nWe make it easier for you to have WhatsApp contacts according to the countries of your choice. In addition, their contacts are automatically saved in your phone and your contact in theirs. \nWe also allow you to recover their contacts in case of loss. Join the WhatsPerson community.",
+                            ? "Nous simplifions votre quête de visibilité sur vos différents réseaux sociaux et surtout sur vos statuts WhatsApp. \nGrâce à Dressur, faite la promotion de vos produits et services qui seront visibles par des milliers d'utilisateurs en seulement 24H. \nNous vous permettons d'avoir plus facilement des contacts WhatsApp selon les pays de votre choix. De plus, ses contacts sont automatiquement enregistrés dans votre téléphone et votre contact dans les leurs. \nNous vous permettons également de récupérer ses contacts en cas de perte. Rejoignez la communauté Dressur."
+                            : "We simplify your quest for visibility on your various social networks and especially on your WhatsApp statuses. \nThanks to Dressur, promote your products and services that will be visible to thousands of users in just 24 hours. \nWe make it easier for you to have WhatsApp contacts according to the countries of your choice. In addition, their contacts are automatically saved in your phone and your contact in theirs. \nWe also allow you to recover their contacts in case of loss. Join the Dressur community.",
                         style: GoogleFonts.poppins(
                           fontSize: 16,
                         ),
@@ -92,8 +92,7 @@ class AproposPage extends StatelessWidget {
                         : "Terms of use",
                     Myicon: const Icon(Icons.abc),
                     press: () async {
-                      final Uri _url =
-                          Uri.parse(whatsPersonConditionUtilisation);
+                      final Uri _url = Uri.parse(dressurConditionUtilisation);
                       if (!await launchUrl(_url,
                           mode: LaunchMode.externalApplication)) {
                         throw 'Could not launch $_url';
@@ -107,7 +106,7 @@ class AproposPage extends StatelessWidget {
                     Myicon: const Icon(Icons.abc),
                     press: () async {
                       final Uri _url =
-                          Uri.parse(whatsPersonPolitiqueConfidentialite);
+                          Uri.parse(dressurPolitiqueConfidentialite);
                       if (!await launchUrl(_url,
                           mode: LaunchMode.externalApplication)) {
                         throw 'Could not launch $_url';

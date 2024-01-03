@@ -6,11 +6,11 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:select_form_field/select_form_field.dart';
-import 'package:whatsperson/5_autre/support_assistance.dart';
-import 'package:whatsperson/components/constant.dart';
-import 'package:whatsperson/components/delayed_animation.dart';
-import 'package:whatsperson/components/noti.dart';
-import 'package:whatsperson/components/sql_helper.dart';
+import 'package:dressur/5_autre/support_assistance.dart';
+import 'package:dressur/components/constant.dart';
+import 'package:dressur/components/delayed_animation.dart';
+import 'package:dressur/components/noti.dart';
+import 'package:dressur/components/sql_helper.dart';
 
 class Promotion {
   final String id;
@@ -947,7 +947,7 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
             DelayedAnimation(
               delay: 0, // 1500,
               child: Text(
-                "Pour payer par Wave ou Carte Bancaire, veuillez contactez l'Assistance WhatsPerson par WhatsApp. Merci...",
+                "Pour payer par Wave ou Carte Bancaire, veuillez contactez l'Assistance Dressur par WhatsApp. Merci...",
                 style: GoogleFonts.poppins(
                   fontWeight: FontWeight.w600,
                   fontSize: 12,

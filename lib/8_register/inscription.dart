@@ -2,14 +2,14 @@
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:whatsperson/1_contact/reconnaissance_contact.dart';
-import 'package:whatsperson/components/delayed_animation.dart';
-import 'package:whatsperson/components/constant.dart';
+import 'package:dressur/1_contact/reconnaissance_contact.dart';
+import 'package:dressur/components/delayed_animation.dart';
+import 'package:dressur/components/constant.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
-import 'package:whatsperson/components/sql_helper.dart';
-import 'package:whatsperson/components/noti.dart';
-import 'package:whatsperson/5_autre/support_assistance.dart';
+import 'package:dressur/components/sql_helper.dart';
+import 'package:dressur/components/noti.dart';
+import 'package:dressur/5_autre/support_assistance.dart';
 
 class InscriptionPage extends StatelessWidget {
   @override
@@ -147,8 +147,7 @@ class _RegisterFormState extends State<RegisterForm> {
       });
 
       http.StreamedResponse response = await request.send();
-      
-      
+
       if (response.statusCode == 200) {
         var data1 = await response.stream.bytesToString();
         data = convert.jsonDecode(data1);

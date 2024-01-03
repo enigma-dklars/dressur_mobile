@@ -5,7 +5,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
-import 'package:whatsperson/components/constant.dart';
+import 'package:dressur/components/constant.dart';
 
 class Country {
   final String name;
@@ -179,8 +179,10 @@ class _ChoixDesPaysState extends State<ChoixDesPays> {
               onChanged: (value) {
                 searchCountries(value);
               },
-              decoration:  InputDecoration(
-                labelText: (langUserPhone == "fr") ? 'Rechercher un pays avec son indicatif' : 'Find a country with its area code',
+              decoration: InputDecoration(
+                labelText: (langUserPhone == "fr")
+                    ? 'Rechercher un pays avec son indicatif'
+                    : 'Find a country with its area code',
                 border: const OutlineInputBorder(),
               ),
             ),
