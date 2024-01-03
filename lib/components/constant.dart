@@ -20,12 +20,11 @@ const instagramBLT = "https://www.instagram.com/bluelife.tech";
 const youtubeBLT = "https://www.youtube.com/@bluelife-tech";
 const whatsappWPURL = "https://wa.me/22960330478";
 const dressurConditionUtilisation = "https://dressur.online/condition.html";
-const dressurPolitiqueConfidentialite =
-    "https://dressur.online/politique.html";
+const dressurPolitiqueConfidentialite = "https://dressur.online/politique.html";
 const dressurUrlPlaystore =
     "https://play.google.com/store/apps/details?id=com.ds.dressur";
 
-const primaryColor = Colors.indigo;
+const primaryColor = Color(0xFF2a4b9a);
 const secondaryColor = Colors.indigoAccent;
 const databaseSqlCode = """
   CREATE TABLE userInfos(

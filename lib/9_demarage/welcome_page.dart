@@ -306,7 +306,7 @@ class _LogoAnimationState extends State<LogoAnimation>
           return Transform.scale(
             scale: _animation.value,
             child: Image.asset(
-              'images/new_logo_wp.png',
+              'images/dressur_logo.png',
               width: 300,
               height: 300,
             ),

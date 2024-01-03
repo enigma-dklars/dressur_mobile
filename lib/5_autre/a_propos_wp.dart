@@ -39,7 +39,7 @@ class AproposPage extends StatelessWidget {
                     delay: 0, // 500,
                     child: SizedBox(
                       height: 200,
-                      child: Image.asset("images/new_logo_wp.png"),
+                      child: Image.asset("images/dressur_logo.png"),
                     ),
                   ),
                   DelayedAnimation(
