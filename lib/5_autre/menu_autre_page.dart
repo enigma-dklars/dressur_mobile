@@ -155,7 +155,7 @@ class _SettingPageState extends State<SettingPage> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => const PrettyQrExampleApp()),
+                        builder: (context) => const CarteDeVisite()),
                   );
                 },
               ),

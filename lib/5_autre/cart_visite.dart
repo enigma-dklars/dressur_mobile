@@ -1,10 +1,11 @@
+import 'package:dressur/5_autre/scanner_code_qr.dart';
 import 'package:dressur/components/constant.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pretty_qr_code/pretty_qr_code.dart';
 
-class PrettyQrExampleApp extends StatelessWidget {
-  const PrettyQrExampleApp({
+class CarteDeVisite extends StatelessWidget {
+  const CarteDeVisite({
     super.key,
   });
 
@@ -37,8 +38,11 @@ class _PrettyQrHomePageState extends State<PrettyQrHomePage> {
   void initState() {
     super.initState();
 
-    qrCode = QrCode.fromData(
-      data: 'https://pub.dev/packages/pretty_qr_code',
+    List<String> qrData = ['dressur', uidUser];
+    String concatenatedData = qrData.join(',');
+
+    QrCode qrCode = QrCode.fromData(
+      data: concatenatedData,
       errorCorrectLevel: QrErrorCorrectLevel.H,
     );
 
@@ -145,7 +149,11 @@ class _PrettyQrHomePageState extends State<PrettyQrHomePage> {
                           textAlign: TextAlign.center,
                         ),
                         onPressed: () {
-                          // go to page de scannage
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const ScannerCodeQR()),
+                          );
                         },
                       ),
                     ),
