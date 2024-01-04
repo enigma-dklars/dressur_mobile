@@ -2,6 +2,7 @@
 
 import 'dart:io';
 
+import 'package:dressur/5_autre/cart_visite.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
@@ -143,6 +144,18 @@ class _SettingPageState extends State<SettingPage> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) => ProfilPage()),
+                  );
+                },
+              ),
+              ProfileMenu(
+                text:
+                    (langUserPhone == "fr") ? "Carte de visite" : "Visit card",
+                Myicon: const Icon(Icons.card_membership),
+                press: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const PrettyQrExampleApp()),
                   );
                 },
               ),
