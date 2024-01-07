@@ -178,6 +178,53 @@ void insertDressurContact() async {
   }
 }
 
+List<Map<String, dynamic>> listeMethodePaiement = [
+  {
+    'value': 'mtn',
+    'label': 'MTN Mobile Money Bénin',
+  },
+  {
+    'value': 'moov',
+    'label': 'MOOV Flooz Bénin',
+  },
+  {
+    'value': 'mtn_ci',
+    'label': "MTN Mobile Money Côte d'Ivoire",
+  },
+  {
+    'value': 'moov_tg',
+    'label': 'MOOV Flooz Togo',
+  },
+  {
+    'value': 'orange_ci',
+    'label': "Orange Côte d'Ivoire",
+  },
+  {
+    'value': 'orange_sn',
+    'label': 'Orange Sénégal',
+  },
+  {
+    'value': 'free_sn',
+    'label': 'Free Sénégal',
+  },
+  {
+    'value': 'airtel_ne',
+    'label': 'Airtel Niger',
+  },
+  {
+    'value': 'togocel',
+    'label': 'TOGOCEL T-Money',
+  },
+  {
+    'value': 'orange_ml',
+    'label': 'Orange Mali',
+  },
+  {
+    'value': 'mtn_gn',
+    'label': 'MTN Mobile Money Guinée',
+  },
+];
+
 // map de tous les pays du monde
 Map<String, String> countryCodes = {
   '93': 'Afghanistan',

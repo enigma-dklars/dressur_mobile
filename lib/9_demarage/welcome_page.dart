@@ -175,6 +175,14 @@ class _PageDepartState extends State<PageDepart> {
     } else {
       _handleInvalidPermissionsStockageMemoire(permissionStatusStockageMemoire);
     }
+
+    // permission camera
+    PermissionStatus permissionStatusCamera = await _getCameraPermission();
+    if (permissionStatusCamera == PermissionStatus.granted) {
+      // OK
+    } else {
+      _handleInvalidPermissionsCamera(permissionStatusCamera);
+    }
   }
 
   Future<PermissionStatus> _getContactPermission() async {
@@ -195,6 +203,17 @@ class _PageDepartState extends State<PageDepart> {
       PermissionStatus permissionStatusStockageMemoire =
           await Permission.storage.request();
       return permissionStatusStockageMemoire;
+    } else {
+      return permission;
+    }
+  }
+
+  Future<PermissionStatus> _getCameraPermission() async {
+    PermissionStatus permission = await Permission.camera.status;
+    // permission != PermissionStatus.granted && permission != PermissionStatus.permanentlyDenied
+    if (permission != PermissionStatus.granted) {
+      PermissionStatus permissionStatus = await Permission.camera.request();
+      return permissionStatus;
     } else {
       return permission;
     }
@@ -228,6 +247,22 @@ class _PageDepartState extends State<PageDepart> {
         warningNoti(
             "Attention !",
             "Veuillez autoriser Dressur a accédé à vos images de votre téléphone pour vos futurs boosts affaire.\nCette autorisation est nécéssaire pour profiter pleinement de nos fonctionnalités.",
+            context);
+      }
+    }
+  }
+
+  void _handleInvalidPermissionsCamera(PermissionStatus permissionStatus) {
+    if (permissionStatus != PermissionStatus.granted) {
+      if (langUserPhone != "fr") {
+        warningNoti(
+            "Attention !",
+            "Please authorize Dressur to access your camera for scanning QR codes and automatically saving contacts to your phone.\nThis authorization is necessary to take full advantage of our features.",
+            context);
+      } else {
+        warningNoti(
+            "Attention !",
+            "Veuillez autoriser Dressur à accéder à votre caméra pour le scannage des codes QR et l'enregistrement automatiquement des contacts dans votre téléphone.\nCette autorisation est nécessaire pour profiter pleinement de nos fonctionnalités.",
             context);
       }
     }
