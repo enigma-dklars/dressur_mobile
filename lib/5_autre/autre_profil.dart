@@ -3,7 +3,6 @@
 import 'dart:convert';
 
 import 'package:dressur/components/noti.dart';
-import 'package:dressur/components/profile_menu_reseau.dart';
 import 'package:dressur/components/profile_menu_reseau_blanc.dart';
 import 'package:dressur/components/sql_helper.dart';
 import 'package:flutter/material.dart';
