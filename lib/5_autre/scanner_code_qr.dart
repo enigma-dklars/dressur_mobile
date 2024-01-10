@@ -1,6 +1,9 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:developer';
 import 'dart:io';
 
+import 'package:dressur/5_autre/autre_profil.dart';
 import 'package:dressur/components/constant.dart';
 import 'package:dressur/components/noti.dart';
 import 'package:flutter/foundation.dart';
@@ -24,7 +27,7 @@ class QRViewExample extends StatefulWidget {
 }
 
 class _QRViewExampleState extends State<QRViewExample> {
-  Barcode? result;
+  String scannedResult = '';
   QRViewController? controller;
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
 
@@ -44,48 +47,61 @@ class _QRViewExampleState extends State<QRViewExample> {
     return Scaffold(
       body: Column(
         children: <Widget>[
-          Expanded(flex: 9, child: _buildQrView(context)),
+          Expanded(flex: 14, child: _buildQrView(context)),
           Expanded(
             flex: 1,
             child: FittedBox(
-              fit: BoxFit.contain,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: <Widget>[
-                  // if (result != null)
-                  //   Text(
-                  //       'Barcode Type: ${describeEnum(result!.format)}   Data: ${result!.code}')
-                  // else
-                  //   const Text('Scan a code'),
-                  Row(
+                fit: BoxFit.cover,
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        Colors.white,
+                        Colors.white,
+                      ],
+                    ),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  width: MediaQuery.of(context).size.width * 0.90,
+                  child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: <Widget>[
-                      Container(
-                          margin: const EdgeInsets.all(8),
-                          child: ElevatedButton(
-                            onPressed: () async {
-                              await controller?.toggleFlash();
-                              setState(() {});
-                            },
-                            child: FutureBuilder(
-                              future: controller?.getFlashStatus(),
-                              builder: (context, snapshot) {
-                                if (snapshot.data == true) {
-                                  return const Icon(
-                                      Icons.flash_on); // Flash allumé
-                                } else {
-                                  return const Icon(
-                                      Icons.flash_off); // Flash éteint
-                                }
-                              },
-                            ),
-                          )),
+                    children: [
+                      // TextButton(
+                      //   onPressed: () {
+                      //     // au click ....
+                      //   },
+                      //   child: const Icon(
+                      //     Icons.image,
+                      //     color: primaryColor,
+                      //   ),
+                      // ),
+                      TextButton(
+                        onPressed: () async {
+                          await controller?.toggleFlash();
+                          setState(() {});
+                        },
+                        child: FutureBuilder(
+                          future: controller?.getFlashStatus(),
+                          builder: (context, snapshot) {
+                            if (snapshot.data == true) {
+                              return const Icon(
+                                Icons.flash_on,
+                                color: primaryColor,
+                              ); // Flash allumé
+                            } else {
+                              return const Icon(
+                                Icons.flash_off,
+                                color: primaryColor,
+                              ); // Flash éteint
+                            }
+                          },
+                        ),
+                      ),
                     ],
                   ),
-                ],
-              ),
-            ),
+                )),
           )
         ],
       ),
@@ -126,19 +142,23 @@ class _QRViewExampleState extends State<QRViewExample> {
       List<String> qrData = scanData.code!.split(',');
       if (qrData.length == 2 && qrData[0] == 'dressur') {
         String idUser = qrData[1];
-
-        // Navigator.push(
-        //   context,
-        //   MaterialPageRoute(builder: (context) => UserDetailsPage(idUser)),
-        // );
-
-        setState(() {
-          result = scanData;
-
-          successNoti(
-              (langUserPhone == "fr") ? "Code QR" : "QR Code", idUser, context);
-        });
-        await controller.pauseCamera();
+        if (idUser != uidUser) {
+          setState(() {
+            uidAutreUser = idUser;
+          });
+          await controller.pauseCamera();
+          Navigator.pop(context);
+          Navigator.of(context)
+              .push(MaterialPageRoute(builder: (context) => AutreProfilPage()));
+        } else {
+          warningNoti(
+              (langUserPhone == "fr") ? "Code QR" : "QR Code",
+              (langUserPhone == "fr")
+                  ? "Il s'agit de votre propre Code QR."
+                  : "This is your own QR Code.",
+              context);
+          await controller.pauseCamera();
+        }
       } else {
         warningNoti(
             (langUserPhone == "fr") ? "Code QR" : "QR Code",
@@ -146,8 +166,6 @@ class _QRViewExampleState extends State<QRViewExample> {
             context);
         await controller.pauseCamera();
       }
-
-      // 'Barcode Type: ${describeEnum(result!.format)}   Data: ${result!.code}'
     });
   }
 
