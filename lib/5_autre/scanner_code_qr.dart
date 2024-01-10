@@ -1,6 +1,9 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:developer';
 import 'dart:io';
 
+import 'package:dressur/5_autre/autre_profil.dart';
 import 'package:dressur/components/constant.dart';
 import 'package:dressur/components/noti.dart';
 import 'package:flutter/foundation.dart';
@@ -126,19 +129,25 @@ class _QRViewExampleState extends State<QRViewExample> {
       List<String> qrData = scanData.code!.split(',');
       if (qrData.length == 2 && qrData[0] == 'dressur') {
         String idUser = qrData[1];
-
-        // Navigator.push(
-        //   context,
-        //   MaterialPageRoute(builder: (context) => UserDetailsPage(idUser)),
-        // );
-
-        setState(() {
-          result = scanData;
-
-          successNoti(
-              (langUserPhone == "fr") ? "Code QR" : "QR Code", idUser, context);
-        });
-        await controller.pauseCamera();
+        if (idUser != uidUser) {
+          setState(() {
+            result = scanData;
+            uidAutreUser = idUser;
+            // successNoti((langUserPhone == "fr") ? "Code QR" : "QR Code", idUser, context);
+          });
+          await controller.pauseCamera();
+          Navigator.pop(context);
+          Navigator.of(context)
+              .push(MaterialPageRoute(builder: (context) => AutreProfilPage()));
+        } else {
+          warningNoti(
+              (langUserPhone == "fr") ? "Code QR" : "QR Code",
+              (langUserPhone == "fr")
+                  ? "Il s'agit de votre propre Code QR."
+                  : "This is your own QR Code.",
+              context);
+          await controller.pauseCamera();
+        }
       } else {
         warningNoti(
             (langUserPhone == "fr") ? "Code QR" : "QR Code",
