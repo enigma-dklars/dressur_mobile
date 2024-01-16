@@ -1,9 +1,7 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:dressur/1_contact/reconnaissance_contact.dart';
-import 'package:dressur/components/delayed_animation.dart';
 import 'package:dressur/components/constant.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
@@ -52,52 +50,7 @@ class InscriptionPage extends StatelessWidget {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            Container(
-              margin: const EdgeInsets.symmetric(vertical: 20, horizontal: 15),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  DelayedAnimation(
-                    delay: 0, // 500,
-                    child: SizedBox(
-                      height: 200,
-                      child: Image.asset("images/register.png"),
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  DelayedAnimation(
-                    delay: 0, // 500,
-                    child: Text(
-                      (langUserPhone == "fr") ? "Inscription" : "Registration",
-                      style: GoogleFonts.poppins(
-                          color: primaryColor,
-                          fontSize: 30,
-                          fontWeight: FontWeight.w600),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  DelayedAnimation(
-                    delay: 0, // 750,
-                    child: Text(
-                      (langUserPhone == "fr")
-                          ? "Entrer vos informations primordiales"
-                          : "Enter your essential information",
-                      style: GoogleFonts.poppins(
-                        fontSize: 16,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-
-                  const SizedBox(height: 10),
-                  // Formulaire
-                  RegisterForm(),
-
-                  const SizedBox(height: 20),
-                ],
-              ),
-            ),
+            RegisterForm(),
           ],
         ),
       ),
@@ -112,8 +65,6 @@ class RegisterForm extends StatefulWidget {
 
 class _RegisterFormState extends State<RegisterForm> {
   bool _desactive = false;
-  var _obscureText = true;
-  var _obscureText_1 = true;
   var data;
   final pseudoController = TextEditingController();
   final telController = TextEditingController();
@@ -196,135 +147,257 @@ class _RegisterFormState extends State<RegisterForm> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      child: Column(
+      child: Stack(
         children: [
-          DelayedAnimation(
-            delay: 0, // 1000,
-            child: TextField(
-              controller: pseudoController,
-              decoration: InputDecoration(
-                labelStyle: TextStyle(color: Colors.grey[400]),
-                border: const OutlineInputBorder(),
-                labelText: 'Pseudo',
+          Container(
+            height: MediaQuery.of(context).size.height / 3.5,
+            width: MediaQuery.of(context).size.width,
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                colors: [
+                  primaryColor,
+                  Color(0xFF6380fb),
+                ],
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+              ),
+              borderRadius: BorderRadius.vertical(
+                bottom:
+                    Radius.elliptical(MediaQuery.of(context).size.width, 105.0),
               ),
             ),
           ),
-          const SizedBox(height: 10),
-          DelayedAnimation(
-            delay: 0, // 1500,
-            child: TextField(
-              controller: telController,
-              decoration: InputDecoration(
-                labelStyle: TextStyle(color: Colors.grey[400]),
-                border: const OutlineInputBorder(),
-                labelText: (langUserPhone == "fr")
-                    ? 'Numéro Whatsapp'
-                    : 'WhatsApp number',
-              ),
-            ),
-          ),
-          const SizedBox(height: 10),
-          DelayedAnimation(
-            delay: 0, // 1500,
-            child: TextField(
-              controller: emailController,
-              decoration: InputDecoration(
-                labelStyle: TextStyle(color: Colors.grey[400]),
-                border: const OutlineInputBorder(),
-                labelText: 'E-mail',
-              ),
-            ),
-          ),
-          const SizedBox(height: 10),
-          DelayedAnimation(
-            delay: 0, // 1750,
-            child: TextField(
-              controller: passwordController,
-              obscureText: _obscureText,
-              decoration: InputDecoration(
-                labelStyle: TextStyle(color: Colors.grey[400]),
-                border: const OutlineInputBorder(),
-                labelText:
-                    (langUserPhone == "fr") ? 'Mot de passe' : 'Password',
-                suffixIcon: IconButton(
-                  icon: _obscureText
-                      ? const Icon(
-                          Icons.visibility,
-                        )
-                      : const Icon(
-                          Icons.visibility_off,
-                        ),
-                  onPressed: () {
-                    setState(() {
-                      _obscureText = !_obscureText;
-                    });
-                  },
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(height: 10),
-          DelayedAnimation(
-            delay: 0, // 2000,
-            child: TextField(
-              controller: passwordVerifController,
-              obscureText: _obscureText_1,
-              decoration: InputDecoration(
-                labelStyle: TextStyle(color: Colors.grey[400]),
-                border: const OutlineInputBorder(),
-                labelText: (langUserPhone == "fr")
-                    ? 'Confirmer le mot de passe'
-                    : 'Confirm password',
-                suffixIcon: IconButton(
-                  icon: _obscureText_1
-                      ? const Icon(
-                          Icons.visibility,
-                        )
-                      : const Icon(
-                          Icons.visibility_off,
-                        ),
-                  onPressed: () {
-                    setState(() {
-                      _obscureText_1 = !_obscureText_1;
-                    });
-                  },
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(height: 10),
-          DelayedAnimation(
-            delay: 0, // 2500,
-            child: SizedBox(
-              width: MediaQuery.of(context).size.width * 0.90,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: primaryColor,
-                  shape: const StadiumBorder(),
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 13,
+          Padding(
+            padding: const EdgeInsets.only(top: 40),
+            child: Column(
+              children: [
+                Center(
+                    child: Text(
+                  (langUserPhone == "fr") ? "Inscription" : "Registration",
+                  style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 30,
+                      fontWeight: FontWeight.bold),
+                )),
+                const SizedBox(height: 5),
+                Center(
+                    child: Text(
+                  (langUserPhone == "fr")
+                      ? "Entrer vos informations primordiales"
+                      : "Enter your essential information",
+                  style: const TextStyle(
+                      color: Color(0xFFbbb0ff),
+                      fontSize: 16.0,
+                      fontWeight: FontWeight.w500),
+                )),
+                const SizedBox(height: 10),
+                Container(
+                  margin: const EdgeInsets.symmetric(
+                      vertical: 15.0, horizontal: 15.0),
+                  child: Material(
+                    borderRadius: BorderRadius.circular(10),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 30.0, horizontal: 15.0),
+                      width: MediaQuery.of(context).size.width,
+                      decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(10)),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'Pseudo',
+                            style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 18.0,
+                                fontWeight: FontWeight.w500),
+                          ),
+                          const SizedBox(height: 5),
+                          Container(
+                            decoration: BoxDecoration(
+                                border: Border.all(
+                                    width: 1.0, color: Colors.black38),
+                                borderRadius: BorderRadius.circular(10)),
+                            child: TextFormField(
+                              style: const TextStyle(
+                                color: Colors.black,
+                                fontSize: 20,
+                              ),
+                              controller: pseudoController,
+                              decoration: const InputDecoration(
+                                  border: InputBorder.none,
+                                  prefixIcon: Icon(
+                                    Icons.person_outline,
+                                    color: primaryColor,
+                                  )),
+                            ),
+                          ),
+                          const SizedBox(height: 15),
+                          Text(
+                            (langUserPhone == "fr")
+                                ? 'Numéro Whatsapp'
+                                : 'WhatsApp number',
+                            style: const TextStyle(
+                                color: Colors.black,
+                                fontSize: 18.0,
+                                fontWeight: FontWeight.w500),
+                          ),
+                          const SizedBox(height: 5),
+                          Container(
+                            decoration: BoxDecoration(
+                                border: Border.all(
+                                    width: 1.0, color: Colors.black38),
+                                borderRadius: BorderRadius.circular(10)),
+                            child: TextFormField(
+                              style: const TextStyle(
+                                color: Colors.black,
+                                fontSize: 20,
+                              ),
+                              controller: telController,
+                              decoration: const InputDecoration(
+                                  border: InputBorder.none,
+                                  prefixIcon: Icon(
+                                    Icons.phone,
+                                    color: primaryColor,
+                                  )),
+                            ),
+                          ),
+                          const SizedBox(height: 15),
+                          const Text(
+                            "E-mail",
+                            style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 18.0,
+                                fontWeight: FontWeight.w500),
+                          ),
+                          const SizedBox(height: 5),
+                          Container(
+                            decoration: BoxDecoration(
+                                border: Border.all(
+                                    width: 1.0, color: Colors.black38),
+                                borderRadius: BorderRadius.circular(10)),
+                            child: TextFormField(
+                              style: const TextStyle(
+                                color: Colors.black,
+                                fontSize: 20,
+                              ),
+                              controller: emailController,
+                              decoration: const InputDecoration(
+                                  border: InputBorder.none,
+                                  prefixIcon: Icon(
+                                    Icons.mail_outline,
+                                    color: primaryColor,
+                                  )),
+                            ),
+                          ),
+                          const SizedBox(height: 15),
+                          Text(
+                            (langUserPhone == "fr")
+                                ? 'Mot de passe'
+                                : 'Password',
+                            style: const TextStyle(
+                                color: Colors.black,
+                                fontSize: 18.0,
+                                fontWeight: FontWeight.w500),
+                          ),
+                          const SizedBox(height: 5),
+                          Container(
+                            decoration: BoxDecoration(
+                                border: Border.all(
+                                    width: 1.0, color: Colors.black38),
+                                borderRadius: BorderRadius.circular(10)),
+                            child: TextFormField(
+                              style: const TextStyle(
+                                color: Colors.black,
+                                fontSize: 20,
+                              ),
+                              controller: passwordController,
+                              decoration: const InputDecoration(
+                                  border: InputBorder.none,
+                                  prefixIcon: Icon(
+                                    Icons.password,
+                                    color: primaryColor,
+                                  )),
+                              obscureText: true,
+                            ),
+                          ),
+                          const SizedBox(height: 15),
+                          Text(
+                            (langUserPhone == "fr")
+                                ? 'Confirmer le mot de passe'
+                                : 'Confirm password',
+                            style: const TextStyle(
+                                color: Colors.black,
+                                fontSize: 18.0,
+                                fontWeight: FontWeight.w500),
+                          ),
+                          const SizedBox(height: 5),
+                          Container(
+                            decoration: BoxDecoration(
+                                border: Border.all(
+                                    width: 1.0, color: Colors.black38),
+                                borderRadius: BorderRadius.circular(10)),
+                            child: TextFormField(
+                              style: const TextStyle(
+                                color: Colors.black,
+                                fontSize: 20,
+                              ),
+                              controller: passwordVerifController,
+                              decoration: const InputDecoration(
+                                  border: InputBorder.none,
+                                  prefixIcon: Icon(
+                                    Icons.password,
+                                    color: primaryColor,
+                                  )),
+                              obscureText: true,
+                            ),
+                          ),
+                          const SizedBox(height: 15),
+                          SizedBox(
+                            width: MediaQuery.of(context).size.width * 0.90,
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: primaryColor,
+                                shape: const StadiumBorder(),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 13,
+                                ),
+                                minimumSize: const Size.fromHeight(50),
+                              ),
+                              child: _desactive
+                                  ? const Text("Wait...")
+                                  : Text(
+                                      (langUserPhone == "fr")
+                                          ? "INSCRIPTION"
+                                          : "REGISTRATION",
+                                      style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                              onPressed: () {
+                                _desactive
+                                    ? null
+                                    : registerIn(
+                                        pseudoController.text,
+                                        telController.text,
+                                        emailController.text,
+                                        passwordController.text,
+                                        passwordVerifController.text,
+                                      );
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
-                  minimumSize: const Size.fromHeight(50),
                 ),
-                child: _desactive
-                    ? const Text("Wait...")
-                    : Text((langUserPhone == "fr")
-                        ? "INSCRIPTION"
-                        : "REGISTRATION"),
-                onPressed: () {
-                  _desactive
-                      ? null
-                      : registerIn(
-                          pseudoController.text,
-                          telController.text,
-                          emailController.text,
-                          passwordController.text,
-                          passwordVerifController.text,
-                        );
-                },
-              ),
+                const SizedBox(height: 40),
+              ],
             ),
-          ),
+          )
         ],
       ),
     );
