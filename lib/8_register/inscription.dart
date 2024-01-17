@@ -65,6 +65,8 @@ class RegisterForm extends StatefulWidget {
 
 class _RegisterFormState extends State<RegisterForm> {
   bool _desactive = false;
+  bool isPasswordObscured = true;
+  bool isVerificationPasswordObscured = true;
   var data;
   final pseudoController = TextEditingController();
   final telController = TextEditingController();
@@ -304,22 +306,39 @@ class _RegisterFormState extends State<RegisterForm> {
                           const SizedBox(height: 5),
                           Container(
                             decoration: BoxDecoration(
-                                border: Border.all(
-                                    width: 1.0, color: Colors.black38),
-                                borderRadius: BorderRadius.circular(10)),
+                              border: Border.all(
+                                width: 1.0,
+                                color: Colors.black38,
+                              ),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
                             child: TextFormField(
                               style: const TextStyle(
                                 color: Colors.black,
                                 fontSize: 20,
                               ),
                               controller: passwordController,
-                              decoration: const InputDecoration(
-                                  border: InputBorder.none,
-                                  prefixIcon: Icon(
-                                    Icons.password,
+                              decoration: InputDecoration(
+                                border: InputBorder.none,
+                                prefixIcon: Icon(
+                                  Icons.password,
+                                  color: primaryColor,
+                                ),
+                                suffixIcon: IconButton(
+                                  icon: Icon(
+                                    isPasswordObscured
+                                        ? Icons.visibility
+                                        : Icons.visibility_off,
                                     color: primaryColor,
-                                  )),
-                              obscureText: true,
+                                  ),
+                                  onPressed: () {
+                                    setState(() {
+                                      isPasswordObscured = !isPasswordObscured;
+                                    });
+                                  },
+                                ),
+                              ),
+                              obscureText: isPasswordObscured,
                             ),
                           ),
                           const SizedBox(height: 15),
@@ -335,22 +354,40 @@ class _RegisterFormState extends State<RegisterForm> {
                           const SizedBox(height: 5),
                           Container(
                             decoration: BoxDecoration(
-                                border: Border.all(
-                                    width: 1.0, color: Colors.black38),
-                                borderRadius: BorderRadius.circular(10)),
+                              border: Border.all(
+                                width: 1.0,
+                                color: Colors.black38,
+                              ),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
                             child: TextFormField(
                               style: const TextStyle(
                                 color: Colors.black,
                                 fontSize: 20,
                               ),
                               controller: passwordVerifController,
-                              decoration: const InputDecoration(
-                                  border: InputBorder.none,
-                                  prefixIcon: Icon(
-                                    Icons.password,
+                              decoration: InputDecoration(
+                                border: InputBorder.none,
+                                prefixIcon: Icon(
+                                  Icons.password,
+                                  color: primaryColor,
+                                ),
+                                suffixIcon: IconButton(
+                                  icon: Icon(
+                                    isVerificationPasswordObscured
+                                        ? Icons.visibility
+                                        : Icons.visibility_off,
                                     color: primaryColor,
-                                  )),
-                              obscureText: true,
+                                  ),
+                                  onPressed: () {
+                                    setState(() {
+                                      isVerificationPasswordObscured =
+                                          !isVerificationPasswordObscured;
+                                    });
+                                  },
+                                ),
+                              ),
+                              obscureText: isVerificationPasswordObscured,
                             ),
                           ),
                           const SizedBox(height: 15),

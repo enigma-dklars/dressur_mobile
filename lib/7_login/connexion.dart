@@ -58,48 +58,48 @@ class LoginPage extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  DelayedAnimation(
-                    delay: 0, // 500,
-                    child: SizedBox(
-                      height: 200,
-                      child: Image.asset("images/login.png"),
-                    ),
-                  ),
-
-                  DelayedAnimation(
-                    delay: 0, // 750,
-                    child: Container(
-                      margin: const EdgeInsets.symmetric(
-                        vertical: 20,
-                        horizontal: 0,
-                      ),
-                      child: Column(
-                        children: [
-                          Text(
-                            (langUserPhone == "fr") ? "Connexion" : "Login",
-                            style: GoogleFonts.poppins(
-                                color: primaryColor,
-                                fontSize: 30,
-                                fontWeight: FontWeight.w600),
-                            textAlign: TextAlign.center,
-                          ),
-                          const SizedBox(height: 10),
-                          Text(
-                            (langUserPhone == "fr")
-                                ? "Renseigner votre adresse email et mot de passe pour accéder à votre compte."
-                                : "Enter your email address and password to access your account.",
-                            style: GoogleFonts.poppins(
-                              fontSize: 16,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-
-                  // Formulaire
                   LoginForm(),
+                  // DelayedAnimation(
+                  //   delay: 0, // 500,
+                  //   child: SizedBox(
+                  //     height: 200,
+                  //     child: Image.asset("images/login.png"),
+                  //   ),
+                  // ),
+
+                  // DelayedAnimation(
+                  //   delay: 0, // 750,
+                  //   child: Container(
+                  //     margin: const EdgeInsets.symmetric(
+                  //       vertical: 20,
+                  //       horizontal: 0,
+                  //     ),
+                  //     child: Column(
+                  //       children: [
+                  //         Text(
+                  //           (langUserPhone == "fr") ? "Connexion" : "Login",
+                  //           style: GoogleFonts.poppins(
+                  //               color: primaryColor,
+                  //               fontSize: 30,
+                  //               fontWeight: FontWeight.w600),
+                  //           textAlign: TextAlign.center,
+                  //         ),
+                  //         const SizedBox(height: 10),
+                  //         Text(
+                  //           (langUserPhone == "fr")
+                  //               ? "Renseigner votre adresse email et mot de passe pour accéder à votre compte."
+                  //               : "Enter your email address and password to access your account.",
+                  //           style: GoogleFonts.poppins(
+                  //             fontSize: 16,
+                  //           ),
+                  //           textAlign: TextAlign.center,
+                  //         ),
+                  //       ],
+                  //     ),
+                  //   ),
+                  // ),
+
+                  // // Formulaire
                 ],
               ),
             ),
@@ -160,7 +160,7 @@ class _LoginFormState extends State<LoginForm> {
           });
 
           Navigator.of(context)
-              .push(MaterialPageRoute(builder: (context) => BottomBar()));
+              .push(MaterialPageRoute(builder: (context) => const BottomBar()));
         }
       } else {
         if (langUserPhone != "fr") {
