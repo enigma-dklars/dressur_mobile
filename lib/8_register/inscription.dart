@@ -320,7 +320,7 @@ class _RegisterFormState extends State<RegisterForm> {
                               controller: passwordController,
                               decoration: InputDecoration(
                                 border: InputBorder.none,
-                                prefixIcon: Icon(
+                                prefixIcon: const Icon(
                                   Icons.password,
                                   color: primaryColor,
                                 ),
@@ -368,7 +368,7 @@ class _RegisterFormState extends State<RegisterForm> {
                               controller: passwordVerifController,
                               decoration: InputDecoration(
                                 border: InputBorder.none,
-                                prefixIcon: Icon(
+                                prefixIcon: const Icon(
                                   Icons.password,
                                   color: primaryColor,
                                 ),
