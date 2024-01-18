@@ -142,7 +142,7 @@ class AproposPage extends StatelessWidget {
                   DelayedAnimation(
                     delay: 0, // 500,
                     child: Text(
-                      "www.blue-life.tech",
+                      "www.bluelife.tech",
                       style: GoogleFonts.poppins(
                           color: Colors.grey,
                           fontSize: 16,
