@@ -20,8 +20,10 @@ const instagramBLT = "https://www.instagram.com/bluelife.tech";
 const instagramELTCS = "https://www.instagram.com/eliticscore";
 const youtubeBLT = "https://www.youtube.com/@bluelife-tech";
 const whatsappDSURL = "https://wa.me/22960330478";
-const dressurConditionUtilisation = "https://dressur.online/condition.html";
-const dressurPolitiqueConfidentialite = "https://dressur.online/politique.html";
+const dressurConditionUtilisation =
+    "https://www.bluelife.tech/realisations/dressur/condition";
+const dressurPolitiqueConfidentialite =
+    "https://www.bluelife.tech/realisations/dressur/politique";
 const dressurUrlPlaystore =
     "https://play.google.com/store/apps/details?id=com.ds.dressur";
 
