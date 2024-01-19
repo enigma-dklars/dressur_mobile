@@ -63,6 +63,7 @@ bool havePublicites = false;
 var modeMotDePasseOublier = false;
 var mailConnexion = "";
 var textChargementEvolution = "Chargement ...";
+var addUserOnAutreProfilPage = "oui";
 var uidAutreUser;
 var uidUser;
 var pseudo;

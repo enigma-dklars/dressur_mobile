@@ -1,14 +1,12 @@
 import 'dart:convert';
+import 'package:dressur/5_autre/autre_profil.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:dressur/1_reception/synchronisation_avance.dart';
 import 'package:dressur/5_autre/support_assistance.dart';
-import 'package:dressur/6_notification/liste_notification.dart';
 import 'package:dressur/components/constant.dart';
 import 'package:http/http.dart' as http;
-import 'package:dressur/components/profile_menu_reseau.dart';
 
 class ContactDS {
   final String id;
@@ -48,6 +46,8 @@ class ContactPage extends StatefulWidget {
 class _ContactPageState extends State<ContactPage> {
   bool _loading = false;
   List<ContactDS> _contacts = [];
+  List<ContactDS> _filteredContacts = [];
+  String _searchText = '';
 
   Future<void> fetchContactDSs() async {
     setState(() {
@@ -313,15 +313,14 @@ class _ContactPageState extends State<ContactPage> {
                                       size: 13,
                                     ),
                                     onPressed: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              ContactDetailPage(
-                                            contact: contact,
-                                          ),
-                                        ),
-                                      );
+                                      setState(() {
+                                        uidAutreUser = contact.id;
+                                        addUserOnAutreProfilPage = "non";
+                                      });
+                                      Navigator.of(context).push(
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  AutreProfilPage()));
                                     },
                                   ),
                                 ],
@@ -335,153 +334,6 @@ class _ContactPageState extends State<ContactPage> {
                 );
               },
             ),
-    );
-  }
-}
-
-class ContactDetailPage extends StatelessWidget {
-  final ContactDS contact;
-
-  ContactDetailPage({required this.contact});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          (langUserPhone == "fr") ? "Contact Détails" : "Contact Details",
-          style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
-        ),
-        backgroundColor: primaryColor,
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              (langUserPhone == "fr")
-                  ? "Pseudo : ${contact.pseudo}"
-                  : "Pseudo : ${contact.pseudo}",
-              style: GoogleFonts.poppins(
-                fontSize: 20,
-                fontWeight: FontWeight.w600,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 10),
-            if (contact.afficheNom == true)
-              Text(
-                (langUserPhone == "fr")
-                    ? "Nom : ${contact.nom}"
-                    : "Name : ${contact.nom}",
-                style: GoogleFonts.poppins(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            if (contact.afficheNom == true) const SizedBox(height: 10),
-            Text(
-              (langUserPhone == "fr")
-                  ? "Pays : ${contact.pays}"
-                  : "Country : ${contact.pays}",
-              style: GoogleFonts.poppins(
-                fontSize: 20,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            const SizedBox(height: 10),
-            ProfileMenuReseau(
-              text: "E-mail",
-              press: () async {
-                final Uri _url = Uri.parse("mailto:${contact.mail}");
-                if (!await launchUrl(_url,
-                    mode: LaunchMode.externalApplication)) {
-                  throw 'Could not launch $_url';
-                }
-              },
-            ),
-            const SizedBox(height: 5),
-            ProfileMenuReseau(
-              text: "WhatsApp",
-              press: () async {
-                final Uri _url = Uri.parse("https://wa.me/${contact.tel}");
-                if (!await launchUrl(_url,
-                    mode: LaunchMode.externalApplication)) {
-                  throw 'Could not launch $_url';
-                }
-              },
-            ),
-            const SizedBox(height: 5),
-            if (contact.tiktok != "")
-              ProfileMenuReseau(
-                text: "TikTok",
-                press: () async {
-                  final Uri _url = Uri.parse(contact.tiktok);
-                  if (!await launchUrl(_url,
-                      mode: LaunchMode.externalApplication)) {
-                    throw 'Could not launch $_url';
-                  }
-                },
-              ),
-            if (contact.tiktok != "") const SizedBox(height: 5),
-            if (contact.instagram != "")
-              ProfileMenuReseau(
-                text: "Instagram",
-                press: () async {
-                  final Uri _url = Uri.parse(contact.instagram);
-                  if (!await launchUrl(_url,
-                      mode: LaunchMode.externalApplication)) {
-                    throw 'Could not launch $_url';
-                  }
-                },
-              ),
-            if (contact.instagram != "") const SizedBox(height: 5),
-            if (contact.facebook != "")
-              ProfileMenuReseau(
-                text: "Facebook",
-                press: () async {
-                  final Uri _url = Uri.parse(contact.facebook);
-                  if (!await launchUrl(_url,
-                      mode: LaunchMode.externalApplication)) {
-                    throw 'Could not launch $_url';
-                  }
-                },
-              ),
-            if (contact.facebook != "") const SizedBox(height: 5),
-            if (contact.youtube != "")
-              ProfileMenuReseau(
-                text: "Youtube",
-                press: () async {
-                  final Uri _url = Uri.parse(contact.youtube);
-                  if (!await launchUrl(_url,
-                      mode: LaunchMode.externalApplication)) {
-                    throw 'Could not launch $_url';
-                  }
-                },
-              ),
-            if (contact.youtube != "") const SizedBox(height: 5),
-            const SizedBox(height: 20),
-            if (contact.apropos != "")
-              Text(
-                (langUserPhone == "fr") ? "À propos :" : "About :",
-                style: GoogleFonts.poppins(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            const SizedBox(height: 5),
-            Text(
-              contact.apropos,
-              style: GoogleFonts.poppins(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            const SizedBox(height: 10),
-          ],
-        ),
-      ),
     );
   }
 }
