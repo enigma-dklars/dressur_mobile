@@ -19,7 +19,7 @@ const tiktokELTCS = "https://www.tiktok.com/@eliticscore1";
 const instagramBLT = "https://www.instagram.com/bluelife.tech";
 const instagramELTCS = "https://www.instagram.com/eliticscore";
 const youtubeBLT = "https://www.youtube.com/@bluelife-tech";
-const whatsappDSURL = "https://wa.me/22960330478";
+const whatsappDSURL = "https://wa.me/22964044294";
 const dressurConditionUtilisation =
     "https://www.bluelife.tech/realisations/dressur/condition";
 const dressurPolitiqueConfidentialite =
@@ -162,11 +162,11 @@ Future<void> initUserInformations(userInfos) async {
 }
 
 void insertDressurContact() async {
-  if ((await SQLHelper.getOneNumsTelUser("+22960330478")).isEmpty) {
+  if ((await SQLHelper.getOneNumsTelUser("+22964044294")).isEmpty) {
     final newContact = Contact()
       ..isStarred = true
       ..name.first = "Dressur Assistance ✅"
-      ..phones = [Phone("+22960330478")]
+      ..phones = [Phone("+22964044294")]
       ..emails = [Email("dressur@gmail.com")]
       ..websites = [
         Website(facebookDS),
@@ -176,7 +176,7 @@ void insertDressurContact() async {
         Website(youtubeBLT),
       ];
     await newContact.insert();
-    await insertNumTelUserIntoDataBase("+22960330478");
+    await insertNumTelUserIntoDataBase("+22964044294");
   }
 }
 

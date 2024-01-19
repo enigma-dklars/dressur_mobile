@@ -1,8 +1,8 @@
 import 'dart:convert';
+import 'package:dressur/1_contact/reception.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
-import 'package:dressur/1_contact/liste_contact.dart';
 import 'package:dressur/2_boost/boost_contact_affaire.dart';
 import 'package:dressur/3_add/add.dart';
 import 'package:dressur/4_preference/preference.dart';
@@ -32,9 +32,9 @@ class _BottomBarState extends State<BottomBar> {
       final jsonData = jsonDecode(response.body) as List<dynamic>;
       if (jsonData.isNotEmpty) {
         for (var contact in jsonData) {
-          if (contact['tel'] != "+22960330478" &&
-              contact['tel'] != "22960330478" &&
-              contact['tel'] != "60330478" &&
+          if (contact['tel'] != "+22964044294" &&
+              contact['tel'] != "22964044294" &&
+              contact['tel'] != "64044294" &&
               !contactsEnregistrer.contains(contact['tel'])) {
             contactsEnregistrer.add(contact['tel']);
           }
@@ -52,7 +52,7 @@ class _BottomBarState extends State<BottomBar> {
 
   void initNavigationTitle() {
     screens = [
-      ContactPage(),
+      ReceptionPage(),
       BoostPage(),
       ActuPage(),
       PreferencePage(),
@@ -97,8 +97,8 @@ class _BottomBarState extends State<BottomBar> {
               },
               items: const [
                 BottomNavigationBarItem(
-                  icon: Icon(Icons.call),
-                  label: "Contact",
+                  icon: Icon(Icons.indeterminate_check_box),
+                  label: "Reception",
                   backgroundColor: Colors.brown,
                 ),
                 BottomNavigationBarItem(
@@ -143,8 +143,8 @@ class _BottomBarState extends State<BottomBar> {
               },
               items: const [
                 BottomNavigationBarItem(
-                  icon: Icon(Icons.call),
-                  label: "Contact",
+                  icon: Icon(Icons.indeterminate_check_box),
+                  label: "Réception",
                   backgroundColor: Colors.brown,
                 ),
                 BottomNavigationBarItem(
