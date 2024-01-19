@@ -1,18 +1,12 @@
 import 'dart:io';
 import 'dart:async';
-import 'package:dressur/1_contact/liste_contact.dart';
+import 'package:dressur/1_reception/liste_contact.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:dressur/2_boost/liste_boost_affaire.dart';
-import 'package:dressur/2_boost/liste_boost_contact.dart';
-import 'package:dressur/2_boost/new_boost_contact.dart';
-import 'package:dressur/2_boost/new_boost_affaire.dart';
 import 'package:dressur/5_autre/support_assistance.dart';
 import 'package:dressur/6_notification/liste_notification.dart';
-import 'package:dressur/components/advertisements.dart';
 import 'package:dressur/components/constant.dart';
-import 'package:dressur/components/sociaux.dart';
 
 class ReceptionPage extends StatefulWidget {
   @override

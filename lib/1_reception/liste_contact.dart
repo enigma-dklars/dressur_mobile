@@ -1,10 +1,9 @@
 import 'dart:convert';
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:dressur/1_contact/synchronisation_avance.dart';
+import 'package:dressur/1_reception/synchronisation_avance.dart';
 import 'package:dressur/5_autre/support_assistance.dart';
 import 'package:dressur/6_notification/liste_notification.dart';
 import 'package:dressur/components/constant.dart';
@@ -131,17 +130,6 @@ class _ContactPageState extends State<ContactPage> {
           style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
         ),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.notifications),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => ListeNotification(),
-                ),
-              );
-            },
-          ),
           const Padding(
             padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
             child: VerticalDivider(

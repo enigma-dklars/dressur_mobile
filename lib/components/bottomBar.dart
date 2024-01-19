@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'package:dressur/1_contact/reception.dart';
+import 'package:dressur/1_reception/reception.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';

@@ -4,7 +4,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:dressur/1_contact/reconnaissance_contact.dart';
+import 'package:dressur/1_reception/reconnaissance_contact.dart';
 import 'package:dressur/9_demarage/update_app_important.dart';
 import 'package:dressur/9_demarage/pas_de_connexion.dart';
 import 'package:dressur/9_demarage/presentation_ds.dart';
