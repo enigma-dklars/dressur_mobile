@@ -230,8 +230,10 @@ class _ContactPageState extends State<ContactPage> {
                 });
               },
               decoration: InputDecoration(
-                hintText: 'Rechercher...',
-                prefixIcon: Icon(Icons.search),
+                hintText: (langUserPhone == "fr")
+                    ? "Rechercher..."
+                    : "To research...",
+                prefixIcon: const Icon(Icons.search),
               ),
             ),
           ),
@@ -239,125 +241,136 @@ class _ContactPageState extends State<ContactPage> {
               ? const Center(
                   child: CircularProgressIndicator(),
                 )
-              : Expanded(
-                  child: ListView.builder(
-                    itemCount: _filteredContacts.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      final contact = _filteredContacts[index];
+              : _filteredContacts.isEmpty
+                  ? Center(
+                      child: Text(
+                        (langUserPhone == "fr")
+                            ? "Aucun contact trouvé."
+                            : "No contacts found.",
+                        style: const TextStyle(fontSize: 16),
+                      ),
+                    )
+                  : Expanded(
+                      child: ListView.builder(
+                        itemCount: _filteredContacts.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          final contact = _filteredContacts[index];
 
-                      return Container(
-                        margin: const EdgeInsets.only(
-                            left: 10, top: 10, right: 10, bottom: 0),
-                        child: Row(
-                          children: [
-                            Container(
-                              height: 60,
-                              width: 60,
-                              decoration: BoxDecoration(
-                                gradient: const LinearGradient(
-                                  begin: Alignment.topCenter,
-                                  end: Alignment.bottomCenter,
-                                  colors: [
-                                    Colors.white,
-                                    Colors.indigoAccent,
-                                    Colors.indigo,
-                                  ],
-                                ),
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  CircleAvatar(
-                                    backgroundImage: AssetImage(
-                                        "images-pays/${contact.pays}.png"),
-                                  ),
-                                  const SizedBox(height: 3),
-                                  Text(
-                                    contact.pays,
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 8,
+                          return Container(
+                            margin: const EdgeInsets.only(
+                                left: 10, top: 10, right: 10, bottom: 0),
+                            child: Row(
+                              children: [
+                                Container(
+                                  height: 60,
+                                  width: 60,
+                                  decoration: BoxDecoration(
+                                    gradient: const LinearGradient(
+                                      begin: Alignment.topCenter,
+                                      end: Alignment.bottomCenter,
+                                      colors: [
+                                        Colors.white,
+                                        Colors.indigoAccent,
+                                        Colors.indigo,
+                                      ],
                                     ),
+                                    borderRadius: BorderRadius.circular(10),
                                   ),
-                                ],
-                              ),
-                            ),
-                            const SizedBox(width: 5),
-                            Expanded(
-                              child: Container(
-                                height: 60,
-                                decoration: BoxDecoration(
-                                  gradient: const LinearGradient(
-                                    begin: Alignment.topCenter,
-                                    end: Alignment.bottomRight,
-                                    colors: [
-                                      Colors.indigo,
-                                      Colors.indigoAccent,
-                                      Colors.white,
-                                      Colors.white,
-                                      Colors.white,
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      CircleAvatar(
+                                        backgroundImage: AssetImage(
+                                            "images-pays/${contact.pays}.png"),
+                                      ),
+                                      const SizedBox(height: 3),
+                                      Text(
+                                        contact.pays,
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 8,
+                                        ),
+                                      ),
                                     ],
                                   ),
-                                  borderRadius: BorderRadius.circular(10),
                                 ),
-                                padding:
-                                    const EdgeInsets.fromLTRB(15, 0, 15, 0),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    const SizedBox(height: 5),
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
+                                const SizedBox(width: 5),
+                                Expanded(
+                                  child: Container(
+                                    height: 60,
+                                    decoration: BoxDecoration(
+                                      gradient: const LinearGradient(
+                                        begin: Alignment.topCenter,
+                                        end: Alignment.bottomRight,
+                                        colors: [
+                                          Colors.indigo,
+                                          Colors.indigoAccent,
+                                          Colors.white,
+                                          Colors.white,
+                                          Colors.white,
+                                        ],
+                                      ),
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    padding:
+                                        const EdgeInsets.fromLTRB(15, 0, 15, 0),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
-                                        Text(
-                                          contact.pseudo,
-                                          style: const TextStyle(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                        ElevatedButton.icon(
-                                          style: ElevatedButton.styleFrom(
-                                            backgroundColor: primaryColor,
-                                          ),
-                                          label: Text(
-                                            (langUserPhone == "fr")
-                                                ? "Détails"
-                                                : "Details",
-                                            style: const TextStyle(
-                                              fontSize: 13,
-                                              fontWeight: FontWeight.bold,
+                                        const SizedBox(height: 5),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text(
+                                              contact.pseudo,
+                                              style: const TextStyle(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.bold,
+                                              ),
                                             ),
-                                          ),
-                                          icon: const Icon(
-                                            Icons.info,
-                                            size: 13,
-                                          ),
-                                          onPressed: () {
-                                            setState(() {
-                                              uidAutreUser = contact.id;
-                                              addUserOnAutreProfilPage = "non";
-                                            });
-                                            Navigator.of(context).push(
-                                                MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        AutreProfilPage()));
-                                          },
+                                            ElevatedButton.icon(
+                                              style: ElevatedButton.styleFrom(
+                                                backgroundColor: primaryColor,
+                                              ),
+                                              label: Text(
+                                                (langUserPhone == "fr")
+                                                    ? "Détails"
+                                                    : "Details",
+                                                style: const TextStyle(
+                                                  fontSize: 13,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                              icon: const Icon(
+                                                Icons.info,
+                                                size: 13,
+                                              ),
+                                              onPressed: () {
+                                                setState(() {
+                                                  uidAutreUser = contact.id;
+                                                  addUserOnAutreProfilPage =
+                                                      "non";
+                                                });
+                                                Navigator.of(context).push(
+                                                    MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            AutreProfilPage()));
+                                              },
+                                            ),
+                                          ],
                                         ),
                                       ],
                                     ),
-                                  ],
+                                  ),
                                 ),
-                              ),
+                              ],
                             ),
-                          ],
-                        ),
-                      );
-                    },
-                  ),
-                ),
+                          );
+                        },
+                      ),
+                    ),
         ],
       ),
     );
@@ -377,30 +390,6 @@ class _ContactPageState extends State<ContactPage> {
       setState(() {
         _filteredContacts = filteredList;
       });
-
-      if (_filteredContacts.isEmpty) {
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: Text((langUserPhone == "fr")
-                  ? "Aucune correspondance"
-                  : "No match"),
-              content: Text((langUserPhone == "fr")
-                  ? "Aucun contact trouvé."
-                  : "No contacts found."),
-              actions: <Widget>[
-                TextButton(
-                  child: Text('OK'),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                ),
-              ],
-            );
-          },
-        );
-      }
     }
   }
 }
