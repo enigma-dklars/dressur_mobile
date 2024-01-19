@@ -225,6 +225,10 @@ List<Map<String, dynamic>> listeMethodePaiement = [
     'value': 'mtn_gn',
     'label': 'MTN Mobile Money Guinée',
   },
+  {
+    'value': 'sbin',
+    'label': 'Celtis',
+  },
 ];
 
 // map de tous les pays du monde
