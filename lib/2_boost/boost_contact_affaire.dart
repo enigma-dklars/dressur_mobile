@@ -1,5 +1,7 @@
 import 'dart:io';
 import 'dart:async';
+import 'package:dressur/2_boost/new_campagne_mail.dart';
+import 'package:dressur/components/noti.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -412,8 +414,9 @@ class _BoostPageState extends State<BoostPage> {
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                            builder: (context) =>
-                                                NewBoostContactPage()),
+                                          builder: (context) =>
+                                              NewCampagneMailPage(),
+                                        ),
                                       );
                                     }),
                               )
@@ -520,12 +523,20 @@ class _BoostPageState extends State<BoostPage> {
                                           : "To start up",
                                     ),
                                     onPressed: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                NewBoostContactPage()),
-                                      );
+                                      warningNoti(
+                                          (langUserPhone == "fr")
+                                              ? "Désoler"
+                                              : "Sorry",
+                                          (langUserPhone == "fr")
+                                              ? "Ce service est momentanément indisponible"
+                                              : "This service is temporarily unavailable",
+                                          context);
+                                      // Navigator.push(
+                                      //   context,
+                                      //   MaterialPageRoute(
+                                      //       builder: (context) =>
+                                      //           NewBoostContactPage()),
+                                      // );
                                     }),
                               )
                             ],
@@ -546,12 +557,20 @@ class _BoostPageState extends State<BoostPage> {
                                         ? const Text("Voir la liste")
                                         : const Text("See the list"),
                                     onPressed: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                ListeBoostContactPage()),
-                                      );
+                                      warningNoti(
+                                          (langUserPhone == "fr")
+                                              ? "Désoler"
+                                              : "Sorry",
+                                          (langUserPhone == "fr")
+                                              ? "Ce service est momentanément indisponible"
+                                              : "This service is temporarily unavailable",
+                                          context);
+                                      // Navigator.push(
+                                      //   context,
+                                      //   MaterialPageRoute(
+                                      //       builder: (context) =>
+                                      //           ListeBoostContactPage()),
+                                      // );
                                     }),
                               )
                             ],
