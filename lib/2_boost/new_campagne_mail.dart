@@ -116,10 +116,6 @@ class RegisterForm2 extends StatefulWidget {
 class _RegisterForm2State extends State<RegisterForm2> {
   bool _desactive2 = false;
   dynamic data;
-  dynamic idFormulBoost = 1;
-  dynamic valueMethodePaiement = "mtn";
-  List<Map<String, dynamic>> listeFormulBoost = [];
-  String? boostId;
   final telController = TextEditingController(text: tel);
   final replytoController = TextEditingController(text: mail);
   final titreController = TextEditingController();
@@ -127,7 +123,23 @@ class _RegisterForm2State extends State<RegisterForm2> {
   final sendtoController = TextEditingController();
   final contentmailController = TextEditingController();
 
-  void newBoostPayant() async {
+  String extraireAdressesEmail(String texte) {
+    RegExp regex =
+        RegExp(r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b');
+    Iterable<Match> matches = regex.allMatches(texte);
+
+    List<String> adressesEmail = [];
+    for (Match match in matches) {
+      String? email = match.group(0);
+      if (email != null) {
+        adressesEmail.add(email);
+      }
+    }
+
+    return adressesEmail.join(',');
+  }
+
+  void newCampagneMail() async {
     if (telIsVerified == true) {
       dynamic youHaveNetWork = "";
       youHaveConnexion();
@@ -139,15 +151,16 @@ class _RegisterForm2State extends State<RegisterForm2> {
         setState(() {
           _desactive2 = true;
         });
-
         var request = http.MultipartRequest(
-            'POST', Uri.parse('$generalRouteForApi/newBoostPayant'));
+            'POST', Uri.parse('$generalRouteForApi/newCampagneMail'));
         request.fields.addAll({
           'uid': uidUser,
           'langUserPhone': langUserPhone.toString(),
-          'idFormulBoost': idFormulBoost.toString(),
-          'valueMethodePaiement': valueMethodePaiement,
-          'tel': telController.text
+          'titre': titreController.text,
+          'sujet': sujetController.text,
+          'replyto': replytoController.text,
+          'sendto': extraireAdressesEmail(sendtoController.text),
+          'contentmail': contentmailController.text,
         });
 
         http.StreamedResponse response = await request.send();
@@ -156,14 +169,19 @@ class _RegisterForm2State extends State<RegisterForm2> {
           var data1 = await response.stream.bytesToString();
           var data = convert.jsonDecode(data1);
           if (data["error"] == false) {
-            // var idTransaction = data["idTransaction"];
             setState(() {
               _desactive2 = false;
+              successNoti(
+                  "",
+                  (langUserPhone == "fr")
+                      ? 'Votre campagne a été enregistrée, vous passerez au paiement si elle est acceptée.'
+                      : 'Your campaign has been saved, you will proceed to payment if it is accepted.',
+                  context);
               ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                 content: Text(
                   (langUserPhone == "fr")
-                      ? 'Actualiser la liste de vos boosts...'
-                      : 'Refresh the list of your boosts...',
+                      ? 'Votre campagne a été enregistrée, vous passerez au paiement si elle est acceptée.'
+                      : 'Your campaign has been saved, you will proceed to payment if it is accepted.',
                 ),
               ));
             });
@@ -268,7 +286,7 @@ class _RegisterForm2State extends State<RegisterForm2> {
           DelayedAnimation(
             delay: 0, // 1500,
             child: TextField(
-              maxLines: 100,
+              maxLines: 50,
               minLines: 1,
               controller: contentmailController,
               decoration: InputDecoration(
@@ -307,7 +325,7 @@ class _RegisterForm2State extends State<RegisterForm2> {
                         "Veuillez d'abord confirmer votre adresse mail...\n\nVous trouverez sur notre chaine YouTube des vidéos qui peuvent vous aider...",
                         context);
                   } else {
-                    _desactive2 ? null : newBoostPayant();
+                    _desactive2 ? null : newCampagneMail();
                   }
                 },
               ),

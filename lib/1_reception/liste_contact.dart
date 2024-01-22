@@ -124,7 +124,6 @@ class _ContactPageState extends State<ContactPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        automaticallyImplyLeading: false,
         elevation: 0,
         backgroundColor: primaryColor,
         title: Text(
@@ -132,14 +131,6 @@ class _ContactPageState extends State<ContactPage> {
           style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
         ),
         actions: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
-            child: VerticalDivider(
-              width: 0,
-              color: Colors.white,
-              thickness: 1,
-            ),
-          ),
           PopupMenuButton<int>(
             itemBuilder: (context) => [
               PopupMenuItem(
