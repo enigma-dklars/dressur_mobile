@@ -103,7 +103,7 @@ class _BottomBarState extends State<BottomBar> {
                 ),
                 BottomNavigationBarItem(
                   icon: Icon(Icons.move_up),
-                  label: "B & P",
+                  label: "Promo",
                   backgroundColor: primaryColor,
                 ),
                 BottomNavigationBarItem(
@@ -149,7 +149,7 @@ class _BottomBarState extends State<BottomBar> {
                 ),
                 BottomNavigationBarItem(
                   icon: Icon(Icons.move_up),
-                  label: "B & P",
+                  label: "Promo",
                   backgroundColor: primaryColor,
                 ),
                 BottomNavigationBarItem(

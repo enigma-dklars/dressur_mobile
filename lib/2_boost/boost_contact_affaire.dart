@@ -69,9 +69,7 @@ class _BoostPageState extends State<BoostPage> {
           elevation: 0,
           backgroundColor: primaryColor,
           title: Text(
-            (langUserPhone == "fr")
-                ? "Boosts et Promotions"
-                : "Boosts and Promotions",
+            (langUserPhone == "fr") ? "Promotions" : "Promotions",
             style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
           ),
           actions: [
@@ -161,7 +159,6 @@ class _BoostPageState extends State<BoostPage> {
                           color: Colors.white,
                         ),
                       ),
-                      const SizedBox(height: 5),
                       Text(
                         (langUserPhone == "fr")
                             ? "Rendez visible le ($tel) aux contacts correspondant à vos préférences pays."
@@ -171,7 +168,6 @@ class _BoostPageState extends State<BoostPage> {
                           fontSize: 14,
                         ),
                       ),
-                      const SizedBox(height: 5),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -274,7 +270,6 @@ class _BoostPageState extends State<BoostPage> {
                           color: Colors.white,
                         ),
                       ),
-                      const SizedBox(height: 5),
                       Text(
                         (langUserPhone == "fr")
                             ? "Faite la promotion de vos produits et services. Les utilisateurs intéressés vous contacterons sur WhatsApp."
@@ -284,7 +279,6 @@ class _BoostPageState extends State<BoostPage> {
                           fontSize: 14,
                         ),
                       ),
-                      const SizedBox(height: 5),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -335,6 +329,228 @@ class _BoostPageState extends State<BoostPage> {
                                         MaterialPageRoute(
                                             builder: (context) =>
                                                 PromotionListPage()),
+                                      );
+                                    }),
+                              )
+                            ],
+                          ),
+                        ],
+                      )
+                    ],
+                  ),
+                ),
+              ),
+              const Padding(
+                padding:
+                    EdgeInsets.only(left: 50, top: 5, right: 50, bottom: 5),
+                child: Divider(
+                  height: 1,
+                  thickness: 1,
+                  color: Colors.grey,
+                ),
+              ),
+              Card(
+                margin: const EdgeInsets.only(
+                    left: 10, top: 5, right: 10, bottom: 5),
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(5),
+                    gradient: const LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        primaryColor,
+                        secondaryColor,
+                        Colors.white,
+                      ],
+                    ),
+                  ),
+                  padding: const EdgeInsets.fromLTRB(15, 10, 15, 10),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Text(
+                        (langUserPhone == "fr")
+                            ? "Campagne Mail"
+                            : "Email Campaign",
+                        style: GoogleFonts.poppins(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 24,
+                          color: Colors.white,
+                        ),
+                      ),
+                      Text(
+                        (langUserPhone == "fr")
+                            ? "Faites la promotion de vos produits et services grâce à notre Campagne Mail."
+                            : "Promote your products and services with our Mail Campaign.",
+                        style: GoogleFonts.poppins(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 14,
+                        ),
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Column(
+                            children: [
+                              SizedBox(
+                                width: MediaQuery.of(context).size.width * 0.35,
+                                child: ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: primaryColor,
+                                      shape: const StadiumBorder(),
+                                      padding: const EdgeInsets.symmetric(
+                                        vertical: 10,
+                                      ),
+                                    ),
+                                    child: Text(
+                                      (langUserPhone == "fr")
+                                          ? "Démarrer"
+                                          : "To start up",
+                                    ),
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                NewBoostContactPage()),
+                                      );
+                                    }),
+                              )
+                            ],
+                          ),
+                          Column(
+                            children: [
+                              SizedBox(
+                                width: MediaQuery.of(context).size.width * 0.35,
+                                child: ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: secondaryColor,
+                                      shape: const StadiumBorder(),
+                                      padding: const EdgeInsets.symmetric(
+                                        vertical: 10,
+                                      ),
+                                    ),
+                                    child: (langUserPhone == "fr")
+                                        ? const Text("Voir la liste")
+                                        : const Text("See the list"),
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                ListeBoostContactPage()),
+                                      );
+                                    }),
+                              )
+                            ],
+                          ),
+                        ],
+                      )
+                    ],
+                  ),
+                ),
+              ),
+              const Padding(
+                padding:
+                    EdgeInsets.only(left: 50, top: 5, right: 50, bottom: 5),
+                child: Divider(
+                  height: 1,
+                  thickness: 1,
+                  color: Colors.grey,
+                ),
+              ),
+              Card(
+                margin: const EdgeInsets.only(
+                    left: 10, top: 5, right: 10, bottom: 5),
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(5),
+                    gradient: const LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        primaryColor,
+                        secondaryColor,
+                        Colors.white,
+                      ],
+                    ),
+                  ),
+                  padding: const EdgeInsets.fromLTRB(15, 10, 15, 10),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Text(
+                        (langUserPhone == "fr")
+                            ? "Campagne SMS"
+                            : "SMS Campaign",
+                        style: GoogleFonts.poppins(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 24,
+                          color: Colors.white,
+                        ),
+                      ),
+                      Text(
+                        (langUserPhone == "fr")
+                            ? "Grâce à notre Campagne SMS, Faites la promotion de vos produits et services."
+                            : "Thanks to our SMS Campaign, promote your products and services.",
+                        style: GoogleFonts.poppins(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 14,
+                        ),
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Column(
+                            children: [
+                              SizedBox(
+                                width: MediaQuery.of(context).size.width * 0.35,
+                                child: ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: primaryColor,
+                                      shape: const StadiumBorder(),
+                                      padding: const EdgeInsets.symmetric(
+                                        vertical: 10,
+                                      ),
+                                    ),
+                                    child: Text(
+                                      (langUserPhone == "fr")
+                                          ? "Démarrer"
+                                          : "To start up",
+                                    ),
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                NewBoostContactPage()),
+                                      );
+                                    }),
+                              )
+                            ],
+                          ),
+                          Column(
+                            children: [
+                              SizedBox(
+                                width: MediaQuery.of(context).size.width * 0.35,
+                                child: ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: secondaryColor,
+                                      shape: const StadiumBorder(),
+                                      padding: const EdgeInsets.symmetric(
+                                        vertical: 10,
+                                      ),
+                                    ),
+                                    child: (langUserPhone == "fr")
+                                        ? const Text("Voir la liste")
+                                        : const Text("See the list"),
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                ListeBoostContactPage()),
                                       );
                                     }),
                               )
