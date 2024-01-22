@@ -7,7 +7,6 @@ import 'package:dressur/components/constant.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
 import 'package:dressur/components/sql_helper.dart';
-import 'package:select_form_field/select_form_field.dart';
 import 'package:dressur/components/noti.dart';
 
 class NewCampagneMailPage extends StatefulWidget {
@@ -116,7 +115,6 @@ class RegisterForm2 extends StatefulWidget {
 
 class _RegisterForm2State extends State<RegisterForm2> {
   bool _desactive2 = false;
-  var _message = "";
   dynamic data;
   dynamic idFormulBoost = 1;
   dynamic valueMethodePaiement = "mtn";
@@ -127,79 +125,7 @@ class _RegisterForm2State extends State<RegisterForm2> {
   final titreController = TextEditingController();
   final sujetController = TextEditingController();
   final sendtoController = TextEditingController();
-
-  void listeFormuleBoost() async {
-    dynamic youHaveNetWork = "";
-    youHaveConnexion();
-    youHaveNetWork = await SQLHelper.getYouHaveConnexion();
-    while (youHaveNetWork.length == 0) {
-      youHaveNetWork = await SQLHelper.getYouHaveConnexion();
-    }
-    if (youHaveNetWork[0]['youHaveConnexion'] == "oui") {
-      setState(() {
-        _desactive2 = true;
-      });
-
-      var request = http.MultipartRequest(
-          'POST', Uri.parse('$generalRouteForApi/listeFormuleBoost'));
-      request.fields.addAll({});
-
-      http.StreamedResponse response = await request.send();
-
-      if (response.statusCode == 200) {
-        var data1 = await response.stream.bytesToString();
-        var data = convert.jsonDecode(data1);
-        if (data["error"] == false) {
-          SQLHelper.delete('listeFormulBoost');
-          for (var listeFormulBoost in data["listeFormulBoost"]) {
-            SQLHelper.insert({
-              'tableName': "listeFormulBoost",
-              'value': listeFormulBoost['id'],
-              'label': listeFormulBoost['label'] +
-                  " à " +
-                  (listeFormulBoost['prix']).toString() +
-                  " FCFA",
-              'prix': listeFormulBoost['prix'],
-              'jours': listeFormulBoost['jours']
-            });
-          }
-          final dataElements = await SQLHelper.getAll("listeFormulBoost");
-          setState(() {
-            _desactive2 = false;
-            listeFormulBoost = dataElements;
-            onChangeFormulBoost(1);
-          });
-        }
-      }
-    } else {
-      if (langUserPhone != "fr") {
-        dangerNoti(
-            "Mistake!", "You are not connected to the internet.", context);
-      } else {
-        dangerNoti("Erreur!", "Vous n'ètes pas connecté a internet.", context);
-      }
-      setState(() {
-        _desactive2 = false;
-      });
-    }
-  }
-
-  onChangeFormulBoost(val) async {
-    var prix = (await SQLHelper.getFormulBoostWhithId(val))[0]['prix'];
-    var jours = (await SQLHelper.getFormulBoostWhithId(val))[0]['jours'];
-    setState(() {
-      idFormulBoost = val;
-      _message = (langUserPhone == "fr")
-          ? "Cette formule vous offre un boost de $jours jour(s) pour $prix FCFA."
-          : "This formula offers you a boost of $jours day(s) for $prix FCFA.";
-    });
-  }
-
-  onChangeMethodePaiement(val) async {
-    setState(() {
-      valueMethodePaiement = val;
-    });
-  }
+  final contentmailController = TextEditingController();
 
   void newBoostPayant() async {
     if (telIsVerified == true) {
@@ -274,87 +200,9 @@ class _RegisterForm2State extends State<RegisterForm2> {
     }
   }
 
-  void checkTransaction(idTransaction) async {
-    if (telIsVerified == true) {
-      dynamic youHaveNetWork = "";
-      youHaveConnexion();
-      youHaveNetWork = await SQLHelper.getYouHaveConnexion();
-      while (youHaveNetWork.length == 0) {
-        youHaveNetWork = await SQLHelper.getYouHaveConnexion();
-      }
-      if (youHaveNetWork[0]['youHaveConnexion'] == "oui") {
-        setState(() {
-          _desactive2 = true;
-        });
-
-        var request = http.MultipartRequest(
-            'POST', Uri.parse('$generalRouteForApi/checkTransaction'));
-        request.fields.addAll({
-          'uid': uidUser,
-          'langUserPhone': langUserPhone.toString(),
-          'idTransaction': idTransaction.toString()
-        });
-
-        http.StreamedResponse response = await request.send();
-
-        if (response.statusCode == 200) {
-          var data1 = await response.stream.bytesToString();
-          var data = convert.jsonDecode(data1);
-          if (data["error"] == false) {
-            if (data["transaction"] == false) {
-              dangerNoti(data["titre"], data["message"], context);
-
-              setState(() {
-                _desactive2 = false;
-              });
-            } else if (data["transaction"] == true) {
-              successNoti(data["titre"], data["message"], context);
-
-              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                content: Text(data["message"]),
-              ));
-
-              setState(() {
-                _desactive2 = false;
-              });
-            }
-          } else {
-            dangerNoti(data["titre"], data["message"], context);
-            setState(() {
-              _desactive2 = false;
-            });
-          }
-        }
-      } else {
-        if (langUserPhone != "fr") {
-          dangerNoti(
-              "Mistake!", "You are not connected to the internet.", context);
-        } else {
-          dangerNoti(
-              "Erreur!", "Vous n'ètes pas connecté a internet.", context);
-        }
-        setState(() {
-          _desactive2 = false;
-        });
-      }
-    } else {
-      if (langUserPhone != "fr") {
-        dangerNoti("Access denied !",
-            "Please confirm your WhatsApp number first.", context);
-      } else {
-        dangerNoti("Accès Refusé !",
-            "Veuillez d'abord confirmer votre numéro WhatsApp.", context);
-      }
-      setState(() {
-        _desactive2 = false;
-      });
-    }
-  }
-
   @override
   void initState() {
     super.initState(); // Loading the diary when the app starts
-    listeFormuleBoost();
   }
 
   @override
@@ -377,7 +225,7 @@ class _RegisterForm2State extends State<RegisterForm2> {
           DelayedAnimation(
             delay: 0, // 1500,
             child: TextField(
-              controller: titreController,
+              controller: sujetController,
               decoration: InputDecoration(
                 labelStyle: TextStyle(color: Colors.grey[400]),
                 labelText: (langUserPhone == "fr") ? "Sujet" : "Subject",
@@ -402,6 +250,8 @@ class _RegisterForm2State extends State<RegisterForm2> {
           DelayedAnimation(
             delay: 0, // 1500,
             child: TextField(
+              maxLines: 3,
+              minLines: 1,
               controller: sendtoController,
               decoration: InputDecoration(
                 labelStyle: TextStyle(color: Colors.grey[400]),
@@ -417,27 +267,15 @@ class _RegisterForm2State extends State<RegisterForm2> {
           const SizedBox(height: 10),
           DelayedAnimation(
             delay: 0, // 1500,
-            child: SelectFormField(
-              decoration: const InputDecoration(
-                labelText: 'Methode de paiement mobile',
-                border: OutlineInputBorder(),
-              ),
-              type: SelectFormFieldType.dropdown,
-              initialValue: 'mtn',
-              labelText: 'Methode de paiement mobile',
-              items: listeMethodePaiement,
-              onChanged: (val) => onChangeMethodePaiement(val),
-              onSaved: (val) => print(val),
-            ),
-          ),
-          const SizedBox(height: 10),
-          DelayedAnimation(
-            delay: 0, // 1500,
             child: TextField(
-              controller: telController,
+              maxLines: 100,
+              minLines: 1,
+              controller: contentmailController,
               decoration: InputDecoration(
                 labelStyle: TextStyle(color: Colors.grey[400]),
-                labelText: 'Indicatif + Numéro du paiement',
+                labelText: (langUserPhone == "fr")
+                    ? "Contenu du mail"
+                    : "Content of the email",
                 border: const OutlineInputBorder(),
               ),
             ),
@@ -455,9 +293,8 @@ class _RegisterForm2State extends State<RegisterForm2> {
                     vertical: 13,
                   ),
                 ),
-                child: _desactive2
-                    ? const Text("Wait...")
-                    : const Text("PAYER & BOOSTER"),
+                child:
+                    _desactive2 ? const Text("Wait...") : const Text("ENVOYER"),
                 onPressed: () {
                   if (!telIsVerified) {
                     warningNoti(
@@ -477,33 +314,6 @@ class _RegisterForm2State extends State<RegisterForm2> {
             ),
           ),
           const SizedBox(height: 20),
-          DelayedAnimation(
-            delay: 0, // 1000,
-            child: Text(
-              _message,
-              style: GoogleFonts.poppins(
-                color: Colors.blue[400],
-                fontWeight: FontWeight.w600,
-                fontSize: 12,
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ),
-          const SizedBox(height: 10),
-          DelayedAnimation(
-            delay: 0, // 1500,
-            child: Text(
-              (langUserPhone == "fr")
-                  ? "Pour payer par Wave ou Carte Bancaire, veuillez contacter l'Assistance Dressur par WhatsApp. Merci..."
-                  : "To pay by Wave or Credit Card, please contact Dressur Support by WhatsApp. THANKS...",
-              style: GoogleFonts.poppins(
-                fontWeight: FontWeight.w600,
-                fontSize: 12,
-                color: Colors.red[400],
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ),
         ],
       ),
     );
