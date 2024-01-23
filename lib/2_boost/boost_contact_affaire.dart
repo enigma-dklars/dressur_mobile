@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:async';
+import 'package:dressur/2_boost/liste_campagne_mail.dart';
 import 'package:dressur/2_boost/new_campagne_mail.dart';
 import 'package:dressur/components/noti.dart';
 import 'package:flutter/material.dart';
@@ -149,7 +150,7 @@ class _BoostPageState extends State<BoostPage> {
                       ],
                     ),
                   ),
-                  padding: const EdgeInsets.fromLTRB(15, 10, 15, 10),
+                  padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
@@ -235,7 +236,7 @@ class _BoostPageState extends State<BoostPage> {
               ),
               const Padding(
                 padding:
-                    EdgeInsets.only(left: 50, top: 5, right: 50, bottom: 5),
+                    EdgeInsets.only(left: 50, top: 2, right: 50, bottom: 2),
                 child: Divider(
                   height: 1,
                   thickness: 1,
@@ -258,7 +259,7 @@ class _BoostPageState extends State<BoostPage> {
                       ],
                     ),
                   ),
-                  padding: const EdgeInsets.fromLTRB(15, 10, 15, 10),
+                  padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
@@ -344,7 +345,7 @@ class _BoostPageState extends State<BoostPage> {
               ),
               const Padding(
                 padding:
-                    EdgeInsets.only(left: 50, top: 5, right: 50, bottom: 5),
+                    EdgeInsets.only(left: 50, top: 2, right: 50, bottom: 2),
                 child: Divider(
                   height: 1,
                   thickness: 1,
@@ -367,7 +368,7 @@ class _BoostPageState extends State<BoostPage> {
                       ],
                     ),
                   ),
-                  padding: const EdgeInsets.fromLTRB(15, 10, 15, 10),
+                  padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
@@ -442,7 +443,7 @@ class _BoostPageState extends State<BoostPage> {
                                         context,
                                         MaterialPageRoute(
                                             builder: (context) =>
-                                                ListeBoostContactPage()),
+                                                CampagneMailListePage()),
                                       );
                                     }),
                               )
@@ -456,7 +457,7 @@ class _BoostPageState extends State<BoostPage> {
               ),
               const Padding(
                 padding:
-                    EdgeInsets.only(left: 50, top: 5, right: 50, bottom: 5),
+                    EdgeInsets.only(left: 50, top: 2, right: 50, bottom: 2),
                 child: Divider(
                   height: 1,
                   thickness: 1,
@@ -479,7 +480,7 @@ class _BoostPageState extends State<BoostPage> {
                       ],
                     ),
                   ),
-                  padding: const EdgeInsets.fromLTRB(15, 10, 15, 10),
+                  padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
@@ -583,7 +584,7 @@ class _BoostPageState extends State<BoostPage> {
               ),
               const Padding(
                 padding:
-                    EdgeInsets.only(left: 50, top: 5, right: 50, bottom: 5),
+                    EdgeInsets.only(left: 50, top: 2, right: 50, bottom: 2),
                 child: Divider(
                   height: 1,
                   thickness: 1,

@@ -125,6 +125,7 @@ class _ReceptionPageState extends State<ReceptionPage> {
         body: SingleChildScrollView(
           child: Column(
             children: [
+              const SizedBox(height: 5),
               GestureDetector(
                 onTap: () {
                   Navigator.push(
@@ -134,134 +135,188 @@ class _ReceptionPageState extends State<ReceptionPage> {
                     ),
                   );
                 },
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    // Première colonne avec une icône centrée dans un cercle vert
-                    Container(
-                      padding: const EdgeInsets.all(10.0),
-                      margin: const EdgeInsets.all(10.0),
-                      decoration: const BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Colors.green,
-                      ),
-                      child: const Icon(
-                        Icons.contacts,
-                        color: Colors.white,
-                        size: 20,
-                      ),
-                    ),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            (langUserPhone == "fr")
-                                ? "Nouveaux Contacts Dressur"
-                                : "New Contacts Dressur",
-                            style: const TextStyle(fontSize: 20),
-                          ),
-                          const SizedBox(height: 5),
-                          Text(
-                            (langUserPhone == "fr")
-                                ? "Contacts ajouter et scanner"
-                                : "Contacts add and scan",
-                            style: const TextStyle(fontSize: 12),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
+                child: Card(
+                  margin: const EdgeInsets.only(
+                      left: 10, top: 5, right: 10, bottom: 5),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(5),
+                      gradient: const LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          primaryColor,
+                          secondaryColor,
+                          Colors.white,
                         ],
                       ),
                     ),
-
-                    Container(
-                      padding: const EdgeInsets.all(5),
-                      margin: const EdgeInsets.all(5),
-                      child: const Icon(
-                        Icons.chevron_right,
-                        size: 20,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const Padding(
-                padding:
-                    EdgeInsets.only(left: 40, top: 0, right: 40, bottom: 0),
-                child: Divider(
-                  height: 1,
-                  thickness: 2,
-                  color: Colors.green,
-                ),
-              ),
-              GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => ContactPage(),
-                    ),
-                  );
-                },
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(0),
-                      margin: const EdgeInsets.all(10),
-                      child: CircleAvatar(
-                        radius:
-                            20, // Définissez le rayon du cercle selon votre besoin
-                        backgroundColor: Colors.white,
-                        child: Image.asset(
-                          "images/dressur_logo_centrer_sans_fond.png",
-                          width: 90, // Définissez la largeur de l'image
-                          height: 90, // Définissez la hauteur de l'image
-                          fit: BoxFit
-                              .cover, // Ajustez le comportement de l'ajustement d'image si nécessaire
+                    padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        // Première colonne avec une icône centrée dans un cercle vert
+                        Container(
+                          padding: const EdgeInsets.all(10.0),
+                          margin: const EdgeInsets.all(10.0),
+                          decoration: const BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Colors.green,
+                          ),
+                          child: const Icon(
+                            Icons.contacts,
+                            color: Colors.white,
+                            size: 20,
+                          ),
                         ),
-                      ),
-                    ),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Text(
-                            "Dressur Notifications",
-                            style: TextStyle(fontSize: 20),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                (langUserPhone == "fr")
+                                    ? "Nouveaux Contacts Dressur"
+                                    : "New Contacts Dressur",
+                                style: GoogleFonts.poppins(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w500,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              const SizedBox(height: 5),
+                              Text(
+                                (langUserPhone == "fr")
+                                    ? "Contacts ajouter et scanner"
+                                    : "Contacts add and scan",
+                                style: GoogleFonts.poppins(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w500,
+                                  color: Colors.black,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
                           ),
-                          const SizedBox(height: 5),
-                          Text(
-                            (langUserPhone == "fr")
-                                ? "Cadeaux, Astuces, Recommandations, Informations, Avertissements, "
-                                : "Gifts, Tips, Recommendations, Information, Warnings, ",
-                            style: const TextStyle(fontSize: 12),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
+                        ),
+
+                        Container(
+                          padding: const EdgeInsets.all(5),
+                          margin: const EdgeInsets.all(5),
+                          child: const Icon(
+                            Icons.chevron_right,
+                            size: 20,
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                    Container(
-                      padding: const EdgeInsets.all(5),
-                      margin: const EdgeInsets.all(5),
-                      child: const Icon(
-                        Icons.chevron_right,
-                        size: 20,
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
               ),
               const Padding(
                 padding:
-                    EdgeInsets.only(left: 40, top: 0, right: 40, bottom: 0),
+                    EdgeInsets.only(left: 50, top: 2, right: 50, bottom: 2),
                 child: Divider(
                   height: 1,
-                  thickness: 2,
-                  color: primaryColor,
+                  thickness: 1,
+                  color: Colors.grey,
+                ),
+              ),
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ListeNotification(),
+                    ),
+                  );
+                },
+                child: Card(
+                  margin: const EdgeInsets.only(
+                      left: 10, top: 5, right: 10, bottom: 5),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(5),
+                      gradient: const LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          primaryColor,
+                          secondaryColor,
+                          Colors.white,
+                        ],
+                      ),
+                    ),
+                    padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(0),
+                          margin: const EdgeInsets.all(10),
+                          child: CircleAvatar(
+                            radius:
+                                20, // Définissez le rayon du cercle selon votre besoin
+                            backgroundColor: Colors.white,
+                            child: Image.asset(
+                              "images/dressur_logo_centrer_sans_fond.png",
+                              width: 90, // Définissez la largeur de l'image
+                              height: 90, // Définissez la hauteur de l'image
+                              fit: BoxFit
+                                  .cover, // Ajustez le comportement de l'ajustement d'image si nécessaire
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                "Dressur Notifications",
+                                style: GoogleFonts.poppins(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w500,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              const SizedBox(height: 5),
+                              Text(
+                                (langUserPhone == "fr")
+                                    ? "Cadeaux, Astuces, Recommandations, Informations, Avertissements, "
+                                    : "Gifts, Tips, Recommendations, Information, Warnings, ",
+                                style: GoogleFonts.poppins(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w500,
+                                  color: Colors.black,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.all(5),
+                          margin: const EdgeInsets.all(5),
+                          child: const Icon(
+                            Icons.chevron_right,
+                            size: 20,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              const Padding(
+                padding:
+                    EdgeInsets.only(left: 50, top: 2, right: 50, bottom: 2),
+                child: Divider(
+                  height: 1,
+                  thickness: 1,
+                  color: Colors.grey,
                 ),
               ),
               const SizedBox(height: 5),

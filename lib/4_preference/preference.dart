@@ -235,7 +235,7 @@ class _PreferencePageState extends State<PreferencePage> {
                         ],
                       ),
                     ),
-                    padding: const EdgeInsets.fromLTRB(15, 10, 15, 10),
+                    padding: const EdgeInsets.fromLTRB(10, 5, 10, 0),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
@@ -250,7 +250,6 @@ class _PreferencePageState extends State<PreferencePage> {
                           ),
                           textAlign: TextAlign.left,
                         ),
-                        const SizedBox(height: 5),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
@@ -305,7 +304,7 @@ class _PreferencePageState extends State<PreferencePage> {
                 ),
                 const Padding(
                   padding:
-                      EdgeInsets.only(left: 50, top: 5, right: 50, bottom: 5),
+                      EdgeInsets.only(left: 50, top: 2, right: 50, bottom: 2),
                   child: Divider(
                     height: 1,
                     thickness: 1,
@@ -328,7 +327,7 @@ class _PreferencePageState extends State<PreferencePage> {
                         ],
                       ),
                     ),
-                    padding: const EdgeInsets.fromLTRB(15, 10, 15, 10),
+                    padding: const EdgeInsets.fromLTRB(10, 5, 10, 2),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
@@ -343,7 +342,6 @@ class _PreferencePageState extends State<PreferencePage> {
                           ),
                           textAlign: TextAlign.left,
                         ),
-                        const SizedBox(height: 10),
                         Text(
                           preferencePaysText.toString(),
                           style: GoogleFonts.poppins(
@@ -353,7 +351,6 @@ class _PreferencePageState extends State<PreferencePage> {
                           ),
                           textAlign: TextAlign.left,
                         ),
-                        const SizedBox(height: 10),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
@@ -387,7 +384,7 @@ class _PreferencePageState extends State<PreferencePage> {
                 ),
                 const Padding(
                   padding:
-                      EdgeInsets.only(left: 50, top: 5, right: 50, bottom: 5),
+                      EdgeInsets.only(left: 50, top: 2, right: 50, bottom: 2),
                   child: Divider(
                     height: 1,
                     thickness: 1,

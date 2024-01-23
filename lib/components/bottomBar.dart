@@ -107,17 +107,17 @@ class _BottomBarState extends State<BottomBar> {
                   backgroundColor: primaryColor,
                 ),
                 BottomNavigationBarItem(
-                  icon: Icon(Icons.person_add),
-                  label: "Add",
+                  icon: Icon(Icons.add_box),
+                  label: "News",
                   backgroundColor: Colors.blue,
                 ),
                 BottomNavigationBarItem(
-                  icon: Icon(Icons.hearing_outlined),
+                  icon: Icon(Icons.favorite),
                   label: "Preferences",
                   backgroundColor: Colors.teal,
                 ),
                 BottomNavigationBarItem(
-                  icon: Icon(Icons.settings),
+                  icon: Icon(Icons.settings_applications),
                   label: "Other...",
                   backgroundColor: Colors.grey,
                 ),
@@ -153,17 +153,17 @@ class _BottomBarState extends State<BottomBar> {
                   backgroundColor: primaryColor,
                 ),
                 BottomNavigationBarItem(
-                  icon: Icon(Icons.person_add),
-                  label: "Add",
+                  icon: Icon(Icons.add_box),
+                  label: "Actu",
                   backgroundColor: Colors.blue,
                 ),
                 BottomNavigationBarItem(
-                  icon: Icon(Icons.hearing_outlined),
+                  icon: Icon(Icons.favorite),
                   label: "Préférences",
                   backgroundColor: Colors.teal,
                 ),
                 BottomNavigationBarItem(
-                  icon: Icon(Icons.settings),
+                  icon: Icon(Icons.settings_applications),
                   label: "Autre...",
                   backgroundColor: Colors.grey,
                 ),

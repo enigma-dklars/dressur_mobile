@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_const_constructors
+
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
@@ -286,7 +288,7 @@ class _ActuPageState extends State<ActuPage> {
           elevation: 0,
           backgroundColor: primaryColor,
           title: Text(
-            "Add",
+            (langUserPhone == "fr") ? "Actu" : "News",
             style: GoogleFonts.poppins(
               fontWeight: FontWeight.w600,
             ),
@@ -442,7 +444,7 @@ class _ActuPageState extends State<ActuPage> {
               const SizedBox(height: 5),
               const Padding(
                 padding:
-                    EdgeInsets.only(left: 50, top: 5, right: 50, bottom: 5),
+                    EdgeInsets.only(left: 50, top: 2, right: 50, bottom: 2),
                 child: Divider(
                   height: 1,
                   thickness: 1,
@@ -465,7 +467,7 @@ class _ActuPageState extends State<ActuPage> {
                             ],
                           ),
                         ),
-                        padding: const EdgeInsets.fromLTRB(15, 10, 15, 10),
+                        padding: const EdgeInsets.fromLTRB(10, 3, 10, 3),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
@@ -479,7 +481,6 @@ class _ActuPageState extends State<ActuPage> {
                                 color: Colors.white,
                               ),
                             ),
-                            const SizedBox(height: 10),
                             Text(
                               (langUserPhone == "fr")
                                   ? "Veuillez confirmer votre adresse mail pour pouvoir récupérer votre compte lorsque vous oubliez votre mot de passe..."
@@ -489,7 +490,6 @@ class _ActuPageState extends State<ActuPage> {
                                 fontSize: 16,
                               ),
                             ),
-                            const SizedBox(height: 15),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.end,
                               children: [
@@ -503,7 +503,7 @@ class _ActuPageState extends State<ActuPage> {
                                             backgroundColor: primaryColor,
                                             shape: const StadiumBorder(),
                                             padding: const EdgeInsets.symmetric(
-                                              vertical: 13,
+                                              vertical: 10,
                                             ),
                                           ),
                                           child: (langUserPhone == "fr")
@@ -530,7 +530,7 @@ class _ActuPageState extends State<ActuPage> {
               !mailIsVerified
                   ? const Padding(
                       padding: EdgeInsets.only(
-                          left: 50, top: 5, right: 50, bottom: 5),
+                          left: 50, top: 2, right: 50, bottom: 2),
                       child: Divider(
                         height: 1,
                         thickness: 1,
@@ -554,7 +554,7 @@ class _ActuPageState extends State<ActuPage> {
                             ],
                           ),
                         ),
-                        padding: const EdgeInsets.fromLTRB(15, 10, 15, 10),
+                        padding: const EdgeInsets.fromLTRB(10, 3, 10, 0),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
@@ -587,7 +587,7 @@ class _ActuPageState extends State<ActuPage> {
               !telIsVerified
                   ? const Padding(
                       padding: EdgeInsets.only(
-                          left: 50, top: 5, right: 50, bottom: 5),
+                          left: 50, top: 2, right: 50, bottom: 2),
                       child: Divider(
                         height: 1,
                         thickness: 1,
@@ -611,7 +611,7 @@ class _ActuPageState extends State<ActuPage> {
                       ],
                     ),
                   ),
-                  padding: const EdgeInsets.fromLTRB(15, 2, 15, 10),
+                  padding: const EdgeInsets.fromLTRB(10, 0, 10, 3),
                   child: Column(
                     children: [
                       Row(
@@ -659,7 +659,6 @@ class _ActuPageState extends State<ActuPage> {
                           fontSize: 14,
                         ),
                       ),
-                      const SizedBox(height: 5),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -749,7 +748,7 @@ class _ActuPageState extends State<ActuPage> {
               ),
               const Padding(
                 padding:
-                    EdgeInsets.only(left: 50, top: 5, right: 50, bottom: 5),
+                    EdgeInsets.only(left: 50, top: 2, right: 50, bottom: 2),
                 child: Divider(
                   height: 1,
                   thickness: 1,
@@ -764,7 +763,7 @@ class _ActuPageState extends State<ActuPage> {
                     const SizedBox(height: 5),
                     const Padding(
                       padding: EdgeInsets.only(
-                          left: 50, top: 5, right: 50, bottom: 5),
+                          left: 50, top: 2, right: 50, bottom: 2),
                       child: Divider(
                         height: 1,
                         thickness: 1,
@@ -799,7 +798,7 @@ class _PasDeContactAddState extends State<PasDeContactAdd> {
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
         Container(
-          padding: const EdgeInsets.fromLTRB(15, 10, 15, 10),
+          padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(5),
             gradient: const LinearGradient(
