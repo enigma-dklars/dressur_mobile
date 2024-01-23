@@ -3,6 +3,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'package:dressur/components/pub_smt_2024.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -368,7 +369,9 @@ class _ActuPageState extends State<ActuPage> {
         body: SingleChildScrollView(
           child: Column(
             children: [
-              const SizedBox(height: 10),
+              const SizedBox(height: 5),
+              SpecialPub(),
+              const SizedBox(height: 5),
               Container(
                 padding: const EdgeInsets.only(
                     left: 10, top: 0, right: 10, bottom: 0),

@@ -3,6 +3,7 @@
 import 'dart:io';
 
 import 'package:dressur/5_autre/cart_visite.dart';
+import 'package:dressur/components/pub_smt_2024.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
@@ -102,6 +103,7 @@ class _SettingPageState extends State<SettingPage> {
           child: Column(
             children: [
               const SizedBox(height: 5),
+              SpecialPub(),
               admin
                   ? ProfileMenu(
                       text: "Administration",

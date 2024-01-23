@@ -1,12 +1,14 @@
 import 'dart:io';
 import 'dart:async';
 import 'package:dressur/1_reception/liste_contact.dart';
+import 'package:dressur/components/pub_smt_2024.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:dressur/5_autre/support_assistance.dart';
 import 'package:dressur/6_notification/liste_notification.dart';
 import 'package:dressur/components/constant.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ReceptionPage extends StatefulWidget {
   @override
@@ -126,6 +128,7 @@ class _ReceptionPageState extends State<ReceptionPage> {
           child: Column(
             children: [
               const SizedBox(height: 5),
+              SpecialPub(),
               GestureDetector(
                 onTap: () {
                   Navigator.push(

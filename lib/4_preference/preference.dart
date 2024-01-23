@@ -1,6 +1,7 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'dart:io';
+import 'package:dressur/components/pub_smt_2024.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -219,6 +220,7 @@ class _PreferencePageState extends State<PreferencePage> {
             child: Column(
               children: [
                 const SizedBox(height: 5),
+              SpecialPub(),
                 Card(
                   margin: const EdgeInsets.only(
                       left: 10, top: 5, right: 10, bottom: 5),
