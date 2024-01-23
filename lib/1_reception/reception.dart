@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:async';
 import 'package:dressur/1_reception/liste_contact.dart';
+import 'package:dressur/components/padding_and_divider.dart';
 import 'package:dressur/components/pub_smt_2024.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -217,15 +218,7 @@ class _ReceptionPageState extends State<ReceptionPage> {
                   ),
                 ),
               ),
-              const Padding(
-                padding:
-                    EdgeInsets.only(left: 50, top: 2, right: 50, bottom: 2),
-                child: Divider(
-                  height: 1,
-                  thickness: 1,
-                  color: Colors.grey,
-                ),
-              ),
+              DressurDivider(),
               GestureDetector(
                 onTap: () {
                   Navigator.push(
@@ -313,15 +306,7 @@ class _ReceptionPageState extends State<ReceptionPage> {
                   ),
                 ),
               ),
-              const Padding(
-                padding:
-                    EdgeInsets.only(left: 50, top: 2, right: 50, bottom: 2),
-                child: Divider(
-                  height: 1,
-                  thickness: 1,
-                  color: Colors.grey,
-                ),
-              ),
+              DressurDivider(),
               const SizedBox(height: 5),
               const SizedBox(height: 5),
             ],

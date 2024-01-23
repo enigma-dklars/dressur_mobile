@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:dressur/2_boost/liste_campagne_mail.dart';
 import 'package:dressur/2_boost/new_campagne_mail.dart';
 import 'package:dressur/components/noti.dart';
+import 'package:dressur/components/padding_and_divider.dart';
 import 'package:dressur/components/pub_smt_2024.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -236,15 +237,7 @@ class _BoostPageState extends State<BoostPage> {
                   ),
                 ),
               ),
-              const Padding(
-                padding:
-                    EdgeInsets.only(left: 50, top: 2, right: 50, bottom: 2),
-                child: Divider(
-                  height: 1,
-                  thickness: 1,
-                  color: Colors.grey,
-                ),
-              ),
+              DressurDivider(),
               Card(
                 margin: const EdgeInsets.only(
                     left: 10, top: 5, right: 10, bottom: 5),
@@ -345,15 +338,7 @@ class _BoostPageState extends State<BoostPage> {
                   ),
                 ),
               ),
-              const Padding(
-                padding:
-                    EdgeInsets.only(left: 50, top: 2, right: 50, bottom: 2),
-                child: Divider(
-                  height: 1,
-                  thickness: 1,
-                  color: Colors.grey,
-                ),
-              ),
+              DressurDivider(),
               Card(
                 margin: const EdgeInsets.only(
                     left: 10, top: 5, right: 10, bottom: 5),
@@ -457,15 +442,7 @@ class _BoostPageState extends State<BoostPage> {
                   ),
                 ),
               ),
-              const Padding(
-                padding:
-                    EdgeInsets.only(left: 50, top: 2, right: 50, bottom: 2),
-                child: Divider(
-                  height: 1,
-                  thickness: 1,
-                  color: Colors.grey,
-                ),
-              ),
+              DressurDivider(),
               Card(
                 margin: const EdgeInsets.only(
                     left: 10, top: 5, right: 10, bottom: 5),
@@ -584,15 +561,7 @@ class _BoostPageState extends State<BoostPage> {
                   ),
                 ),
               ),
-              const Padding(
-                padding:
-                    EdgeInsets.only(left: 50, top: 2, right: 50, bottom: 2),
-                child: Divider(
-                  height: 1,
-                  thickness: 1,
-                  color: Colors.grey,
-                ),
-              ),
+              DressurDivider(),
               const SizedBox(height: 5),
               if (havePublicites == true)
                 Column(
