@@ -181,8 +181,9 @@ class _ChoixDesPaysState extends State<ChoixDesPays> {
               },
               decoration: InputDecoration(
                 labelText: (langUserPhone == "fr")
-                    ? 'Rechercher un pays avec son indicatif'
-                    : 'Find a country with its area code',
+                    ? 'Rechercher un pays ...'
+                    : 'Find a country with ...',
+                prefixIcon: const Icon(Icons.search),
                 border: const OutlineInputBorder(),
               ),
             ),

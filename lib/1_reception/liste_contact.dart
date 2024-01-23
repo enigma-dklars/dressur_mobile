@@ -127,7 +127,7 @@ class _ContactPageState extends State<ContactPage> {
         elevation: 0,
         backgroundColor: primaryColor,
         title: Text(
-          "Contacts DS ($nombreContacts)",
+          "Contacts Dressur ($nombreContacts)",
           style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
         ),
         actions: [
@@ -218,10 +218,11 @@ class _ContactPageState extends State<ContactPage> {
                 });
               },
               decoration: InputDecoration(
-                hintText: (langUserPhone == "fr")
-                    ? "Rechercher..."
-                    : "To research...",
+                labelText: (langUserPhone == "fr")
+                    ? "Rechercher ..."
+                    : "To research ...",
                 prefixIcon: const Icon(Icons.search),
+                border: const OutlineInputBorder(),
               ),
             ),
           ),
