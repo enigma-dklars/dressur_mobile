@@ -8,7 +8,6 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:dressur/4_preference/choix_pays_preference.dart';
 import 'package:dressur/6_notification/liste_notification.dart';
-import 'package:dressur/components/advertisements.dart';
 import 'package:dressur/components/constant.dart';
 import 'package:http/http.dart' as http;
 import 'package:dressur/components/sociaux.dart';
@@ -379,23 +378,6 @@ class _PreferencePageState extends State<PreferencePage> {
                 ),
                 DressurDivider(),
                 const SizedBox(height: 5),
-                if (havePublicites == true)
-                  Column(
-                    children: [
-                      AdvertisementListPage(),
-                      const SizedBox(height: 5),
-                      const Padding(
-                        padding: EdgeInsets.only(
-                            left: 50, top: 5, right: 50, bottom: 5),
-                        child: Divider(
-                          height: 1,
-                          thickness: 1,
-                          color: Colors.grey,
-                        ),
-                      ),
-                      const SizedBox(height: 5),
-                    ],
-                  ),
                 SociauxPage(),
                 const SizedBox(height: 5),
               ],

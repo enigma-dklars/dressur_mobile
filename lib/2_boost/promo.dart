@@ -14,7 +14,6 @@ import 'package:dressur/2_boost/new_boost_contact.dart';
 import 'package:dressur/2_boost/new_boost_affaire.dart';
 import 'package:dressur/5_autre/support_assistance.dart';
 import 'package:dressur/6_notification/liste_notification.dart';
-import 'package:dressur/components/advertisements.dart';
 import 'package:dressur/components/constant.dart';
 import 'package:dressur/components/sociaux.dart';
 
@@ -563,23 +562,6 @@ class _BoostPageState extends State<BoostPage> {
               ),
               DressurDivider(),
               const SizedBox(height: 5),
-              if (havePublicites == true)
-                Column(
-                  children: [
-                    AdvertisementListPage(),
-                    const SizedBox(height: 5),
-                    const Padding(
-                      padding: EdgeInsets.only(
-                          left: 50, top: 5, right: 50, bottom: 5),
-                      child: Divider(
-                        height: 1,
-                        thickness: 1,
-                        color: Colors.grey,
-                      ),
-                    ),
-                    const SizedBox(height: 5),
-                  ],
-                ),
               SociauxPage(),
               const SizedBox(height: 5),
             ],
