@@ -9,7 +9,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:dressur/5_autre/support_assistance.dart';
 import 'package:dressur/6_notification/liste_notification.dart';
 import 'package:dressur/components/constant.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class ReceptionPage extends StatefulWidget {
   @override
@@ -165,11 +164,11 @@ class _ReceptionPageState extends State<ReceptionPage> {
                           margin: const EdgeInsets.all(10.0),
                           decoration: const BoxDecoration(
                             shape: BoxShape.circle,
-                            color: Colors.green,
+                            color: Colors.white,
                           ),
                           child: const Icon(
                             Icons.contacts,
-                            color: Colors.white,
+                            color: primaryColor,
                             size: 20,
                           ),
                         ),
