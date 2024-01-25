@@ -1,3 +1,5 @@
+// ignore_for_file: unnecessary_null_comparison
+
 import 'dart:convert';
 import 'package:dressur/5_autre/autre_profil.dart';
 import 'package:flutter/material.dart';
@@ -271,6 +273,14 @@ class _ContactPageState extends State<ContactPage> {
                                       CircleAvatar(
                                         backgroundImage: AssetImage(
                                             "images-pays/${contact.pays}.png"),
+                                        backgroundColor: Colors.transparent,
+                                        child: AssetImage(
+                                                    "images-pays/${contact.pays}.png") ==
+                                                null
+                                            ? Image.asset(
+                                                "images-pays/no_pays.png",
+                                              )
+                                            : null,
                                       ),
                                       const SizedBox(height: 3),
                                       Text(

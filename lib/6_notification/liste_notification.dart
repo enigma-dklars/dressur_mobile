@@ -1,3 +1,5 @@
+// ignore_for_file: unnecessary_null_comparison
+
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -215,6 +217,14 @@ class _ListeNotificationState extends State<ListeNotification> {
                             CircleAvatar(
                               backgroundImage:
                                   AssetImage("images-pays/${contact.pays}.png"),
+                              backgroundColor: Colors.transparent,
+                              child: AssetImage(
+                                          "images-pays/${contact.pays}.png") ==
+                                      null
+                                  ? Image.asset(
+                                      "images-pays/no_pays.png",
+                                    )
+                                  : null,
                             ),
                             const SizedBox(height: 3),
                             Text(

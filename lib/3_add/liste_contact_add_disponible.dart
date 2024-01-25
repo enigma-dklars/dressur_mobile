@@ -1,3 +1,5 @@
+// ignore_for_file: unnecessary_null_comparison
+
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
@@ -254,6 +256,14 @@ class _ListeContactAAddPageState extends State<ListeContactAAddPage> {
                             CircleAvatar(
                               backgroundImage:
                                   AssetImage("images-pays/${contact.pays}.png"),
+                              backgroundColor: Colors.transparent,
+                              child: AssetImage(
+                                          "images-pays/${contact.pays}.png") ==
+                                      null
+                                  ? Image.asset(
+                                      "images-pays/no_pays.png",
+                                    )
+                                  : null,
                             ),
                             const SizedBox(height: 3),
                             Text(
