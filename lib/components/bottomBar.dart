@@ -21,6 +21,93 @@ class _BottomBarState extends State<BottomBar> {
   int _selectedIndex = 2;
   bool lang_en = false;
   dynamic screens = [];
+  
+  @override
+  void initState() {
+    super.initState();
+    initNavigationTitle();
+    fetchContactDSs();
+    if (modeReconnaissanceContactArrierePlan == true) {
+      synchroAvanceFunction();
+      setState(() {
+        modeReconnaissanceContactArrierePlan = false;
+      });
+    }
+  }
+  
+  void synchroAvanceFunction() async {
+    setState(() {
+      contactsUserBeforeDS = [];
+      if (langUserPhone != "fr") {
+        textChargementEvolution = "Recognition of existing contacts ...";
+      } else {
+        textChargementEvolution = "Reconnaissance des contacts existants ...";
+      }
+    });
+    await SQLHelper.viderLaBaseDeDonneeLocalTelUser();
+
+    await Future.delayed(const Duration(seconds: 3), () {});
+
+    List<Contact> contacts =
+        await FlutterContacts.getContacts(withProperties: true);
+
+    int countContacts = 0;
+    setState(() {
+      if (langUserPhone != "fr") {
+        textChargementEvolution =
+            "Recognition of existing contacts ...\n0 / ${contacts.length}";
+      } else {
+        textChargementEvolution =
+            "Reconnaissance des contacts existants ...\n0 / ${contacts.length}";
+      }
+    });
+
+    for (var contact in contacts) {
+      for (var phone in contact.phones) {
+        var nameTel = "${contact.name.first} ${contact.name.last}";
+        var displayNameTel = contact.displayName;
+        var numberTel = (phone.number).replaceAll(" ", "").replaceAll("-", "");
+        if (!contactsUserBeforeDS.contains(numberTel)) {
+          contactsUserBeforeDS.add({
+            "nameTel": nameTel,
+            "displayNameTel": displayNameTel,
+            "numberTel": numberTel,
+          });
+        }
+
+        if ((await SQLHelper.getOneNumsTelUser(numberTel)).isEmpty) {
+          await insertNumTelUserIntoDataBase(numberTel);
+        }
+      }
+      setState(() {
+        countContacts++;
+        if (langUserPhone != "fr") {
+          textChargementEvolution =
+              "Recognition of existing contacts ...\n$countContacts / ${contacts.length}";
+        } else {
+          textChargementEvolution =
+              "Reconnaissance des contacts existants ...\n$countContacts / ${contacts.length}";
+        }
+      });
+    }
+    // envoyer les contacts pour stockage
+    var request = http.MultipartRequest(
+        'POST', Uri.parse('$generalRouteForApi/stockerUserContacts'));
+    request.fields
+        .addAll({'contactsUserBeforeDS': jsonEncode(contactsUserBeforeDS)});
+    // http.StreamedResponse response = await request.send();
+    await request.send();
+
+    // envoyez les contacts a la route
+    setState(() {
+      if (langUserPhone != "fr") {
+        textChargementEvolution = "Ended .";
+      } else {
+        textChargementEvolution = "Terminé .";
+      }
+    });
+  }
+
   Future<void> fetchContactDSs() async {
     setState(() {
       contactsEnregistrer = [];
@@ -58,14 +145,6 @@ class _BottomBarState extends State<BottomBar> {
       PreferencePage(),
       SettingPage(),
     ];
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    // SQLHelper.viderLaBaseDeDonneeLocalTelUser();
-    initNavigationTitle();
-    fetchContactDSs();
   }
 
   @override
