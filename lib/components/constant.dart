@@ -7,7 +7,7 @@ import 'package:dressur/components/sql_helper.dart';
 const versionApp = '1.0.0';
 const oldDatabaseName = 'un_dressur.db';
 const nowDataBaseName = 'deux_dressur.db';
-bool modeReconnaissanceContactArrierePlan = true;
+bool modeReconnaissanceContactArrierePlan = false;
 // const generalApiDomaine = 'http://dressur.rf.gd/public';
 const generalRouteForApi = '$generalApiDomaine/api';
 const generalRouteForPromotionImage = '$generalApiDomaine/promotion/';
