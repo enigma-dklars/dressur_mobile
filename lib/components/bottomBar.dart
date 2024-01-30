@@ -19,7 +19,6 @@ class BottomBar extends StatefulWidget {
 
 class _BottomBarState extends State<BottomBar> {
   int _selectedIndex = 2;
-  bool lang_en = false;
   dynamic screens = [];
   
   @override
