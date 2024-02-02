@@ -1,7 +1,7 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'package:dressur/components/bottomBar.dart';
 import 'package:flutter/material.dart';
-import 'package:dressur/1_contact/reconnaissance_contact.dart';
 import 'package:dressur/components/constant.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
@@ -112,10 +112,11 @@ class _RegisterFormState extends State<RegisterForm> {
         } else {
           setState(() {
             _desactive = false;
+            modeReconnaissanceContactArrierePlan = true;
             initUserInformations(data['user']);
           });
-          Navigator.of(context).push(
-              MaterialPageRoute(builder: (context) => ReconnaissanceContact()));
+          Navigator.of(context)
+              .push(MaterialPageRoute(builder: (context) => const BottomBar()));
         }
       } else {
         if (langUserPhone != "fr") {

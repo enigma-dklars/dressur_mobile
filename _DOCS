@@ -5,13 +5,11 @@
 # select input flutter
     https://pub.dev/packages/select_form_field
 
-# contact 
+# contact
     https://pub.dev/packages/flutter_contacts
 
-# timer 
+# timer
     https://stackoverflow.com/questions/54610121/flutter-countdown-timer
-
-# passe gmail = Dressur2022$
 
 # 
     flutter build apk
@@ -23,3 +21,5 @@
 # bloquer le retour de page flutter
     https://www.flutterbeads.com/disable-override-back-button-in-flutter/
 
+# connecter par wifi
+    adb tcpip 5555; adb connect 192.168.100.10

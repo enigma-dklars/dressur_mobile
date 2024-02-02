@@ -68,7 +68,10 @@ class _AutreProfilPageState extends State<AutreProfilPage> {
           autre_youtube = userAutreInfos["youtube"];
           autre_affUserName = userAutreInfos["affUserName"];
           _loading = false;
-          addUserContact(autre_tel, autre_pseudo, context);
+          if (addUserOnAutreProfilPage == "oui") {
+            addUserContact(autre_tel, autre_pseudo, context);
+          }
+          addUserOnAutreProfilPage = "oui";
         });
       } else {
         setState(() {
@@ -177,7 +180,7 @@ class _AutreProfilPageState extends State<AutreProfilPage> {
         backgroundColor: primaryColor,
         title: Text(
           (langUserPhone == "fr")
-              ? "Information Utilisateurs"
+              ? "Informations Utilisateur"
               : "User Information",
           style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
         ),

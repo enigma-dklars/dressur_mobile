@@ -1,12 +1,13 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'dart:io';
+import 'package:dressur/components/padding_and_divider.dart';
+import 'package:dressur/components/pub_smt_2024.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:dressur/4_preference/choix_pays_preference.dart';
 import 'package:dressur/6_notification/liste_notification.dart';
-import 'package:dressur/components/advertisements.dart';
 import 'package:dressur/components/constant.dart';
 import 'package:http/http.dart' as http;
 import 'package:dressur/components/sociaux.dart';
@@ -219,6 +220,7 @@ class _PreferencePageState extends State<PreferencePage> {
             child: Column(
               children: [
                 const SizedBox(height: 5),
+                SpecialPub(),
                 Card(
                   margin: const EdgeInsets.only(
                       left: 10, top: 5, right: 10, bottom: 5),
@@ -235,7 +237,7 @@ class _PreferencePageState extends State<PreferencePage> {
                         ],
                       ),
                     ),
-                    padding: const EdgeInsets.fromLTRB(15, 10, 15, 10),
+                    padding: const EdgeInsets.fromLTRB(10, 5, 10, 0),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
@@ -250,7 +252,6 @@ class _PreferencePageState extends State<PreferencePage> {
                           ),
                           textAlign: TextAlign.left,
                         ),
-                        const SizedBox(height: 5),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
@@ -303,15 +304,7 @@ class _PreferencePageState extends State<PreferencePage> {
                     ),
                   ),
                 ),
-                const Padding(
-                  padding:
-                      EdgeInsets.only(left: 50, top: 5, right: 50, bottom: 5),
-                  child: Divider(
-                    height: 1,
-                    thickness: 1,
-                    color: Colors.grey,
-                  ),
-                ),
+                DressurDivider(),
                 Card(
                   margin: const EdgeInsets.only(
                       left: 10, top: 5, right: 10, bottom: 5),
@@ -328,7 +321,7 @@ class _PreferencePageState extends State<PreferencePage> {
                         ],
                       ),
                     ),
-                    padding: const EdgeInsets.fromLTRB(15, 10, 15, 10),
+                    padding: const EdgeInsets.fromLTRB(10, 5, 10, 2),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
@@ -343,7 +336,6 @@ class _PreferencePageState extends State<PreferencePage> {
                           ),
                           textAlign: TextAlign.left,
                         ),
-                        const SizedBox(height: 10),
                         Text(
                           preferencePaysText.toString(),
                           style: GoogleFonts.poppins(
@@ -353,7 +345,6 @@ class _PreferencePageState extends State<PreferencePage> {
                           ),
                           textAlign: TextAlign.left,
                         ),
-                        const SizedBox(height: 10),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
@@ -385,33 +376,8 @@ class _PreferencePageState extends State<PreferencePage> {
                     ),
                   ),
                 ),
-                const Padding(
-                  padding:
-                      EdgeInsets.only(left: 50, top: 5, right: 50, bottom: 5),
-                  child: Divider(
-                    height: 1,
-                    thickness: 1,
-                    color: Colors.grey,
-                  ),
-                ),
+                DressurDivider(),
                 const SizedBox(height: 5),
-                if (havePublicites == true)
-                  Column(
-                    children: [
-                      AdvertisementListPage(),
-                      const SizedBox(height: 5),
-                      const Padding(
-                        padding: EdgeInsets.only(
-                            left: 50, top: 5, right: 50, bottom: 5),
-                        child: Divider(
-                          height: 1,
-                          thickness: 1,
-                          color: Colors.grey,
-                        ),
-                      ),
-                      const SizedBox(height: 5),
-                    ],
-                  ),
                 SociauxPage(),
                 const SizedBox(height: 5),
               ],

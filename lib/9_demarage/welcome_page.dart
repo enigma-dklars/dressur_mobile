@@ -4,7 +4,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:dressur/1_contact/reconnaissance_contact.dart';
 import 'package:dressur/9_demarage/update_app_important.dart';
 import 'package:dressur/9_demarage/pas_de_connexion.dart';
 import 'package:dressur/9_demarage/presentation_ds.dart';
@@ -116,8 +115,11 @@ class _PageDepartState extends State<PageDepart> {
       });
       final numsTelUser = await SQLHelper.getAll("numsTelUser");
       if (numsTelUser.isEmpty) {
-        return Navigator.of(context).push(
-            MaterialPageRoute(builder: (context) => ReconnaissanceContact()));
+        setState(() {
+          modeReconnaissanceContactArrierePlan = true;
+        });
+        return Navigator.of(context)
+            .push(MaterialPageRoute(builder: (context) => const BottomBar()));
       } else {
         return Navigator.of(context)
             .push(MaterialPageRoute(builder: (context) => const BottomBar()));
