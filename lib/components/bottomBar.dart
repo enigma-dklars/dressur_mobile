@@ -20,7 +20,7 @@ class BottomBar extends StatefulWidget {
 class _BottomBarState extends State<BottomBar> {
   int _selectedIndex = 2;
   dynamic screens = [];
-  
+
   @override
   void initState() {
     super.initState();
@@ -33,7 +33,7 @@ class _BottomBarState extends State<BottomBar> {
       });
     }
   }
-  
+
   void synchroAvanceFunction() async {
     setState(() {
       contactsUserBeforeDS = [];
@@ -180,7 +180,7 @@ class _BottomBarState extends State<BottomBar> {
                   backgroundColor: Colors.brown,
                 ),
                 BottomNavigationBarItem(
-                  icon: Icon(Icons.move_up),
+                  icon: Icon(Icons.query_stats),
                   label: "Promo",
                   backgroundColor: primaryColor,
                 ),
@@ -226,7 +226,7 @@ class _BottomBarState extends State<BottomBar> {
                   backgroundColor: Colors.brown,
                 ),
                 BottomNavigationBarItem(
-                  icon: Icon(Icons.move_up),
+                  icon: Icon(Icons.query_stats),
                   label: "Promo",
                   backgroundColor: primaryColor,
                 ),
