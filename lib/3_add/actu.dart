@@ -567,8 +567,8 @@ class _ActuPageState extends State<ActuPage> {
                             const SizedBox(height: 10),
                             Text(
                               (langUserPhone == "fr")
-                                  ? "Patientez quelques heures qu'un des administrateurs vérifie si le $tel est bien inscrit sur WhatsApp Messenger ou WhatsApp Business."
-                                  : "Wait a few hours for one of the administrators to check if the $tel is registered on WhatsApp Messenger or WhatsApp Business.",
+                                  ? "Envoyer Confirmation_WhatsApp a l'assistance Dressur sur WhatsApp avec le $tel pour la confirmation de votre numéro."
+                                  : "Send Confirmation_WhatsApp to Dressur assistance on WhatsApp with $tel for confirmation of your number.",
                               style: GoogleFonts.poppins(
                                 fontWeight: FontWeight.w600,
                                 fontSize: 16,

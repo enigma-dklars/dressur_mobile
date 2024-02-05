@@ -170,9 +170,22 @@ class AdvertisementDetailPage extends StatelessWidget {
   AdvertisementDetailPage({required this.advertisement});
 
   void openWhatsAppChat() async {
-    String text = (langUserPhone == "fr")
-        ? "Bonjour/Bonsoir *${advertisement.pseudoAnnonceur}*, j'ai une question concernant la promotion ci-dessous: \n\n<<${advertisement.description.substring(0, 100)}...>>\n\n*Depuis Dressur.*"
-        : "Good morning or Good evening *${advertisement.pseudoAnnonceur}*, I have a question regarding the promotion below: \n\n<<${advertisement.description.substring(0, 100)}...>>\n\n*From Dressur.*";
+    String text;
+    if (langUserPhone == "fr") {
+      text =
+          "Bonjour/Bonsoir *${advertisement.pseudoAnnonceur}*, j'ai une question concernant la promotion ci-dessous: \n\n";
+    } else {
+      text =
+          "Good morning or Good evening *${advertisement.pseudoAnnonceur}*, I have a question regarding the promotion below: \n\n";
+    }
+
+    // Vérification de la longueur de la description
+    if (advertisement.description.length >= 100) {
+      text +=
+          "<<${advertisement.description.substring(0, 100)}...>>\n\n*Depuis Dressur.*";
+    } else {
+      text += "<<${advertisement.description}>>\n\n*Depuis Dressur.*";
+    }
 
     String encodedText = Uri.encodeComponent(text);
 
