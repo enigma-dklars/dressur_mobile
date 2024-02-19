@@ -14,6 +14,8 @@ import 'package:dressur/components/sql_helper.dart';
 
 class CampagneMail {
   final String id;
+  final String idFormuleCampagneMail;
+  final String prixFormuleCampagneMail;
   final String titre;
   final String sujet;
   final String replyto;
@@ -25,6 +27,8 @@ class CampagneMail {
 
   CampagneMail({
     required this.id,
+    required this.idFormuleCampagneMail,
+    required this.prixFormuleCampagneMail,
     required this.titre,
     required this.sujet,
     required this.replyto,
@@ -60,6 +64,8 @@ class _CampagneMailListePageState extends State<CampagneMailListePage> {
       final campagneMails = jsonData.map((data) {
         return CampagneMail(
           id: data['id'],
+          idFormuleCampagneMail: data['idFormuleCampagneMail'],
+          prixFormuleCampagneMail: data['prixFormuleCampagneMail'],
           titre: data['titre'],
           sujet: data['sujet'],
           replyto: data['replyto'],
@@ -204,23 +210,15 @@ class _CampagneMailListePageState extends State<CampagneMailListePage> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
+                                'Titre: ${campagneMail.titre}',
+                                style: const TextStyle(
+                                  fontSize: 12.0,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const SizedBox(height: 5),
+                              Text(
                                 'Status: ${campagneMail.status}',
-                                style: const TextStyle(
-                                  fontSize: 12.0,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              Text(
-                                'Impressions: ---',
-                                style: const TextStyle(
-                                  fontSize: 12.0,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              Text(
-                                (langUserPhone == "fr")
-                                    ? 'Vues: ---'
-                                    : 'Views: ---',
                                 style: const TextStyle(
                                   fontSize: 12.0,
                                   fontWeight: FontWeight.bold,
@@ -284,8 +282,8 @@ class CampagneMailDetailPage extends StatelessWidget {
       appBar: AppBar(
         title: Text(
           (langUserPhone == "fr")
-              ? 'Détails de la campagneMail'
-              : 'Details of the campagneMail',
+              ? 'Détails de la campagne Mail'
+              : 'Details of the campagne Mail',
           style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
         ),
         backgroundColor: primaryColor,
@@ -311,8 +309,8 @@ class CampagneMailDetailPage extends StatelessWidget {
                   const SizedBox(height: 5),
                   Text(
                     (langUserPhone == "fr")
-                        ? 'Votre demande de campagneMail a été acceptée. Vous pouvez démarrer la campagneMail à titre gratuite ou payante.'
-                        : "Your campagneMail request has been accepted. You can start the campagneMail for free or paid.",
+                        ? 'Votre demande de campagne Mail a été acceptée. Vous pouvez démarrer la campagne Mail payante.'
+                        : "Your Mail campaign request has been accepted. You can start the paid Mail campaign.",
                     style: GoogleFonts.poppins(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
@@ -322,20 +320,6 @@ class CampagneMailDetailPage extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      ElevatedButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => PaymentGratuitPage(
-                                  campagneMail: campagneMail),
-                            ),
-                          );
-                        },
-                        child: Text(
-                          (langUserPhone == "fr") ? 'Gratuite' : "Free",
-                        ),
-                      ),
                       ElevatedButton(
                         onPressed: () {
                           Navigator.push(
@@ -366,250 +350,40 @@ class CampagneMailDetailPage extends StatelessWidget {
             const SizedBox(height: 16.0),
             Text(
               (langUserPhone == "fr")
-                  ? 'Formule de campagneMail : ---'
-                  : 'Promo formula: : ---',
+                  ? 'Prix : ${campagneMail.prixFormuleCampagneMail} FCFA'
+                  : 'Price: : ${campagneMail.prixFormuleCampagneMail} FCFA',
             ),
             const SizedBox(height: 16.0),
             Text(
               (langUserPhone == "fr")
-                  ? 'Nombre de vues : ---'
-                  : 'Number of views : ---',
+                  ? 'Titre : ${campagneMail.titre}'
+                  : 'Title: : ${campagneMail.titre}',
             ),
-            const SizedBox(height: 16.0),
-            Text('Status : ${campagneMail.status}'),
             const SizedBox(height: 16.0),
             Text(
               (langUserPhone == "fr")
-                  ? 'Date de début : ---'
-                  : 'Start date : ---',
+                  ? 'Sujet : ${campagneMail.sujet}'
+                  : 'Subject: : ${campagneMail.sujet}',
             ),
             const SizedBox(height: 16.0),
-            Text((langUserPhone == "fr")
-                ? "Date d'enregistrement : ${campagneMail.createdAt}"
-                : "Expiration date : ${campagneMail.createdAt}"),
+            Text(
+              (langUserPhone == "fr")
+                  ? 'Répondre à : ${campagneMail.replyto}'
+                  : 'Reply to : ${campagneMail.replyto}',
+            ),
             const SizedBox(height: 16.0),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class PaymentGratuitPage extends StatefulWidget {
-  final CampagneMail campagneMail;
-
-  PaymentGratuitPage({required this.campagneMail});
-
-  @override
-  _PaymentGratuitPageState createState() => _PaymentGratuitPageState();
-}
-
-class _PaymentGratuitPageState extends State<PaymentGratuitPage> {
-  bool _desactive = false;
-  var _message = "";
-  dynamic data;
-  dynamic idFormulBoost = 1;
-  List<Map<String, dynamic>> listeFormulBoost = [];
-  String? boostId;
-
-  void listeFormuleBoost() async {
-    dynamic youHaveNetWork = "";
-    youHaveConnexion();
-    youHaveNetWork = await SQLHelper.getYouHaveConnexion();
-    while (youHaveNetWork.length == 0) {
-      youHaveNetWork = await SQLHelper.getYouHaveConnexion();
-    }
-    if (youHaveNetWork[0]['youHaveConnexion'] == "oui") {
-      setState(() {
-        _desactive = true;
-      });
-
-      var request = http.MultipartRequest(
-          'POST', Uri.parse('$generalRouteForApi/listeFormuleBoost'));
-      request.fields.addAll({});
-
-      http.StreamedResponse response = await request.send();
-
-      if (response.statusCode == 200) {
-        var data1 = await response.stream.bytesToString();
-        var data = convert.jsonDecode(data1);
-        if (data["error"] == false) {
-          SQLHelper.delete('listeFormulBoost');
-          for (var listeFormulBoost in data["listeFormulBoost"]) {
-            SQLHelper.insert({
-              'tableName': "listeFormulBoost",
-              'value': listeFormulBoost['id'],
-              'label': listeFormulBoost['label'],
-              'prix': listeFormulBoost['prix'],
-              'jours': listeFormulBoost['jours']
-            });
-          }
-          final dataElements = await SQLHelper.getAll("listeFormulBoost");
-          setState(() {
-            _desactive = false;
-            listeFormulBoost = dataElements;
-            onChangeFormulBoost(1);
-          });
-        }
-      }
-    } else {
-      if (langUserPhone != "fr") {
-        dangerNoti(
-            "Mistake!", "You are not connected to the internet.", context);
-      } else {
-        dangerNoti("Erreur!", "Vous n'ètes pas connecté a internet.", context);
-      }
-      setState(() {
-        _desactive = false;
-      });
-    }
-  }
-
-  void newPromo() async {
-    if (telIsVerified == true) {
-      dynamic youHaveNetWork = "";
-      youHaveConnexion();
-      youHaveNetWork = await SQLHelper.getYouHaveConnexion();
-      while (youHaveNetWork.length == 0) {
-        youHaveNetWork = await SQLHelper.getYouHaveConnexion();
-      }
-      if (youHaveNetWork[0]['youHaveConnexion'] == "oui") {
-        setState(() {
-          _desactive = true;
-        });
-
-        var request = http.MultipartRequest(
-            'POST', Uri.parse('$generalRouteForApi/newPromo'));
-        request.fields.addAll({
-          'uid': uidUser,
-          'idCampagneMail': widget.campagneMail.id,
-          'langUserPhone': langUserPhone.toString(),
-          'idFormulBoost': idFormulBoost.toString()
-        });
-
-        http.StreamedResponse response = await request.send();
-
-        if (response.statusCode == 200) {
-          var data1 = await response.stream.bytesToString();
-          var data = convert.jsonDecode(data1);
-          if (data["error"] == false) {
-            setState(() {
-              _desactive = false;
-              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                content: Text('Votre Promo a déja démarer.'),
-              ));
-            });
-          } else {
-            dangerNoti(data["titre"], data["message"], context);
-            setState(() {
-              _desactive = false;
-            });
-          }
-        }
-      } else {
-        if (langUserPhone != "fr") {
-          dangerNoti(
-              "Mistake!", "You are not connected to the internet.", context);
-        } else {
-          dangerNoti(
-              "Erreur!", "Vous n'ètes pas connecté a internet.", context);
-        }
-        setState(() {
-          _desactive = false;
-        });
-      }
-    } else {
-      dangerNoti("Accès Refusé !",
-          "Veuillez d'abord confirmer votre numéro WhatsApp.", context);
-    }
-  }
-
-  onChangeFormulBoost(val) async {
-    var prix = (await SQLHelper.getFormulBoostWhithId(val))[0]['prix'];
-    var jours = (await SQLHelper.getFormulBoostWhithId(val))[0]['jours'];
-    setState(() {
-      idFormulBoost = val;
-      _message = (langUserPhone == "fr")
-          ? "Cette formule vous offre une campagneMail de $jours jour(s) pour $prix Points qui seront déduit de votre solde bonus."
-          : "This formula offers you a campagneMail of $jours day(s) for $prix Points which will be deducted from your bonus balance.";
-    });
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    listeFormuleBoost(); // Loading the diary when the app starts
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'Page de Démarrage Gratuit',
-          style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
-        ),
-        backgroundColor: primaryColor,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            DelayedAnimation(
-              delay: 0, // 1500,
-              child: SelectFormField(
-                type: SelectFormFieldType.dropdown,
-                initialValue: '1',
-                labelText: 'Formules de Boost',
-                items: listeFormulBoost,
-                onChanged: (val) => onChangeFormulBoost(val),
-                onSaved: (val) => print(val),
-              ),
+            Text(
+              (langUserPhone == "fr")
+                  ? 'Destinataires : ${campagneMail.sendto}'
+                  : 'Recipients: : ${campagneMail.sendto}',
             ),
-            const SizedBox(height: 20),
-            DelayedAnimation(
-              delay: 0, // 1000,
-              child: Text(
-                _message,
-                style: GoogleFonts.poppins(
-                  fontSize: 16,
-                ),
-                textAlign: TextAlign.center,
-              ),
+            const SizedBox(height: 16.0),
+            Text(
+              (langUserPhone == "fr")
+                  ? 'Contenu du mail : ${campagneMail.contentmail}'
+                  : 'Content of the email : ${campagneMail.contentmail}',
             ),
-            const SizedBox(height: 20),
-            DelayedAnimation(
-                delay: 0,
-                child: SizedBox(
-                  width: MediaQuery.of(context).size.width * 0.95,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: primaryColor,
-                      shape: const StadiumBorder(),
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 13,
-                      ),
-                    ),
-                    child: _desactive
-                        ? const Text("Wait...")
-                        : const Text("BOOSTER"),
-                    onPressed: () {
-                      if (!telIsVerified) {
-                        warningNoti(
-                            "Configuration du compte",
-                            "Patientez encore svp. Votre numéro WhatsApp n'a pas encore été confirmé par un administrateur. Il le sera dans les plus brefs délais.",
-                            context);
-                      } else if (!mailIsVerified) {
-                        warningNoti(
-                            "Configuration du compte",
-                            "Veuillez d'abord confirmer votre adresse mail...\n\nVous trouverez sur notre chaine YouTube des vidéos qui peuvent vous aider...",
-                            context);
-                      } else {
-                        _desactive ? null : newPromo();
-                      }
-                    },
-                  ),
-                )),
+            const SizedBox(height: 16.0),
           ],
         ),
       ),
@@ -627,80 +401,13 @@ class PaymentPayantPage extends StatefulWidget {
 }
 
 class _PaymentPayantPageState extends State<PaymentPayantPage> {
+  late CampagneMail campagneMail;
+
   bool _desactive2 = false;
-  var _message = "";
   dynamic data;
-  dynamic idFormulBoost = 1;
   dynamic valueMethodePaiement = "mtn";
-  List<Map<String, dynamic>> listeFormulBoost = [];
   String? boostId;
   final telController = TextEditingController(text: tel);
-
-  void listeFormuleBoost() async {
-    dynamic youHaveNetWork = "";
-    youHaveConnexion();
-    youHaveNetWork = await SQLHelper.getYouHaveConnexion();
-    while (youHaveNetWork.length == 0) {
-      youHaveNetWork = await SQLHelper.getYouHaveConnexion();
-    }
-    if (youHaveNetWork[0]['youHaveConnexion'] == "oui") {
-      setState(() {
-        _desactive2 = true;
-      });
-
-      var request = http.MultipartRequest(
-          'POST', Uri.parse('$generalRouteForApi/listeFormuleBoost'));
-      request.fields.addAll({});
-
-      http.StreamedResponse response = await request.send();
-
-      if (response.statusCode == 200) {
-        var data1 = await response.stream.bytesToString();
-        var data = convert.jsonDecode(data1);
-        if (data["error"] == false) {
-          SQLHelper.delete('listeFormulBoost');
-          for (var listeFormulBoost in data["listeFormulBoost"]) {
-            SQLHelper.insert({
-              'tableName': "listeFormulBoost",
-              'value': listeFormulBoost['id'],
-              'label': listeFormulBoost['label'] +
-                  " à " +
-                  (listeFormulBoost['prix']).toString() +
-                  " FCFA",
-              'prix': listeFormulBoost['prix'],
-              'jours': listeFormulBoost['jours']
-            });
-          }
-          final dataElements = await SQLHelper.getAll("listeFormulBoost");
-          setState(() {
-            _desactive2 = false;
-            listeFormulBoost = dataElements;
-            onChangeFormulBoost(1);
-          });
-        }
-      }
-    } else {
-      if (langUserPhone != "fr") {
-        dangerNoti(
-            "Mistake!", "You are not connected to the internet.", context);
-      } else {
-        dangerNoti("Erreur!", "Vous n'ètes pas connecté a internet.", context);
-      }
-      setState(() {
-        _desactive2 = false;
-      });
-    }
-  }
-
-  onChangeFormulBoost(val) async {
-    var prix = (await SQLHelper.getFormulBoostWhithId(val))[0]['prix'];
-    var jours = (await SQLHelper.getFormulBoostWhithId(val))[0]['jours'];
-    setState(() {
-      idFormulBoost = val;
-      _message =
-          "Cette formule vous offre une campagneMail de $jours jour(s) pour $prix FCFA.";
-    });
-  }
 
   onChangeMethodePaiement(val) async {
     setState(() {
@@ -708,7 +415,7 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
     });
   }
 
-  void newPromoPayant() async {
+  void newCampageMailPayant() async {
     if (telIsVerified == true) {
       dynamic youHaveNetWork = "";
       youHaveConnexion();
@@ -722,12 +429,11 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
         });
 
         var request = http.MultipartRequest(
-            'POST', Uri.parse('$generalRouteForApi/newPromoPayant'));
+            'POST', Uri.parse('$generalRouteForApi/newCampageMailPayant/paiement'));
         request.fields.addAll({
           'uid': uidUser,
           'idCampagneMail': widget.campagneMail.id,
           'langUserPhone': langUserPhone.toString(),
-          'idFormulBoost': idFormulBoost.toString(),
           'valueMethodePaiement': valueMethodePaiement,
           'tel': telController.text
         });
@@ -775,8 +481,8 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
 
   @override
   void initState() {
-    super.initState(); // Loading the diary when the app starts
-    listeFormuleBoost();
+    super.initState();
+    campagneMail = widget.campagneMail;
   }
 
   @override
@@ -795,13 +501,14 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
           children: [
             DelayedAnimation(
               delay: 0, // 1500,
-              child: SelectFormField(
-                type: SelectFormFieldType.dropdown,
-                initialValue: '1',
-                labelText: 'Formules de CampagneMail Payante',
-                items: listeFormulBoost,
-                onChanged: (val) => onChangeFormulBoost(val),
-                onSaved: (val) => print(val),
+              child: Text(
+                (langUserPhone == "fr")
+                    ? 'Prix : ${campagneMail.prixFormuleCampagneMail} FCFA'
+                    : 'Price: : ${campagneMail.prixFormuleCampagneMail} FCFA',
+                style: GoogleFonts.poppins(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 20,
+                ),
               ),
             ),
             const SizedBox(height: 20),
@@ -840,9 +547,8 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
                       vertical: 13,
                     ),
                   ),
-                  child: _desactive2
-                      ? const Text("Wait...")
-                      : const Text("PAYER & BOOSTER"),
+                  child:
+                      _desactive2 ? const Text("Wait...") : const Text("PAYER"),
                   onPressed: () {
                     if (!telIsVerified) {
                       warningNoti(
@@ -855,26 +561,13 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
                           "Veuillez d'abord confirmer votre adresse mail...\n\nVous trouverez sur notre chaine YouTube des vidéos qui peuvent vous aider...",
                           context);
                     } else {
-                      _desactive2 ? null : newPromoPayant();
+                      _desactive2 ? null : newCampageMailPayant();
                     }
                   },
                 ),
               ),
             ),
             const SizedBox(height: 20),
-            DelayedAnimation(
-              delay: 0, // 1000,
-              child: Text(
-                _message,
-                style: GoogleFonts.poppins(
-                  color: Colors.blue[400],
-                  fontWeight: FontWeight.w600,
-                  fontSize: 12,
-                ),
-                textAlign: TextAlign.center,
-              ),
-            ),
-            const SizedBox(height: 10),
             DelayedAnimation(
               delay: 0, // 1500,
               child: Text(

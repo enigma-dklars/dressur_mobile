@@ -8,6 +8,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
 import 'package:dressur/components/sql_helper.dart';
 import 'package:dressur/components/noti.dart';
+import 'package:select_form_field/select_form_field.dart';
 
 class NewCampagneMailPage extends StatefulWidget {
   @override
@@ -114,8 +115,14 @@ class RegisterForm2 extends StatefulWidget {
 }
 
 class _RegisterForm2State extends State<RegisterForm2> {
+  int nombreMail = 0;
+  var nombreAdresseMailForm = 0;
   bool _desactive2 = false;
   dynamic data;
+  List<Map<String, dynamic>> listeFormuleCampagneMail = [];
+  String? boostId;
+  dynamic idFormuleCampagneMail = 1;
+  var _message = "";
   final telController = TextEditingController(text: tel);
   final replytoController = TextEditingController(text: mail);
   final titreController = TextEditingController();
@@ -127,20 +134,99 @@ class _RegisterForm2State extends State<RegisterForm2> {
     RegExp regex =
         RegExp(r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b');
     Iterable<Match> matches = regex.allMatches(texte);
-
+    nombreAdresseMailForm = 0;
     List<String> adressesEmail = [];
     for (Match match in matches) {
       String? email = match.group(0);
       if (email != null) {
         adressesEmail.add(email);
+        nombreAdresseMailForm++;
       }
     }
-
     return adressesEmail.join(',');
   }
 
+  void listeFormuleBoost() async {
+    dynamic youHaveNetWork = "";
+    youHaveConnexion();
+    youHaveNetWork = await SQLHelper.getYouHaveConnexion();
+    while (youHaveNetWork.length == 0) {
+      youHaveNetWork = await SQLHelper.getYouHaveConnexion();
+    }
+    if (youHaveNetWork[0]['youHaveConnexion'] == "oui") {
+      setState(() {
+        _desactive2 = true;
+      });
+
+      var request = http.MultipartRequest(
+          'POST', Uri.parse('$generalRouteForApi/listeFormuleCampagneMail'));
+      request.fields.addAll({});
+
+      http.StreamedResponse response = await request.send();
+
+      if (response.statusCode == 200) {
+        var data1 = await response.stream.bytesToString();
+        var data = convert.jsonDecode(data1);
+        if (data["error"] == false) {
+          SQLHelper.delete('listeFormuleCampagneMail');
+          for (var listeFormuleCampagneMail
+              in data["listeFormuleCampagneMail"]) {
+            SQLHelper.insert({
+              'tableName': "listeFormuleCampagneMail",
+              'value': listeFormuleCampagneMail['id'],
+              'label': listeFormuleCampagneMail['label'] +
+                  " à " +
+                  (listeFormuleCampagneMail['prix']).toString() +
+                  " FCFA",
+              'prix': listeFormuleCampagneMail['prix'],
+              'jours': (listeFormuleCampagneMail['nombre_mail']).toString()
+            });
+          }
+
+          final dataElements =
+              await SQLHelper.getAll("listeFormuleCampagneMail");
+          setState(() {
+            _desactive2 = false;
+            listeFormuleCampagneMail = dataElements;
+            onChangeFormulBoost(1);
+          });
+        }
+      }
+    } else {
+      if (langUserPhone != "fr") {
+        dangerNoti(
+            "Mistake!", "You are not connected to the internet.", context);
+      } else {
+        dangerNoti("Erreur!", "Vous n'ètes pas connecté a internet.", context);
+      }
+      setState(() {
+        _desactive2 = false;
+      });
+    }
+  }
+
   void newCampagneMail() async {
-    if (telIsVerified == true) {
+    // ignore: unused_local_variable
+    final vmail = extraireAdressesEmail(sendtoController.text);
+    if (nombreAdresseMailForm > nombreMail) {
+      if (langUserPhone != "fr") {
+        dangerNoti(
+            "Error !",
+            "Maximum $nombreMail recipients for the plan you have chosen.",
+            context);
+      } else {
+        dangerNoti(
+            "Erreur !",
+            "Maximum $nombreMail destinataires pour le plan que vous avez choisi.",
+            context);
+      }
+    } else if (nombreAdresseMailForm < 10) {
+      if (langUserPhone != "fr") {
+        dangerNoti("Error !", "At least 10 recipients are required.", context);
+      } else {
+        dangerNoti("Erreur !", "Il faut au minimum 10 destinataires.", context);
+      }
+    } else if (telIsVerified == true) {
       dynamic youHaveNetWork = "";
       youHaveConnexion();
       youHaveNetWork = await SQLHelper.getYouHaveConnexion();
@@ -156,6 +242,7 @@ class _RegisterForm2State extends State<RegisterForm2> {
         request.fields.addAll({
           'uid': uidUser,
           'langUserPhone': langUserPhone.toString(),
+          'idFormuleCampagneMail': idFormuleCampagneMail.toString(),
           'titre': titreController.text,
           'sujet': sujetController.text,
           'replyto': replytoController.text,
@@ -218,9 +305,24 @@ class _RegisterForm2State extends State<RegisterForm2> {
     }
   }
 
+  void onChangeFormulBoost(val) async {
+    var boostDataList = await SQLHelper.getFormulBoostWhithId(val);
+    var boostData = boostDataList[0];
+    var joursAsString = boostData['jours'];
+    var nombreMailFromDB = int.parse(joursAsString);
+    setState(() {
+      idFormuleCampagneMail = val;
+      _message = (langUserPhone == "fr")
+          ? "Cette formule vous offre une Campagne Mail vers 10 à $nombreMailFromDB adresses mails au maximum."
+          : "This formula offers you an Email Campaign to 10 to $nombreMailFromDB email addresses at most.";
+    });
+    nombreMail = nombreMailFromDB;
+  }
+
   @override
   void initState() {
-    super.initState(); // Loading the diary when the app starts
+    super.initState();
+    listeFormuleBoost();
   }
 
   @override
@@ -228,6 +330,22 @@ class _RegisterForm2State extends State<RegisterForm2> {
     return Container(
       child: Column(
         children: [
+          DelayedAnimation(
+            delay: 0, // 1500,
+            child: SelectFormField(
+              decoration: const InputDecoration(
+                labelText: 'Formules de Campagne Mail Payante',
+                border: OutlineInputBorder(),
+              ),
+              type: SelectFormFieldType.dropdown,
+              initialValue: '1',
+              labelText: 'Formules de Campagne Mail Payante',
+              items: listeFormuleCampagneMail,
+              onChanged: (val) => onChangeFormulBoost(val),
+              onSaved: (val) => print(val),
+            ),
+          ),
+          const SizedBox(height: 10),
           DelayedAnimation(
             delay: 0, // 1500,
             child: TextField(
@@ -332,6 +450,19 @@ class _RegisterForm2State extends State<RegisterForm2> {
             ),
           ),
           const SizedBox(height: 20),
+          DelayedAnimation(
+            delay: 0, // 1000,
+            child: Text(
+              _message,
+              style: GoogleFonts.poppins(
+                color: Colors.blue[400],
+                fontWeight: FontWeight.w600,
+                fontSize: 12,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+          const SizedBox(height: 10),
         ],
       ),
     );
