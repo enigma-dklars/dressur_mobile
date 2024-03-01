@@ -16,11 +16,11 @@ import 'package:dressur/components/noti.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
 import 'package:flutter_contacts/flutter_contacts.dart';
-import 'package:share_plus/share_plus.dart';
 import 'package:dressur/components/sociaux.dart';
 import 'package:dressur/components/sql_helper.dart';
 import 'package:dressur/5_autre/support_assistance.dart';
 import 'liste_contact_add_disponible.dart';
+import 'package:share_plus/share_plus.dart';
 
 class ActuPage extends StatefulWidget {
   ActuPage({Key? key}) : super(key: key);

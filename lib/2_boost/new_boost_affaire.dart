@@ -37,7 +37,7 @@ class _PromotionFormPageState extends State<PromotionFormPage> {
 
   Future<void> _selectImage() async {
     final picker = ImagePicker();
-    final pickedImage = await picker.getImage(source: ImageSource.gallery);
+    final pickedImage = await picker.pickImage(source: ImageSource.gallery);
 
     if (pickedImage != null) {
       final imageFile = File(pickedImage.path);
