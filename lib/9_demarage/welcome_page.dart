@@ -2,6 +2,7 @@
 
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:dressur/9_demarage/update_app_important.dart';
@@ -15,7 +16,12 @@ import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
 
 class WelcomePage extends StatelessWidget {
-  const WelcomePage({Key? key}) : super(key: key);
+  const WelcomePage(this.notificationAppLaunchDetails, {Key? key})
+      : super(key: key);
+  static const String routeName = '/';
+  final NotificationAppLaunchDetails? notificationAppLaunchDetails;
+  bool get didNotificationLaunchApp =>
+      notificationAppLaunchDetails?.didNotificationLaunchApp ?? false;
 
   @override
   Widget build(BuildContext context) {
@@ -185,6 +191,14 @@ class _PageDepartState extends State<PageDepart> {
     } else {
       _handleInvalidPermissionsCamera(permissionStatusCamera);
     }
+
+    // permission camera
+    PermissionStatus permissionStatusAlarm = await _getAlarmPermission();
+    if (permissionStatusAlarm == PermissionStatus.granted) {
+      // OK
+    } else {
+      _handleInvalidPermissionsAlarm(permissionStatusAlarm);
+    }
   }
 
   Future<PermissionStatus> _getContactPermission() async {
@@ -215,6 +229,18 @@ class _PageDepartState extends State<PageDepart> {
     // permission != PermissionStatus.granted && permission != PermissionStatus.permanentlyDenied
     if (permission != PermissionStatus.granted) {
       PermissionStatus permissionStatus = await Permission.camera.request();
+      return permissionStatus;
+    } else {
+      return permission;
+    }
+  }
+
+  Future<PermissionStatus> _getAlarmPermission() async {
+    PermissionStatus permission = await Permission.camera.status;
+    // permission != PermissionStatus.granted && permission != PermissionStatus.permanentlyDenied
+    if (permission != PermissionStatus.granted) {
+      PermissionStatus permissionStatus =
+          await Permission.scheduleExactAlarm.request();
       return permissionStatus;
     } else {
       return permission;
@@ -265,6 +291,22 @@ class _PageDepartState extends State<PageDepart> {
         warningNoti(
             "Attention !",
             "Veuillez autoriser Dressur à accéder à votre caméra pour le scannage des codes QR et l'enregistrement automatiquement des contacts dans votre téléphone.\nCette autorisation est nécessaire pour profiter pleinement de nos fonctionnalités.",
+            context);
+      }
+    }
+  }
+
+  void _handleInvalidPermissionsAlarm(PermissionStatus permissionStatus) {
+    if (permissionStatus != PermissionStatus.granted) {
+      if (langUserPhone != "fr") {
+        warningNoti(
+            "Attention !",
+            "Veuillez autoriser Dressur à vous notifier les enregistrements automatiques de contact ainsi que votre messagerie.\nThis authorization is necessary to take full advantage of our features.",
+            context);
+      } else {
+        warningNoti(
+            "Attention !",
+            "Veuillez autoriser Dressur à vous notifier les enregistrements automatiques de contact ainsi que votre messagerie.\nCette autorisation est nécessaire pour profiter pleinement de nos fonctionnalités.",
             context);
       }
     }

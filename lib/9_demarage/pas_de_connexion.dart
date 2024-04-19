@@ -1,7 +1,10 @@
 import 'dart:io';
 
+import 'package:dressur/main.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_local_notifications_platform_interface/src/types.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:dressur/components/constant.dart';
 import 'package:dressur/components/delayed_animation.dart';
@@ -27,6 +30,9 @@ class PageDepart extends StatefulWidget {
 }
 
 class _PageDepartState extends State<PageDepart> {
+
+NotificationAppLaunchDetails? notificationAppLaunchDetails;
+
   Future<bool> _onWillPop() async {
     return (await showDialog(
           context: context,
@@ -135,7 +141,7 @@ class _PageDepartState extends State<PageDepart> {
                         ),
                         onPressed: () {
                           Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) => const WelcomePage()));
+                              builder: (context) => WelcomePage(notificationAppLaunchDetails)));
                         },
                       ),
                     )),
