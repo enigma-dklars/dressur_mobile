@@ -116,7 +116,20 @@ class _PromotionListPageState extends State<PromotionListPage> {
           (langUserPhone == "fr")
               ? 'Liste Promotion Affaire'
               : "Business Promotion List",
-          style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+          style: GoogleFonts.poppins(
+            fontWeight: FontWeight.w600,
+            color: Colors.white,
+          ),
+        ),
+        leading: IconButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          icon: const Icon(
+            Icons.arrow_back,
+            size: 30,
+            color: Colors.white,
+          ),
         ),
         backgroundColor: primaryColor,
         actions: [
@@ -221,7 +234,7 @@ class _PromotionListPageState extends State<PromotionListPage> {
                             ),
                             borderRadius: BorderRadius.circular(5),
                           ),
-                          padding: const EdgeInsets.fromLTRB(15, 10, 15, 0),
+                          padding: const EdgeInsets.fromLTRB(15, 5, 15, 0),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -230,6 +243,7 @@ class _PromotionListPageState extends State<PromotionListPage> {
                                 style: const TextStyle(
                                   fontSize: 12.0,
                                   fontWeight: FontWeight.bold,
+                                  color: Colors.white,
                                 ),
                               ),
                               Text(
@@ -237,6 +251,7 @@ class _PromotionListPageState extends State<PromotionListPage> {
                                 style: const TextStyle(
                                   fontSize: 12.0,
                                   fontWeight: FontWeight.bold,
+                                  color: Colors.white,
                                 ),
                               ),
                               Text(
@@ -246,9 +261,9 @@ class _PromotionListPageState extends State<PromotionListPage> {
                                 style: const TextStyle(
                                   fontSize: 12.0,
                                   fontWeight: FontWeight.bold,
+                                  color: Colors.white,
                                 ),
                               ),
-                              const SizedBox(height: 5),
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.end,
                                 children: [
@@ -259,11 +274,18 @@ class _PromotionListPageState extends State<PromotionListPage> {
                                           style: ElevatedButton.styleFrom(
                                             backgroundColor: Colors.green,
                                           ),
-                                          label: Text((langUserPhone == "fr")
-                                              ? 'Autres Informations'
-                                              : 'Other information'),
+                                          label: Text(
+                                            (langUserPhone == "fr")
+                                                ? 'Autres Informations'
+                                                : 'Other information',
+                                            style: GoogleFonts.poppins(
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.w400,
+                                            ),
+                                          ),
                                           icon: const Icon(
                                             Icons.info,
+                                            color: Colors.white,
                                           ),
                                           onPressed: () {
                                             Navigator.push(
@@ -308,7 +330,20 @@ class PromotionDetailPage extends StatelessWidget {
           (langUserPhone == "fr")
               ? 'Détails de la promotion'
               : 'Details of the promotion',
-          style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+          style: GoogleFonts.poppins(
+            fontWeight: FontWeight.w600,
+            color: Colors.white,
+          ),
+        ),
+        leading: IconButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          icon: const Icon(
+            Icons.arrow_back,
+            size: 30,
+            color: Colors.white,
+          ),
         ),
         backgroundColor: primaryColor,
       ),
@@ -571,7 +606,20 @@ class _PaymentGratuitPageState extends State<PaymentGratuitPage> {
       appBar: AppBar(
         title: Text(
           'Page de Démarrage Gratuit',
-          style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+          style: GoogleFonts.poppins(
+            fontWeight: FontWeight.w600,
+            color: Colors.white,
+          ),
+        ),
+        leading: IconButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          icon: const Icon(
+            Icons.arrow_back,
+            size: 30,
+            color: Colors.white,
+          ),
         ),
         backgroundColor: primaryColor,
       ),
@@ -582,6 +630,10 @@ class _PaymentGratuitPageState extends State<PaymentGratuitPage> {
             DelayedAnimation(
               delay: 0, // 1500,
               child: SelectFormField(
+                decoration: const InputDecoration(
+                  labelText: 'Formules de Boost Payant',
+                  border: OutlineInputBorder(),
+                ),
                 type: SelectFormFieldType.dropdown,
                 initialValue: '1',
                 labelText: 'Formules de Boost',
@@ -614,9 +666,12 @@ class _PaymentGratuitPageState extends State<PaymentGratuitPage> {
                         vertical: 13,
                       ),
                     ),
-                    child: _desactive
-                        ? const Text("Wait...")
-                        : const Text("BOOSTER"),
+                    child: Text(
+                      _desactive ? "Wait..." : "BOOSTER",
+                      style: GoogleFonts.poppins(
+                        color: Colors.white,
+                      ),
+                    ),
                     onPressed: () {
                       if (!telIsVerified) {
                         warningNoti(
@@ -809,7 +864,20 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
       appBar: AppBar(
         title: Text(
           'Page de Démarrage Payant',
-          style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+          style: GoogleFonts.poppins(
+            fontWeight: FontWeight.w600,
+            color: Colors.white,
+          ),
+        ),
+        leading: IconButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          icon: const Icon(
+            Icons.arrow_back,
+            size: 30,
+            color: Colors.white,
+          ),
         ),
         backgroundColor: primaryColor,
       ),
@@ -820,6 +888,10 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
             DelayedAnimation(
               delay: 0, // 1500,
               child: SelectFormField(
+                decoration: const InputDecoration(
+                  labelText: 'Formules de Boost Payant',
+                  border: OutlineInputBorder(),
+                ),
                 type: SelectFormFieldType.dropdown,
                 initialValue: '1',
                 labelText: 'Formules de Promotion Payante',
@@ -832,6 +904,10 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
             DelayedAnimation(
               delay: 0, // 1500,
               child: SelectFormField(
+                decoration: const InputDecoration(
+                  labelText: 'Formules de Boost Payant',
+                  border: OutlineInputBorder(),
+                ),
                 type: SelectFormFieldType.dropdown,
                 initialValue: 'mtn',
                 labelText: 'Methode de paiement mobile',
@@ -846,8 +922,8 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
               child: TextField(
                 controller: telController,
                 decoration: InputDecoration(
-                  labelStyle: TextStyle(color: Colors.grey[400]),
                   labelText: 'Indicatif + Numéro du paiement',
+                  border: OutlineInputBorder(),
                 ),
               ),
             ),
@@ -864,9 +940,12 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
                       vertical: 13,
                     ),
                   ),
-                  child: _desactive2
-                      ? const Text("Wait...")
-                      : const Text("PAYER & BOOSTER"),
+                  child: Text(
+                    _desactive2 ? "Wait..." : "PAYER & BOOSTER",
+                    style: GoogleFonts.poppins(
+                      color: Colors.white,
+                    ),
+                  ),
                   onPressed: () {
                     if (!telIsVerified) {
                       warningNoti(

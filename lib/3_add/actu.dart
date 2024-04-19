@@ -6,6 +6,7 @@ import 'dart:io';
 import 'package:dressur/components/padding_and_divider.dart';
 import 'package:dressur/components/pub_smt_2024.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:dressur/5_autre/confirme_mail_user.dart';
@@ -19,6 +20,7 @@ import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:dressur/components/sociaux.dart';
 import 'package:dressur/components/sql_helper.dart';
 import 'package:dressur/5_autre/support_assistance.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'liste_contact_add_disponible.dart';
 import 'package:share_plus/share_plus.dart';
 
@@ -30,16 +32,46 @@ class ActuPage extends StatefulWidget {
 }
 
 class _ActuPageState extends State<ActuPage> {
+  final ScrollController _scrollController = ScrollController();
+
+  final ValueNotifier<bool> _showFabText = ValueNotifier(true);
   bool _loading = false;
   List<Map<String, dynamic>> historiqueContactsAdd = [];
-  bool _isExpanded = true;
   Timer? _timer;
 
   @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_scrollListener);
+    // Démarre le timer lors de l'initialisation du widget
+    _startTimer();
+  }
+
+  @override
   void dispose() {
+    _scrollController.removeListener(_scrollListener);
+    _scrollController.dispose();
+
+    _showFabText.dispose();
     // Arrête le timer lors de la suppression du widget
     _stopTimer();
     super.dispose();
+  }
+
+  void _scrollListener() {
+    if (_scrollController.position.userScrollDirection ==
+        ScrollDirection.reverse) {
+      _showFabText.value = false;
+    } else if (_scrollController.position.atEdge &&
+        _scrollController.position.pixels == 0) {
+      _showFabText.value = true;
+    }
+  }
+
+  Future<void> _refreshData() async {
+    setState(() {
+      actualise();
+    });
   }
 
   void _startTimer() {
@@ -264,20 +296,22 @@ class _ActuPageState extends State<ActuPage> {
     );
   }
 
-  Future<void> executeAfterDelay() async {
-    await Future.delayed(const Duration(seconds: 5));
-    // Code à exécuter après le délai de 10 secondes
-    setState(() {
-      _isExpanded = false;
-    });
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    executeAfterDelay();
-    // Démarre le timer lors de l'initialisation du widget
-    _startTimer();
+  void _showConfNumeroWhatsapp(context) async {
+    showModalBottomSheet(
+      context: context,
+      elevation: 5,
+      isScrollControlled: true,
+      builder: (_) => Container(
+        padding: EdgeInsets.only(
+          top: 0,
+          left: 0,
+          right: 0,
+          // this will prevent the soft keyboard from covering the text fields
+          bottom: MediaQuery.of(context).viewInsets.bottom + 0,
+        ),
+        child: ConfNumeroWhatsapp(),
+      ),
+    );
   }
 
   @override
@@ -292,12 +326,16 @@ class _ActuPageState extends State<ActuPage> {
           title: Text(
             (langUserPhone == "fr") ? "Actu" : "News",
             style: GoogleFonts.poppins(
-              fontWeight: FontWeight.w600,
+              color: Colors.white,
+              fontWeight: FontWeight.w400,
             ),
           ),
           actions: [
             IconButton(
-              icon: const Icon(Icons.notifications),
+              icon: const Icon(
+                Icons.notifications,
+                color: Colors.white,
+              ),
               onPressed: () {
                 Navigator.push(
                   context,
@@ -367,404 +405,248 @@ class _ActuPageState extends State<ActuPage> {
             ),
           ],
         ),
-        body: SingleChildScrollView(
-          child: Column(
-            children: [
-              const SizedBox(height: 5),
-              SpecialPub(),
-              const SizedBox(height: 5),
-              Container(
-                padding: const EdgeInsets.only(
-                    left: 10, top: 0, right: 10, bottom: 0),
-                child: ExpansionPanelList(
-                  elevation: 1,
-                  expandedHeaderPadding: EdgeInsets.zero,
-                  animationDuration: const Duration(seconds: 1),
-                  children: <ExpansionPanel>[
-                    ExpansionPanel(
-                      backgroundColor: Colors.red,
-                      headerBuilder: (BuildContext context, bool isExpanded) {
-                        return ListTile(
-                          title: Text(
-                            (langUserPhone == "fr")
-                                ? "Message Très Important"
-                                : "Very Important Message",
-                            style: GoogleFonts.poppins(
-                              fontWeight: FontWeight.w600,
-                              color: Colors.white,
-                            ),
-                          ),
-                          onTap: () {
-                            setState(() {
-                              _isExpanded = !isExpanded;
-                            });
-                          },
-                        );
-                      },
-                      body: Card(
-                        child: Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(3),
-                            gradient: const LinearGradient(
-                              begin: Alignment.topCenter,
-                              end: Alignment.bottomCenter,
-                              colors: [
-                                Colors.red,
-                                Color.fromARGB(255, 85, 3, 3),
-                              ],
-                            ),
-                          ),
-                          padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              const SizedBox(height: 10),
-                              Text(
-                                (langUserPhone == "fr")
-                                    ? "NB: Dressur ne peut garantir la bonne volonté et l'intégrité de tous ses utilisateurs, nous souhaitons attirer votre attention sur la question importante de la sécurité en ligne.\nMalheureusement, il existe des individus malveillants qui cherchent à arnaquer les utilisateurs innocents. Ensemble, nous pouvons prévenir les arnaques. Soyez vigilants, restez en sécurité. Signalez tous comportements que vous trouvez suspect."
-                                    : "NB: Dressur cannot guarantee the goodwill and integrity of all of its users, we would like to draw your attention to the important issue of online security.\nUnfortunately, there are malicious individuals out there who seek to scam innocent users. Together we can prevent scams. Be vigilant, stay safe. Report any behavior you find suspicious.",
-                                style: GoogleFonts.poppins(
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 16,
-                                  color: Colors.white,
-                                ),
-                                textAlign: TextAlign.justify,
-                              ),
-                              const SizedBox(height: 10),
-                            ],
+        body: Column(
+          children: [
+            Expanded(
+              child: RefreshIndicator(
+                onRefresh: _refreshData,
+                child: ListView(
+                  controller: _scrollController,
+                  children: [
+                    const SizedBox(height: 5),
+                    if (nombreContactDispo <= 0 ||
+                        telIsVerified == false ||
+                        mailIsVerified == false)
+                      Container(
+                        padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
+                        child: Text(
+                          (langUserPhone == "fr") ? "À faire :" : "To do :",
+                          style: GoogleFonts.poppins(
+                            fontWeight: FontWeight.w300,
+                            fontSize: 20,
                           ),
                         ),
                       ),
-                      isExpanded: _isExpanded,
-                    ),
-                  ],
-                  expansionCallback: (int index, bool isExpanded) {
-                    setState(() {
-                      _isExpanded = !isExpanded;
-                    });
-                  },
-                ),
-              ),
-              const SizedBox(height: 5),
-              DressurDivider(),
-              !mailIsVerified
-                  ? Card(
-                      margin: const EdgeInsets.only(
-                          left: 10, top: 5, right: 10, bottom: 5),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(5),
-                          gradient: const LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            colors: [
-                              Colors.red,
-                              Colors.white60,
-                            ],
-                          ),
-                        ),
-                        padding: const EdgeInsets.fromLTRB(10, 3, 10, 3),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            Text(
-                              (langUserPhone == "fr")
-                                  ? "Configurer votre compte"
-                                  : "Configure your account",
-                              style: GoogleFonts.poppins(
-                                fontWeight: FontWeight.w600,
-                                fontSize: 26,
-                                color: Colors.white,
-                              ),
+                    !telIsVerified
+                        ? ListTile(
+                            dense: true,
+                            contentPadding: EdgeInsets.symmetric(
+                                vertical: 0, horizontal: 10),
+                            leading: Icon(
+                              Icons.fiber_manual_record,
+                              color: Colors.red,
                             ),
-                            Text(
-                              (langUserPhone == "fr")
-                                  ? "Veuillez confirmer votre adresse mail pour pouvoir récupérer votre compte lorsque vous oubliez votre mot de passe..."
-                                  : "Please confirm your email address so that you can recover your account when you forget your password...",
-                              style: GoogleFonts.poppins(
-                                fontWeight: FontWeight.w600,
-                                fontSize: 16,
-                              ),
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                Column(
-                                  children: [
-                                    SizedBox(
-                                      width: MediaQuery.of(context).size.width *
-                                          0.45,
-                                      child: ElevatedButton(
-                                          style: ElevatedButton.styleFrom(
-                                            backgroundColor: primaryColor,
-                                            shape: const StadiumBorder(),
-                                            padding: const EdgeInsets.symmetric(
-                                              vertical: 10,
-                                            ),
-                                          ),
-                                          child: (langUserPhone == "fr")
-                                              ? const Text("Confirmer mon Mail")
-                                              : const Text("Confirm my email"),
-                                          onPressed: () {
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      CodeMailConfirmePage()),
-                                            );
-                                          }),
-                                    )
-                                  ],
-                                ),
-                              ],
-                            )
-                          ],
-                        ),
-                      ),
-                    )
-                  : const SizedBox(height: 0),
-              !mailIsVerified
-                  ? const Padding(
-                      padding: EdgeInsets.only(
-                          left: 50, top: 2, right: 50, bottom: 2),
-                      child: Divider(
-                        height: 1,
-                        thickness: 1,
-                        color: Colors.grey,
-                      ),
-                    )
-                  : const SizedBox(height: 0),
-              !telIsVerified
-                  ? Card(
-                      margin: const EdgeInsets.only(
-                          left: 10, top: 5, right: 10, bottom: 5),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(5),
-                          gradient: const LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            colors: [
-                              Colors.red,
-                              Colors.white60,
-                            ],
-                          ),
-                        ),
-                        padding: const EdgeInsets.fromLTRB(10, 3, 10, 0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            Text(
+                            title: Text(
                               (langUserPhone == "fr")
                                   ? "Confirmation du numéro WhatsApp"
                                   : "WhatsApp Number Confirmation",
-                              style: GoogleFonts.poppins(
-                                fontWeight: FontWeight.w600,
-                                fontSize: 20,
-                                color: Colors.white,
-                              ),
+                              style: GoogleFonts.poppins(),
                             ),
-                            const SizedBox(height: 10),
-                            Text(
+                            onTap: () {
+                              _showConfNumeroWhatsapp(context);
+                            },
+                          )
+                        : const SizedBox(height: 0),
+                    !mailIsVerified
+                        ? ListTile(
+                            dense: true,
+                            contentPadding: EdgeInsets.symmetric(
+                                vertical: 0, horizontal: 10),
+                            leading: Icon(
+                              Icons.fiber_manual_record,
+                              color: Colors.red,
+                            ),
+                            title: Text(
                               (langUserPhone == "fr")
-                                  ? "Envoyer Confirmation_WhatsApp a l'assistance Dressur sur WhatsApp avec le $tel pour la confirmation de votre numéro."
-                                  : "Send Confirmation_WhatsApp to Dressur assistance on WhatsApp with $tel for confirmation of your number.",
-                              style: GoogleFonts.poppins(
-                                fontWeight: FontWeight.w600,
-                                fontSize: 16,
-                              ),
+                                  ? "Confirmation de l'Email"
+                                  : "Email Confirmation",
+                              style: GoogleFonts.poppins(),
                             ),
-                            const SizedBox(height: 15),
-                          ],
-                        ),
-                      ),
-                    )
-                  : const SizedBox(height: 0),
-              !telIsVerified
-                  ? const Padding(
-                      padding: EdgeInsets.only(
-                          left: 50, top: 2, right: 50, bottom: 2),
-                      child: Divider(
-                        height: 1,
-                        thickness: 1,
-                        color: Colors.grey,
-                      ),
-                    )
-                  : const SizedBox(height: 0),
-              Card(
-                margin: const EdgeInsets.only(
-                    left: 10, top: 5, right: 10, bottom: 5),
-                child: Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(5),
-                    gradient: const LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        primaryColor,
-                        secondaryColor,
-                        Colors.white,
-                      ],
-                    ),
-                  ),
-                  padding: const EdgeInsets.fromLTRB(10, 0, 10, 3),
-                  child: Column(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          if (nombreContactDispo > 0)
-                            Text(
-                              (langUserPhone == "fr")
-                                  ? "ADD DS Disponible"
-                                  : "ADD DS Available",
-                              style: GoogleFonts.poppins(
-                                fontWeight: FontWeight.w600,
-                                fontSize: 24,
-                                color: Colors.white,
-                              ),
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        CodeMailConfirmePage()),
+                              );
+                            },
+                          )
+                        : const SizedBox(height: 0),
+                    (nombreContactDispo <= 0)
+                        ? ListTile(
+                            dense: true,
+                            contentPadding: EdgeInsets.symmetric(
+                                vertical: 0, horizontal: 10),
+                            leading: Icon(
+                              Icons.fiber_manual_record,
+                              color: Colors.red,
                             ),
-                          if (nombreContactDispo <= 0)
-                            Text(
+                            title: Text(
                               (langUserPhone == "fr")
                                   ? "ADD DS Indisponible"
                                   : "ADD DS Unavailable",
-                              style: GoogleFonts.poppins(
-                                fontWeight: FontWeight.w600,
-                                fontSize: 24,
-                                color: Colors.white,
-                              ),
+                              style: GoogleFonts.poppins(),
                             ),
-                          IconButton(
-                            onPressed: () {
-                              _loading ? '' : actualise();
+                            onTap: () {
+                              _showPasDeContactAdd(context);
                             },
-                            icon: const Icon(
-                              Icons.refresh,
-                              size: 25,
-                            ),
+                          )
+                        : const SizedBox(height: 0),
+                    if (nombreContactDispo > 0)
+                      Card(
+                        margin: const EdgeInsets.only(
+                            left: 10, top: 5, right: 10, bottom: 5),
+                        child: Container(
+                          padding: const EdgeInsets.fromLTRB(10, 0, 10, 3),
+                          child: Column(
+                            children: [
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    (langUserPhone == "fr")
+                                        ? "ADD DS Disponible"
+                                        : "ADD DS Available",
+                                    style: GoogleFonts.poppins(
+                                      fontWeight: FontWeight.w500,
+                                      color: primaryColor,
+                                      fontSize: 24,
+                                    ),
+                                  ),
+                                  IconButton(
+                                    onPressed: () {
+                                      _loading ? '' : actualise();
+                                    },
+                                    icon: const Icon(
+                                      color: primaryColor,
+                                      Icons.refresh,
+                                      size: 25,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Text(
+                                (langUserPhone == "fr")
+                                    ? "$nombreContactDispo contact(s) disponible(s) selon vos préférences pays."
+                                    : "$nombreContactDispo contact available according to your country preferences.",
+                                style: GoogleFonts.poppins(
+                                  fontWeight: FontWeight.w300,
+                                  fontSize: 14,
+                                ),
+                              ),
+                              const SizedBox(height: 5),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Column(
+                                    children: [
+                                      SizedBox(
+                                        width:
+                                            MediaQuery.of(context).size.width *
+                                                0.35,
+                                        child: ElevatedButton(
+                                            style: ElevatedButton.styleFrom(
+                                              backgroundColor: _loading
+                                                  ? Colors.red
+                                                  : primaryColor,
+                                              shape: const StadiumBorder(),
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                vertical: 10,
+                                              ),
+                                            ),
+                                            child: Text(
+                                              (_loading == true)
+                                                  ? "Wait..."
+                                                  : (langUserPhone == "fr")
+                                                      ? "Enregistrer Tous"
+                                                      : "Save All",
+                                              style: GoogleFonts.poppins(
+                                                color: Colors.white,
+                                              ),
+                                            ),
+                                            onPressed: () {
+                                              if (!telIsVerified) {
+                                                warningNoti(
+                                                    (langUserPhone == "fr")
+                                                        ? "Configurer votre compte"
+                                                        : "Configure your account",
+                                                    (langUserPhone == "fr")
+                                                        ? "Patientez encore svp. Votre numéro WhatsApp n'a pas encore été confirmé par un administrateur. Il le sera dans les plus brefs délais."
+                                                        : "Please wait again. Your WhatsApp number has not yet been confirmed by an administrator. It will be as soon as possible.",
+                                                    context);
+                                              } else if (!mailIsVerified) {
+                                                warningNoti(
+                                                    (langUserPhone == "fr")
+                                                        ? "Configurer votre compte"
+                                                        : "Configure your account",
+                                                    (langUserPhone == "fr")
+                                                        ? "Veuillez d'abord confirmer votre adresse mail...\n\nVous trouverez sur notre chaine YouTube des vidéos qui peuvent vous aider..."
+                                                        : "Please confirm your email address first...\n\nYou will find videos on our YouTube channel that can help you...",
+                                                    context);
+                                              } else {
+                                                _loading
+                                                    ? ''
+                                                    : addTousLesContacts();
+                                              }
+                                            }),
+                                      )
+                                    ],
+                                  ),
+                                  Column(
+                                    children: [
+                                      SizedBox(
+                                        width:
+                                            MediaQuery.of(context).size.width *
+                                                0.35,
+                                        child: ElevatedButton(
+                                            style: ElevatedButton.styleFrom(
+                                              backgroundColor: secondaryColor,
+                                              shape: const StadiumBorder(),
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                vertical: 10,
+                                              ),
+                                            ),
+                                            child: Text(
+                                              (langUserPhone == "fr")
+                                                  ? "Voir la liste"
+                                                  : "See the list",
+                                              style: GoogleFonts.poppins(
+                                                color: Colors.white,
+                                              ),
+                                            ),
+                                            onPressed: () {
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        ListeContactAAddPage()),
+                                              );
+                                            }),
+                                      )
+                                    ],
+                                  ),
+                                ],
+                              )
+                            ],
                           ),
-                        ],
-                      ),
-                      Text(
-                        (langUserPhone == "fr")
-                            ? "$nombreContactDispo contact(s) disponible(s) selon vos préférences pays."
-                            : "$nombreContactDispo contact available according to your country preferences.",
-                        style: GoogleFonts.poppins(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 14,
                         ),
                       ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Column(
-                            children: [
-                              SizedBox(
-                                width: MediaQuery.of(context).size.width * 0.35,
-                                child: ElevatedButton(
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor:
-                                          _loading ? Colors.red : primaryColor,
-                                      shape: const StadiumBorder(),
-                                      padding: const EdgeInsets.symmetric(
-                                        vertical: 10,
-                                      ),
-                                    ),
-                                    child: _loading
-                                        ? const Text("Wait...")
-                                        : (langUserPhone == "fr")
-                                            ? const Text("Enregistrer tous")
-                                            : const Text("Save all"),
-                                    onPressed: () {
-                                      if (!telIsVerified) {
-                                        warningNoti(
-                                            (langUserPhone == "fr")
-                                                ? "Configurer votre compte"
-                                                : "Configure your account",
-                                            (langUserPhone == "fr")
-                                                ? "Patientez encore svp. Votre numéro WhatsApp n'a pas encore été confirmé par un administrateur. Il le sera dans les plus brefs délais."
-                                                : "Please wait again. Your WhatsApp number has not yet been confirmed by an administrator. It will be as soon as possible.",
-                                            context);
-                                      } else if (!mailIsVerified) {
-                                        warningNoti(
-                                            (langUserPhone == "fr")
-                                                ? "Configurer votre compte"
-                                                : "Configure your account",
-                                            (langUserPhone == "fr")
-                                                ? "Veuillez d'abord confirmer votre adresse mail...\n\nVous trouverez sur notre chaine YouTube des vidéos qui peuvent vous aider..."
-                                                : "Please confirm your email address first...\n\nYou will find videos on our YouTube channel that can help you...",
-                                            context);
-                                      } else {
-                                        if (nombreContactDispo > 0) {
-                                          _loading ? '' : addTousLesContacts();
-                                        } else {
-                                          _showPasDeContactAdd(context);
-                                        }
-                                      }
-                                    }),
-                              )
-                            ],
-                          ),
-                          Column(
-                            children: [
-                              SizedBox(
-                                width: MediaQuery.of(context).size.width * 0.35,
-                                child: ElevatedButton(
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: secondaryColor,
-                                      shape: const StadiumBorder(),
-                                      padding: const EdgeInsets.symmetric(
-                                        vertical: 10,
-                                      ),
-                                    ),
-                                    child: (langUserPhone == "fr")
-                                        ? const Text("Voir la liste")
-                                        : const Text("See the list"),
-                                    onPressed: () {
-                                      if (nombreContactDispo > 0) {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  ListeContactAAddPage()),
-                                        );
-                                      } else {
-                                        _showPasDeContactAdd(context);
-                                      }
-                                    }),
-                              )
-                            ],
-                          ),
-                        ],
-                      )
-                    ],
-                  ),
-                ),
-              ),
-              DressurDivider(),
-              const SizedBox(height: 5),
-              if (havePublicites == true)
-                Column(
-                  children: [
-                    AdvertisementListPage(),
+                    DressurDivider(),
+                    SpecialPub(),
+                    DressurDivider(),
+                    if (havePublicites == true) AdvertisementListPage(),
                     const SizedBox(height: 5),
-                    const Padding(
-                      padding: EdgeInsets.only(
-                          left: 50, top: 2, right: 50, bottom: 2),
-                      child: Divider(
-                        height: 1,
-                        thickness: 1,
-                        color: Colors.grey,
-                      ),
-                    ),
+                    SociauxPage(),
                     const SizedBox(height: 5),
                   ],
                 ),
-              SociauxPage(),
-              const SizedBox(height: 5),
-            ],
-          ),
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -814,8 +696,8 @@ class _PasDeContactAddState extends State<PasDeContactAdd> {
               const SizedBox(height: 10),
               Text(
                 (langUserPhone == "fr")
-                    ? "Pour le moment, aucun des contacts correspondant à vos préférences pays n'a fait de boost. Vous pouvez faire un boost pour qu'ils puissent vous enregistrer.\n\nLorsque vous faites un boost, vous avez accès à plus de contact, dans le cas contraire, vous êtes limités aux utilisateurs qui ont fait un boost."
-                    : "For the moment, none of the contacts corresponding to your country preferences have been boosted. You can boost so they can check you in.\n\nWhen you boost you have access to more contacts, otherwise you are limited to users who have boosted.",
+                    ? "Pour le moment, aucun des contacts correspondant à vos préférences pays n'a fait de boost. Vous pouvez faire un boost pour qu'ils puissent vous enregistrer."
+                    : "For the moment, none of the contacts corresponding to your country preferences have been boosted. You can boost so they can check you in.",
                 style: const TextStyle(
                   color: Colors.white,
                   fontSize: 17,
@@ -824,12 +706,21 @@ class _PasDeContactAddState extends State<PasDeContactAdd> {
               const SizedBox(height: 10),
               Text(
                 (langUserPhone == "fr")
-                    ? "Partager votre code de parrainage pour avoir plus de filleuls et surtout accompagner ses derniers durant tout le long du processus. Assurez-vous que vos filleuls ont utilisé votre code de parrainage et qu'ils ont compris comment fonctionne l'application Dressur."
-                    : "Share your sponsorship code to have more referrals and above all to accompany them throughout the process. Make sure your referrals have used your referral code and understood how the Dressur app works.",
+                    ? "Lorsque vous faites un boost, vous avez accès à plusieurs contacts, dans le cas contraire, vous êtes limités aux utilisateurs qui ont fait un boost."
+                    : "When you boost, you have access to several contacts, otherwise, you are limited to users who have boosted.",
                 style: const TextStyle(
                   color: Colors.white,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w200,
+                  fontSize: 17,
+                ),
+              ),
+              const SizedBox(height: 10),
+              Text(
+                (langUserPhone == "fr")
+                    ? "Partager votre code de parrainage pour avoir plus de filleuls et surtout, gagnez des points bonus et faites ainsi des boosts gratuitement et continuellement. Contactez-nous pour d'éventuelles questions, nous y répondrons avec plaisir."
+                    : "Share your sponsorship code to have more referrals and above all, earn bonus points and thus boost for free and continuously. Contact us for any questions, we will be happy to answer them.",
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 17,
                 ),
               ),
               const SizedBox(height: 10),
@@ -839,7 +730,7 @@ class _PasDeContactAddState extends State<PasDeContactAdd> {
                   shape: const StadiumBorder(),
                   padding: const EdgeInsets.symmetric(
                     vertical: 13,
-                    horizontal: 23,
+                    horizontal: 40,
                   ),
                 ),
                 child: Text((langUserPhone == "fr") ? "PARTAGER" : "SHARE",
@@ -854,6 +745,110 @@ class _PasDeContactAddState extends State<PasDeContactAdd> {
                   await Share.share(messageShare, subject: 'Partager Dressur!');
                 },
               ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class ConfNumeroWhatsapp extends StatefulWidget {
+  ConfNumeroWhatsapp({Key? key}) : super(key: key);
+
+  @override
+  State<ConfNumeroWhatsapp> createState() => _ConfNumeroWhatsappState();
+}
+
+class _ConfNumeroWhatsappState extends State<ConfNumeroWhatsapp> {
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        Container(
+          padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(5),
+            gradient: const LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                Color.fromARGB(255, 1, 156, 81),
+                Color.fromARGB(255, 1, 156, 81),
+                Colors.green,
+              ],
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                (langUserPhone == "fr")
+                    ? "Confirmation du numéro WhatsApp"
+                    : "WhatsApp Number Confirmation",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 25,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 10),
+              Text(
+                (langUserPhone == "fr")
+                    ? "Assurez-vous de nous envoyer <<WhatsApp Confirmation>> avec le numéro WhatsApp utiliser pour créer votre compte Dressur."
+                    : "Make sure to send us <<WhatsApp Confirmation>> with the WhatsApp number you use to create your Dressur account.",
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 17,
+                ),
+              ),
+              const SizedBox(height: 10),
+              Text(
+                (langUserPhone == "fr")
+                    ? "Cliquez juste sur Demander ci-dessous pour demander la confirmation de votre numéro WhatsApp."
+                    : "Just click Request below to request confirmation of your WhatsApp number.",
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 17,
+                ),
+              ),
+              const SizedBox(height: 10),
+              Text(
+                (langUserPhone == "fr")
+                    ? "Les demandes sont traitées le plus tôt possible, ne vous inquiétez pas."
+                    : "Requests are processed as soon as possible, don't worry.",
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 17,
+                ),
+              ),
+              const SizedBox(height: 10),
+              ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    shape: const StadiumBorder(),
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 13,
+                      horizontal: 40,
+                    ),
+                  ),
+                  child: Text(
+                    (langUserPhone == "fr") ? "Demander" : "Ask",
+                    style: GoogleFonts.poppins(
+                      fontWeight: FontWeight.w600,
+                      color: Color.fromARGB(255, 1, 156, 81),
+                    ),
+                  ),
+                  onPressed: () async {
+                    final Uri _url =
+                        Uri.parse("$whatsappDSURL?text=WhatsApp Confirmation");
+                    if (!await launchUrl(_url,
+                        mode: LaunchMode.externalApplication)) {
+                      throw 'Could not launch $_url';
+                    }
+                  }),
             ],
           ),
         ),

@@ -26,7 +26,10 @@ class _NewCampagneMailPageState extends State<NewCampagneMailPage> {
           (langUserPhone == "fr")
               ? "Nouvelle Campagne Mail"
               : "New Email Campaign",
-          style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+          style: GoogleFonts.poppins(
+            fontWeight: FontWeight.w600,
+            color: Colors.white,
+          ),
         ),
         leading: IconButton(
           onPressed: () {
@@ -35,6 +38,7 @@ class _NewCampagneMailPageState extends State<NewCampagneMailPage> {
           icon: const Icon(
             Icons.arrow_back,
             size: 30,
+            color: Colors.white,
           ),
         ),
       ),
@@ -429,8 +433,12 @@ class _RegisterForm2State extends State<RegisterForm2> {
                     vertical: 13,
                   ),
                 ),
-                child:
-                    _desactive2 ? const Text("Wait...") : const Text("ENVOYER"),
+                child: Text(
+                  _desactive2 ? "Wait..." : "ENVOYER",
+                  style: GoogleFonts.poppins(
+                    color: Colors.white,
+                  ),
+                ),
                 onPressed: () {
                   if (!telIsVerified) {
                     warningNoti(

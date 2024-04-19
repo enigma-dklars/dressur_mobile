@@ -87,7 +87,20 @@ class _ListeBonusPageState extends State<ListeBonusPage> {
           (langUserPhone == "fr")
               ? "Liste des Bonus Reçu"
               : "List of Bonuses Received",
-          style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+          style: GoogleFonts.poppins(
+            color: Colors.white,
+            fontWeight: FontWeight.w400,
+          ),
+        ),
+        leading: IconButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          icon: const Icon(
+            Icons.arrow_back,
+            size: 30,
+            color: Colors.white,
+          ),
         ),
       ),
       body: _loading

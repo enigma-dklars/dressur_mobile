@@ -18,11 +18,15 @@ class SupportPage extends StatelessWidget {
           icon: const Icon(
             Icons.arrow_back,
             size: 30,
+            color: Colors.white,
           ),
         ),
         title: Text(
           (langUserPhone == "fr") ? "Support" : "Support",
-          style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+          style: GoogleFonts.poppins(
+            fontWeight: FontWeight.w400,
+            color: Colors.white,
+          ),
         ),
       ),
       body: SingleChildScrollView(
@@ -41,9 +45,7 @@ class SupportPage extends StatelessWidget {
                           ? "Support & Assistance Technique"
                           : "Support & Technical Assistance",
                       style: GoogleFonts.poppins(
-                          color: primaryColor,
-                          fontSize: 22,
-                          fontWeight: FontWeight.w600),
+                          fontSize: 22, fontWeight: FontWeight.w600),
                       textAlign: TextAlign.center,
                     ),
                   ),
@@ -88,6 +90,10 @@ class SupportPage extends StatelessWidget {
                         (langUserPhone == "fr")
                             ? "Contactez nous sur WhatsApp"
                             : "Contact us on WhatsApp",
+                        style: GoogleFonts.poppins(
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                        ),
                       ),
                       onPressed: () async {
                         final Uri _url = Uri.parse(whatsappDSURL);

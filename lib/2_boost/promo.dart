@@ -74,11 +74,15 @@ class _BoostPageState extends State<BoostPage> {
           backgroundColor: primaryColor,
           title: Text(
             (langUserPhone == "fr") ? "Promotions" : "Promotions",
-            style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+            style: GoogleFonts.poppins(
+              fontWeight: FontWeight.w400,
+              color: Colors.white,
+            ),
           ),
           actions: [
             IconButton(
               icon: const Icon(Icons.notifications),
+              color: Colors.white,
               onPressed: () {
                 Navigator.push(
                   context,
@@ -140,18 +144,6 @@ class _BoostPageState extends State<BoostPage> {
                 margin: const EdgeInsets.only(
                     left: 10, top: 5, right: 10, bottom: 5),
                 child: Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(5),
-                    gradient: const LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        primaryColor,
-                        secondaryColor,
-                        Colors.white,
-                      ],
-                    ),
-                  ),
                   padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -159,17 +151,18 @@ class _BoostPageState extends State<BoostPage> {
                       Text(
                         "Boost Contact",
                         style: GoogleFonts.poppins(
-                          fontWeight: FontWeight.w600,
+                          color: primaryColor,
+                          fontWeight: FontWeight.w400,
                           fontSize: 24,
-                          color: Colors.white,
                         ),
                       ),
+                      const SizedBox(height: 5),
                       Text(
                         (langUserPhone == "fr")
                             ? "Rendez visible le ($tel) aux contacts correspondant à vos préférences pays."
                             : "Make the ($tel) visible to contacts corresponding to your country preferences.",
                         style: GoogleFonts.poppins(
-                          fontWeight: FontWeight.w600,
+                          fontWeight: FontWeight.w300,
                           fontSize: 14,
                         ),
                       ),
@@ -192,6 +185,9 @@ class _BoostPageState extends State<BoostPage> {
                                       (langUserPhone == "fr")
                                           ? "Faire un Boost"
                                           : "Boost",
+                                      style: GoogleFonts.poppins(
+                                        color: Colors.white,
+                                      ),
                                     ),
                                     onPressed: () {
                                       Navigator.push(
@@ -216,9 +212,14 @@ class _BoostPageState extends State<BoostPage> {
                                         vertical: 10,
                                       ),
                                     ),
-                                    child: (langUserPhone == "fr")
-                                        ? const Text("Voir la liste")
-                                        : const Text("See the list"),
+                                    child: Text(
+                                      (langUserPhone == "fr")
+                                          ? "Voir la liste"
+                                          : "See the list",
+                                      style: GoogleFonts.poppins(
+                                        color: Colors.white,
+                                      ),
+                                    ),
                                     onPressed: () {
                                       Navigator.push(
                                         context,
@@ -241,18 +242,6 @@ class _BoostPageState extends State<BoostPage> {
                 margin: const EdgeInsets.only(
                     left: 10, top: 5, right: 10, bottom: 5),
                 child: Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(5),
-                    gradient: const LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        primaryColor,
-                        secondaryColor,
-                        Colors.white,
-                      ],
-                    ),
-                  ),
                   padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -262,17 +251,18 @@ class _BoostPageState extends State<BoostPage> {
                             ? "Promotion Affaire"
                             : "Business Promotion",
                         style: GoogleFonts.poppins(
-                          fontWeight: FontWeight.w600,
+                          color: primaryColor,
+                          fontWeight: FontWeight.w400,
                           fontSize: 24,
-                          color: Colors.white,
                         ),
                       ),
+                      const SizedBox(height: 5),
                       Text(
                         (langUserPhone == "fr")
                             ? "Faite la promotion de vos produits et services. Les utilisateurs intéressés vous contacterons sur WhatsApp."
                             : "Promote your products and services. Interested users will contact you on WhatsApp.",
                         style: GoogleFonts.poppins(
-                          fontWeight: FontWeight.w600,
+                          fontWeight: FontWeight.w300,
                           fontSize: 14,
                         ),
                       ),
@@ -291,9 +281,14 @@ class _BoostPageState extends State<BoostPage> {
                                         vertical: 10,
                                       ),
                                     ),
-                                    child: Text((langUserPhone == "fr")
-                                        ? "Faire une Promo"
-                                        : "Make a Promo"),
+                                    child: Text(
+                                      (langUserPhone == "fr")
+                                          ? "Faire une Promo"
+                                          : "Make a Promo",
+                                      style: GoogleFonts.poppins(
+                                        color: Colors.white,
+                                      ),
+                                    ),
                                     onPressed: () {
                                       Navigator.push(
                                         context,
@@ -317,9 +312,14 @@ class _BoostPageState extends State<BoostPage> {
                                         vertical: 10,
                                       ),
                                     ),
-                                    child: (langUserPhone == "fr")
-                                        ? const Text("Voir la liste")
-                                        : const Text("See the list"),
+                                    child: Text(
+                                      (langUserPhone == "fr")
+                                          ? "Voir la liste"
+                                          : "See the list",
+                                      style: GoogleFonts.poppins(
+                                        color: Colors.white,
+                                      ),
+                                    ),
                                     onPressed: () {
                                       Navigator.push(
                                         context,
@@ -342,18 +342,6 @@ class _BoostPageState extends State<BoostPage> {
                 margin: const EdgeInsets.only(
                     left: 10, top: 5, right: 10, bottom: 5),
                 child: Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(5),
-                    gradient: const LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        primaryColor,
-                        secondaryColor,
-                        Colors.white,
-                      ],
-                    ),
-                  ),
                   padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -363,17 +351,18 @@ class _BoostPageState extends State<BoostPage> {
                             ? "Campagne Mail"
                             : "Email Campaign",
                         style: GoogleFonts.poppins(
-                          fontWeight: FontWeight.w600,
+                          color: primaryColor,
+                          fontWeight: FontWeight.w400,
                           fontSize: 24,
-                          color: Colors.white,
                         ),
                       ),
+                      const SizedBox(height: 5),
                       Text(
                         (langUserPhone == "fr")
                             ? "Faites la promotion de vos produits et services grâce à notre Campagne Mail."
                             : "Promote your products and services with our Mail Campaign.",
                         style: GoogleFonts.poppins(
-                          fontWeight: FontWeight.w600,
+                          fontWeight: FontWeight.w300,
                           fontSize: 14,
                         ),
                       ),
@@ -396,6 +385,9 @@ class _BoostPageState extends State<BoostPage> {
                                       (langUserPhone == "fr")
                                           ? "Démarrer"
                                           : "To start up",
+                                      style: GoogleFonts.poppins(
+                                        color: Colors.white,
+                                      ),
                                     ),
                                     onPressed: () {
                                       Navigator.push(
@@ -421,9 +413,14 @@ class _BoostPageState extends State<BoostPage> {
                                         vertical: 10,
                                       ),
                                     ),
-                                    child: (langUserPhone == "fr")
-                                        ? const Text("Voir la liste")
-                                        : const Text("See the list"),
+                                    child: Text(
+                                      (langUserPhone == "fr")
+                                          ? "Voir la liste"
+                                          : "See the list",
+                                      style: GoogleFonts.poppins(
+                                        color: Colors.white,
+                                      ),
+                                    ),
                                     onPressed: () {
                                       Navigator.push(
                                         context,
@@ -446,18 +443,6 @@ class _BoostPageState extends State<BoostPage> {
                 margin: const EdgeInsets.only(
                     left: 10, top: 5, right: 10, bottom: 5),
                 child: Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(5),
-                    gradient: const LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        primaryColor,
-                        secondaryColor,
-                        Colors.white,
-                      ],
-                    ),
-                  ),
                   padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -467,17 +452,18 @@ class _BoostPageState extends State<BoostPage> {
                             ? "Campagne SMS"
                             : "SMS Campaign",
                         style: GoogleFonts.poppins(
-                          fontWeight: FontWeight.w600,
+                          color: primaryColor,
+                          fontWeight: FontWeight.w400,
                           fontSize: 24,
-                          color: Colors.white,
                         ),
                       ),
+                      const SizedBox(height: 5),
                       Text(
                         (langUserPhone == "fr")
                             ? "Grâce à notre Campagne SMS, Faites la promotion de vos produits et services."
                             : "Thanks to our SMS Campaign, promote your products and services.",
                         style: GoogleFonts.poppins(
-                          fontWeight: FontWeight.w600,
+                          fontWeight: FontWeight.w300,
                           fontSize: 14,
                         ),
                       ),
@@ -500,6 +486,9 @@ class _BoostPageState extends State<BoostPage> {
                                       (langUserPhone == "fr")
                                           ? "Démarrer"
                                           : "To start up",
+                                      style: GoogleFonts.poppins(
+                                        color: Colors.white,
+                                      ),
                                     ),
                                     onPressed: () {
                                       warningNoti(
@@ -532,9 +521,14 @@ class _BoostPageState extends State<BoostPage> {
                                         vertical: 10,
                                       ),
                                     ),
-                                    child: (langUserPhone == "fr")
-                                        ? const Text("Voir la liste")
-                                        : const Text("See the list"),
+                                    child: Text(
+                                      (langUserPhone == "fr")
+                                          ? "Voir la liste"
+                                          : "See the list",
+                                      style: GoogleFonts.poppins(
+                                        color: Colors.white,
+                                      ),
+                                    ),
                                     onPressed: () {
                                       warningNoti(
                                           (langUserPhone == "fr")

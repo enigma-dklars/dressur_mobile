@@ -119,7 +119,20 @@ class _CampagneMailListePageState extends State<CampagneMailListePage> {
           (langUserPhone == "fr")
               ? 'Liste Campagne Mail'
               : "Email Campaign List",
-          style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+          style: GoogleFonts.poppins(
+            fontWeight: FontWeight.w600,
+            color: Colors.white,
+          ),
+        ),
+        leading: IconButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          icon: const Icon(
+            Icons.arrow_back,
+            size: 30,
+            color: Colors.white,
+          ),
         ),
         backgroundColor: primaryColor,
         actions: [
@@ -214,6 +227,7 @@ class _CampagneMailListePageState extends State<CampagneMailListePage> {
                                 style: const TextStyle(
                                   fontSize: 12.0,
                                   fontWeight: FontWeight.bold,
+                                  color: Colors.white,
                                 ),
                               ),
                               const SizedBox(height: 5),
@@ -222,6 +236,7 @@ class _CampagneMailListePageState extends State<CampagneMailListePage> {
                                 style: const TextStyle(
                                   fontSize: 12.0,
                                   fontWeight: FontWeight.bold,
+                                  color: Colors.white,
                                 ),
                               ),
                               const SizedBox(height: 5),
@@ -235,11 +250,18 @@ class _CampagneMailListePageState extends State<CampagneMailListePage> {
                                           style: ElevatedButton.styleFrom(
                                             backgroundColor: Colors.green,
                                           ),
-                                          label: Text((langUserPhone == "fr")
-                                              ? 'Autres Informations'
-                                              : 'Other information'),
+                                          label: Text(
+                                            (langUserPhone == "fr")
+                                                ? 'Autres Informations'
+                                                : 'Other information',
+                                            style: GoogleFonts.poppins(
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
                                           icon: const Icon(
                                             Icons.info,
+                                            color: Colors.white,
                                           ),
                                           onPressed: () {
                                             Navigator.push(
@@ -284,7 +306,20 @@ class CampagneMailDetailPage extends StatelessWidget {
           (langUserPhone == "fr")
               ? 'Détails de la campagne Mail'
               : 'Details of the campagne Mail',
-          style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+          style: GoogleFonts.poppins(
+            fontWeight: FontWeight.w600,
+            color: Colors.white,
+          ),
+        ),
+        leading: IconButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          icon: const Icon(
+            Icons.arrow_back,
+            size: 30,
+            color: Colors.white,
+          ),
         ),
         backgroundColor: primaryColor,
       ),
@@ -428,8 +463,8 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
           _desactive2 = true;
         });
 
-        var request = http.MultipartRequest(
-            'POST', Uri.parse('$generalRouteForApi/newCampageMailPayant/paiement'));
+        var request = http.MultipartRequest('POST',
+            Uri.parse('$generalRouteForApi/newCampageMailPayant/paiement'));
         request.fields.addAll({
           'uid': uidUser,
           'idCampagneMail': widget.campagneMail.id,
@@ -491,7 +526,20 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
       appBar: AppBar(
         title: Text(
           'Page de Démarrage Payant',
-          style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+          style: GoogleFonts.poppins(
+            fontWeight: FontWeight.w600,
+            color: Colors.white,
+          ),
+        ),
+        leading: IconButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          icon: const Icon(
+            Icons.arrow_back,
+            size: 30,
+            color: Colors.white,
+          ),
         ),
         backgroundColor: primaryColor,
       ),
@@ -515,6 +563,10 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
             DelayedAnimation(
               delay: 0, // 1500,
               child: SelectFormField(
+                decoration: const InputDecoration(
+                  labelText: 'Formules de Boost Payant',
+                  border: OutlineInputBorder(),
+                ),
                 type: SelectFormFieldType.dropdown,
                 initialValue: 'mtn',
                 labelText: 'Methode de paiement mobile',
@@ -529,6 +581,7 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
               child: TextField(
                 controller: telController,
                 decoration: InputDecoration(
+                  border: OutlineInputBorder(),
                   labelStyle: TextStyle(color: Colors.grey[400]),
                   labelText: 'Indicatif + Numéro du paiement',
                 ),
@@ -547,8 +600,12 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
                       vertical: 13,
                     ),
                   ),
-                  child:
-                      _desactive2 ? const Text("Wait...") : const Text("PAYER"),
+                  child: Text(
+                    _desactive2 ? "Wait..." : "PAYER",
+                    style: GoogleFonts.poppins(
+                      color: Colors.white,
+                    ),
+                  ),
                   onPressed: () {
                     if (!telIsVerified) {
                       warningNoti(

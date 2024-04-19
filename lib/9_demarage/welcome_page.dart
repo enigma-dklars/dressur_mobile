@@ -279,23 +279,41 @@ class _PageDepartState extends State<PageDepart> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.indigo,
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            LogoAnimation(),
-            const SizedBox(height: 16), // Marge entre le logo et le texte
-            Text(
-              textChargementEvolution,
-              style: GoogleFonts.poppins(
-                fontWeight: FontWeight.w400,
-                fontSize: 20,
-                color: Colors.white,
-              ),
-              textAlign: TextAlign.center,
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        elevation: 0,
+        backgroundColor: primaryColor,
+      ),
+      backgroundColor: primaryColor,
+      body: Align(
+        alignment: Alignment.topCenter,
+        child: SizedBox(
+          width: MediaQuery.of(context).size.width * 0.80,
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(
+              maxWidth: 1024,
             ),
-          ],
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                return Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    LogoAnimation(),
+                    Text(
+                      textChargementEvolution,
+                      style: GoogleFonts.poppins(
+                        fontWeight: FontWeight.w300,
+                        fontSize: 20,
+                        color: Colors.white,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                );
+              },
+            ),
+          ),
         ),
       ),
     );

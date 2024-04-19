@@ -27,7 +27,10 @@ class _NewBoostContactPageState extends State<NewBoostContactPage> {
           (langUserPhone == "fr")
               ? "Nouveau Boost Contact"
               : "New Boost Contact",
-          style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+          style: GoogleFonts.poppins(
+            fontWeight: FontWeight.w400,
+            color: Colors.white,
+          ),
         ),
         leading: IconButton(
           onPressed: () {
@@ -36,6 +39,7 @@ class _NewBoostContactPageState extends State<NewBoostContactPage> {
           icon: const Icon(
             Icons.arrow_back,
             size: 30,
+            color: Colors.white,
           ),
         ),
       ),
@@ -115,6 +119,8 @@ class _NewBoostContactPageState extends State<NewBoostContactPage> {
                         textAlign: TextAlign.center,
                       ),
                       Switch(
+                          trackOutlineColor: MaterialStateColor.resolveWith(
+                              (states) => primaryColor),
                           activeColor: Colors.red,
                           activeTrackColor: primaryColor,
                           inactiveThumbColor: Colors.green,
@@ -122,13 +128,10 @@ class _NewBoostContactPageState extends State<NewBoostContactPage> {
                           value: load,
                           onChanged: (bool? newValue) {
                             setState(() {
-                              // affUserName = newValue!;
                               if (newValue == true) {
                                 load = true;
-                                //updateUserPreferenceNom("true");
                               } else {
                                 load = false;
-                                //updateUserPreferenceNom("false");
                               }
                             });
                           }),
@@ -354,8 +357,18 @@ class _RegisterFormState extends State<RegisterForm> {
                     ),
                   ),
                   child: _desactive
-                      ? const Text("Wait...")
-                      : const Text("BOOSTER"),
+                      ? Text(
+                          "Wait...",
+                          style: GoogleFonts.poppins(
+                            color: Colors.white,
+                          ),
+                        )
+                      : Text(
+                          "BOOSTER",
+                          style: GoogleFonts.poppins(
+                            color: Colors.white,
+                          ),
+                        ),
                   onPressed: () {
                     if (!telIsVerified) {
                       warningNoti(
@@ -685,8 +698,18 @@ class _RegisterForm2State extends State<RegisterForm2> {
                   ),
                 ),
                 child: _desactive2
-                    ? const Text("Wait...")
-                    : const Text("PAYER & BOOSTER"),
+                    ? Text(
+                        "Wait...",
+                        style: GoogleFonts.poppins(
+                          color: Colors.white,
+                        ),
+                      )
+                    : Text(
+                        "PAYER & BOOSTER",
+                        style: GoogleFonts.poppins(
+                          color: Colors.white,
+                        ),
+                      ),
                 onPressed: () {
                   if (!telIsVerified) {
                     warningNoti(

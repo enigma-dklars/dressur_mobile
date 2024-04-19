@@ -125,28 +125,24 @@ class _ListeNotificationState extends State<ListeNotification> {
         backgroundColor: primaryColor,
         title: Text(
           "Notifications",
-          style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+          style: GoogleFonts.poppins(
+            fontWeight: FontWeight.w600,
+            color: Colors.white,
+          ),
+        ),
+        leading: IconButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          icon: const Icon(
+            Icons.arrow_back,
+            size: 30,
+            color: Colors.white,
+          ),
         ),
         actions: [
           PopupMenuButton<int>(
             itemBuilder: (context) => [
-              PopupMenuItem(
-                value: 1,
-                onTap: () {
-                  _loading ? '' : fetchContactDSs();
-                },
-                child: Row(
-                  children: [
-                    Text(
-                      (langUserPhone == "fr") ? "Actualiser" : "Refresh",
-                      style: GoogleFonts.poppins(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
               PopupMenuItem(
                 value: 4,
                 child: Row(

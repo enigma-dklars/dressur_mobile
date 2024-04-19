@@ -1,5 +1,7 @@
+// ignore_for_file: non_constant_identifier_names
+
 import 'package:flutter/material.dart';
-import 'package:dressur/components/constant.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class ProfileMenu extends StatelessWidget {
   const ProfileMenu({
@@ -15,26 +17,16 @@ class ProfileMenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-      child: TextButton(
-        style: TextButton.styleFrom(
-          foregroundColor: Colors.grey.shade600,
-          padding: const EdgeInsets.all(20),
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-          side: const BorderSide(color: primaryColor),
-        ),
-        onPressed: press,
-        child: Row(
-          children: [
-            Myicon,
-            const SizedBox(width: 20),
-            Expanded(child: Text(text)),
-            const Icon(Icons.arrow_forward_ios),
-          ],
+    return ListTile(
+      // dense: true,
+      leading: Myicon,
+      title: Text(
+        text,
+        style: GoogleFonts.poppins(
+          fontSize: 15,
         ),
       ),
+      onTap: press,
     );
   }
 }

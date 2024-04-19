@@ -101,7 +101,20 @@ class _ListeBoostContactPageState extends State<ListeBoostContactPage> {
           (langUserPhone == "fr")
               ? "Liste Boost Contact"
               : "Boost List Contact",
-          style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+          style: GoogleFonts.poppins(
+            fontWeight: FontWeight.w600,
+            color: Colors.white,
+          ),
+        ),
+        leading: IconButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          icon: const Icon(
+            Icons.arrow_back,
+            size: 30,
+            color: Colors.white,
+          ),
         ),
         actions: [
           PopupMenuButton<dynamic>(
