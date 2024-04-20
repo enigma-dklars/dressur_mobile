@@ -108,9 +108,7 @@ class _NewBoostContactPageState extends State<NewBoostContactPage> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        (langUserPhone == "fr")
-                            ? 'Boost Gratuit'
-                            : 'Free Boost',
+                        (langUserPhone == "fr") ? 'Gratuit' : 'Free',
                         style: GoogleFonts.poppins(
                           fontSize: 20,
                           fontWeight: FontWeight.w800,
@@ -118,25 +116,28 @@ class _NewBoostContactPageState extends State<NewBoostContactPage> {
                         ),
                         textAlign: TextAlign.center,
                       ),
+                      const SizedBox(width: 10),
                       Switch(
-                          trackOutlineColor: MaterialStateColor.resolveWith(
-                              (states) => primaryColor),
-                          activeColor: Colors.red,
-                          activeTrackColor: primaryColor,
-                          inactiveThumbColor: Colors.green,
-                          inactiveTrackColor: primaryColor,
-                          value: load,
-                          onChanged: (bool? newValue) {
-                            setState(() {
-                              if (newValue == true) {
-                                load = true;
-                              } else {
-                                load = false;
-                              }
-                            });
-                          }),
+                        trackOutlineColor: MaterialStateColor.resolveWith(
+                            (states) => primaryColor),
+                        activeColor: Colors.red,
+                        activeTrackColor: primaryColor,
+                        inactiveThumbColor: Colors.green,
+                        inactiveTrackColor: primaryColor,
+                        value: load,
+                        onChanged: (bool? newValue) {
+                          setState(() {
+                            if (newValue == true) {
+                              load = true;
+                            } else {
+                              load = false;
+                            }
+                          });
+                        },
+                      ),
+                      const SizedBox(width: 10),
                       Text(
-                        (langUserPhone == "fr") ? 'Boost Payant' : 'Paid Boost',
+                        (langUserPhone == "fr") ? 'Payant' : 'Paid',
                         style: GoogleFonts.poppins(
                           fontSize: 20,
                           fontWeight: FontWeight.w800,

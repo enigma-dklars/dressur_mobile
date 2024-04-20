@@ -545,7 +545,7 @@ class _ActuPageState extends State<ActuPage> {
                                       SizedBox(
                                         width:
                                             MediaQuery.of(context).size.width *
-                                                0.35,
+                                                0.42,
                                         child: ElevatedButton(
                                             style: ElevatedButton.styleFrom(
                                               backgroundColor: _loading
@@ -600,7 +600,7 @@ class _ActuPageState extends State<ActuPage> {
                                       SizedBox(
                                         width:
                                             MediaQuery.of(context).size.width *
-                                                0.35,
+                                                0.42,
                                         child: ElevatedButton(
                                             style: ElevatedButton.styleFrom(
                                               backgroundColor: secondaryColor,
@@ -643,7 +643,6 @@ class _ActuPageState extends State<ActuPage> {
                     SociauxPage(),
                     const SizedBox(height: 5),
                     // essai notification
-                    
                   ],
                 ),
               ),

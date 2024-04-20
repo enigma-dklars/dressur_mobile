@@ -172,7 +172,7 @@ class _BoostPageState extends State<BoostPage> {
                           Column(
                             children: [
                               SizedBox(
-                                width: MediaQuery.of(context).size.width * 0.35,
+                                width: MediaQuery.of(context).size.width * 0.42,
                                 child: ElevatedButton(
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: primaryColor,
@@ -203,7 +203,7 @@ class _BoostPageState extends State<BoostPage> {
                           Column(
                             children: [
                               SizedBox(
-                                width: MediaQuery.of(context).size.width * 0.35,
+                                width: MediaQuery.of(context).size.width * 0.42,
                                 child: ElevatedButton(
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: secondaryColor,
@@ -272,7 +272,7 @@ class _BoostPageState extends State<BoostPage> {
                           Column(
                             children: [
                               SizedBox(
-                                width: MediaQuery.of(context).size.width * 0.35,
+                                width: MediaQuery.of(context).size.width * 0.42,
                                 child: ElevatedButton(
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: primaryColor,
@@ -303,7 +303,7 @@ class _BoostPageState extends State<BoostPage> {
                           Column(
                             children: [
                               SizedBox(
-                                width: MediaQuery.of(context).size.width * 0.35,
+                                width: MediaQuery.of(context).size.width * 0.42,
                                 child: ElevatedButton(
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: secondaryColor,
@@ -372,7 +372,7 @@ class _BoostPageState extends State<BoostPage> {
                           Column(
                             children: [
                               SizedBox(
-                                width: MediaQuery.of(context).size.width * 0.35,
+                                width: MediaQuery.of(context).size.width * 0.42,
                                 child: ElevatedButton(
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: primaryColor,
@@ -404,7 +404,7 @@ class _BoostPageState extends State<BoostPage> {
                           Column(
                             children: [
                               SizedBox(
-                                width: MediaQuery.of(context).size.width * 0.35,
+                                width: MediaQuery.of(context).size.width * 0.42,
                                 child: ElevatedButton(
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: secondaryColor,
@@ -473,7 +473,7 @@ class _BoostPageState extends State<BoostPage> {
                           Column(
                             children: [
                               SizedBox(
-                                width: MediaQuery.of(context).size.width * 0.35,
+                                width: MediaQuery.of(context).size.width * 0.42,
                                 child: ElevatedButton(
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: primaryColor,
@@ -512,7 +512,7 @@ class _BoostPageState extends State<BoostPage> {
                           Column(
                             children: [
                               SizedBox(
-                                width: MediaQuery.of(context).size.width * 0.35,
+                                width: MediaQuery.of(context).size.width * 0.42,
                                 child: ElevatedButton(
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: secondaryColor,
