@@ -83,7 +83,7 @@ void main() async {
   initializeNotifications();
 
   const AndroidInitializationSettings initializationSettingsAndroid =
-      AndroidInitializationSettings('@mipmap/ic_launcher');
+      AndroidInitializationSettings('@mipmap/dressur_logo_blanc');
 
   final List<DarwinNotificationCategory> darwinNotificationCategories =
       <DarwinNotificationCategory>[
@@ -153,7 +153,7 @@ void main() async {
   final LinuxInitializationSettings initializationSettingsLinux =
       LinuxInitializationSettings(
     defaultActionName: 'Open notification',
-    defaultIcon: AssetsLinuxIcon('images/dressur_logo.png'),
+    defaultIcon: AssetsLinuxIcon('images/dressur_logo_blanc.png'),
   );
   final InitializationSettings initializationSettings = InitializationSettings(
     android: initializationSettingsAndroid,
