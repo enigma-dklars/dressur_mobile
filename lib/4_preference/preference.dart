@@ -197,7 +197,7 @@ class _PreferencePageState extends State<PreferencePage> {
                         Text(
                           preferencePaysText.toString(),
                           style: GoogleFonts.poppins(
-                            fontSize: 15,
+                            fontSize: 16,
                             fontWeight: FontWeight.w400,
                           ),
                           textAlign: TextAlign.left,

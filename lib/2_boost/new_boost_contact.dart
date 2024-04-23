@@ -513,13 +513,12 @@ class _RegisterForm2State extends State<RegisterForm2> {
             // var idTransaction = data["idTransaction"];
             setState(() {
               _desactive2 = false;
-              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                content: Text(
+              dangerNoti(
+                  (langUserPhone == "fr") ? "Attention !!!" : "Attention !!!",
                   (langUserPhone == "fr")
-                      ? 'Actualiser la liste de vos boosts...'
-                      : 'Refresh the list of your boosts...',
-                ),
-              ));
+                      ? "Après confirmation du paiement, veuillez consulter la liste de vos boosts."
+                      : "After payment confirmation, please view the list of your boosts.",
+                  context);
             });
           } else {
             dangerNoti(data["titre"], data["message"], context);

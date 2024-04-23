@@ -820,9 +820,12 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
             // var idTransaction = data["idTransaction"];
             setState(() {
               _desactive2 = false;
-              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                content: Text('Actualisez la liste de vos promos...'),
-              ));
+              dangerNoti(
+                  (langUserPhone == "fr") ? "Attention !!!" : "Attention !!!",
+                  (langUserPhone == "fr")
+                      ? "Après confirmation du paiement, veuillez consulter la liste de vos promotions affaires."
+                      : "After confirmation of payment, please consult the list of your business promotions.",
+                  context);
             });
           } else {
             dangerNoti(data["titre"], data["message"], context);
