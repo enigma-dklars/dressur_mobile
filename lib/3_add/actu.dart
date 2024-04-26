@@ -3,6 +3,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'package:dressur/5_autre/cart_visite.dart';
 import 'package:dressur/components/padding_and_divider.dart';
 import 'package:dressur/components/pub_smt_2024.dart';
 import 'package:flutter/material.dart';
@@ -331,6 +332,28 @@ class _ActuPageState extends State<ActuPage> {
             ),
           ),
           actions: [
+            IconButton(
+              icon: const Icon(
+                Icons.qr_code_scanner,
+                color: Colors.white,
+              ),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => CarteDeVisite(),
+                  ),
+                );
+              },
+            ),
+            const Padding(
+              padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
+              child: VerticalDivider(
+                width: 0,
+                color: Colors.white,
+                thickness: 1,
+              ),
+            ),
             IconButton(
               icon: const Icon(
                 Icons.notifications,
