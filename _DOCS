@@ -15,7 +15,7 @@
     flutter build apk
     flutter build appbundle
 
-# symbsymbolsols.zip
+# symbols.zip
     C:\Users\dklar\codes\dressur_mobile\build\app\intermediates\merged_native_libs\release\out\lib
 
 # bloquer le retour de page flutter

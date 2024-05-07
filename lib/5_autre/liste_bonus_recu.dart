@@ -107,75 +107,87 @@ class _ListeBonusPageState extends State<ListeBonusPage> {
           ? const Center(
               child: CircularProgressIndicator(),
             )
-          : ListView.builder(
-              itemCount: _listeBonus.length,
-              itemBuilder: (BuildContext context, int index) {
-                final listeBonus = _listeBonus[index];
+          : _listeBonus.isEmpty
+              ? Center(
+                  child: Text(
+                    (langUserPhone == "fr")
+                        ? "Aucun Bonus Reçu."
+                        : "No Bonus Received.",
+                    style: const TextStyle(fontSize: 16),
+                  ),
+                )
+              : Expanded(
+                  child: ListView.builder(
+                    itemCount: _listeBonus.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      final listeBonus = _listeBonus[index];
 
-                return Card(
-                  margin: const EdgeInsets.only(
-                      left: 10, top: 10, right: 10, bottom: 0),
-                  child: Container(
-                    width: MediaQuery.of(context).size.width * 0.95,
-                    decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [
-                          secondaryColor,
-                          primaryColor,
-                        ],
-                      ),
-                      borderRadius: BorderRadius.circular(5),
-                    ),
-                    padding: const EdgeInsets.fromLTRB(15, 10, 15, 10),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Column(
-                              children: [
-                                Text(
-                                  listeBonus.titre,
-                                  style: GoogleFonts.poppins(
-                                    fontSize: 14,
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w800,
-                                  ),
-                                  textAlign: TextAlign.end,
-                                ),
+                      return Card(
+                        margin: const EdgeInsets.only(
+                            left: 10, top: 10, right: 10, bottom: 0),
+                        child: Container(
+                          width: MediaQuery.of(context).size.width * 0.95,
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                              colors: [
+                                secondaryColor,
+                                primaryColor,
                               ],
                             ),
-                            Column(
-                              children: [
-                                Text(
-                                  listeBonus.montant,
-                                  style: GoogleFonts.poppins(
-                                    fontSize: 14,
-                                    color: Colors.white,
+                            borderRadius: BorderRadius.circular(5),
+                          ),
+                          padding: const EdgeInsets.fromLTRB(15, 10, 15, 10),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Column(
+                                    children: [
+                                      Text(
+                                        listeBonus.titre,
+                                        style: GoogleFonts.poppins(
+                                          fontSize: 14,
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w800,
+                                        ),
+                                        textAlign: TextAlign.end,
+                                      ),
+                                    ],
                                   ),
-                                  textAlign: TextAlign.end,
+                                  Column(
+                                    children: [
+                                      Text(
+                                        listeBonus.montant,
+                                        style: GoogleFonts.poppins(
+                                          fontSize: 14,
+                                          color: Colors.white,
+                                        ),
+                                        textAlign: TextAlign.end,
+                                      ),
+                                    ],
+                                  )
+                                ],
+                              ),
+                              const SizedBox(height: 5),
+                              Text(
+                                listeBonus.date,
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.white,
                                 ),
-                              ],
-                            )
-                          ],
-                        ),
-                        const SizedBox(height: 5),
-                        Text(
-                          listeBonus.date,
-                          style: const TextStyle(
-                            fontSize: 12,
-                            color: Colors.white,
+                              ),
+                            ],
                           ),
                         ),
-                      ],
-                    ),
+                      );
+                    },
                   ),
-                );
-              },
-            ),
+                ),
     );
   }
 }

@@ -173,7 +173,17 @@ class _ListeBoostContactPageState extends State<ListeBoostContactPage> {
           ? const Center(
               child: CircularProgressIndicator(),
             )
-          : ListView.builder(
+          : _boosts.isEmpty
+                  ? Center(
+                      child: Text(
+                        (langUserPhone == "fr")
+                            ? "Aucun boost contact trouvé."
+                            : "No contact boost found.",
+                        style: const TextStyle(fontSize: 16),
+                      ),
+                    )
+                  : Expanded(
+                      child: ListView.builder(
               itemCount: _boosts.length,
               itemBuilder: (BuildContext context, int index) {
                 final boost = _boosts[index];
@@ -250,6 +260,7 @@ class _ListeBoostContactPageState extends State<ListeBoostContactPage> {
                   ),
                 );
               },
+            ),
             ),
     );
   }

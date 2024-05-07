@@ -192,7 +192,17 @@ class _CampagneMailListePageState extends State<CampagneMailListePage> {
           ? const Center(
               child: CircularProgressIndicator(),
             )
-          : ListView.builder(
+          : _campagneMails.isEmpty
+                  ? Center(
+                      child: Text(
+                        (langUserPhone == "fr")
+                            ? "Aucune campagne email trouvé."
+                            : "No email campaigns found.",
+                        style: const TextStyle(fontSize: 16),
+                      ),
+                    )
+                  : Expanded(
+                      child: ListView.builder(
               itemCount: _campagneMails.length,
               itemBuilder: (BuildContext context, int index) {
                 final campagneMail = _campagneMails[index];
@@ -288,6 +298,7 @@ class _CampagneMailListePageState extends State<CampagneMailListePage> {
                   ),
                 );
               },
+            ),
             ),
     );
   }

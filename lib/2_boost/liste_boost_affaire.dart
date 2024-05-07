@@ -189,130 +189,142 @@ class _PromotionListPageState extends State<PromotionListPage> {
           ? const Center(
               child: CircularProgressIndicator(),
             )
-          : ListView.builder(
-              itemCount: _promotions.length,
-              itemBuilder: (BuildContext context, int index) {
-                final promotion = _promotions[index];
+          : _promotions.isEmpty
+              ? Center(
+                  child: Text(
+                    (langUserPhone == "fr")
+                        ? "Aucune promotion affaire trouvée."
+                        : "No deal promotions found.",
+                    style: const TextStyle(fontSize: 16),
+                  ),
+                )
+              : Expanded(
+                  child: ListView.builder(
+                    itemCount: _promotions.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      final promotion = _promotions[index];
 
-                return Card(
-                  margin: const EdgeInsets.only(
-                      left: 10, top: 10, right: 10, bottom: 0),
-                  child: Row(
-                    children: [
-                      Container(
-                        height: 100,
-                        width: 70,
-                        decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            colors: [
-                              primaryColor,
-                              secondaryColor,
-                            ],
-                          ),
-                          borderRadius: BorderRadius.circular(5),
-                        ),
-                        child: Image.network(
-                          promotion.image,
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                      const SizedBox(width: 5),
-                      Expanded(
-                        child: Container(
-                          // width: 80,
-                          height: 100,
-                          decoration: BoxDecoration(
-                            gradient: const LinearGradient(
-                              begin: Alignment.topCenter,
-                              end: Alignment.bottomCenter,
-                              colors: [
-                                primaryColor,
-                                secondaryColor,
-                              ],
+                      return Card(
+                        margin: const EdgeInsets.only(
+                            left: 10, top: 10, right: 10, bottom: 0),
+                        child: Row(
+                          children: [
+                            Container(
+                              height: 100,
+                              width: 70,
+                              decoration: BoxDecoration(
+                                gradient: const LinearGradient(
+                                  begin: Alignment.topCenter,
+                                  end: Alignment.bottomCenter,
+                                  colors: [
+                                    primaryColor,
+                                    secondaryColor,
+                                  ],
+                                ),
+                                borderRadius: BorderRadius.circular(5),
+                              ),
+                              child: Image.network(
+                                promotion.image,
+                                fit: BoxFit.cover,
+                              ),
                             ),
-                            borderRadius: BorderRadius.circular(5),
-                          ),
-                          padding: const EdgeInsets.fromLTRB(15, 5, 15, 0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Status: ${promotion.status}',
-                                style: const TextStyle(
-                                  fontSize: 12.0,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
-                              ),
-                              Text(
-                                'Impressions: ${promotion.nombreImpression}',
-                                style: const TextStyle(
-                                  fontSize: 12.0,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
-                              ),
-                              Text(
-                                (langUserPhone == "fr")
-                                    ? 'Vues: ${promotion.nombreDeVues}'
-                                    : 'Views: ${promotion.nombreDeVues}',
-                                style: const TextStyle(
-                                  fontSize: 12.0,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
-                              ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  Column(
-                                    children: [
-                                      SizedBox(
-                                        child: ElevatedButton.icon(
-                                          style: ElevatedButton.styleFrom(
-                                            backgroundColor: Colors.green,
-                                          ),
-                                          label: Text(
-                                            (langUserPhone == "fr")
-                                                ? 'Autres Informations'
-                                                : 'Other information',
-                                            style: GoogleFonts.poppins(
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.w400,
-                                            ),
-                                          ),
-                                          icon: const Icon(
-                                            Icons.info,
-                                            color: Colors.white,
-                                          ),
-                                          onPressed: () {
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (context) =>
-                                                    PromotionDetailPage(
-                                                  promotion: promotion,
-                                                ),
-                                              ),
-                                            );
-                                          },
-                                        ),
-                                      ),
+                            const SizedBox(width: 5),
+                            Expanded(
+                              child: Container(
+                                // width: 80,
+                                height: 100,
+                                decoration: BoxDecoration(
+                                  gradient: const LinearGradient(
+                                    begin: Alignment.topCenter,
+                                    end: Alignment.bottomCenter,
+                                    colors: [
+                                      primaryColor,
+                                      secondaryColor,
                                     ],
                                   ),
-                                ],
+                                  borderRadius: BorderRadius.circular(5),
+                                ),
+                                padding:
+                                    const EdgeInsets.fromLTRB(15, 5, 15, 0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Status: ${promotion.status}',
+                                      style: const TextStyle(
+                                        fontSize: 12.0,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                    Text(
+                                      'Impressions: ${promotion.nombreImpression}',
+                                      style: const TextStyle(
+                                        fontSize: 12.0,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                    Text(
+                                      (langUserPhone == "fr")
+                                          ? 'Vues: ${promotion.nombreDeVues}'
+                                          : 'Views: ${promotion.nombreDeVues}',
+                                      style: const TextStyle(
+                                        fontSize: 12.0,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      children: [
+                                        Column(
+                                          children: [
+                                            SizedBox(
+                                              child: ElevatedButton.icon(
+                                                style: ElevatedButton.styleFrom(
+                                                  backgroundColor: Colors.green,
+                                                ),
+                                                label: Text(
+                                                  (langUserPhone == "fr")
+                                                      ? 'Autres Informations'
+                                                      : 'Other information',
+                                                  style: GoogleFonts.poppins(
+                                                    color: Colors.white,
+                                                    fontWeight: FontWeight.w400,
+                                                  ),
+                                                ),
+                                                icon: const Icon(
+                                                  Icons.info,
+                                                  color: Colors.white,
+                                                ),
+                                                onPressed: () {
+                                                  Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          PromotionDetailPage(
+                                                        promotion: promotion,
+                                                      ),
+                                                    ),
+                                                  );
+                                                },
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
-                      ),
-                    ],
+                      );
+                    },
                   ),
-                );
-              },
-            ),
+                ),
     );
   }
 }
