@@ -1,41 +1,12 @@
-import 'dart:convert';
+// ignore_for_file: unnecessary_null_comparison, prefer_const_constructors
+
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:dressur/5_autre/support_assistance.dart';
 import 'package:dressur/components/constant.dart';
-import 'package:http/http.dart' as http;
-import 'package:dressur/components/profile_menu_reseau.dart';
-
-class ContactDS {
-  final String id;
-  final String pseudo;
-  final String nom;
-  final bool afficheNom;
-  final String mail;
-  final String pays;
-  final String tel;
-  final String apropos;
-  final String tiktok;
-  final String instagram;
-  final String facebook;
-  final String youtube;
-
-  ContactDS({
-    required this.id,
-    required this.pseudo,
-    required this.nom,
-    required this.afficheNom,
-    required this.mail,
-    required this.pays,
-    required this.tel,
-    required this.apropos,
-    required this.tiktok,
-    required this.instagram,
-    required this.facebook,
-    required this.youtube,
-  });
-}
 
 class ListeNotification extends StatefulWidget {
   @override
@@ -43,412 +14,282 @@ class ListeNotification extends StatefulWidget {
 }
 
 class _ListeNotificationState extends State<ListeNotification> {
-  bool _loading = false;
-  List<ContactDS> _contacts = [];
-
-  Future<void> fetchContactDSs() async {
-    setState(() {
-      _loading = true;
-      nombreContacts = 0;
-    });
-    final url =
-        Uri.parse('$generalRouteForApi/listContactDS/$uidUser/$langUserPhone');
-
-    final response = await http.get(url);
-
-    if (response.statusCode == 200) {
-      final jsonData = jsonDecode(response.body) as List<dynamic>;
-
-      final contacts = jsonData.map((data) {
-        return ContactDS(
-          id: data['id'],
-          pseudo: data['pseudo'],
-          nom: data['nom'],
-          afficheNom: data['afficheNom'],
-          mail: data['mail'],
-          pays: data['pays'],
-          tel: data['tel'],
-          apropos: data['apropos'],
-          tiktok: data['tiktok'],
-          instagram: data['instagram'],
-          facebook: data['facebook'],
-          youtube: data['youtube'],
-        );
-      }).toList();
-
-      setState(() {
-        _loading = false;
-        _contacts = contacts;
-        nombreContacts = contacts.length;
-      });
-    } else {
-      // ignore: use_build_context_synchronously
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text('Erreur'),
-            content: (langUserPhone == "fr")
-                ? Text(
-                    "Échec de récupération des contacts. Code d'erreur: ${response.statusCode}")
-                : Text(
-                    'Failed to retrieve contacts. Error code: ${response.statusCode}'),
-            actions: <Widget>[
-              TextButton(
-                child: const Text('OK'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          );
-        },
-      );
-      setState(() {
-        _loading = false;
-      });
-    }
-  }
+  final ValueNotifier<bool> _showFabText = ValueNotifier(true);
+  final ScrollController _scrollController = ScrollController();
+  List<Map<String, dynamic>> historiqueContactsAdd = [];
+  Timer? _timer;
 
   @override
   void initState() {
     super.initState();
-    // fetchContactDSs();
+  }
+
+  Future<void> _refreshData() async {
+    setState(() {
+      // actualise();
+    });
+  }
+
+  void dispose() {
+    _scrollController.removeListener(_scrollListener);
+    _scrollController.dispose();
+
+    _showFabText.dispose();
+    // Arrête le timer lors de la suppression du widget
+    _stopTimer();
+    super.dispose();
+  }
+
+  void _scrollListener() {
+    if (_scrollController.position.userScrollDirection ==
+        ScrollDirection.reverse) {
+      _showFabText.value = false;
+    } else if (_scrollController.position.atEdge &&
+        _scrollController.position.pixels == 0) {
+      _showFabText.value = true;
+    }
+  }
+
+  void _startTimer() {
+    // Crée un nouveau timer qui exécute la fonction everySecond toutes les secondes
+    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
+      everySecond();
+    });
+  }
+
+  void _stopTimer() {
+    // Arrête et annule le timer
+    _timer?.cancel();
+    _timer = null;
+  }
+
+  void everySecond() {
+    // Code à exécuter toutes les secondes
+    setState(() {
+      nombreContactDispo = nombreContactDispo;
+    });
   }
 
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        elevation: 0,
-        backgroundColor: primaryColor,
-        title: Text(
-          "Notifications",
-          style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
-        ),
-        actions: [
-          PopupMenuButton<int>(
-            itemBuilder: (context) => [
-              PopupMenuItem(
-                value: 1,
-                onTap: () {
-                  _loading ? '' : fetchContactDSs();
-                },
-                child: Row(
-                  children: [
-                    Text(
-                      (langUserPhone == "fr") ? "Actualiser" : "Refresh",
-                      style: GoogleFonts.poppins(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              PopupMenuItem(
-                value: 4,
-                child: Row(
-                  children: [
-                    Text(
-                      (langUserPhone == "fr") ? "Aide" : "Help",
-                      style: GoogleFonts.poppins(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-            offset: const Offset(0, 60),
-            color: primaryColor,
-            icon: const Icon(
-              Icons.menu,
+        appBar: AppBar(
+          elevation: 0,
+          backgroundColor: primaryColor,
+          title: Text(
+            "Notifications",
+            style: GoogleFonts.poppins(
+              fontWeight: FontWeight.w400,
               color: Colors.white,
             ),
-            elevation: 2,
-            onSelected: (value) {
-              if (value == 4) {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => SupportPage(),
-                  ),
-                );
-              }
-            },
           ),
-        ],
-      ),
-      body: _loading
-          ? const Center(
-              child: CircularProgressIndicator(),
-            )
-          : ListView.builder(
-              itemCount: _contacts.length,
-              itemBuilder: (BuildContext context, int index) {
-                final contact = _contacts[index];
-
-                return Container(
-                  margin: const EdgeInsets.only(
-                      left: 10, top: 10, right: 10, bottom: 0),
+          leading: IconButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            icon: const Icon(
+              Icons.arrow_back,
+              size: 30,
+              color: Colors.white,
+            ),
+          ),
+          actions: [
+            PopupMenuButton<int>(
+              itemBuilder: (context) => [
+                PopupMenuItem(
+                  value: 4,
                   child: Row(
                     children: [
-                      Container(
-                        height: 60,
-                        width: 60,
-                        decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            colors: [
-                              Colors.white,
-                              Colors.indigoAccent,
-                              Colors.indigo,
-                            ],
-                          ),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            CircleAvatar(
-                              backgroundImage:
-                                  AssetImage("images-pays/${contact.pays}.png"),
-                            ),
-                            const SizedBox(height: 3),
-                            Text(
-                              contact.pays,
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 8,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(width: 5),
-                      Expanded(
-                        child: Container(
-                          // width: 80,
-                          height: 60,
-                          decoration: BoxDecoration(
-                            gradient: const LinearGradient(
-                              begin: Alignment.topCenter,
-                              end: Alignment.bottomRight,
-                              colors: [
-                                Colors.indigo,
-                                Colors.indigoAccent,
-                                Colors.white,
-                                Colors.white,
-                                Colors.white,
-                              ],
-                            ),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          padding: const EdgeInsets.fromLTRB(15, 0, 15, 0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const SizedBox(height: 5),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    contact.pseudo,
-                                    style: const TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  ElevatedButton.icon(
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: primaryColor,
-                                    ),
-                                    label: Text(
-                                      (langUserPhone == "fr")
-                                          ? "Détails"
-                                          : "Details",
-                                      style: const TextStyle(
-                                        fontSize: 13,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    icon: const Icon(
-                                      Icons.info,
-                                      size: 13,
-                                    ),
-                                    onPressed: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              ContactDetailPage(
-                                            contact: contact,
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
+                      Text(
+                        (langUserPhone == "fr") ? "Aide" : "Help",
+                        style: GoogleFonts.poppins(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                     ],
                   ),
-                );
-              },
-            ),
-    );
-  }
-}
-
-class ContactDetailPage extends StatelessWidget {
-  final ContactDS contact;
-
-  ContactDetailPage({required this.contact});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          (langUserPhone == "fr") ? "Contact Détails" : "Contact Details",
-          style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
-        ),
-        backgroundColor: primaryColor,
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              (langUserPhone == "fr")
-                  ? "Pseudo : ${contact.pseudo}"
-                  : "Pseudo : ${contact.pseudo}",
-              style: GoogleFonts.poppins(
-                fontSize: 20,
-                fontWeight: FontWeight.w600,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 10),
-            if (contact.afficheNom == true)
-              Text(
-                (langUserPhone == "fr")
-                    ? "Nom : ${contact.nom}"
-                    : "Name : ${contact.nom}",
-                style: GoogleFonts.poppins(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w600,
                 ),
+              ],
+              offset: const Offset(0, 60),
+              color: primaryColor,
+              icon: const Icon(
+                Icons.menu,
+                color: Colors.white,
               ),
-            if (contact.afficheNom == true) const SizedBox(height: 10),
-            Text(
-              (langUserPhone == "fr")
-                  ? "Pays : ${contact.pays}"
-                  : "Country : ${contact.pays}",
-              style: GoogleFonts.poppins(
-                fontSize: 20,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            const SizedBox(height: 10),
-            ProfileMenuReseau(
-              text: "E-mail",
-              press: () async {
-                final Uri _url = Uri.parse("mailto:${contact.mail}");
-                if (!await launchUrl(_url,
-                    mode: LaunchMode.externalApplication)) {
-                  throw 'Could not launch $_url';
+              elevation: 2,
+              onSelected: (value) {
+                if (value == 4) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => SupportPage(),
+                    ),
+                  );
                 }
               },
             ),
-            const SizedBox(height: 5),
-            ProfileMenuReseau(
-              text: "WhatsApp",
-              press: () async {
-                final Uri _url = Uri.parse("https://wa.me/${contact.tel}");
-                if (!await launchUrl(_url,
-                    mode: LaunchMode.externalApplication)) {
-                  throw 'Could not launch $_url';
-                }
-              },
-            ),
-            const SizedBox(height: 5),
-            if (contact.tiktok != "")
-              ProfileMenuReseau(
-                text: "TikTok",
-                press: () async {
-                  final Uri _url = Uri.parse(contact.tiktok);
-                  if (!await launchUrl(_url,
-                      mode: LaunchMode.externalApplication)) {
-                    throw 'Could not launch $_url';
-                  }
-                },
-              ),
-            if (contact.tiktok != "") const SizedBox(height: 5),
-            if (contact.instagram != "")
-              ProfileMenuReseau(
-                text: "Instagram",
-                press: () async {
-                  final Uri _url = Uri.parse(contact.instagram);
-                  if (!await launchUrl(_url,
-                      mode: LaunchMode.externalApplication)) {
-                    throw 'Could not launch $_url';
-                  }
-                },
-              ),
-            if (contact.instagram != "") const SizedBox(height: 5),
-            if (contact.facebook != "")
-              ProfileMenuReseau(
-                text: "Facebook",
-                press: () async {
-                  final Uri _url = Uri.parse(contact.facebook);
-                  if (!await launchUrl(_url,
-                      mode: LaunchMode.externalApplication)) {
-                    throw 'Could not launch $_url';
-                  }
-                },
-              ),
-            if (contact.facebook != "") const SizedBox(height: 5),
-            if (contact.youtube != "")
-              ProfileMenuReseau(
-                text: "Youtube",
-                press: () async {
-                  final Uri _url = Uri.parse(contact.youtube);
-                  if (!await launchUrl(_url,
-                      mode: LaunchMode.externalApplication)) {
-                    throw 'Could not launch $_url';
-                  }
-                },
-              ),
-            if (contact.youtube != "") const SizedBox(height: 5),
-            const SizedBox(height: 20),
-            if (contact.apropos != "")
-              Text(
-                (langUserPhone == "fr") ? "À propos :" : "About :",
-                style: GoogleFonts.poppins(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            const SizedBox(height: 5),
-            Text(
-              contact.apropos,
-              style: GoogleFonts.poppins(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            const SizedBox(height: 10),
           ],
         ),
-      ),
-    );
+        body: Column(
+          children: [
+            Expanded(
+              child: RefreshIndicator(
+                onRefresh: _refreshData,
+                child: ListView(
+                  controller: _scrollController,
+                  children: [
+                    const SizedBox(height: 5),
+                    Card(
+                      margin: const EdgeInsets.only(
+                          left: 10, top: 5, right: 10, bottom: 5),
+                      child: Container(
+                        padding: const EdgeInsets.fromLTRB(10, 0, 10, 3),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const SizedBox(height: 10),
+                            Center(
+                              child: Text(
+                                (langUserPhone == "fr")
+                                    ? "Bienvenue sur Dressur"
+                                    : "Welcome to Dressur",
+                                style: GoogleFonts.poppins(
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 22,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            Text(
+                              (langUserPhone == "fr")
+                                  ? "Dressur a été conçu pour être bien plus qu'une simple application mobile. C'est votre allié pour gérer votre visibilité en ligne, communiquer avec style, et optimiser votre présence numérique. Voici un aperçu rapide de ce que vous pouvez faire avec Dressur :"
+                                  : "Dressur was designed to be much more than just a mobile app. It is your ally to manage your online visibility, communicate with style, and optimize your digital presence. Here's a quick overview of what you can do with Dressur:",
+                              style: GoogleFonts.poppins(
+                                fontWeight: FontWeight.w300,
+                                fontSize: 15,
+                              ),
+                            ),
+                            const SizedBox(height: 25),
+                            Text(
+                              (langUserPhone == "fr")
+                                  ? "1 - ADD WhatsApp "
+                                  : "1 - ADD WhatsApp ",
+                              style: GoogleFonts.poppins(
+                                fontWeight: FontWeight.w500,
+                                fontSize: 18,
+                              ),
+                            ),
+                            const SizedBox(height: 5),
+                            Text(
+                              (langUserPhone == "fr")
+                                  ? "Avec Dressur, vous pouvez aisément avoir un large éventail de contacts WhatsApp qui correspondent à vos choix de pays. L'application enregistre automatiquement ces contacts à la fois dans votre téléphone et dans celui des personnes que vous ajoutez. Vous pouvez également synchroniser les contacts en cas de perte pour retrouver vos contacts Dressur manquant."
+                                  : "With Dressur, you can easily have a wide range of WhatsApp contacts that match your country choices. The app automatically saves these contacts to both your phone and the phones of the people you add. You can also sync contacts if lost to find your missing Dressur contacts.",
+                              style: GoogleFonts.poppins(
+                                fontWeight: FontWeight.w300,
+                                fontSize: 15,
+                              ),
+                            ),
+                            const SizedBox(height: 15),
+                            Text(
+                              (langUserPhone == "fr")
+                                  ? "2 - Promotion des Produits et Services"
+                                  : "2 - Promotion of Products and Services",
+                              style: GoogleFonts.poppins(
+                                fontWeight: FontWeight.w500,
+                                fontSize: 18,
+                              ),
+                            ),
+                            const SizedBox(height: 5),
+                            Text(
+                              (langUserPhone == "fr")
+                                  ? "Avec Dressur, vous pouvez faire la promotion de vos produits et services (une affiche + un texte), votre annonce est proposée à tous les utilisateurs correspondants à vos préférences pays."
+                                  : "With Dressur, you can promote your products and services (a poster + a text), your ad is offered to all users corresponding to your country preferences.",
+                              style: GoogleFonts.poppins(
+                                fontWeight: FontWeight.w300,
+                                fontSize: 15,
+                              ),
+                            ),
+                            const SizedBox(height: 15),
+                            Text(
+                              (langUserPhone == "fr")
+                                  ? "3 - Campagnes Mail et SMS"
+                                  : "3 - Mail and SMS campaigns",
+                              style: GoogleFonts.poppins(
+                                fontWeight: FontWeight.w500,
+                                fontSize: 18,
+                              ),
+                            ),
+                            const SizedBox(height: 5),
+                            Text(
+                              (langUserPhone == "fr")
+                                  ? "Nous vous offrons la possibilité de proposer vos produits et services a d'autres potentiels clients hors Dressur par des campagnes Mail et SMS. Envoyez Jusqu'à 10.000 Mails et SMS."
+                                  : "We offer you the possibility of offering your products and services to other potential customers outside Dressur through Mail and SMS campaigns. Send Up to 10,000 Emails and SMS.",
+                              style: GoogleFonts.poppins(
+                                fontWeight: FontWeight.w300,
+                                fontSize: 15,
+                              ),
+                            ),
+                            const SizedBox(height: 15),
+                            Text(
+                              (langUserPhone == "fr")
+                                  ? "4 - Carte de Visite Numérique"
+                                  : "4 - Digital Business Card",
+                              style: GoogleFonts.poppins(
+                                fontWeight: FontWeight.w500,
+                                fontSize: 18,
+                              ),
+                            ),
+                            const SizedBox(height: 5),
+                            Text(
+                              (langUserPhone == "fr")
+                                  ? "Votre profil Dressur comprend une carte de visite numérique munie d'un code QR personnalisé. Lorsque ce code est scanné par un autre utilisateur, toutes vos informations enregistrées dans Dressur sont instantanément transférées dans son téléphone, et réciproquement. Cette fonctionnalité facilite grandement l'échange d'informations professionnelles et renforce les liens avec vos contacts, éliminant ainsi le besoin d'imprimer des centaines de cartes de visite."
+                                  : "Your Dressur profile includes a digital business card with a personalized QR code. When this code is scanned by another user, all your information stored in Dressur is instantly transferred to their phone, and vice versa. This feature makes exchanging professional information much easier and strengthens connections with your contacts, eliminating the need to print hundreds of business cards.",
+                              style: GoogleFonts.poppins(
+                                fontWeight: FontWeight.w300,
+                                fontSize: 15,
+                              ),
+                            ),
+                            const SizedBox(height: 30),
+                            Text(
+                              (langUserPhone == "fr")
+                                  ? "À quoi servent les points bonus sur Dressur ?"
+                                  : "What are bonus points used for on Dressur ?",
+                              style: GoogleFonts.poppins(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 15,
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            Text(
+                              (langUserPhone == "fr")
+                                  ? "L'utilisation des points bonus dans l'application permet à l'équipe de Dressur d'assurer à ses utilisateurs une augmentation continue du nombre d'utilisateurs à travers le monde, ce qui se traduit par une audience croissante pour leurs contacts et leurs promotions de produits ou services. Etc."
+                                  : "The use of bonus points in the application allows the Dressur team to ensure its users a continuous increase in the number of users around the world, which translates into a growing audience for their contacts and promotions of products or services. Etc.",
+                              style: GoogleFonts.poppins(
+                                fontWeight: FontWeight.w300,
+                                fontSize: 15,
+                              ),
+                            ),
+                            const SizedBox(height: 30),
+                            Text(
+                              (langUserPhone == "fr")
+                                  ? "Pour toutes questions, veuillez contacter l'assistance technique de Dressur sur WhatsApp. MERCI."
+                                  : "For any questions, please contact Dressur Technical Support on WhatsApp. THANK YOU.",
+                              style: GoogleFonts.poppins(
+                                fontWeight: FontWeight.w400,
+                                fontSize: 18,
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 5),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ));
   }
 }

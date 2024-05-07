@@ -3,7 +3,7 @@
 import 'dart:convert';
 
 import 'package:dressur/components/noti.dart';
-import 'package:dressur/components/profile_menu_reseau_blanc.dart';
+import 'package:dressur/components/profile_menu_reseau.dart';
 import 'package:dressur/components/sql_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
@@ -68,7 +68,10 @@ class _AutreProfilPageState extends State<AutreProfilPage> {
           autre_youtube = userAutreInfos["youtube"];
           autre_affUserName = userAutreInfos["affUserName"];
           _loading = false;
-          addUserContact(autre_tel, autre_pseudo, context);
+          if (addUserOnAutreProfilPage == "oui") {
+            addUserContact(autre_tel, autre_pseudo, context);
+          }
+          addUserOnAutreProfilPage = "oui";
         });
       } else {
         setState(() {
@@ -177,9 +180,22 @@ class _AutreProfilPageState extends State<AutreProfilPage> {
         backgroundColor: primaryColor,
         title: Text(
           (langUserPhone == "fr")
-              ? "Information Utilisateurs"
+              ? "Informations Utilisateur"
               : "User Information",
-          style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+          style: GoogleFonts.poppins(
+            color: Colors.white,
+            fontWeight: FontWeight.w400,
+          ),
+        ),
+        leading: IconButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          icon: const Icon(
+            Icons.arrow_back,
+            size: 30,
+            color: Colors.white,
+          ),
         ),
       ),
       body: _loading
@@ -287,7 +303,7 @@ class _AutreProfilPageState extends State<AutreProfilPage> {
                           fontSize: 10,
                         ),
                       ),
-                      ProfileMenuReseauBlanc(
+                      ProfileMenuReseau(
                         text: "Tiktok",
                         press: () async {
                           final Uri _url = Uri.parse(autre_tiktok);
@@ -311,7 +327,7 @@ class _AutreProfilPageState extends State<AutreProfilPage> {
                           fontSize: 10,
                         ),
                       ),
-                      ProfileMenuReseauBlanc(
+                      ProfileMenuReseau(
                         text: "Youtube",
                         press: () async {
                           final Uri _url = Uri.parse(autre_youtube);
@@ -335,7 +351,7 @@ class _AutreProfilPageState extends State<AutreProfilPage> {
                           fontSize: 10,
                         ),
                       ),
-                      ProfileMenuReseauBlanc(
+                      ProfileMenuReseau(
                         text: "Facebook",
                         press: () async {
                           final Uri _url = Uri.parse(autre_facebook);
@@ -359,7 +375,7 @@ class _AutreProfilPageState extends State<AutreProfilPage> {
                           fontSize: 10,
                         ),
                       ),
-                      ProfileMenuReseauBlanc(
+                      ProfileMenuReseau(
                         text: "Instagram",
                         press: () async {
                           final Uri _url = Uri.parse(autre_instagram);

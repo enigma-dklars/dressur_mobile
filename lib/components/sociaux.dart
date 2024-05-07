@@ -73,7 +73,7 @@ class _SociauxPageState extends State<SociauxPage> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   SizedBox(
-                    width: MediaQuery.of(context).size.width * 0.40,
+                    width: MediaQuery.of(context).size.width * 0.44,
                     child: ProfileMenuReseauBlanc(
                       text: "TikTok BLT",
                       press: () async {
@@ -86,7 +86,7 @@ class _SociauxPageState extends State<SociauxPage> {
                     ),
                   ),
                   SizedBox(
-                    width: MediaQuery.of(context).size.width * 0.40,
+                    width: MediaQuery.of(context).size.width * 0.44,
                     child: ProfileMenuReseauBlanc(
                       text: "TikTok ELTCS",
                       press: () async {
@@ -104,7 +104,7 @@ class _SociauxPageState extends State<SociauxPage> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   SizedBox(
-                    width: MediaQuery.of(context).size.width * 0.40,
+                    width: MediaQuery.of(context).size.width * 0.44,
                     child: ProfileMenuReseauBlanc(
                       text: "Facebook BLT",
                       press: () async {
@@ -117,7 +117,7 @@ class _SociauxPageState extends State<SociauxPage> {
                     ),
                   ),
                   SizedBox(
-                    width: MediaQuery.of(context).size.width * 0.40,
+                    width: MediaQuery.of(context).size.width * 0.44,
                     child: ProfileMenuReseauBlanc(
                       text: "Facebook ELTCS",
                       press: () async {
@@ -135,7 +135,7 @@ class _SociauxPageState extends State<SociauxPage> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   SizedBox(
-                    width: MediaQuery.of(context).size.width * 0.40,
+                    width: MediaQuery.of(context).size.width * 0.44,
                     child: ProfileMenuReseauBlanc(
                       text: "Instagram BLT",
                       press: () async {
@@ -148,7 +148,7 @@ class _SociauxPageState extends State<SociauxPage> {
                     ),
                   ),
                   SizedBox(
-                    width: MediaQuery.of(context).size.width * 0.40,
+                    width: MediaQuery.of(context).size.width * 0.44,
                     child: ProfileMenuReseauBlanc(
                       text: "Instagram ELTCS",
                       press: () async {

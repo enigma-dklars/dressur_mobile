@@ -3,6 +3,7 @@
 import 'dart:io';
 
 import 'package:dressur/5_autre/cart_visite.dart';
+import 'package:dressur/components/pub_smt_2024.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
@@ -81,12 +82,16 @@ class _SettingPageState extends State<SettingPage> {
           title: Text(
             (langUserPhone == "fr") ? "Autres Pages" : "Other Pages",
             style: GoogleFonts.poppins(
-              fontWeight: FontWeight.w600,
+              color: Colors.white,
+              fontWeight: FontWeight.w400,
             ),
           ),
           actions: [
             IconButton(
-              icon: const Icon(Icons.notifications),
+              icon: const Icon(
+                Icons.notifications,
+                color: Colors.white,
+              ),
               onPressed: () {
                 Navigator.push(
                   context,
@@ -102,6 +107,7 @@ class _SettingPageState extends State<SettingPage> {
           child: Column(
             children: [
               const SizedBox(height: 5),
+              SpecialPub(),
               admin
                   ? ProfileMenu(
                       text: "Administration",

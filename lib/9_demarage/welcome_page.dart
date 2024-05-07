@@ -2,9 +2,9 @@
 
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:dressur/1_contact/reconnaissance_contact.dart';
 import 'package:dressur/9_demarage/update_app_important.dart';
 import 'package:dressur/9_demarage/pas_de_connexion.dart';
 import 'package:dressur/9_demarage/presentation_ds.dart';
@@ -16,7 +16,12 @@ import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
 
 class WelcomePage extends StatelessWidget {
-  const WelcomePage({Key? key}) : super(key: key);
+  const WelcomePage(this.notificationAppLaunchDetails, {Key? key})
+      : super(key: key);
+  static const String routeName = '/';
+  final NotificationAppLaunchDetails? notificationAppLaunchDetails;
+  bool get didNotificationLaunchApp =>
+      notificationAppLaunchDetails?.didNotificationLaunchApp ?? false;
 
   @override
   Widget build(BuildContext context) {
@@ -116,8 +121,11 @@ class _PageDepartState extends State<PageDepart> {
       });
       final numsTelUser = await SQLHelper.getAll("numsTelUser");
       if (numsTelUser.isEmpty) {
-        return Navigator.of(context).push(
-            MaterialPageRoute(builder: (context) => ReconnaissanceContact()));
+        setState(() {
+          modeReconnaissanceContactArrierePlan = true;
+        });
+        return Navigator.of(context)
+            .push(MaterialPageRoute(builder: (context) => const BottomBar()));
       } else {
         return Navigator.of(context)
             .push(MaterialPageRoute(builder: (context) => const BottomBar()));
@@ -183,6 +191,14 @@ class _PageDepartState extends State<PageDepart> {
     } else {
       _handleInvalidPermissionsCamera(permissionStatusCamera);
     }
+
+    // permission camera
+    PermissionStatus permissionStatusAlarm = await _getAlarmPermission();
+    if (permissionStatusAlarm == PermissionStatus.granted) {
+      // OK
+    } else {
+      _handleInvalidPermissionsAlarm(permissionStatusAlarm);
+    }
   }
 
   Future<PermissionStatus> _getContactPermission() async {
@@ -213,6 +229,18 @@ class _PageDepartState extends State<PageDepart> {
     // permission != PermissionStatus.granted && permission != PermissionStatus.permanentlyDenied
     if (permission != PermissionStatus.granted) {
       PermissionStatus permissionStatus = await Permission.camera.request();
+      return permissionStatus;
+    } else {
+      return permission;
+    }
+  }
+
+  Future<PermissionStatus> _getAlarmPermission() async {
+    PermissionStatus permission = await Permission.camera.status;
+    // permission != PermissionStatus.granted && permission != PermissionStatus.permanentlyDenied
+    if (permission != PermissionStatus.granted) {
+      PermissionStatus permissionStatus =
+          await Permission.scheduleExactAlarm.request();
       return permissionStatus;
     } else {
       return permission;
@@ -268,6 +296,22 @@ class _PageDepartState extends State<PageDepart> {
     }
   }
 
+  void _handleInvalidPermissionsAlarm(PermissionStatus permissionStatus) {
+    if (permissionStatus != PermissionStatus.granted) {
+      if (langUserPhone != "fr") {
+        warningNoti(
+            "Attention !",
+            "Veuillez autoriser Dressur à vous notifier les enregistrements automatiques de contact ainsi que votre messagerie.\nThis authorization is necessary to take full advantage of our features.",
+            context);
+      } else {
+        warningNoti(
+            "Attention !",
+            "Veuillez autoriser Dressur à vous notifier les enregistrements automatiques de contact ainsi que votre messagerie.\nCette autorisation est nécessaire pour profiter pleinement de nos fonctionnalités.",
+            context);
+      }
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -277,23 +321,41 @@ class _PageDepartState extends State<PageDepart> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.indigo,
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            LogoAnimation(),
-            const SizedBox(height: 16), // Marge entre le logo et le texte
-            Text(
-              textChargementEvolution,
-              style: GoogleFonts.poppins(
-                fontWeight: FontWeight.w400,
-                fontSize: 20,
-                color: Colors.white,
-              ),
-              textAlign: TextAlign.center,
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        elevation: 0,
+        backgroundColor: primaryColor,
+      ),
+      backgroundColor: primaryColor,
+      body: Align(
+        alignment: Alignment.topCenter,
+        child: SizedBox(
+          width: MediaQuery.of(context).size.width * 0.80,
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(
+              maxWidth: 1024,
             ),
-          ],
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                return Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    LogoAnimation(),
+                    Text(
+                      textChargementEvolution,
+                      style: GoogleFonts.poppins(
+                        fontWeight: FontWeight.w300,
+                        fontSize: 20,
+                        color: Colors.white,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                );
+              },
+            ),
+          ),
         ),
       ),
     );

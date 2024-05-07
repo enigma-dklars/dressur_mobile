@@ -24,6 +24,7 @@ class CodeMailConfirmePage extends StatelessWidget {
           },
           icon: const Icon(
             Icons.arrow_back,
+            color: Colors.white,
             size: 30,
           ),
         ),
@@ -31,7 +32,10 @@ class CodeMailConfirmePage extends StatelessWidget {
           (langUserPhone == "fr")
               ? "Confirmation du Mail"
               : "Email Confirmation",
-          style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+          style: GoogleFonts.poppins(
+            fontWeight: FontWeight.w600,
+            color: Colors.white,
+          ),
         ),
         actions: [
           PopupMenuButton<int>(
@@ -51,7 +55,7 @@ class CodeMailConfirmePage extends StatelessWidget {
                 child: Row(
                   children: [
                     Text(
-                      (langUserPhone == "fr") ? "Actualiser" : "Help",
+                      (langUserPhone == "fr") ? "Aide" : "Help",
                     ),
                   ],
                 ),
@@ -271,9 +275,14 @@ class _ConfirmeFormeState extends State<ConfirmeForme> {
               ),
               child: _desactive
                   ? const Text("Wait...")
-                  : Text((langUserPhone == "fr")
-                      ? "Renvoyer le code"
-                      : "Return the code"),
+                  : Text(
+                      (langUserPhone == "fr")
+                          ? "Renvoyer le code"
+                          : "Return the code",
+                      style: GoogleFonts.poppins(
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                      )),
               onPressed: () {
                 _desactive ? null : sendMail();
               },
@@ -307,12 +316,14 @@ class _ConfirmeFormeState extends State<ConfirmeForme> {
               textAlign: TextAlign.center,
             ),
           ),
+          const SizedBox(height: 20),
           DelayedAnimation(
             delay: 0, // 2000,
             child: TextField(
               controller: _codeMailVerifyController,
               decoration: InputDecoration(
                 labelStyle: TextStyle(color: secondaryColor),
+                border: const OutlineInputBorder(),
                 labelText: (langUserPhone == "fr")
                     ? 'Code verification mail'
                     : 'Mail verification code',
@@ -334,7 +345,11 @@ class _ConfirmeFormeState extends State<ConfirmeForme> {
                 ),
                 child: _desactive
                     ? const Text("Wait...")
-                    : Text((langUserPhone == "fr") ? "CONFIRMER" : "CONFIRM"),
+                    : Text((langUserPhone == "fr") ? "CONFIRMER" : "CONFIRM",
+                        style: GoogleFonts.poppins(
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                        )),
                 onPressed: () {
                   _desactive ? null : codeVerif(_codeMailVerifyController.text);
                 },

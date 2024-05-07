@@ -37,7 +37,7 @@ class _PromotionFormPageState extends State<PromotionFormPage> {
 
   Future<void> _selectImage() async {
     final picker = ImagePicker();
-    final pickedImage = await picker.getImage(source: ImageSource.gallery);
+    final pickedImage = await picker.pickImage(source: ImageSource.gallery);
 
     if (pickedImage != null) {
       final imageFile = File(pickedImage.path);
@@ -218,7 +218,20 @@ class _PromotionFormPageState extends State<PromotionFormPage> {
           (langUserPhone == "fr")
               ? 'Nouvelle Promotion Affaire'
               : 'New Business Promotion',
-          style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+          style: GoogleFonts.poppins(
+            fontWeight: FontWeight.w600,
+            color: Colors.white,
+          ),
+        ),
+        leading: IconButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          icon: const Icon(
+            Icons.arrow_back,
+            size: 30,
+            color: Colors.white,
+          ),
         ),
         backgroundColor: primaryColor,
       ),
@@ -287,6 +300,10 @@ class _PromotionFormPageState extends State<PromotionFormPage> {
                 (langUserPhone == "fr")
                     ? 'Sélectionner une image'
                     : 'Select an image',
+                style: GoogleFonts.poppins(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
             if (_imageFile != null)
@@ -320,7 +337,12 @@ class _PromotionFormPageState extends State<PromotionFormPage> {
               ),
               child: _isSending
                   ? const Text('Wait ...')
-                  : Text((langUserPhone == "fr") ? 'Envoyer' : 'Send'),
+                  : Text(
+                      (langUserPhone == "fr") ? 'Envoyer' : 'Send',
+                      style: GoogleFonts.poppins(
+                        color: Colors.white,
+                      ),
+                    ),
             ),
           ],
         ),

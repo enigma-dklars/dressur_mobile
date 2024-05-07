@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:dressur/components/padding_and_divider.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
@@ -13,6 +14,8 @@ class Advertisement {
   final String description;
   final String whatsappNumber;
   final String pseudoAnnonceur;
+  final String nombreDeVues;
+  final String nombreImpression;
 
   Advertisement({
     required this.uidUser,
@@ -21,6 +24,8 @@ class Advertisement {
     required this.description,
     required this.whatsappNumber,
     required this.pseudoAnnonceur,
+    required this.nombreDeVues,
+    required this.nombreImpression,
   });
 }
 
@@ -31,24 +36,23 @@ class AdvertisementListPage extends StatefulWidget {
 
 class _AdvertisementListPageState extends State<AdvertisementListPage> {
   bool rechercheEnCours = true;
-  List<Advertisement> _advertisements = [];
-  int _currentIndex = 0;
-  Timer? _timer;
+  late Future<List<Advertisement>> _futureAdvertisements;
 
   @override
   void initState() {
     super.initState();
-    fetchAdvertisements();
-    startTimer();
+    setState(() {
+      _futureAdvertisements = fetchAdvertisements();
+    });
   }
 
   @override
   void dispose() {
-    _timer?.cancel();
     super.dispose();
   }
 
-  Future<void> fetchAdvertisements() async {
+  Future<List<Advertisement>> fetchAdvertisements() async {
+    // Votre logique pour récupérer les annonces
     if (lesPublicites.toString().isNotEmpty) {
       final jsonData = jsonDecode(lesPublicites) as List<dynamic>;
 
@@ -60,24 +64,15 @@ class _AdvertisementListPageState extends State<AdvertisementListPage> {
           description: data['description'],
           whatsappNumber: data['whatsappNumber'],
           pseudoAnnonceur: data['pseudoAnnonceur'],
+          nombreDeVues: data['nombreDeVues'],
+          nombreImpression: data['nombreImpression'],
         );
       }).toList();
 
-      setState(() {
-        _advertisements = advertisements;
-        rechercheEnCours = false;
-      });
+      return advertisements;
+    } else {
+      return []; // Retourne une liste vide si aucune annonce n'est disponible
     }
-  }
-
-  void startTimer() {
-    _timer = Timer.periodic(const Duration(seconds: 5), (_) {
-      if (_advertisements.isNotEmpty) {
-        setState(() {
-          _currentIndex = (_currentIndex + 1) % _advertisements.length;
-        });
-      }
-    });
   }
 
   Future<void> setPromotionToWatch(Advertisement advertisement) async {
@@ -93,74 +88,105 @@ class _AdvertisementListPageState extends State<AdvertisementListPage> {
 
   @override
   Widget build(BuildContext context) {
-    return rechercheEnCours
-        ? const SizedBox(height: 0)
-        : Container(
-            margin:
-                const EdgeInsets.only(left: 10, top: 0, right: 10, bottom: 0),
-            padding:
-                const EdgeInsets.only(left: 5, top: 5, right: 5, bottom: 15),
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  primaryColor,
-                  primaryColor,
-                ],
-              ),
-              borderRadius: BorderRadius.circular(5),
-            ),
-            child: Column(
-              children: [
-                Text(
-                  (langUserPhone == "fr") ? "Promotions" : "Specials",
-                  style: GoogleFonts.poppins(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 5),
-                GestureDetector(
+    return FutureBuilder<List<Advertisement>>(
+      future: _futureAdvertisements,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(
+            child:
+                CircularProgressIndicator(), // Affichez un indicateur de chargement pendant que les données sont chargées
+          );
+        } else if (snapshot.hasError) {
+          return Center(
+            child: Text('Erreur: ${snapshot.error}'),
+          );
+        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+          return const Center(
+            child: Text('Aucune annonce trouvée'),
+          );
+        } else {
+          return ListView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: snapshot.data!.length,
+            itemBuilder: (context, index) {
+              Advertisement advertisement = snapshot.data![index];
+              return Container(
+                margin:
+                    const EdgeInsets.only(left: 7, top: 0, right: 7, bottom: 0),
+                child: GestureDetector(
                   onTap: () {
-                    setPromotionToWatch(_advertisements[_currentIndex]);
+                    setPromotionToWatch(advertisement);
                     // Ouvrir la page de détails au clic sur l'image ou la description
                     Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (context) => AdvertisementDetailPage(
-                          advertisement: _advertisements[_currentIndex],
+                          advertisement: advertisement,
                         ),
                       ),
                     );
                   },
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(
-                        5), // Définissez le rayon souhaité ici
-                    child: Image.network(
-                      _advertisements[_currentIndex].image,
-                      height: 300,
-                      width: double.infinity,
-                      fit: BoxFit.cover,
-                    ),
+                  child: Column(
+                    children: [
+                      const SizedBox(height: 1),
+                      Card(
+                        child: Column(
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(3),
+                              child: Image.network(
+                                advertisement.image,
+                                // height: 300,
+                                // width: double.infinity,
+                                // fit: BoxFit.cover,
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            Padding(
+                                padding:
+                                    const EdgeInsets.fromLTRB(10, 0, 10, 10),
+                                child: Column(
+                                  children: [
+                                    Text(
+                                      advertisement.description,
+                                      maxLines: 5,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.w400,
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 5),
+                                    Row(
+                                      children: [
+                                        const Icon(Icons.visibility),
+                                        const SizedBox(width: 4),
+                                        Text(advertisement.nombreImpression
+                                            .toString()),
+                                        const SizedBox(width: 16),
+                                        const Icon(Icons.touch_app),
+                                        const SizedBox(width: 4),
+                                        Text(advertisement.nombreDeVues
+                                            .toString()),
+                                      ],
+                                    )
+                                  ],
+                                ))
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 1),
+                      DressurDivider(),
+                    ],
                   ),
                 ),
-                const SizedBox(height: 10),
-                Text(
-                  _advertisements[_currentIndex].description,
-                  maxLines: 3,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w300,
-                    fontSize: 16,
-                    color: Colors.white,
-                  ),
-                ),
-              ],
-            ),
+              );
+            },
           );
+        }
+      },
+    );
   }
 }
 
@@ -170,9 +196,22 @@ class AdvertisementDetailPage extends StatelessWidget {
   AdvertisementDetailPage({required this.advertisement});
 
   void openWhatsAppChat() async {
-    String text = (langUserPhone == "fr")
-        ? "Bonjour/Bonsoir *${advertisement.pseudoAnnonceur}*, j'ai une question concernant la promotion ci-dessous: \n\n<<${advertisement.description.substring(0, 100)}...>>\n\n*Depuis Dressur.*"
-        : "Good morning or Good evening *${advertisement.pseudoAnnonceur}*, I have a question regarding the promotion below: \n\n<<${advertisement.description.substring(0, 100)}...>>\n\n*From Dressur.*";
+    String text;
+    if (langUserPhone == "fr") {
+      text =
+          "Bonjour/Bonsoir *${advertisement.pseudoAnnonceur}*, j'ai une question concernant la promotion ci-dessous: \n\n";
+    } else {
+      text =
+          "Good morning or Good evening *${advertisement.pseudoAnnonceur}*, I have a question regarding the promotion below: \n\n";
+    }
+
+    // Vérification de la longueur de la description
+    if (advertisement.description.length >= 100) {
+      text +=
+          "<<${advertisement.description.substring(0, 100)}...>>\n\n*Depuis Dressur.*";
+    } else {
+      text += "<<${advertisement.description}>>\n\n*Depuis Dressur.*";
+    }
 
     String encodedText = Uri.encodeComponent(text);
 
@@ -189,13 +228,26 @@ class AdvertisementDetailPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: primaryColor,
         title: Text(
           (langUserPhone == "fr")
               ? 'Détails de la promotion'
               : 'Details of the promotion',
-          style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+          style: GoogleFonts.poppins(
+            color: Colors.white,
+            fontWeight: FontWeight.w400,
+          ),
         ),
-        backgroundColor: primaryColor,
+        leading: IconButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          icon: const Icon(
+            Icons.arrow_back,
+            size: 30,
+            color: Colors.white,
+          ),
+        ),
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -218,9 +270,15 @@ class AdvertisementDetailPage extends StatelessWidget {
                     onPressed: () {
                       openWhatsAppChat();
                     },
-                    child: Text((langUserPhone == "fr")
-                        ? "Contacter l'annonceur"
-                        : "Contact the announcer"),
+                    child: Text(
+                      (langUserPhone == "fr")
+                          ? "Contacter l'annonceur"
+                          : "Contact the announcer",
+                      style: GoogleFonts.poppins(
+                        fontWeight: FontWeight.w400,
+                        color: Colors.white,
+                      ),
+                    ),
                   ),
                   const SizedBox(height: 5),
                   Text(

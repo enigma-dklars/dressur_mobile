@@ -1,0 +1,73 @@
+
+              // const SizedBox(height: 5),
+              // Container(
+              //   padding: const EdgeInsets.only(
+              //       left: 10, top: 0, right: 10, bottom: 0),
+              //   child: ExpansionPanelList(
+              //     elevation: 1,
+              //     expandedHeaderPadding: EdgeInsets.zero,
+              //     animationDuration: const Duration(seconds: 1),
+              //     children: <ExpansionPanel>[
+              //       ExpansionPanel(
+              //         backgroundColor: Colors.red,
+              //         headerBuilder: (BuildContext context, bool isExpanded) {
+              //           return ListTile(
+              //             title: Text(
+              //               (langUserPhone == "fr")
+              //                   ? "Message Très Important"
+              //                   : "Very Important Message",
+              //               style: GoogleFonts.poppins(
+              //                 fontWeight: FontWeight.w600,
+              //                 color: Colors.white,
+              //               ),
+              //             ),
+              //             onTap: () {
+              //               setState(() {
+              //                 _isExpanded = !isExpanded;
+              //               });
+              //             },
+              //           );
+              //         },
+              //         body: Card(
+              //           child: Container(
+              //             decoration: BoxDecoration(
+              //               borderRadius: BorderRadius.circular(3),
+              //               gradient: const LinearGradient(
+              //                 begin: Alignment.topCenter,
+              //                 end: Alignment.bottomCenter,
+              //                 colors: [
+              //                   Colors.red,
+              //                   Color.fromARGB(255, 85, 3, 3),
+              //                 ],
+              //               ),
+              //             ),
+              //             padding: const EdgeInsets.fromLTRB(5, 0, 5, 0),
+              //             child: Column(
+              //               crossAxisAlignment: CrossAxisAlignment.stretch,
+              //               children: [
+              //                 Text(
+              //                   (langUserPhone == "fr")
+              //                       ? "NB: Dressur ne peut garantir la bonne volonté et l'intégrité de tous ses utilisateurs, nous souhaitons attirer votre attention sur la question importante de la sécurité en ligne.\nMalheureusement, il existe des individus malveillants qui cherchent à arnaquer les utilisateurs innocents. Ensemble, nous pouvons prévenir les arnaques. Soyez vigilants, restez en sécurité. Signalez tous comportements que vous trouvez suspect."
+              //                       : "NB: Dressur cannot guarantee the goodwill and integrity of all of its users, we would like to draw your attention to the important issue of online security.\nUnfortunately, there are malicious individuals out there who seek to scam innocent users. Together we can prevent scams. Be vigilant, stay safe. Report any behavior you find suspicious.",
+              //                   style: GoogleFonts.poppins(
+              //                     fontWeight: FontWeight.w300,
+              //                     fontSize: 9,
+              //                     color: Colors.white,
+              //                   ),
+              //                 ),
+              //                 const SizedBox(height: 10),
+              //               ],
+              //             ),
+              //           ),
+              //         ),
+              //         isExpanded: _isExpanded,
+              //       ),
+              //     ],
+              //     expansionCallback: (int index, bool isExpanded) {
+              //       setState(() {
+              //         _isExpanded = !isExpanded;
+              //       });
+              //     },
+              //   ),
+              // ),
+              // const SizedBox(height: 5),

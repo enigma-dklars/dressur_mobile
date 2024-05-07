@@ -23,11 +23,15 @@ class ProfilPage extends StatelessWidget {
           icon: const Icon(
             Icons.arrow_back,
             size: 30,
+            color: Colors.white,
           ),
         ),
         title: Text(
           (langUserPhone == "fr") ? "Mon Profil" : "My profile",
-          style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+          style: GoogleFonts.poppins(
+            fontWeight: FontWeight.w400,
+            color: Colors.white,
+          ),
         ),
       ),
       body: SingleChildScrollView(
@@ -49,7 +53,6 @@ class ProfilPage extends StatelessWidget {
                         ? "Modifiez et complétez vos informations."
                         : "Edit and complete your information.",
                     style: GoogleFonts.poppins(
-                      color: Colors.grey,
                       fontSize: 16,
                     ),
                     textAlign: TextAlign.center,
@@ -318,12 +321,20 @@ class _RegisterFormState extends State<RegisterForm> {
                   backgroundColor: primaryColor,
                   shape: const StadiumBorder(),
                   padding: const EdgeInsets.symmetric(
-                    vertical: 13,
+                    vertical: 16,
                   ),
                 ),
-                child: _desactive
-                    ? const Text("Wait...")
-                    : Text((langUserPhone == "fr") ? "ENREGISTRER" : "SAVED"),
+                child: Text(
+                  _desactive
+                      ? "Wait..."
+                      : (langUserPhone == "fr")
+                          ? "ENREGISTRER"
+                          : "SAVED",
+                  style: GoogleFonts.poppins(
+                    fontWeight: FontWeight.w400,
+                    color: Colors.white,
+                  ),
+                ),
                 onPressed: () {
                   _desactive
                       ? null

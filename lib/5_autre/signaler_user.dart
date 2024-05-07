@@ -23,11 +23,15 @@ class SignalerPage extends StatelessWidget {
           icon: const Icon(
             Icons.arrow_back,
             size: 30,
+            color: Colors.white,
           ),
         ),
         title: Text(
           (langUserPhone == "fr") ? "Signaler un utilisateur" : "Report a user",
-          style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+          style: GoogleFonts.poppins(
+            color: Colors.white,
+            fontWeight: FontWeight.w400,
+          ),
         ),
       ),
       body: SingleChildScrollView(
@@ -162,7 +166,6 @@ class _SignalerFormState extends State<SignalerForm> {
             child: TextField(
               controller: telController,
               decoration: InputDecoration(
-                labelStyle: TextStyle(color: Colors.grey[400]),
                 border: const OutlineInputBorder(),
                 labelText: (langUserPhone == "fr")
                     ? 'Numéro Whatsapp'
@@ -177,7 +180,6 @@ class _SignalerFormState extends State<SignalerForm> {
               maxLines: null,
               controller: motifController,
               decoration: InputDecoration(
-                labelStyle: TextStyle(color: Colors.grey[400]),
                 border: const OutlineInputBorder(),
                 labelText: (langUserPhone == "fr") ? 'Motif' : 'Pattern',
               ),
@@ -197,11 +199,17 @@ class _SignalerFormState extends State<SignalerForm> {
                   ),
                   minimumSize: const Size.fromHeight(50),
                 ),
-                child: _desactive
-                    ? const Text("Wait...")
-                    : Text(
-                        (langUserPhone == "fr") ? "SIGNALER" : "REPORT",
-                      ),
+                child: Text(
+                  _desactive
+                      ? "Wait..."
+                      : (langUserPhone == "fr")
+                          ? "SIGNALER"
+                          : "REPORT",
+                  style: GoogleFonts.poppins(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
                 onPressed: () {
                   _desactive
                       ? null

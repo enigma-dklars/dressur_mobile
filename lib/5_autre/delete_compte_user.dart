@@ -26,13 +26,17 @@ class DeletecomptePage extends StatelessWidget {
           icon: const Icon(
             Icons.arrow_back,
             size: 30,
+            color: Colors.white,
           ),
         ),
         title: Text(
           (langUserPhone == "fr")
               ? "Suppression de compte"
               : "Account deletion",
-          style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+          style: GoogleFonts.poppins(
+            color: Colors.white,
+            fontWeight: FontWeight.w400,
+          ),
         ),
       ),
       body: SingleChildScrollView(
@@ -206,9 +210,17 @@ class _DeletecompteFormState extends State<DeletecompteForm> {
                   ),
                   minimumSize: const Size.fromHeight(50),
                 ),
-                child: _desactive
-                    ? const Text("Wait...")
-                    : Text((langUserPhone == "fr") ? "SUPPRIMER" : "DELETE"),
+                child: Text(
+                  _desactive
+                      ? "Wait..."
+                      : (langUserPhone == "fr")
+                          ? "SUPPRIMER"
+                          : "DELETE",
+                  style: GoogleFonts.poppins(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
                 onPressed: () async {
                   if (_desactive) {
                   } else {

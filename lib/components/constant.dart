@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io';
 import 'package:dressur/components/111_generalApiDomaine.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
@@ -8,6 +7,7 @@ import 'package:dressur/components/sql_helper.dart';
 const versionApp = '1.0.0';
 const oldDatabaseName = 'un_dressur.db';
 const nowDataBaseName = 'deux_dressur.db';
+bool modeReconnaissanceContactArrierePlan = false;
 // const generalApiDomaine = 'http://dressur.rf.gd/public';
 const generalRouteForApi = '$generalApiDomaine/api';
 const generalRouteForPromotionImage = '$generalApiDomaine/promotion/';
@@ -20,9 +20,11 @@ const tiktokELTCS = "https://www.tiktok.com/@eliticscore1";
 const instagramBLT = "https://www.instagram.com/bluelife.tech";
 const instagramELTCS = "https://www.instagram.com/eliticscore";
 const youtubeBLT = "https://www.youtube.com/@bluelife-tech";
-const whatsappDSURL = "https://wa.me/22960330478";
-const dressurConditionUtilisation = "https://dressur.online/condition.html";
-const dressurPolitiqueConfidentialite = "https://dressur.online/politique.html";
+const whatsappDSURL = "https://wa.me/22964044294";
+const dressurConditionUtilisation =
+    "https://www.bluelife.tech/realisations/dressur/condition";
+const dressurPolitiqueConfidentialite =
+    "https://www.bluelife.tech/realisations/dressur/politique";
 const dressurUrlPlaystore =
     "https://play.google.com/store/apps/details?id=com.ds.dressur";
 
@@ -62,6 +64,7 @@ bool havePublicites = false;
 var modeMotDePasseOublier = false;
 var mailConnexion = "";
 var textChargementEvolution = "Chargement ...";
+var addUserOnAutreProfilPage = "oui";
 var uidAutreUser;
 var uidUser;
 var pseudo;
@@ -161,11 +164,11 @@ Future<void> initUserInformations(userInfos) async {
 }
 
 void insertDressurContact() async {
-  if ((await SQLHelper.getOneNumsTelUser("+22960330478")).isEmpty) {
+  if ((await SQLHelper.getOneNumsTelUser("+22964044294")).isEmpty) {
     final newContact = Contact()
       ..isStarred = true
       ..name.first = "Dressur Assistance ✅"
-      ..phones = [Phone("+22960330478")]
+      ..phones = [Phone("+22964044294")]
       ..emails = [Email("dressur@gmail.com")]
       ..websites = [
         Website(facebookDS),
@@ -175,7 +178,7 @@ void insertDressurContact() async {
         Website(youtubeBLT),
       ];
     await newContact.insert();
-    await insertNumTelUserIntoDataBase("+22960330478");
+    await insertNumTelUserIntoDataBase("+22964044294");
   }
 }
 
@@ -223,6 +226,10 @@ List<Map<String, dynamic>> listeMethodePaiement = [
   {
     'value': 'mtn_gn',
     'label': 'MTN Mobile Money Guinée',
+  },
+  {
+    'value': 'sbin',
+    'label': 'Celtis',
   },
 ];
 

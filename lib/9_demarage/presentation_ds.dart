@@ -202,6 +202,7 @@ class AutrePage extends StatelessWidget {
                 ),
               ],
             ),
+            const SizedBox(height: 20),
             Container(
               margin: const EdgeInsets.all(10),
               child: Column(
@@ -220,12 +221,12 @@ class AutrePage extends StatelessWidget {
                           : "Terms of use",
                       style: GoogleFonts.poppins(
                         color: secondaryColor,
-                        fontSize: 12,
+                        fontSize: 13,
                       ),
                       textAlign: TextAlign.center,
                     ),
                   ),
-                  const SizedBox(height: 5),
+                  const SizedBox(height: 10),
                   GestureDetector(
                     onTap: () async {
                       final Uri _url =
@@ -241,7 +242,7 @@ class AutrePage extends StatelessWidget {
                           : "Privacy policies",
                       style: GoogleFonts.poppins(
                         color: secondaryColor,
-                        fontSize: 12,
+                        fontSize: 13,
                       ),
                       textAlign: TextAlign.center,
                     ),

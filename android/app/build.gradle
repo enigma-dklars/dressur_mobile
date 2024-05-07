@@ -1,14 +1,18 @@
+ plugins {
+    id "com.android.application"
+    id "dev.flutter.flutter-gradle-plugin"
+    id "org.jetbrains.kotlin.android"
+    id "com.google.gms.google-services"
+    id "com.google.firebase.crashlytics"
+}
+
+
 def localProperties = new Properties()
 def localPropertiesFile = rootProject.file('local.properties')
 if (localPropertiesFile.exists()) {
     localPropertiesFile.withReader('UTF-8') { reader ->
         localProperties.load(reader)
     }
-}
-
-def flutterRoot = localProperties.getProperty('flutter.sdk')
-if (flutterRoot == null) {
-    throw new GradleException("Flutter SDK not found. Define location with flutter.sdk in the local.properties file.")
 }
 
 def flutterVersionCode = localProperties.getProperty('flutter.versionCode')
@@ -21,11 +25,6 @@ if (flutterVersionName == null) {
     flutterVersionName = '1.0'
 }
 
-apply plugin: 'com.android.application'
-apply plugin: 'com.google.gms.google-services'
-apply plugin: 'kotlin-android'
-apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
-
 def keystoreProperties = new Properties()
 def keystorePropertiesFile = rootProject.file('key.properties')
 if (keystorePropertiesFile.exists()) {
@@ -33,8 +32,8 @@ if (keystorePropertiesFile.exists()) {
 }
 
 android {
-    compileSdkVersion flutter.compileSdkVersion
-    ndkVersion flutter.ndkVersion
+    compileSdkVersion 34
+    buildToolsVersion "31.0.0"
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -50,30 +49,27 @@ android {
     }
 
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId "com.ds.dressur"
-        // You can update the following values to match your application needs.
-        // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-build-configuration.
-        minSdkVersion 29 // flutter.minSdkVersion
-        targetSdkVersion 29 // flutter.targetSdkVersion
-        versionCode 10
-        versionName "1.0.0"
+        minSdkVersion 20
+        targetSdkVersion 33
+        versionCode flutterVersionCode.toInteger()
+        versionName flutterVersionName
     }
 
-   signingConfigs {
-       release {
-           keyAlias keystoreProperties['keyAlias']
-           keyPassword keystoreProperties['keyPassword']
-           storeFile keystoreProperties['storeFile'] ? file(keystoreProperties['storeFile']) : null
-           storePassword keystoreProperties['storePassword']
-       }
-   }
-   buildTypes {
-       release {
-           signingConfig signingConfigs.release
-       }
-   }
+    signingConfigs {
+        release {
+            keyAlias keystoreProperties['keyAlias']
+            keyPassword keystoreProperties['keyPassword']
+            storeFile keystoreProperties['storeFile'] ? file(keystoreProperties['storeFile']) : null
+            storePassword keystoreProperties['storePassword']
+        }
+    }
 
+    buildTypes {
+        release {
+            signingConfig signingConfigs.release
+        }
+    }
 }
 
 flutter {
@@ -81,6 +77,6 @@ flutter {
 }
 
 dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.10"
     implementation "androidx.browser:browser:1.4.0"
 }

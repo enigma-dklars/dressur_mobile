@@ -1,3 +1,5 @@
+// ignore_for_file: unnecessary_null_comparison
+
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
@@ -182,7 +184,18 @@ class _ListeContactAAddPageState extends State<ListeContactAAddPage> {
               ? "Contact(s) Dispo ($nombreContactDispo)"
               : "Contact(s) Available ($nombreContactDispo)",
           style: GoogleFonts.poppins(
-            fontWeight: FontWeight.w600,
+            fontWeight: FontWeight.w400,
+            color: Colors.white,
+          ),
+        ),
+        leading: IconButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          icon: const Icon(
+            Icons.arrow_back,
+            size: 30,
+            color: Colors.white,
           ),
         ),
         actions: [
@@ -236,24 +249,20 @@ class _ListeContactAAddPageState extends State<ListeContactAAddPage> {
                       Container(
                         height: 60,
                         width: 60,
-                        decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            colors: [
-                              Colors.white,
-                              Colors.indigoAccent,
-                              Colors.indigo,
-                            ],
-                          ),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             CircleAvatar(
                               backgroundImage:
                                   AssetImage("images-pays/${contact.pays}.png"),
+                              backgroundColor: Colors.transparent,
+                              child: AssetImage(
+                                          "images-pays/${contact.pays}.png") ==
+                                      null
+                                  ? Image.asset(
+                                      "images-pays/no_pays.png",
+                                    )
+                                  : null,
                             ),
                             const SizedBox(height: 3),
                             Text(
@@ -271,20 +280,6 @@ class _ListeContactAAddPageState extends State<ListeContactAAddPage> {
                         child: Container(
                           // width: 80,
                           height: 60,
-                          decoration: BoxDecoration(
-                            gradient: const LinearGradient(
-                              begin: Alignment.topCenter,
-                              end: Alignment.bottomRight,
-                              colors: [
-                                Colors.indigo,
-                                Colors.indigoAccent,
-                                Colors.white,
-                                Colors.white,
-                                Colors.white,
-                              ],
-                            ),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
                           padding: const EdgeInsets.fromLTRB(15, 0, 15, 0),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -311,12 +306,13 @@ class _ListeContactAAddPageState extends State<ListeContactAAddPage> {
                                           : 'Save',
                                       style: const TextStyle(
                                         fontSize: 13,
-                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
                                       ),
                                     ),
                                     icon: const Icon(
                                       Icons.person_add,
                                       size: 13,
+                                      color: Colors.white,
                                     ),
                                     onPressed: () {
                                       addUserContact(contact, context);

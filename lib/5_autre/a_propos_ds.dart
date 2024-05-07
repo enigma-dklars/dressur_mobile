@@ -12,6 +12,13 @@ class AproposPage extends StatelessWidget {
       appBar: AppBar(
         elevation: 0,
         backgroundColor: primaryColor,
+        title: Text(
+          (langUserPhone == "fr") ? "À Propos" : "About Us",
+          style: GoogleFonts.poppins(
+            fontWeight: FontWeight.w400,
+            color: Colors.white,
+          ),
+        ),
         leading: IconButton(
           onPressed: () {
             Navigator.pop(context);
@@ -19,11 +26,8 @@ class AproposPage extends StatelessWidget {
           icon: const Icon(
             Icons.arrow_back,
             size: 30,
+            color: Colors.white,
           ),
-        ),
-        title: Text(
-          (langUserPhone == "fr") ? "À Propos" : "About Us",
-          style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
         ),
       ),
       body: SingleChildScrollView(
@@ -142,7 +146,7 @@ class AproposPage extends StatelessWidget {
                   DelayedAnimation(
                     delay: 0, // 500,
                     child: Text(
-                      "www.blue-life.tech",
+                      "www.bluelife.tech",
                       style: GoogleFonts.poppins(
                           color: Colors.grey,
                           fontSize: 16,
