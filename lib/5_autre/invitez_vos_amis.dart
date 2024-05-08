@@ -8,9 +8,9 @@ import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
 import 'package:dressur/components/sql_helper.dart';
 import 'package:flutter/services.dart';
-import 'package:share_plus/share_plus.dart';
 import 'package:dressur/components/noti.dart';
 import 'package:dressur/5_autre/support_assistance.dart';
+import 'package:share_plus/share_plus.dart';
 
 class AddFriendPage extends StatefulWidget {
   AddFriendPage({Key? key}) : super(key: key);
@@ -109,14 +109,20 @@ class _AddFriendPageState extends State<AddFriendPage> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            Text((langUserPhone == "fr")
-                ? 'Entrer le code promo'
-                : 'Enter promo code'),
+            const SizedBox(height: 20),
+            Text(
+              (langUserPhone == "fr")
+                  ? 'Entrer le code promo'
+                  : 'Enter promo code',
+              style: GoogleFonts.poppins(
+                fontWeight: FontWeight.w400,
+                fontSize: 16,
+              ),
+            ),
             const SizedBox(height: 10),
             TextField(
               controller: codePromoController,
               decoration: InputDecoration(
-                labelStyle: TextStyle(color: Colors.grey[400]),
                 labelText:
                     (langUserPhone == "fr") ? 'Code Promo' : 'Promo code',
                 border: const OutlineInputBorder(),
@@ -134,9 +140,17 @@ class _AddFriendPageState extends State<AddFriendPage> {
               onPressed: () async {
                 _loading ? null : addPromo(codePromoController.text);
               },
-              child: _loading
-                  ? const Text('Wait...')
-                  : Text((langUserPhone == "fr") ? 'Ajouter' : 'Add'),
+              child: Text(
+                _loading
+                    ? 'Wait...'
+                    : (langUserPhone == "fr")
+                        ? 'Ajouter'
+                        : 'Add',
+                style: GoogleFonts.poppins(
+                  fontWeight: FontWeight.w400,
+                  color: Colors.white,
+                ),
+              ),
             )
           ],
         ),
@@ -161,14 +175,20 @@ class _AddFriendPageState extends State<AddFriendPage> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            Text((langUserPhone == "fr")
-                ? 'Entrer le code reçu de votre parrain'
-                : 'Enter the code received from your sponsor'),
+            const SizedBox(height: 20),
+            Text(
+              (langUserPhone == "fr")
+                  ? 'Entrer le code reçu de votre parrain'
+                  : 'Enter the code received from your sponsor',
+              style: GoogleFonts.poppins(
+                fontWeight: FontWeight.w400,
+                fontSize: 16,
+              ),
+            ),
             const SizedBox(height: 10),
             TextField(
               controller: codeParrainController,
               decoration: InputDecoration(
-                labelStyle: TextStyle(color: Colors.grey[400]),
                 labelText: (langUserPhone == "fr")
                     ? 'Code de Parrainage'
                     : 'Referral Code',
@@ -187,7 +207,13 @@ class _AddFriendPageState extends State<AddFriendPage> {
               onPressed: () async {
                 _loading ? null : addParrain(codeParrainController.text);
               },
-              child: Text((langUserPhone == "fr") ? 'Ajouter' : 'Add'),
+              child: Text(
+                (langUserPhone == "fr") ? 'Ajouter' : 'Add',
+                style: GoogleFonts.poppins(
+                  fontWeight: FontWeight.w400,
+                  color: Colors.white,
+                ),
+              ),
             )
           ],
         ),
@@ -314,13 +340,17 @@ class _AddFriendPageState extends State<AddFriendPage> {
             icon: const Icon(
               Icons.arrow_back,
               size: 30,
+              color: Colors.white,
             ),
           ),
           title: Text(
             (langUserPhone == "fr")
                 ? "Invitez vos amis"
                 : "Invite your friends",
-            style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+            style: GoogleFonts.poppins(
+              fontWeight: FontWeight.w400,
+              color: Colors.white,
+            ),
           ),
           actions: [
             PopupMenuButton<int>(
@@ -491,7 +521,7 @@ class _AddFriendPageState extends State<AddFriendPage> {
                   style: GoogleFonts.poppins(
                       color: primaryColor,
                       fontSize: 25,
-                      fontWeight: FontWeight.w600),
+                      fontWeight: FontWeight.w500),
                   textAlign: TextAlign.center,
                 ),
               ),
@@ -566,9 +596,16 @@ class _FormParrainState extends State<FormParrain> {
                     vertical: 13,
                   ),
                 ),
-                label: Text((langUserPhone == "fr") ? 'PARTAGER' : 'SHARE'),
+                label: Text(
+                  (langUserPhone == "fr") ? 'PARTAGER' : 'SHARE',
+                  style: GoogleFonts.poppins(
+                    fontWeight: FontWeight.w400,
+                    color: Colors.white,
+                  ),
+                ),
                 icon: const Icon(
                   Icons.share,
+                  color: Colors.white,
                 ),
                 onPressed: () async {
                   var messageShare = (langUserPhone == "fr")
@@ -599,9 +636,7 @@ class _FormParrainState extends State<FormParrain> {
                   ? "RECEVEZ $commissionBonus Points PAR FILLEUL\n\nOFFREZ $commissionBonus Points A CHAQU'UN DE VOS FILLEULS"
                   : "RECEIVE $commissionBonus Points PER REFERRAL\n\nGIVE $commissionBonus Points TO EACH OF YOUR REFERRALS",
               style: GoogleFonts.poppins(
-                  color: Colors.grey,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600),
+                  fontSize: 16, fontWeight: FontWeight.w600),
               textAlign: TextAlign.center,
             ),
           ),

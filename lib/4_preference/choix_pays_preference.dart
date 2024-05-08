@@ -168,7 +168,20 @@ class _ChoixDesPaysState extends State<ChoixDesPays> {
         backgroundColor: primaryColor,
         title: Text(
           (langUserPhone == "fr") ? 'Choix des Pays' : 'Choice of Countries',
-          style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+          style: GoogleFonts.poppins(
+            fontWeight: FontWeight.w400,
+            color: Colors.white,
+          ),
+        ),
+        leading: IconButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          icon: const Icon(
+            Icons.arrow_back,
+            size: 30,
+            color: Colors.white,
+          ),
         ),
       ),
       body: Column(
@@ -200,10 +213,12 @@ class _ChoixDesPaysState extends State<ChoixDesPays> {
                       return ListTile(
                         title: Text("(${country.name}) ${country.paysName}"),
                         leading: Switch(
+                          trackOutlineColor: MaterialStateColor.resolveWith(
+                              (states) => primaryColor),
                           activeColor: Colors.green,
-                          activeTrackColor: Colors.green,
-                          inactiveThumbColor: Colors.red,
-                          inactiveTrackColor: Colors.red,
+                          activeTrackColor: primaryColor,
+                          inactiveThumbColor: Colors.white,
+                          inactiveTrackColor: primaryColor,
                           value: country.isSelected,
                           onChanged: (bool? isSelected) {
                             if (isSelected != null) {

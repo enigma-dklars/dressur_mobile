@@ -28,6 +28,7 @@ class _RecuperationPageState extends State<RecuperationPage> {
           icon: const Icon(
             Icons.arrow_back,
             size: 30,
+            color: Colors.white,
           ),
         ),
         actions: [
@@ -45,6 +46,7 @@ class _RecuperationPageState extends State<RecuperationPage> {
                   child: const Icon(
                     Icons.help,
                     size: 30.0,
+                    color: Colors.white,
                   ),
                 )
               ],
@@ -204,7 +206,7 @@ class _RecuperationFormState extends State<RecuperationForm> {
                         ? "Renseigner votre adresse email."
                         : "Fill in your email address.",
                     style: const TextStyle(
-                      color: Color(0xFFbbb0ff),
+                      color: Colors.white,
                       fontSize: 16.0,
                       fontWeight: FontWeight.w500,
                     ),

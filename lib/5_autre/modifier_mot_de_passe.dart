@@ -24,11 +24,15 @@ class ModifierMdpPage extends StatelessWidget {
           icon: const Icon(
             Icons.arrow_back,
             size: 30,
+            color: Colors.white,
           ),
         ),
         title: Text(
           (langUserPhone == "fr") ? "Modifier Mot de Passe" : "Change Password",
-          style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+          style: GoogleFonts.poppins(
+            color: Colors.white,
+            fontWeight: FontWeight.w400,
+          ),
         ),
       ),
       body: SingleChildScrollView(
@@ -254,7 +258,6 @@ class _RegisterFormState extends State<RegisterForm> {
               controller: ancienPasswordController,
               obscureText: _obscureText,
               decoration: InputDecoration(
-                labelStyle: TextStyle(color: Colors.grey[400]),
                 border: const OutlineInputBorder(),
                 labelText: (langUserPhone == "fr")
                     ? 'Ancien mot de passe'
@@ -283,7 +286,6 @@ class _RegisterFormState extends State<RegisterForm> {
               controller: passwordController,
               obscureText: _obscureText_1,
               decoration: InputDecoration(
-                labelStyle: TextStyle(color: Colors.grey[400]),
                 border: const OutlineInputBorder(),
                 labelText: (langUserPhone == "fr")
                     ? 'Nouveau mot de passe'
@@ -312,7 +314,6 @@ class _RegisterFormState extends State<RegisterForm> {
               controller: passwordVerifController,
               obscureText: _obscureText_2,
               decoration: InputDecoration(
-                labelStyle: TextStyle(color: Colors.grey[400]),
                 border: const OutlineInputBorder(),
                 labelText: (langUserPhone == "fr")
                     ? 'Confirmer le nouveau mot de passe'
@@ -347,9 +348,17 @@ class _RegisterFormState extends State<RegisterForm> {
                     vertical: 13,
                   ),
                 ),
-                child: _desactive
-                    ? const Text("Wait...")
-                    : Text((langUserPhone == "fr") ? "MODIFIER" : "EDIT"),
+                child: Text(
+                  _desactive
+                      ? "Wait..."
+                      : (langUserPhone == "fr")
+                          ? "MODIFIER"
+                          : "EDIT",
+                  style: GoogleFonts.poppins(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
                 onPressed: () {
                   _desactive
                       ? null
@@ -375,11 +384,17 @@ class _RegisterFormState extends State<RegisterForm> {
                     vertical: 13,
                   ),
                 ),
-                child: _desactivePasseForgetButton
-                    ? const Text("Wait...")
-                    : Text((langUserPhone == "fr")
-                        ? "Mot de passe oublié ?"
-                        : "Forgot your password ?"),
+                child: Text(
+                  _desactivePasseForgetButton
+                      ? "Wait..."
+                      : (langUserPhone == "fr")
+                          ? "Mot de passe oublié ?"
+                          : "Forgot your password ?",
+                  style: GoogleFonts.poppins(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
                 onPressed: () {
                   _desactivePasseForgetButton ? null : sendMail();
                 },

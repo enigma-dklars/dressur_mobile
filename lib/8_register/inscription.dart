@@ -23,6 +23,7 @@ class InscriptionPage extends StatelessWidget {
           icon: const Icon(
             Icons.arrow_back,
             size: 30,
+            color: Colors.white,
           ),
         ),
         actions: [
@@ -40,6 +41,7 @@ class InscriptionPage extends StatelessWidget {
                   child: const Icon(
                     Icons.help,
                     size: 30.0,
+                    color: Colors.white,
                   ),
                 )
               ],
@@ -189,7 +191,7 @@ class _RegisterFormState extends State<RegisterForm> {
                       ? "Entrer vos informations primordiales"
                       : "Enter your essential information",
                   style: const TextStyle(
-                      color: Color(0xFFbbb0ff),
+                      color: Colors.white,
                       fontSize: 16.0,
                       fontWeight: FontWeight.w500),
                 )),

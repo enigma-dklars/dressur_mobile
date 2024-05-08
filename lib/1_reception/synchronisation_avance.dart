@@ -213,83 +213,118 @@ class _PageDepartState extends State<PageDepart> {
               ? "Synchronisation avancé"
               : "Advanced synchronization",
           style: GoogleFonts.poppins(
-            fontWeight: FontWeight.w600,
+            color: Colors.white,
+            fontWeight: FontWeight.w400,
+          ),
+        ),
+        leading: IconButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          icon: const Icon(
+            Icons.arrow_back,
+            size: 30,
+            color: Colors.white,
           ),
         ),
       ),
-      body: SingleChildScrollView(
-          child: Container(
-        height: MediaQuery.of(context).size.height * 0.98,
-        margin: const EdgeInsets.only(top: 20, bottom: 0),
-        padding: const EdgeInsets.only(left: 20, right: 20),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            DelayedAnimation(
-              delay: 800,
-              child: Text(
-                (langUserPhone == "fr")
-                    ? "Synchronisation avancé"
-                    : "Advanced synchronization",
-                style: GoogleFonts.poppins(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 25,
-                ),
-                textAlign: TextAlign.center,
-              ),
+      body: Align(
+        alignment: Alignment.topCenter,
+        child: SizedBox(
+          width: MediaQuery.of(context).size.width * 0.80,
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(
+              maxWidth: 1024,
             ),
-            const SizedBox(height: 30),
-            DelayedAnimation(
-              delay: 800,
-              child: Text(
-                (langUserPhone == "fr")
-                    ? "Cette opération peut prendre plusieurs secondes ou minutes en fonction du nombre de contacts que vous avez actuellement.\nVous devez patienter tous le long du processus et surtout ne pas quitter l'application.\nCliquez sur Démarrer pour lancer l'opération."
-                    : "This operation can take several seconds or minutes depending on the number of contacts you currently have.\nYou must wait all along the process and above all do not quit the application.\nClick on Start to launch the operation.",
-                style: GoogleFonts.poppins(
-                  fontWeight: FontWeight.w400,
-                  fontSize: 15,
-                  color: Colors.red,
-                ),
-                textAlign: TextAlign.center,
-              ),
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                return Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    DelayedAnimation(
+                      delay: 800,
+                      child: Text(
+                        (langUserPhone == "fr")
+                            ? "Synchronisation avancé"
+                            : "Advanced synchronization",
+                        style: GoogleFonts.poppins(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 25,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                    const SizedBox(height: 30),
+                    SizedBox(
+                      width: MediaQuery.of(context).size.width * 0.90,
+                      child: DelayedAnimation(
+                        delay: 800,
+                        child: Text(
+                          (langUserPhone == "fr")
+                              ? "Cette opération peut prendre plusieurs secondes ou minutes en fonction du nombre de contacts que vous avez actuellement.\nVous devez patienter tous le long du processus et surtout ne pas quitter l'application.\nCliquez sur Démarrer pour lancer l'opération."
+                              : "This operation can take several seconds or minutes depending on the number of contacts you currently have.\nYou must wait all along the process and above all do not quit the application.\nClick on Start to launch the operation.",
+                          style: GoogleFonts.poppins(
+                            fontWeight: FontWeight.w400,
+                            fontSize: 15,
+                            color: Colors.red,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 30),
+                    DelayedAnimation(
+                      delay: 1800,
+                      child: ElevatedButton.icon(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: primaryColor,
+                        ),
+                        label: _enCour
+                            ? Text(
+                                (langUserPhone == "fr")
+                                    ? 'En cours ...'
+                                    : 'In progress ...',
+                                style: GoogleFonts.poppins(
+                                  color: Colors.white,
+                                ),
+                              )
+                            : Text(
+                                (langUserPhone == "fr")
+                                    ? 'Démarrer'
+                                    : 'To start up',
+                                style: GoogleFonts.poppins(
+                                  color: Colors.white,
+                                ),
+                              ),
+                        icon: const Icon(
+                          Icons.run_circle,
+                          color: Colors.white,
+                        ),
+                        onPressed: () async {
+                          _enCour ? '' : await synchroAvanceFunction();
+                        },
+                      ),
+                    ),
+                    const SizedBox(height: 30),
+                    DelayedAnimation(
+                      delay: 1800,
+                      child: Text(
+                        textChargementEvolution,
+                        style: GoogleFonts.poppins(
+                          fontWeight: FontWeight.w400,
+                          fontSize: 16,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ],
+                );
+              },
             ),
-            const SizedBox(height: 30),
-            DelayedAnimation(
-              delay: 1800,
-              child: ElevatedButton.icon(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: primaryColor,
-                ),
-                label: _enCour
-                    ? (langUserPhone == "fr")
-                        ? const Text('En cours ...')
-                        : const Text('In progress ...')
-                    : (langUserPhone == "fr")
-                        ? const Text('Démarrer')
-                        : const Text('To start up'),
-                icon: const Icon(
-                  Icons.run_circle,
-                ),
-                onPressed: () async {
-                  _enCour ? '' : await synchroAvanceFunction();
-                },
-              ),
-            ),
-            const SizedBox(height: 30),
-            DelayedAnimation(
-              delay: 1800,
-              child: Text(
-                textChargementEvolution,
-                style: GoogleFonts.poppins(
-                  fontWeight: FontWeight.w400,
-                  fontSize: 16,
-                ),
-                textAlign: TextAlign.center,
-              ),
-            ),
-          ],
+          ),
         ),
-      )),
+      ),
     );
   }
 }

@@ -116,7 +116,20 @@ class _PromotionListPageState extends State<PromotionListPage> {
           (langUserPhone == "fr")
               ? 'Liste Promotion Affaire'
               : "Business Promotion List",
-          style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+          style: GoogleFonts.poppins(
+            fontWeight: FontWeight.w600,
+            color: Colors.white,
+          ),
+        ),
+        leading: IconButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          icon: const Icon(
+            Icons.arrow_back,
+            size: 30,
+            color: Colors.white,
+          ),
         ),
         backgroundColor: primaryColor,
         actions: [
@@ -176,121 +189,142 @@ class _PromotionListPageState extends State<PromotionListPage> {
           ? const Center(
               child: CircularProgressIndicator(),
             )
-          : ListView.builder(
-              itemCount: _promotions.length,
-              itemBuilder: (BuildContext context, int index) {
-                final promotion = _promotions[index];
+          : _promotions.isEmpty
+              ? Center(
+                  child: Text(
+                    (langUserPhone == "fr")
+                        ? "Aucune promotion affaire trouvée."
+                        : "No deal promotions found.",
+                    style: const TextStyle(fontSize: 16),
+                  ),
+                )
+              : Expanded(
+                  child: ListView.builder(
+                    itemCount: _promotions.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      final promotion = _promotions[index];
 
-                return Card(
-                  margin: const EdgeInsets.only(
-                      left: 10, top: 10, right: 10, bottom: 0),
-                  child: Row(
-                    children: [
-                      Container(
-                        height: 100,
-                        width: 70,
-                        decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            colors: [
-                              primaryColor,
-                              secondaryColor,
-                            ],
-                          ),
-                          borderRadius: BorderRadius.circular(5),
-                        ),
-                        child: Image.network(
-                          promotion.image,
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                      const SizedBox(width: 5),
-                      Expanded(
-                        child: Container(
-                          // width: 80,
-                          height: 100,
-                          decoration: BoxDecoration(
-                            gradient: const LinearGradient(
-                              begin: Alignment.topCenter,
-                              end: Alignment.bottomCenter,
-                              colors: [
-                                primaryColor,
-                                secondaryColor,
-                              ],
+                      return Card(
+                        margin: const EdgeInsets.only(
+                            left: 10, top: 10, right: 10, bottom: 0),
+                        child: Row(
+                          children: [
+                            Container(
+                              height: 100,
+                              width: 70,
+                              decoration: BoxDecoration(
+                                gradient: const LinearGradient(
+                                  begin: Alignment.topCenter,
+                                  end: Alignment.bottomCenter,
+                                  colors: [
+                                    primaryColor,
+                                    secondaryColor,
+                                  ],
+                                ),
+                                borderRadius: BorderRadius.circular(5),
+                              ),
+                              child: Image.network(
+                                promotion.image,
+                                fit: BoxFit.cover,
+                              ),
                             ),
-                            borderRadius: BorderRadius.circular(5),
-                          ),
-                          padding: const EdgeInsets.fromLTRB(15, 10, 15, 0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Status: ${promotion.status}',
-                                style: const TextStyle(
-                                  fontSize: 12.0,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              Text(
-                                'Impressions: ${promotion.nombreImpression}',
-                                style: const TextStyle(
-                                  fontSize: 12.0,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              Text(
-                                (langUserPhone == "fr")
-                                    ? 'Vues: ${promotion.nombreDeVues}'
-                                    : 'Views: ${promotion.nombreDeVues}',
-                                style: const TextStyle(
-                                  fontSize: 12.0,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              const SizedBox(height: 5),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  Column(
-                                    children: [
-                                      SizedBox(
-                                        child: ElevatedButton.icon(
-                                          style: ElevatedButton.styleFrom(
-                                            backgroundColor: Colors.green,
-                                          ),
-                                          label: Text((langUserPhone == "fr")
-                                              ? 'Autres Informations'
-                                              : 'Other information'),
-                                          icon: const Icon(
-                                            Icons.info,
-                                          ),
-                                          onPressed: () {
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (context) =>
-                                                    PromotionDetailPage(
-                                                  promotion: promotion,
-                                                ),
-                                              ),
-                                            );
-                                          },
-                                        ),
-                                      ),
+                            const SizedBox(width: 5),
+                            Expanded(
+                              child: Container(
+                                // width: 80,
+                                height: 100,
+                                decoration: BoxDecoration(
+                                  gradient: const LinearGradient(
+                                    begin: Alignment.topCenter,
+                                    end: Alignment.bottomCenter,
+                                    colors: [
+                                      primaryColor,
+                                      secondaryColor,
                                     ],
                                   ),
-                                ],
+                                  borderRadius: BorderRadius.circular(5),
+                                ),
+                                padding:
+                                    const EdgeInsets.fromLTRB(15, 5, 15, 0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Status: ${promotion.status}',
+                                      style: const TextStyle(
+                                        fontSize: 12.0,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                    Text(
+                                      'Impressions: ${promotion.nombreImpression}',
+                                      style: const TextStyle(
+                                        fontSize: 12.0,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                    Text(
+                                      (langUserPhone == "fr")
+                                          ? 'Vues: ${promotion.nombreDeVues}'
+                                          : 'Views: ${promotion.nombreDeVues}',
+                                      style: const TextStyle(
+                                        fontSize: 12.0,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      children: [
+                                        Column(
+                                          children: [
+                                            SizedBox(
+                                              child: ElevatedButton.icon(
+                                                style: ElevatedButton.styleFrom(
+                                                  backgroundColor: Colors.green,
+                                                ),
+                                                label: Text(
+                                                  (langUserPhone == "fr")
+                                                      ? 'Autres Informations'
+                                                      : 'Other information',
+                                                  style: GoogleFonts.poppins(
+                                                    color: Colors.white,
+                                                    fontWeight: FontWeight.w400,
+                                                  ),
+                                                ),
+                                                icon: const Icon(
+                                                  Icons.info,
+                                                  color: Colors.white,
+                                                ),
+                                                onPressed: () {
+                                                  Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          PromotionDetailPage(
+                                                        promotion: promotion,
+                                                      ),
+                                                    ),
+                                                  );
+                                                },
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
-                      ),
-                    ],
+                      );
+                    },
                   ),
-                );
-              },
-            ),
+                ),
     );
   }
 }
@@ -308,7 +342,20 @@ class PromotionDetailPage extends StatelessWidget {
           (langUserPhone == "fr")
               ? 'Détails de la promotion'
               : 'Details of the promotion',
-          style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+          style: GoogleFonts.poppins(
+            fontWeight: FontWeight.w600,
+            color: Colors.white,
+          ),
+        ),
+        leading: IconButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          icon: const Icon(
+            Icons.arrow_back,
+            size: 30,
+            color: Colors.white,
+          ),
         ),
         backgroundColor: primaryColor,
       ),
@@ -571,7 +618,20 @@ class _PaymentGratuitPageState extends State<PaymentGratuitPage> {
       appBar: AppBar(
         title: Text(
           'Page de Démarrage Gratuit',
-          style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+          style: GoogleFonts.poppins(
+            fontWeight: FontWeight.w600,
+            color: Colors.white,
+          ),
+        ),
+        leading: IconButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          icon: const Icon(
+            Icons.arrow_back,
+            size: 30,
+            color: Colors.white,
+          ),
         ),
         backgroundColor: primaryColor,
       ),
@@ -582,6 +642,10 @@ class _PaymentGratuitPageState extends State<PaymentGratuitPage> {
             DelayedAnimation(
               delay: 0, // 1500,
               child: SelectFormField(
+                decoration: const InputDecoration(
+                  labelText: 'Formules de Boost Payant',
+                  border: OutlineInputBorder(),
+                ),
                 type: SelectFormFieldType.dropdown,
                 initialValue: '1',
                 labelText: 'Formules de Boost',
@@ -614,9 +678,12 @@ class _PaymentGratuitPageState extends State<PaymentGratuitPage> {
                         vertical: 13,
                       ),
                     ),
-                    child: _desactive
-                        ? const Text("Wait...")
-                        : const Text("BOOSTER"),
+                    child: Text(
+                      _desactive ? "Wait..." : "BOOSTER",
+                      style: GoogleFonts.poppins(
+                        color: Colors.white,
+                      ),
+                    ),
                     onPressed: () {
                       if (!telIsVerified) {
                         warningNoti(
@@ -765,9 +832,12 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
             // var idTransaction = data["idTransaction"];
             setState(() {
               _desactive2 = false;
-              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                content: Text('Actualisez la liste de vos promos...'),
-              ));
+              dangerNoti(
+                  (langUserPhone == "fr") ? "Attention !!!" : "Attention !!!",
+                  (langUserPhone == "fr")
+                      ? "Après confirmation du paiement, veuillez consulter la liste de vos promotions affaires."
+                      : "After confirmation of payment, please consult the list of your business promotions.",
+                  context);
             });
           } else {
             dangerNoti(data["titre"], data["message"], context);
@@ -809,7 +879,20 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
       appBar: AppBar(
         title: Text(
           'Page de Démarrage Payant',
-          style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+          style: GoogleFonts.poppins(
+            fontWeight: FontWeight.w600,
+            color: Colors.white,
+          ),
+        ),
+        leading: IconButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          icon: const Icon(
+            Icons.arrow_back,
+            size: 30,
+            color: Colors.white,
+          ),
         ),
         backgroundColor: primaryColor,
       ),
@@ -820,6 +903,10 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
             DelayedAnimation(
               delay: 0, // 1500,
               child: SelectFormField(
+                decoration: const InputDecoration(
+                  labelText: 'Formules de Boost Payant',
+                  border: OutlineInputBorder(),
+                ),
                 type: SelectFormFieldType.dropdown,
                 initialValue: '1',
                 labelText: 'Formules de Promotion Payante',
@@ -832,6 +919,10 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
             DelayedAnimation(
               delay: 0, // 1500,
               child: SelectFormField(
+                decoration: const InputDecoration(
+                  labelText: 'Formules de Boost Payant',
+                  border: OutlineInputBorder(),
+                ),
                 type: SelectFormFieldType.dropdown,
                 initialValue: 'mtn',
                 labelText: 'Methode de paiement mobile',
@@ -846,8 +937,8 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
               child: TextField(
                 controller: telController,
                 decoration: InputDecoration(
-                  labelStyle: TextStyle(color: Colors.grey[400]),
                   labelText: 'Indicatif + Numéro du paiement',
+                  border: OutlineInputBorder(),
                 ),
               ),
             ),
@@ -864,9 +955,12 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
                       vertical: 13,
                     ),
                   ),
-                  child: _desactive2
-                      ? const Text("Wait...")
-                      : const Text("PAYER & BOOSTER"),
+                  child: Text(
+                    _desactive2 ? "Wait..." : "PAYER & BOOSTER",
+                    style: GoogleFonts.poppins(
+                      color: Colors.white,
+                    ),
+                  ),
                   onPressed: () {
                     if (!telIsVerified) {
                       warningNoti(

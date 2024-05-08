@@ -16,7 +16,7 @@
     flutter build appbundle
 
 # symbols.zip
-    C:\Users\SANR\codes\dressur\build\app\intermediates\merged_native_libs\release\out\lib
+    C:\Users\dklar\codes\dressur_mobile\build\app\intermediates\merged_native_libs\release\out\lib
 
 # bloquer le retour de page flutter
     https://www.flutterbeads.com/disable-override-back-button-in-flutter/

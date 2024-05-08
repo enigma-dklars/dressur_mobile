@@ -1,5 +1,7 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:dressur/1_reception/reception.dart';
+import 'package:dressur/components/noti_sys.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
@@ -9,6 +11,7 @@ import 'package:dressur/4_preference/preference.dart';
 import 'package:dressur/5_autre/menu_autre_page.dart';
 import 'package:dressur/components/constant.dart';
 import 'package:dressur/components/sql_helper.dart';
+import 'dart:convert' as convert;
 
 class BottomBar extends StatefulWidget {
   const BottomBar({Key? key}) : super(key: key);
@@ -30,6 +33,54 @@ class _BottomBarState extends State<BottomBar> {
       synchroAvanceFunction();
       setState(() {
         modeReconnaissanceContactArrierePlan = false;
+      });
+    }
+
+    // Exécute la fonction toutes les 5 heures
+    Timer.periodic(const Duration(hours: 5), (timer) {
+      showNotification("Cc $pseudo du nouveau ?",
+          "Consultez votre compte dès maintenant pour découvrir les dernières promotions, actualités et préférences disponibles sur Dressur.");
+    });
+
+// Exécute la fonction toutes les 1 heures
+    Timer.periodic(const Duration(hours: 1), (timer) {
+      actualise();
+    });
+  }
+
+  void actualise() async {
+    setState(() {
+      // _loading = true;
+    });
+    dynamic youHaveNetWork = "";
+    youHaveConnexion();
+    youHaveNetWork = await SQLHelper.getYouHaveConnexion();
+    while (youHaveNetWork.length == 0) {
+      youHaveNetWork = await SQLHelper.getYouHaveConnexion();
+    }
+    var request = http.MultipartRequest(
+        'POST', Uri.parse('$generalRouteForApi/getUserInfo'));
+    request.fields
+        .addAll({'uid': uidUser, 'langUserPhone': langUserPhone.toString()});
+
+    http.StreamedResponse response = await request.send();
+
+    if (response.statusCode == 200) {
+      var data1 = await response.stream.bytesToString();
+      var data = convert.jsonDecode(data1);
+      if (data["error"] == false) {
+        setState(() {
+          initUserInformations(data['user']);
+          // _loading = false;
+        });
+      } else {
+        setState(() {
+          // _loading = false;
+        });
+      }
+    } else {
+      setState(() {
+        // _loading = false;
       });
     }
   }

@@ -68,11 +68,15 @@ class _ReceptionPageState extends State<ReceptionPage> {
           backgroundColor: primaryColor,
           title: Text(
             (langUserPhone == "fr") ? "Boîte de Réception" : "Inbox",
-            style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+            style: GoogleFonts.poppins(
+              fontWeight: FontWeight.w400,
+              color: Colors.white,
+            ),
           ),
           actions: [
             IconButton(
               icon: const Icon(Icons.notifications),
+              color: Colors.white,
               onPressed: () {
                 Navigator.push(
                   context,
@@ -143,18 +147,6 @@ class _ReceptionPageState extends State<ReceptionPage> {
                   margin: const EdgeInsets.only(
                       left: 10, top: 5, right: 10, bottom: 5),
                   child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(5),
-                      gradient: const LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [
-                          primaryColor,
-                          secondaryColor,
-                          Colors.white,
-                        ],
-                      ),
-                    ),
                     padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -165,7 +157,6 @@ class _ReceptionPageState extends State<ReceptionPage> {
                           margin: const EdgeInsets.all(10.0),
                           decoration: const BoxDecoration(
                             shape: BoxShape.circle,
-                            color: Colors.white,
                           ),
                           child: const Icon(
                             Icons.contacts,
@@ -179,13 +170,11 @@ class _ReceptionPageState extends State<ReceptionPage> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text(
-                                (langUserPhone == "fr")
-                                    ? "Nouveaux Contacts Dressur"
-                                    : "New Contacts Dressur",
+                                "Contacts",
                                 style: GoogleFonts.poppins(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w500,
-                                  color: Colors.white,
+                                  color: primaryColor,
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.w400,
                                 ),
                               ),
                               const SizedBox(height: 5),
@@ -194,9 +183,8 @@ class _ReceptionPageState extends State<ReceptionPage> {
                                     ? "Contacts ajouter et scanner"
                                     : "Contacts add and scan",
                                 style: GoogleFonts.poppins(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w500,
-                                  color: Colors.black,
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w300,
                                 ),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
@@ -210,7 +198,7 @@ class _ReceptionPageState extends State<ReceptionPage> {
                           margin: const EdgeInsets.all(5),
                           child: const Icon(
                             Icons.chevron_right,
-                            size: 20,
+                            size: 24,
                           ),
                         ),
                       ],
@@ -218,7 +206,6 @@ class _ReceptionPageState extends State<ReceptionPage> {
                   ),
                 ),
               ),
-              DressurDivider(),
               GestureDetector(
                 onTap: () {
                   Navigator.push(
@@ -232,36 +219,20 @@ class _ReceptionPageState extends State<ReceptionPage> {
                   margin: const EdgeInsets.only(
                       left: 10, top: 5, right: 10, bottom: 5),
                   child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(5),
-                      gradient: const LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [
-                          primaryColor,
-                          secondaryColor,
-                          Colors.white,
-                        ],
-                      ),
-                    ),
                     padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Container(
-                          padding: const EdgeInsets.all(0),
-                          margin: const EdgeInsets.all(10),
-                          child: CircleAvatar(
-                            radius:
-                                20, // Définissez le rayon du cercle selon votre besoin
-                            backgroundColor: Colors.white,
-                            child: Image.asset(
-                              "images/dressur_logo_centrer_sans_fond.png",
-                              width: 90, // Définissez la largeur de l'image
-                              height: 90, // Définissez la hauteur de l'image
-                              fit: BoxFit
-                                  .cover, // Ajustez le comportement de l'ajustement d'image si nécessaire
-                            ),
+                          padding: const EdgeInsets.all(10.0),
+                          margin: const EdgeInsets.all(10.0),
+                          decoration: const BoxDecoration(
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(
+                            Icons.notifications,
+                            color: primaryColor,
+                            size: 20,
                           ),
                         ),
                         Expanded(
@@ -270,11 +241,11 @@ class _ReceptionPageState extends State<ReceptionPage> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text(
-                                "Dressur Notifications",
+                                "Notifications",
                                 style: GoogleFonts.poppins(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w500,
-                                  color: Colors.white,
+                                  color: primaryColor,
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.w400,
                                 ),
                               ),
                               const SizedBox(height: 5),
@@ -283,9 +254,8 @@ class _ReceptionPageState extends State<ReceptionPage> {
                                     ? "Cadeaux, Astuces, Recommandations, Informations, Avertissements, "
                                     : "Gifts, Tips, Recommendations, Information, Warnings, ",
                                 style: GoogleFonts.poppins(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w500,
-                                  color: Colors.black,
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w300,
                                 ),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
@@ -298,7 +268,7 @@ class _ReceptionPageState extends State<ReceptionPage> {
                           margin: const EdgeInsets.all(5),
                           child: const Icon(
                             Icons.chevron_right,
-                            size: 20,
+                            size: 24,
                           ),
                         ),
                       ],

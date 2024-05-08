@@ -74,11 +74,15 @@ class _PrettyQrHomePageState extends State<PrettyQrHomePage> {
           icon: const Icon(
             Icons.arrow_back,
             size: 30,
+            color: Colors.white,
           ),
         ),
         title: Text(
           (langUserPhone == "fr") ? "Carte de visite" : "Visit card",
-          style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+          style: GoogleFonts.poppins(
+            fontWeight: FontWeight.w400,
+            color: Colors.white,
+          ),
         ),
       ),
       body: Align(
@@ -115,8 +119,8 @@ class _PrettyQrHomePageState extends State<PrettyQrHomePage> {
                     const SizedBox(height: 10),
                     Padding(
                       padding: safePadding.copyWith(
-                        right: 15,
-                        left: 15,
+                        right: 10,
+                        left: 10,
                       ),
                       child: Text(
                         (langUserPhone == "fr")
@@ -145,6 +149,7 @@ class _PrettyQrHomePageState extends State<PrettyQrHomePage> {
                               : "Scan a QR Code",
                           style: GoogleFonts.poppins(
                             fontSize: 18,
+                            color: Colors.white,
                           ),
                           textAlign: TextAlign.center,
                         ),

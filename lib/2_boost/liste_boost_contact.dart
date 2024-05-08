@@ -101,7 +101,20 @@ class _ListeBoostContactPageState extends State<ListeBoostContactPage> {
           (langUserPhone == "fr")
               ? "Liste Boost Contact"
               : "Boost List Contact",
-          style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+          style: GoogleFonts.poppins(
+            fontWeight: FontWeight.w600,
+            color: Colors.white,
+          ),
+        ),
+        leading: IconButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          icon: const Icon(
+            Icons.arrow_back,
+            size: 30,
+            color: Colors.white,
+          ),
         ),
         actions: [
           PopupMenuButton<dynamic>(
@@ -160,7 +173,17 @@ class _ListeBoostContactPageState extends State<ListeBoostContactPage> {
           ? const Center(
               child: CircularProgressIndicator(),
             )
-          : ListView.builder(
+          : _boosts.isEmpty
+                  ? Center(
+                      child: Text(
+                        (langUserPhone == "fr")
+                            ? "Aucun boost contact trouvé."
+                            : "No contact boost found.",
+                        style: const TextStyle(fontSize: 16),
+                      ),
+                    )
+                  : Expanded(
+                      child: ListView.builder(
               itemCount: _boosts.length,
               itemBuilder: (BuildContext context, int index) {
                 final boost = _boosts[index];
@@ -237,6 +260,7 @@ class _ListeBoostContactPageState extends State<ListeBoostContactPage> {
                   ),
                 );
               },
+            ),
             ),
     );
   }

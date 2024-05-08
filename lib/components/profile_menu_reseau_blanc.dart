@@ -30,7 +30,7 @@ class ProfileMenuReseauBlanc extends StatelessWidget {
               text,
               style: GoogleFonts.poppins(
                 color: Colors.white,
-                fontSize: 12,
+                fontSize: 11,
                 fontWeight: FontWeight.w500,
               ),
             ),

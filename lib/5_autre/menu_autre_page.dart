@@ -82,12 +82,16 @@ class _SettingPageState extends State<SettingPage> {
           title: Text(
             (langUserPhone == "fr") ? "Autres Pages" : "Other Pages",
             style: GoogleFonts.poppins(
-              fontWeight: FontWeight.w600,
+              color: Colors.white,
+              fontWeight: FontWeight.w400,
             ),
           ),
           actions: [
             IconButton(
-              icon: const Icon(Icons.notifications),
+              icon: const Icon(
+                Icons.notifications,
+                color: Colors.white,
+              ),
               onPressed: () {
                 Navigator.push(
                   context,

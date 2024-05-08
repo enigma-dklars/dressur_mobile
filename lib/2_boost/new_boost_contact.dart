@@ -27,7 +27,10 @@ class _NewBoostContactPageState extends State<NewBoostContactPage> {
           (langUserPhone == "fr")
               ? "Nouveau Boost Contact"
               : "New Boost Contact",
-          style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+          style: GoogleFonts.poppins(
+            fontWeight: FontWeight.w400,
+            color: Colors.white,
+          ),
         ),
         leading: IconButton(
           onPressed: () {
@@ -36,6 +39,7 @@ class _NewBoostContactPageState extends State<NewBoostContactPage> {
           icon: const Icon(
             Icons.arrow_back,
             size: 30,
+            color: Colors.white,
           ),
         ),
       ),
@@ -104,9 +108,7 @@ class _NewBoostContactPageState extends State<NewBoostContactPage> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        (langUserPhone == "fr")
-                            ? 'Boost Gratuit'
-                            : 'Free Boost',
+                        (langUserPhone == "fr") ? 'Gratuit' : 'Free',
                         style: GoogleFonts.poppins(
                           fontSize: 20,
                           fontWeight: FontWeight.w800,
@@ -114,26 +116,28 @@ class _NewBoostContactPageState extends State<NewBoostContactPage> {
                         ),
                         textAlign: TextAlign.center,
                       ),
+                      const SizedBox(width: 10),
                       Switch(
-                          activeColor: Colors.red,
-                          activeTrackColor: primaryColor,
-                          inactiveThumbColor: Colors.green,
-                          inactiveTrackColor: primaryColor,
-                          value: load,
-                          onChanged: (bool? newValue) {
-                            setState(() {
-                              // affUserName = newValue!;
-                              if (newValue == true) {
-                                load = true;
-                                //updateUserPreferenceNom("true");
-                              } else {
-                                load = false;
-                                //updateUserPreferenceNom("false");
-                              }
-                            });
-                          }),
+                        trackOutlineColor: MaterialStateColor.resolveWith(
+                            (states) => primaryColor),
+                        activeColor: Colors.red,
+                        activeTrackColor: primaryColor,
+                        inactiveThumbColor: Colors.green,
+                        inactiveTrackColor: primaryColor,
+                        value: load,
+                        onChanged: (bool? newValue) {
+                          setState(() {
+                            if (newValue == true) {
+                              load = true;
+                            } else {
+                              load = false;
+                            }
+                          });
+                        },
+                      ),
+                      const SizedBox(width: 10),
                       Text(
-                        (langUserPhone == "fr") ? 'Boost Payant' : 'Paid Boost',
+                        (langUserPhone == "fr") ? 'Payant' : 'Paid',
                         style: GoogleFonts.poppins(
                           fontSize: 20,
                           fontWeight: FontWeight.w800,
@@ -354,8 +358,18 @@ class _RegisterFormState extends State<RegisterForm> {
                     ),
                   ),
                   child: _desactive
-                      ? const Text("Wait...")
-                      : const Text("BOOSTER"),
+                      ? Text(
+                          "Wait...",
+                          style: GoogleFonts.poppins(
+                            color: Colors.white,
+                          ),
+                        )
+                      : Text(
+                          "BOOSTER",
+                          style: GoogleFonts.poppins(
+                            color: Colors.white,
+                          ),
+                        ),
                   onPressed: () {
                     if (!telIsVerified) {
                       warningNoti(
@@ -499,13 +513,12 @@ class _RegisterForm2State extends State<RegisterForm2> {
             // var idTransaction = data["idTransaction"];
             setState(() {
               _desactive2 = false;
-              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                content: Text(
+              dangerNoti(
+                  (langUserPhone == "fr") ? "Attention !!!" : "Attention !!!",
                   (langUserPhone == "fr")
-                      ? 'Actualiser la liste de vos boosts...'
-                      : 'Refresh the list of your boosts...',
-                ),
-              ));
+                      ? "Après confirmation du paiement, veuillez consulter la liste de vos boosts."
+                      : "After payment confirmation, please view the list of your boosts.",
+                  context);
             });
           } else {
             dangerNoti(data["titre"], data["message"], context);
@@ -685,8 +698,18 @@ class _RegisterForm2State extends State<RegisterForm2> {
                   ),
                 ),
                 child: _desactive2
-                    ? const Text("Wait...")
-                    : const Text("PAYER & BOOSTER"),
+                    ? Text(
+                        "Wait...",
+                        style: GoogleFonts.poppins(
+                          color: Colors.white,
+                        ),
+                      )
+                    : Text(
+                        "PAYER & BOOSTER",
+                        style: GoogleFonts.poppins(
+                          color: Colors.white,
+                        ),
+                      ),
                 onPressed: () {
                   if (!telIsVerified) {
                     warningNoti(

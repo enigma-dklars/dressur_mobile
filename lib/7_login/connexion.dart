@@ -24,6 +24,7 @@ class LoginPage extends StatelessWidget {
           icon: const Icon(
             Icons.arrow_back,
             size: 30,
+            color: Colors.white,
           ),
         ),
         actions: [
@@ -41,6 +42,7 @@ class LoginPage extends StatelessWidget {
                   child: const Icon(
                     Icons.help,
                     size: 30.0,
+                    color: Colors.white,
                   ),
                 )
               ],
@@ -182,7 +184,7 @@ class _LoginFormState extends State<LoginForm> {
                         ? "Renseigner votre adresse email et mot de passe pour accéder à votre compte."
                         : "Enter your email address and password to access your account.",
                     style: const TextStyle(
-                      color: Color(0xFFbbb0ff),
+                      color: Colors.white,
                       fontSize: 16.0,
                       fontWeight: FontWeight.w500,
                     ),
