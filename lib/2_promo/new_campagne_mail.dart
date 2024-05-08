@@ -269,6 +269,7 @@ class _RegisterForm2State extends State<RegisterForm2> {
                       : 'Your campaign has been saved, you will proceed to payment if it is accepted.',
                   context);
               ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      behavior: SnackBarBehavior.floating,
                 content: Text(
                   (langUserPhone == "fr")
                       ? 'Votre campagne a été enregistrée, vous passerez au paiement si elle est acceptée.'

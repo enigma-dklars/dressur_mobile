@@ -287,6 +287,14 @@ class _AddFriendPageState extends State<AddFriendPage> {
   }
 
   void actualiseNombreInvite() async {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      behavior: SnackBarBehavior.floating,
+      content: Text(
+        (langUserPhone == "fr")
+            ? 'Actualisation en cours…'
+            : 'Update in progress…',
+      ),
+    ));
     dynamic youHaveNetWork = "";
     youHaveConnexion();
     youHaveNetWork = await SQLHelper.getYouHaveConnexion();
@@ -325,6 +333,14 @@ class _AddFriendPageState extends State<AddFriendPage> {
         _loading = false;
       });
     }
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      behavior: SnackBarBehavior.floating,
+      content: Text(
+        (langUserPhone == "fr")
+            ? 'Actualisation terminer.'
+            : 'Refresh complete.',
+      ),
+    ));
   }
 
   @override
@@ -556,6 +572,7 @@ class _FormParrainState extends State<FormParrain> {
                 setState(() {
                   Clipboard.setData(ClipboardData(text: codeBonus));
                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    behavior: SnackBarBehavior.floating,
                     content: Text((langUserPhone == "fr")
                         ? 'Code de Parrainage Copier ...'
                         : 'Referral Code Copy...'),
@@ -573,6 +590,7 @@ class _FormParrainState extends State<FormParrain> {
                     setState(() {
                       Clipboard.setData(ClipboardData(text: codeBonus));
                       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                        behavior: SnackBarBehavior.floating,
                         content: Text((langUserPhone == "fr")
                             ? 'Code de Parrainage Copier ...'
                             : 'Referral Code Copy...'),

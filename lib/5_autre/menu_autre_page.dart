@@ -15,8 +15,8 @@ import 'package:dressur/5_autre/invitez_vos_amis.dart';
 import 'package:dressur/5_autre/modifier_mot_de_passe.dart';
 import 'package:dressur/5_autre/profil_user.dart';
 import 'package:dressur/5_autre/signaler_user.dart';
-import 'package:dressur/6_notification/liste_notification.dart';
-import 'package:dressur/7_login/connexion.dart';
+import 'package:dressur/1_reception/liste_notification.dart';
+import 'package:dressur/6_login_register/connexion.dart';
 import 'package:dressur/components/profile_menu.dart';
 import 'package:dressur/5_autre/support_assistance.dart';
 import 'package:art_sweetalert/art_sweetalert.dart';
@@ -238,6 +238,7 @@ class _SettingPageState extends State<SettingPage> {
                   if (response.isTapConfirmButton) {
                     if (contactsEnregistrer.isNotEmpty) {
                       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      behavior: SnackBarBehavior.floating,
                         content: Text(
                           (langUserPhone == "fr")
                               ? "Dressur vas parcourir vos contacts un a un et supprimer les contacts DS.\n\nPatientez tous le long du processus.\n\nCe processus peut durée plusieurs minutes."
@@ -260,12 +261,14 @@ class _SettingPageState extends State<SettingPage> {
                         }
                         nombreContact--;
                         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      behavior: SnackBarBehavior.floating,
                           content: Text((langUserPhone == "fr")
                               ? "$nombreContact contact(s) restant à parcourir."
                               : "$nombreContact contact(s) remaining to be scanned."),
                         ));
                       }
                       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      behavior: SnackBarBehavior.floating,
                         content: Text(
                           (langUserPhone == "fr")
                               ? "${contactsEnregistrer.length} contact(s) DS supprimer."
@@ -274,6 +277,7 @@ class _SettingPageState extends State<SettingPage> {
                       ));
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      behavior: SnackBarBehavior.floating,
                         content: Text(
                           (langUserPhone == "fr")
                               ? "Vous n'avez aucun contact DS actuellement. Faite un boost pour en avoir."

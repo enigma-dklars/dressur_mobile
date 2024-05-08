@@ -8,7 +8,7 @@ import 'package:flutter_local_notifications_platform_interface/src/types.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:dressur/components/constant.dart';
 import 'package:dressur/components/delayed_animation.dart';
-import 'package:dressur/9_demarage/welcome_page.dart';
+import 'package:dressur/7_demarage/welcome_page.dart';
 
 class NoConnexionPage extends StatelessWidget {
   const NoConnexionPage({Key? key}) : super(key: key);

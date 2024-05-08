@@ -138,12 +138,13 @@ class _AutreProfilPageState extends State<AutreProfilPage> {
       } else {
         insertContact(tel, pseudo);
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      behavior: SnackBarBehavior.floating,
           backgroundColor: Colors.green,
           padding: const EdgeInsets.fromLTRB(5, 20, 5, 20),
           content: Text(
             (langUserPhone == "fr")
-                ? 'ADD  $pseudo avec succès.'
-                : 'ADD  $pseudo successfully.',
+                ? 'ADD $pseudo avec succès.'
+                : 'ADD $pseudo successfully.',
             style: GoogleFonts.poppins(
               fontWeight: FontWeight.w600,
               fontSize: 20,

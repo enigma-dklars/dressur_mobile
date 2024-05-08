@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:dressur/7_login/connexion.dart';
-import 'package:dressur/8_register/inscription.dart';
+import 'package:dressur/6_login_register/connexion.dart';
+import 'package:dressur/6_login_register/inscription.dart';
 import 'package:dressur/components/constant.dart';
 
 class PresentationPage extends StatefulWidget {
