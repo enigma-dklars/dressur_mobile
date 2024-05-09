@@ -134,9 +134,10 @@ class _ListeContactAAddPageState extends State<ListeContactAAddPage> {
       } else {
         insertContact(contact);
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      behavior: SnackBarBehavior.floating,
           content: Text((langUserPhone == "fr")
-              ? 'ADD  ${contact.pseudo} avec succès.'
-              : 'ADD  ${contact.pseudo} successfully.'),
+              ? 'ADD ${contact.pseudo} avec succès.'
+              : 'ADD ${contact.pseudo} successfully.'),
           duration: const Duration(milliseconds: 500),
         ));
       }

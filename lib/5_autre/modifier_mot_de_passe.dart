@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:dressur/7_login/connexion.dart';
+import 'package:dressur/6_login_register/connexion.dart';
 import 'package:dressur/components/delayed_animation.dart';
 import 'package:dressur/components/constant.dart';
 import 'package:http/http.dart' as http;
@@ -150,9 +150,10 @@ class _RegisterFormState extends State<RegisterForm> {
             passwordController.text = "";
             passwordVerifController.text = "";
             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      behavior: SnackBarBehavior.floating,
               content: Text((langUserPhone == "fr")
-                  ? 'Mot de passe modifier'
-                  : 'Change password'),
+                  ? 'Mot de passe modifié avec succès.'
+                  : 'Password changed successfully.'),
             ));
           });
         }

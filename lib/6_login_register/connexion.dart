@@ -1,7 +1,7 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:flutter/material.dart';
-import 'package:dressur/7_login/mot_de_passe_oublier.dart';
+import 'package:dressur/6_login_register/mot_de_passe_oublier.dart';
 import 'package:dressur/components/constant.dart';
 import 'package:dressur/components/sql_helper.dart';
 import 'package:http/http.dart' as http;

@@ -259,6 +259,7 @@ class _RegisterFormState extends State<RegisterForm> {
             setState(() {
               _desactive = false;
               ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      behavior: SnackBarBehavior.floating,
                 content: Text(
                   (langUserPhone == "fr")
                       ? 'Votre poste a déjà démarré.'
@@ -590,6 +591,7 @@ class _RegisterForm2State extends State<RegisterForm2> {
               successNoti(data["titre"], data["message"], context);
 
               ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      behavior: SnackBarBehavior.floating,
                 content: Text(data["message"]),
               ));
 

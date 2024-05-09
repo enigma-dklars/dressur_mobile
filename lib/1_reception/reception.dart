@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:dressur/5_autre/support_assistance.dart';
-import 'package:dressur/6_notification/liste_notification.dart';
+import 'package:dressur/1_reception/liste_notification.dart';
 import 'package:dressur/components/constant.dart';
 
 class ReceptionPage extends StatefulWidget {

@@ -1,8 +1,9 @@
-// ignore_for_file: prefer_const_constructors
+// ignore_for_file: prefer_const_constructors, use_build_context_synchronously
 
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'package:dressur/2_promo/new_boost_contact.dart';
 import 'package:dressur/5_autre/cart_visite.dart';
 import 'package:dressur/components/padding_and_divider.dart';
 import 'package:dressur/components/pub_smt_2024.dart';
@@ -11,7 +12,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:dressur/5_autre/confirme_mail_user.dart';
-import 'package:dressur/6_notification/liste_notification.dart';
+import 'package:dressur/1_reception/liste_notification.dart';
 import 'package:dressur/components/advertisements.dart';
 import 'package:dressur/components/constant.dart';
 import 'package:dressur/components/noti.dart';
@@ -96,6 +97,14 @@ class _ActuPageState extends State<ActuPage> {
   }
 
   void actualise() async {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      behavior: SnackBarBehavior.floating,
+      content: Text(
+        (langUserPhone == "fr")
+            ? 'Actualisation en cours…'
+            : 'Update in progress…',
+      ),
+    ));
     setState(() {
       _loading = true;
     });
@@ -130,6 +139,16 @@ class _ActuPageState extends State<ActuPage> {
         _loading = false;
       });
     }
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        behavior: SnackBarBehavior.floating,
+        content: Text(
+          (langUserPhone == "fr")
+              ? 'Actualisation terminée.'
+              : 'Refresh complete.',
+        ),
+      ),
+    );
   }
 
   void _showMessagePasPermiAdd(message, context) async {
@@ -235,8 +254,9 @@ class _ActuPageState extends State<ActuPage> {
         nombreContactDispo = nombreContactDispo - nombreAddNow;
       });
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      behavior: SnackBarBehavior.floating,
         content: (langUserPhone == "fr")
-            ? Text('ADD  de  $nombreAddNow contact(s) avec succès.')
+            ? Text('ADD de $nombreAddNow contact(s) avec succès.')
             : Text('ADD of $nombreAddNow contacts successfully.'),
         duration: const Duration(milliseconds: 15000),
       ));
@@ -506,8 +526,8 @@ class _ActuPageState extends State<ActuPage> {
                             ),
                             title: Text(
                               (langUserPhone == "fr")
-                                  ? "ADD DS Indisponible"
-                                  : "ADD DS Unavailable",
+                                  ? "Boost Contact"
+                                  : "Boost Contact",
                               style: GoogleFonts.poppins(),
                             ),
                             onTap: () {
@@ -707,6 +727,7 @@ class _PasDeContactAddState extends State<PasDeContactAdd> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              const SizedBox(height: 10),
               Text(
                 (langUserPhone == "fr")
                     ? 'ADD DS Indisponible'
@@ -748,26 +769,55 @@ class _PasDeContactAddState extends State<PasDeContactAdd> {
                 ),
               ),
               const SizedBox(height: 10),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.orange,
-                  shape: const StadiumBorder(),
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 13,
-                    horizontal: 40,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.orange,
+                      shape: const StadiumBorder(),
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 13,
+                        horizontal: 40,
+                      ),
+                    ),
+                    child: Text((langUserPhone == "fr") ? "PARTAGER" : "SHARE",
+                        style: GoogleFonts.poppins(
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                        )),
+                    onPressed: () async {
+                      var messageShare = (langUserPhone == "fr")
+                          ? "Utilise Dressur, une application simple, sûr et fiable pour avoir de la visibilité sur tes différents réseaux sociaux et surtout sur tes statuts WhatsApp.\nGrâce à Dressur, fait la promotion de tes produits et services qui seront visibles par des milliers d'utilisateurs en seulement 24H.\nElle te permet d'avoir plus facilement des contacts WhatsApp selon les pays de ton choix. De plus, ses contacts sont automatiquement enregistrés dans ton téléphone et ton contact dans les leurs, etc.\n\nA télécharger gratuitement sur Play Store : https://play.google.com/store/apps/details?id=com.ds.dressur \n\nVoici mon code parrainage : $codeBonus\n\nIl te donnera $commissionBonus Points Bonus pour tester les services de l'application."
+                          : "Use Dressur, a simple, safe and reliable application to have visibility on your various social networks and especially on your WhatsApp statuses.\nThanks to Dressur, promote your products and services which will be visible to thousands of users online. only 24H.\nIt allows you to have WhatsApp contacts more easily according to the countries of your choice. In addition, his contacts are automatically saved in your phone and your contact in theirs, etc.\n\nA download for free on Play Store: https://play.google.com/store/apps/details?id=com.ds.dressur \n\nHere is my referral code: $codeBonus\n\nIt will give you $commissionBonus Points Bonus to test the services of the application.";
+                      await Share.share(messageShare,
+                          subject: 'Partager Dressur!');
+                    },
                   ),
-                ),
-                child: Text((langUserPhone == "fr") ? "PARTAGER" : "SHARE",
-                    style: GoogleFonts.poppins(
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white,
-                    )),
-                onPressed: () async {
-                  var messageShare = (langUserPhone == "fr")
-                      ? "Utilise Dressur, une application simple, sûr et fiable pour avoir de la visibilité sur tes différents réseaux sociaux et surtout sur tes statuts WhatsApp.\nGrâce à Dressur, fait la promotion de tes produits et services qui seront visibles par des milliers d'utilisateurs en seulement 24H.\nElle te permet d'avoir plus facilement des contacts WhatsApp selon les pays de ton choix. De plus, ses contacts sont automatiquement enregistrés dans ton téléphone et ton contact dans les leurs, etc.\n\nA télécharger gratuitement sur Play Store : https://play.google.com/store/apps/details?id=com.ds.dressur \n\nVoici mon code parrainage : $codeBonus\n\nIl te donnera $commissionBonus Points Bonus pour tester les services de l'application."
-                      : "Use Dressur, a simple, safe and reliable application to have visibility on your various social networks and especially on your WhatsApp statuses.\nThanks to Dressur, promote your products and services which will be visible to thousands of users online. only 24H.\nIt allows you to have WhatsApp contacts more easily according to the countries of your choice. In addition, his contacts are automatically saved in your phone and your contact in theirs, etc.\n\nA download for free on Play Store: https://play.google.com/store/apps/details?id=com.ds.dressur \n\nHere is my referral code: $codeBonus\n\nIt will give you $commissionBonus Points Bonus to test the services of the application.";
-                  await Share.share(messageShare, subject: 'Partager Dressur!');
-                },
+                  ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        shape: const StadiumBorder(),
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 13,
+                          horizontal: 40,
+                        ),
+                      ),
+                      child: Text(
+                        (langUserPhone == "fr") ? "Faire un Boost" : "Boost",
+                        style: GoogleFonts.poppins(
+                          fontWeight: FontWeight.w600,
+                          color: primaryColor,
+                        ),
+                      ),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => NewBoostContactPage()),
+                        );
+                      }),
+                ],
               ),
             ],
           ),
