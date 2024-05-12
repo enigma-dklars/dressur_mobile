@@ -100,7 +100,7 @@ class _RegisterForm3State extends State<RegisterForm3> {
   var _message = "";
 
   String titre = "";
-  double prix = 0;
+  int prix = 0;
   int id = 0;
   int qte = 0;
   int qteMin = 0;
