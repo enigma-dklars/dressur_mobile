@@ -146,7 +146,6 @@ Future<void> initUserInformations(userInfos) async {
   nombreFilleuls = userInfos["nombreFilleuls"];
   commissionBonus = userInfos["commissionBonus"];
   admin = userInfos["admin"];
-  affUserName = userInfos["affUserName"];
   permissionAdd = userInfos["permissionAdd"];
   messageErreurPermissionAdd = userInfos["messageErreurPermissionAdd"];
   preferencePaysText = userInfos["preferencePaysText"];
