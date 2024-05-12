@@ -1,3 +1,7 @@
+// ignore_for_file: unnecessary_null_comparison
+
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:dressur/components/delayed_animation.dart';
@@ -83,6 +87,7 @@ class RegisterForm3 extends StatefulWidget {
 class _RegisterForm3State extends State<RegisterForm3> {
     int idFormuleFils = 0;
     var nombreAdresseMailForm = 0;
+    bool _loading_liste_formule = false;
     bool _desactive2 = false;
     dynamic data;
     List<dynamic> listSocialNetworks = [];
@@ -93,42 +98,33 @@ String? titreFormuleFils;
 
     String titre = "";
     double prix = 0;
+    int id = 0;
     int qte = 0;
     int qteMin = 0;
     int qteMax = 0;
-    String description = "";
+    String description = (langUserPhone == "fr") ? "Veuillez choisir un réseau social puis un service." : "Please choose a social network then a service.";
 
     final descriptionController = TextEditingController();
     final linkController = TextEditingController();
-    final quantityController = TextEditingController();
+    final quantityController = TextEditingController(text: "0");
     final priceController = TextEditingController();
 
   void onChangeService(val) async {
-  Map<String, dynamic>? service = listServices.firstWhere(
-    (element) => element['value'] == val,
-    orElse: () => <String, dynamic>{},
-  );
+    for (var service in listServices) {
+      if("$val" == "${service['id']}") {
+        setState(() {
+          id = service['id'];
+          titre = service['titre'];
+          prix = service['prix'];
+          qte = service['qte'];
+          qteMin = service['qteMin'];
+          qteMax = service['qteMax'];
+          description = service['description'];
+        });
+      }
+}
 
-  if (service != null) {
-    setState(() {
-      titre = service['titre'];
-      prix = service['prix'];
-      qte = service['qte'];
-      qteMin = service['qteMin'];
-      qteMax = service['qteMax'];
-      description = service['description'];
-    });
 
-    // Utiliser les valeurs affectées
-    print('Titre: $titre');
-    print('Prix: $prix');
-    print('Quantité: $qte');
-    print('Quantité Min: $qteMin');
-    print('Quantité Max: $qteMax');
-    print('Description: $description');
-  } else {
-    print('Service non trouvé');
-  }
 }
 
 
@@ -141,12 +137,13 @@ String? titreFormuleFils;
   }
   if (youHaveNetWork[0]['youHaveConnexion'] == "oui") {
     setState(() {
-      _desactive2 = true;
+      _loading_liste_formule = true;
     });
 
     var request = http.MultipartRequest(
         'POST', Uri.parse('$generalRouteForApi/listeFormulePromoReseau'));
-    request.fields.addAll({});
+    request.fields.addAll({
+          'langUserPhone': langUserPhone.toString(),});
 
     http.StreamedResponse response = await request.send();
 
@@ -156,7 +153,7 @@ String? titreFormuleFils;
       if (data["error"] == false) {
         listSocialNetworks = data["listeFormulePromoReseau"];
         setState(() {
-          _desactive2 = false;
+          _loading_liste_formule = false;
         });
       }
     }
@@ -168,7 +165,7 @@ String? titreFormuleFils;
       dangerNoti("Erreur!", "Vous n'êtes pas connecté à internet.", context);
     }
     setState(() {
-      _desactive2 = false;
+      _loading_liste_formule = false;
     });
   }
 }
@@ -184,7 +181,20 @@ String? titreFormuleFils;
      return Container(
       child: Column(
         children: [
-          Container(
+          _loading_liste_formule
+              ? const Center(
+                  child: CircularProgressIndicator(),
+                )
+              : listSocialNetworks.isEmpty
+                  ? Center(
+                      child: Text(
+                        (langUserPhone == "fr")
+                            ? "Erreur lors du chargement des formules de promotion réseau sociaux. Veuillez Contacter l'assistance Dressur."
+                            : "Error loading social network promotion formulas. Please Contact Dressur Support.",
+                        style: const TextStyle(fontSize: 16),
+                      ),
+                    )
+                  : Container(
       height: 60.0, // Ajustez la hauteur selon vos besoins
       child: Scrollbar(
       thumbVisibility: true,
@@ -239,21 +249,18 @@ String? titreFormuleFils;
             ),
           ),
           const SizedBox(height: 10),
-          DelayedAnimation(
-            delay: 0, // 1500,
-            child: TextField(
-              maxLines: 50,
-              minLines: 1,
-              controller: descriptionController,
-              decoration: InputDecoration(
-                labelStyle: TextStyle(color: Colors.grey[400]),
-                labelText: (langUserPhone == "fr")
-                    ? "Description"
-                    : "Description",
-                border: const OutlineInputBorder(),
-              ),
-            ),
-          ),
+          Card( 
+                      child: Container(
+                        width: MediaQuery.of(context).size.width * 0.90,
+                        padding: const EdgeInsets.fromLTRB(10, 5, 10, 5), child: Column(crossAxisAlignment : CrossAxisAlignment.start, children: [Text(
+                          description,
+                          style: GoogleFonts.poppins(
+                            fontWeight: FontWeight.w400,
+                            fontSize: 16,
+                          ),
+                          textAlign: TextAlign.left,
+                        ),],)),
+                      ),
           const SizedBox(height: 10),
           DelayedAnimation(
             delay: 0, // 1500,
