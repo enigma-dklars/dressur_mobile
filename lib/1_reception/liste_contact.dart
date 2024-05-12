@@ -311,6 +311,8 @@ class _ContactPageState extends State<ContactPage> {
                                                 fontSize: 14,
                                                 fontWeight: FontWeight.bold,
                                               ),
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
                                             ),
                                             ElevatedButton.icon(
                                               style: ElevatedButton.styleFrom(
