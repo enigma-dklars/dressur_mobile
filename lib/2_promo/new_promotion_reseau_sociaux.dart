@@ -87,7 +87,7 @@ class RegisterForm3 extends StatefulWidget {
 }
 
 class _RegisterForm3State extends State<RegisterForm3> {
-  String? selectedSocialNetwork;
+  String? selectedSocialNetwork = "";
   var nombreAdresseMailForm = 0;
   int? initialService;
   bool _loading_liste_formule = false;
