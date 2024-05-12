@@ -23,6 +23,8 @@ class BottomBar extends StatefulWidget {
 class _BottomBarState extends State<BottomBar> {
   int _selectedIndex = 2;
   dynamic screens = [];
+  bool _swipeInProgress = false;
+  final Duration _swipeCooldown = const Duration(milliseconds: 300);
 
   @override
   void initState() {
@@ -200,9 +202,42 @@ class _BottomBarState extends State<BottomBar> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      bottomNavigationBar: buildBottomNavigationBar(),
-      body: screens[_selectedIndex],
-    );
+        bottomNavigationBar: buildBottomNavigationBar(),
+        body: GestureDetector(
+          onHorizontalDragUpdate: (details) {
+            if (!_swipeInProgress) {
+              // Si le swipe n'est pas en cours, permettre la détection
+              _swipeInProgress = true;
+
+              // Si le geste de balayage est vers la droite
+              if (details.delta.dx > 0) {
+                // Si l'indice est supérieur à 0, cela signifie qu'il y a un écran précédent
+                if (_selectedIndex > 0) {
+                  setState(() {
+                    _selectedIndex--;
+                  });
+                }
+              }
+              // Si le geste de balayage est vers la gauche
+              else if (details.delta.dx < 0) {
+                // Si l'indice est inférieur au nombre total d'écrans moins un, cela signifie qu'il y a un écran suivant
+                if (_selectedIndex < screens.length - 1) {
+                  setState(() {
+                    _selectedIndex++;
+                  });
+                }
+              }
+
+              // Attendre la durée de pause avant de réactiver la détection de swipe
+              Future.delayed(_swipeCooldown, () {
+                setState(() {
+                  _swipeInProgress = false;
+                });
+              });
+            }
+          },
+          child: screens[_selectedIndex],
+        ));
   }
 
   buildBottomNavigationBar() {

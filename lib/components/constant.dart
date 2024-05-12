@@ -184,52 +184,64 @@ void insertDressurContact() async {
 
 List<Map<String, dynamic>> listeMethodePaiement = [
   {
-    'value': 'mtn',
-    'label': 'MTN Mobile Money Bénin',
+    'value': 'airtel_ne',
+    'label': 'Airtel Niger',
   },
   {
-    'value': 'moov',
-    'label': 'MOOV Flooz Bénin',
-  },
-  {
-    'value': 'mtn_ci',
-    'label': "MTN Mobile Money Côte d'Ivoire",
-  },
-  {
-    'value': 'moov_tg',
-    'label': 'MOOV Flooz Togo',
-  },
-  {
-    'value': 'orange_ci',
-    'label': "Orange Côte d'Ivoire",
-  },
-  {
-    'value': 'orange_sn',
-    'label': 'Orange Sénégal',
+    'value': 'sbin',
+    'label': 'Celtis Cash',
   },
   {
     'value': 'free_sn',
     'label': 'Free Sénégal',
   },
   {
-    'value': 'airtel_ne',
-    'label': 'Airtel Niger',
+    'value': 'moov',
+    'label': 'MOOV Flooz Bénin',
   },
   {
-    'value': 'togocel',
-    'label': 'TOGOCEL T-Money',
+    'value': 'moov_bf',
+    'label': 'MOOV Burkina Faso',
+  },
+  {
+    'value': 'moov_ci',
+    'label': "MOOV Côte d'Ivoire",
+  },
+  {
+    'value': 'moov_tg',
+    'label': 'MOOV Flooz Togo',
+  },
+  {
+    'value': 'mtn',
+    'label': 'MTN Mobile Money Bénin',
+  },
+  {
+    'value': 'mtn_ci',
+    'label': "MTN Mobile Money Côte d'Ivoire",
+  },
+  {
+    'value': 'mtn_open_gn',
+    'label': 'MTN Mobile Money Guinée',
+  },
+  {
+    'value': 'orange_bf',
+    'label': 'Orange Burkina Faso',
+  },
+  {
+    'value': 'orange_ci',
+    'label': "Orange Côte d'Ivoire",
   },
   {
     'value': 'orange_ml',
     'label': 'Orange Mali',
   },
   {
-    'value': 'mtn_gn',
-    'label': 'MTN Mobile Money Guinée',
+    'value': 'orange_sn',
+    'label': 'Orange Sénégal',
   },
   {
-    'value': 'sbin',
-    'label': 'Celtis',
+    'value': 'togocel',
+    'label': 'TOGOCEL T-Money',
   },
 ];
 

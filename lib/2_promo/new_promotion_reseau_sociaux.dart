@@ -1,8 +1,8 @@
-// ignore_for_file: unnecessary_null_comparison
-
-import 'dart:developer';
+// ignore_for_file: unnecessary_null_comparison, non_constant_identifier_names, prefer_final_fields
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:dressur/components/delayed_animation.dart';
 import 'package:dressur/components/constant.dart';
@@ -14,10 +14,12 @@ import 'package:select_form_field/select_form_field.dart';
 
 class PromotionReseauSociauxFormPage extends StatefulWidget {
   @override
-  State<PromotionReseauSociauxFormPage> createState() => _PromotionReseauSociauxFormPageState();
+  State<PromotionReseauSociauxFormPage> createState() =>
+      _PromotionReseauSociauxFormPageState();
 }
 
-class _PromotionReseauSociauxFormPageState extends State<PromotionReseauSociauxFormPage> {
+class _PromotionReseauSociauxFormPageState
+    extends State<PromotionReseauSociauxFormPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -66,7 +68,7 @@ class _PromotionReseauSociauxFormPageState extends State<PromotionReseauSociauxF
                   const SizedBox(height: 15),
 
                   // Formulaire
-                    RegisterForm3(),
+                  RegisterForm3(),
 
                   const SizedBox(height: 10),
                 ],
@@ -85,33 +87,36 @@ class RegisterForm3 extends StatefulWidget {
 }
 
 class _RegisterForm3State extends State<RegisterForm3> {
-    int idFormuleFils = 0;
-    var nombreAdresseMailForm = 0;
-    bool _loading_liste_formule = false;
-    bool _desactive2 = false;
-    dynamic data;
-    List<dynamic> listSocialNetworks = [];
-List<Map<String, dynamic>> listServices = [];
-String? titreFormuleFils;
-    dynamic idFormuleCampagneMail = 1;
-    var _message = "";
+  String? selectedSocialNetwork;
+  var nombreAdresseMailForm = 0;
+  int? initialService;
+  bool _loading_liste_formule = false;
+  bool _desactive2 = false;
+  dynamic data;
+  List<dynamic> listSocialNetworks = [];
+  List<Map<String, dynamic>> listServices = [];
+  String? titreFormuleFils;
+  dynamic idFormuleCampagneMail = 1;
+  var _message = "";
 
-    String titre = "";
-    double prix = 0;
-    int id = 0;
-    int qte = 0;
-    int qteMin = 0;
-    int qteMax = 0;
-    String description = (langUserPhone == "fr") ? "Veuillez choisir un réseau social puis un service." : "Please choose a social network then a service.";
+  String titre = "";
+  double prix = 0;
+  int id = 0;
+  int qte = 0;
+  int qteMin = 0;
+  int qteMax = 0;
+  String description = (langUserPhone == "fr")
+      ? "Veuillez choisir un réseau social puis un service."
+      : "Please choose a social network then a service.";
 
-    final descriptionController = TextEditingController();
-    final linkController = TextEditingController();
-    final quantityController = TextEditingController(text: "0");
-    final priceController = TextEditingController();
+  final descriptionController = TextEditingController();
+  final linkController = TextEditingController();
+  final quantityController = TextEditingController(text: "0");
+  final priceController = TextEditingController();
 
   void onChangeService(val) async {
     for (var service in listServices) {
-      if("$val" == "${service['id']}") {
+      if ("$val" == "${service['id']}") {
         setState(() {
           id = service['id'];
           titre = service['titre'];
@@ -122,53 +127,51 @@ String? titreFormuleFils;
           description = service['description'];
         });
       }
-}
+    }
+  }
 
-
-}
-
-
- void listeFormPromoReseau() async {
-  dynamic youHaveNetWork = "";
-  youHaveConnexion();
-  youHaveNetWork = await SQLHelper.getYouHaveConnexion();
-  while (youHaveNetWork.length == 0) {
+  void listeFormPromoReseau() async {
+    dynamic youHaveNetWork = "";
+    youHaveConnexion();
     youHaveNetWork = await SQLHelper.getYouHaveConnexion();
-  }
-  if (youHaveNetWork[0]['youHaveConnexion'] == "oui") {
-    setState(() {
-      _loading_liste_formule = true;
-    });
+    while (youHaveNetWork.length == 0) {
+      youHaveNetWork = await SQLHelper.getYouHaveConnexion();
+    }
+    if (youHaveNetWork[0]['youHaveConnexion'] == "oui") {
+      setState(() {
+        _loading_liste_formule = true;
+      });
 
-    var request = http.MultipartRequest(
-        'POST', Uri.parse('$generalRouteForApi/listeFormulePromoReseau'));
-    request.fields.addAll({
-          'langUserPhone': langUserPhone.toString(),});
+      var request = http.MultipartRequest(
+          'POST', Uri.parse('$generalRouteForApi/listeFormulePromoReseau'));
+      request.fields.addAll({
+        'langUserPhone': langUserPhone.toString(),
+      });
 
-    http.StreamedResponse response = await request.send();
+      http.StreamedResponse response = await request.send();
 
-    if (response.statusCode == 200) {
-      var data1 = await response.stream.bytesToString();
-      var data = convert.jsonDecode(data1);
-      if (data["error"] == false) {
-        listSocialNetworks = data["listeFormulePromoReseau"];
-        setState(() {
-          _loading_liste_formule = false;
-        });
+      if (response.statusCode == 200) {
+        var data1 = await response.stream.bytesToString();
+        var data = convert.jsonDecode(data1);
+        if (data["error"] == false) {
+          listSocialNetworks = data["listeFormulePromoReseau"];
+          setState(() {
+            _loading_liste_formule = false;
+          });
+        }
       }
-    }
-  } else {
-    if (langUserPhone != "fr") {
-      dangerNoti(
-          "Mistake!", "You are not connected to the internet.", context);
     } else {
-      dangerNoti("Erreur!", "Vous n'êtes pas connecté à internet.", context);
+      if (langUserPhone != "fr") {
+        dangerNoti(
+            "Mistake!", "You are not connected to the internet.", context);
+      } else {
+        dangerNoti("Erreur!", "Vous n'êtes pas connecté à internet.", context);
+      }
+      setState(() {
+        _loading_liste_formule = false;
+      });
     }
-    setState(() {
-      _loading_liste_formule = false;
-    });
   }
-}
 
   @override
   void initState() {
@@ -178,7 +181,7 @@ String? titreFormuleFils;
 
   @override
   Widget build(BuildContext context) {
-     return Container(
+    return Container(
       child: Column(
         children: [
           _loading_liste_formule
@@ -194,80 +197,105 @@ String? titreFormuleFils;
                         style: const TextStyle(fontSize: 16),
                       ),
                     )
-                  : Container(
-      height: 60.0, // Ajustez la hauteur selon vos besoins
-      child: Scrollbar(
-      thumbVisibility: true,
-      thickness: 5,
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10.0),
-          child: Row(
-            children: List.generate(
-              listSocialNetworks.length,
-              (index) => Padding(
-                padding: const EdgeInsets.only(right: 10.0),
-                child: ActionChip(
-                  label: Text(
-                    listSocialNetworks[index]['titre'],
-                    style: GoogleFonts.poppins(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w400,
+                  : SizedBox(
+                      height: 70,
+                      child: Scrollbar(
+                        thumbVisibility: true,
+                        thickness: 5,
+                        radius: const Radius.circular(5),
+                        child: SingleChildScrollView(
+                          padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+                          scrollDirection: Axis.horizontal,
+                          child: Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 0.0),
+                            child: Row(
+                              children: List.generate(
+                                listSocialNetworks.length,
+                                (index) => Padding(
+                                  padding: const EdgeInsets.only(right: 10),
+                                  child: ActionChip(
+                                    label: Row(
+                                      children: [
+                                        Icon(selectedSocialNetwork ==
+                                                listSocialNetworks[index]
+                                                    ['titre']
+                                            ? Icons.check_circle
+                                            : Icons.radio_button_unchecked),
+                                        const SizedBox(width: 10),
+                                        Text(
+                                          listSocialNetworks[index]['titre'],
+                                          style: GoogleFonts.poppins(
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.w400,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    onPressed: () {
+                                      setState(() {
+                                        selectedSocialNetwork =
+                                            listSocialNetworks[index]['titre'];
+                                        listServices =
+                                            (listSocialNetworks[index]
+                                                        ['lesFormulesFils']
+                                                    as List<dynamic>)
+                                                .map((item) => item
+                                                    as Map<String, dynamic>)
+                                                .toList();
+                                        initialService = listServices.isNotEmpty
+                                            ? listServices.first['id']
+                                            : null;
+                                      });
+                                    },
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
                     ),
-                  ),
-                  onPressed: () {
-                    setState(() {
-                      listServices = (listSocialNetworks[index]['lesFormulesFils'] as List<dynamic>)
-    .map((item) => item as Map<String, dynamic>)
-    .toList();
-
-                    });
-                  },
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
-    ),
-    ),
-    const SizedBox(height: 10),
+          const SizedBox(height: 20),
           DelayedAnimation(
             delay: 0, // 1500,
             child: SelectFormField(
-              decoration: const InputDecoration(
-                labelText: 'Services',
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                labelText: 'Services $selectedSocialNetwork',
+                border: const OutlineInputBorder(),
               ),
               type: SelectFormFieldType.dropdown,
-              initialValue: '1',
-              labelText: 'Services',
+              initialValue: "1",
+              labelText: 'Services $selectedSocialNetwork',
               items: listServices,
               onChanged: (val) => onChangeService(val),
               onSaved: (val) => print(val),
             ),
           ),
           const SizedBox(height: 10),
-          Card( 
-                      child: Container(
-                        width: MediaQuery.of(context).size.width * 0.90,
-                        padding: const EdgeInsets.fromLTRB(10, 5, 10, 5), child: Column(crossAxisAlignment : CrossAxisAlignment.start, children: [Text(
-                          description,
-                          style: GoogleFonts.poppins(
-                            fontWeight: FontWeight.w400,
-                            fontSize: 16,
-                          ),
-                          textAlign: TextAlign.left,
-                        ),],)),
+          Card(
+            child: Container(
+                width: MediaQuery.of(context).size.width * 1,
+                padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      description,
+                      style: GoogleFonts.poppins(
+                        fontWeight: FontWeight.w400,
+                        fontSize: 16,
                       ),
+                    ),
+                  ],
+                )),
+          ),
           const SizedBox(height: 10),
           DelayedAnimation(
             delay: 0, // 1500,
             child: TextField(
               controller: linkController,
               decoration: InputDecoration(
-                labelStyle: TextStyle(color: Colors.grey[400]),
                 labelText: (langUserPhone == "fr") ? "Lien" : "Link",
                 border: const OutlineInputBorder(),
               ),
@@ -280,9 +308,8 @@ String? titreFormuleFils;
               controller: quantityController,
               keyboardType: TextInputType.number,
               decoration: InputDecoration(
-                labelStyle: TextStyle(color: Colors.grey[400]),
                 labelText: (langUserPhone == "fr") ? "Quantité" : "Quantity",
-                helperText: "Min : $qteMin Max : $qteMax",
+                helperText: "Min : $qteMin - Max : $qteMax",
                 border: const OutlineInputBorder(),
               ),
             ),
@@ -294,11 +321,10 @@ String? titreFormuleFils;
               maxLines: 3,
               minLines: 1,
               controller: priceController,
-              keyboardType: TextInputType.numberWithOptions(decimal: true),
+              keyboardType:
+                  const TextInputType.numberWithOptions(decimal: true),
               decoration: InputDecoration(
-                labelStyle: TextStyle(color: Colors.grey[400]),
-                labelText:
-                    (langUserPhone == "fr") ? "Prix" : "Price",
+                labelText: (langUserPhone == "fr") ? "Prix" : "Price",
                 border: const OutlineInputBorder(),
               ),
             ),
@@ -322,9 +348,7 @@ String? titreFormuleFils;
                     color: Colors.white,
                   ),
                 ),
-                onPressed: () {
-                 
-                },
+                onPressed: () {},
               ),
             ),
           ),
