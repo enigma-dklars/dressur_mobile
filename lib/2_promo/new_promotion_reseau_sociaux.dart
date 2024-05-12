@@ -1,0 +1,342 @@
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:dressur/components/delayed_animation.dart';
+import 'package:dressur/components/constant.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert' as convert;
+import 'package:dressur/components/sql_helper.dart';
+import 'package:dressur/components/noti.dart';
+import 'package:select_form_field/select_form_field.dart';
+
+class PromotionReseauSociauxFormPage extends StatefulWidget {
+  @override
+  State<PromotionReseauSociauxFormPage> createState() => _PromotionReseauSociauxFormPageState();
+}
+
+class _PromotionReseauSociauxFormPageState extends State<PromotionReseauSociauxFormPage> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        elevation: 0,
+        backgroundColor: primaryColor,
+        title: Text(
+          (langUserPhone == "fr")
+              ? "Nouvelle Promotion Réseau Sociaux"
+              : "New Social Network Promotion",
+          style: GoogleFonts.poppins(
+            fontWeight: FontWeight.w600,
+            color: Colors.white,
+          ),
+        ),
+        leading: IconButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          icon: const Icon(
+            Icons.arrow_back,
+            size: 30,
+            color: Colors.white,
+          ),
+        ),
+      ),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            const SizedBox(height: 5),
+            Container(
+              margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text(
+                    (langUserPhone == "fr")
+                        ? "Promotion Réseau Sociaux"
+                        : "Social Network Promotion",
+                    style: GoogleFonts.poppins(
+                      fontSize: 25,
+                      fontWeight: FontWeight.w600,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 15),
+
+                  // Formulaire
+                    RegisterForm3(),
+
+                  const SizedBox(height: 10),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class RegisterForm3 extends StatefulWidget {
+  @override
+  State<RegisterForm3> createState() => _RegisterForm3State();
+}
+
+class _RegisterForm3State extends State<RegisterForm3> {
+    int idFormuleFils = 0;
+    var nombreAdresseMailForm = 0;
+    bool _desactive2 = false;
+    dynamic data;
+    List<dynamic> listSocialNetworks = [];
+List<Map<String, dynamic>> listServices = [];
+String? titreFormuleFils;
+    dynamic idFormuleCampagneMail = 1;
+    var _message = "";
+
+    String titre = "";
+    double prix = 0;
+    int qte = 0;
+    int qteMin = 0;
+    int qteMax = 0;
+    String description = "";
+
+    final descriptionController = TextEditingController();
+    final linkController = TextEditingController();
+    final quantityController = TextEditingController();
+    final priceController = TextEditingController();
+
+  void onChangeService(val) async {
+  Map<String, dynamic>? service = listServices.firstWhere(
+    (element) => element['value'] == val,
+    orElse: () => <String, dynamic>{},
+  );
+
+  if (service != null) {
+    setState(() {
+      titre = service['titre'];
+      prix = service['prix'];
+      qte = service['qte'];
+      qteMin = service['qteMin'];
+      qteMax = service['qteMax'];
+      description = service['description'];
+    });
+
+    // Utiliser les valeurs affectées
+    print('Titre: $titre');
+    print('Prix: $prix');
+    print('Quantité: $qte');
+    print('Quantité Min: $qteMin');
+    print('Quantité Max: $qteMax');
+    print('Description: $description');
+  } else {
+    print('Service non trouvé');
+  }
+}
+
+
+ void listeFormPromoReseau() async {
+  dynamic youHaveNetWork = "";
+  youHaveConnexion();
+  youHaveNetWork = await SQLHelper.getYouHaveConnexion();
+  while (youHaveNetWork.length == 0) {
+    youHaveNetWork = await SQLHelper.getYouHaveConnexion();
+  }
+  if (youHaveNetWork[0]['youHaveConnexion'] == "oui") {
+    setState(() {
+      _desactive2 = true;
+    });
+
+    var request = http.MultipartRequest(
+        'POST', Uri.parse('$generalRouteForApi/listeFormulePromoReseau'));
+    request.fields.addAll({});
+
+    http.StreamedResponse response = await request.send();
+
+    if (response.statusCode == 200) {
+      var data1 = await response.stream.bytesToString();
+      var data = convert.jsonDecode(data1);
+      if (data["error"] == false) {
+        listSocialNetworks = data["listeFormulePromoReseau"];
+        setState(() {
+          _desactive2 = false;
+        });
+      }
+    }
+  } else {
+    if (langUserPhone != "fr") {
+      dangerNoti(
+          "Mistake!", "You are not connected to the internet.", context);
+    } else {
+      dangerNoti("Erreur!", "Vous n'êtes pas connecté à internet.", context);
+    }
+    setState(() {
+      _desactive2 = false;
+    });
+  }
+}
+
+  @override
+  void initState() {
+    super.initState();
+    listeFormPromoReseau();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+     return Container(
+      child: Column(
+        children: [
+          Container(
+      height: 60.0, // Ajustez la hauteur selon vos besoins
+      child: Scrollbar(
+      thumbVisibility: true,
+      thickness: 5,
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10.0),
+          child: Row(
+            children: List.generate(
+              listSocialNetworks.length,
+              (index) => Padding(
+                padding: const EdgeInsets.only(right: 10.0),
+                child: ActionChip(
+                  label: Text(
+                    listSocialNetworks[index]['titre'],
+                    style: GoogleFonts.poppins(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w400,
+                    ),
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      listServices = (listSocialNetworks[index]['lesFormulesFils'] as List<dynamic>)
+    .map((item) => item as Map<String, dynamic>)
+    .toList();
+
+                    });
+                  },
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    ),
+    ),
+    const SizedBox(height: 10),
+          DelayedAnimation(
+            delay: 0, // 1500,
+            child: SelectFormField(
+              decoration: const InputDecoration(
+                labelText: 'Services',
+                border: OutlineInputBorder(),
+              ),
+              type: SelectFormFieldType.dropdown,
+              initialValue: '1',
+              labelText: 'Services',
+              items: listServices,
+              onChanged: (val) => onChangeService(val),
+              onSaved: (val) => print(val),
+            ),
+          ),
+          const SizedBox(height: 10),
+          DelayedAnimation(
+            delay: 0, // 1500,
+            child: TextField(
+              maxLines: 50,
+              minLines: 1,
+              controller: descriptionController,
+              decoration: InputDecoration(
+                labelStyle: TextStyle(color: Colors.grey[400]),
+                labelText: (langUserPhone == "fr")
+                    ? "Description"
+                    : "Description",
+                border: const OutlineInputBorder(),
+              ),
+            ),
+          ),
+          const SizedBox(height: 10),
+          DelayedAnimation(
+            delay: 0, // 1500,
+            child: TextField(
+              controller: linkController,
+              decoration: InputDecoration(
+                labelStyle: TextStyle(color: Colors.grey[400]),
+                labelText: (langUserPhone == "fr") ? "Lien" : "Link",
+                border: const OutlineInputBorder(),
+              ),
+            ),
+          ),
+          const SizedBox(height: 10),
+          DelayedAnimation(
+            delay: 0, // 1500,
+            child: TextField(
+              controller: quantityController,
+              keyboardType: TextInputType.number,
+              decoration: InputDecoration(
+                labelStyle: TextStyle(color: Colors.grey[400]),
+                labelText: (langUserPhone == "fr") ? "Quantité" : "Quantity",
+                helperText: "Min : $qteMin Max : $qteMax",
+                border: const OutlineInputBorder(),
+              ),
+            ),
+          ),
+          const SizedBox(height: 10),
+          DelayedAnimation(
+            delay: 0, // 1500,
+            child: TextField(
+              maxLines: 3,
+              minLines: 1,
+              controller: priceController,
+              keyboardType: TextInputType.numberWithOptions(decimal: true),
+              decoration: InputDecoration(
+                labelStyle: TextStyle(color: Colors.grey[400]),
+                labelText:
+                    (langUserPhone == "fr") ? "Prix" : "Price",
+                border: const OutlineInputBorder(),
+              ),
+            ),
+          ),
+          const SizedBox(height: 10),
+          DelayedAnimation(
+            delay: 0,
+            child: SizedBox(
+              width: MediaQuery.of(context).size.width * 0.95,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: primaryColor,
+                  shape: const StadiumBorder(),
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 13,
+                  ),
+                ),
+                child: Text(
+                  _desactive2 ? "Wait..." : "ENVOYER",
+                  style: GoogleFonts.poppins(
+                    color: Colors.white,
+                  ),
+                ),
+                onPressed: () {
+                 
+                },
+              ),
+            ),
+          ),
+          const SizedBox(height: 20),
+          DelayedAnimation(
+            delay: 0, // 1000,
+            child: Text(
+              _message,
+              style: GoogleFonts.poppins(
+                color: Colors.blue[400],
+                fontWeight: FontWeight.w600,
+                fontSize: 12,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+          const SizedBox(height: 10),
+        ],
+      ),
+    );
+  }
+}
