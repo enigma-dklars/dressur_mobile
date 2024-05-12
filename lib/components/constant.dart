@@ -171,11 +171,15 @@ void insertDressurContact() async {
       ..phones = [Phone("+22964044294")]
       ..emails = [Email("dressur@gmail.com")]
       ..websites = [
+        Website(whatsappDSURL),
         Website(facebookDS),
         Website(facebookBLT),
         Website(tiktokBLT),
         Website(instagramBLT),
         Website(youtubeBLT),
+        Website(facebookELTCS),
+        Website(tiktokELTCS),
+        Website(instagramELTCS),
       ];
     await newContact.insert();
     await insertNumTelUserIntoDataBase("+22964044294");

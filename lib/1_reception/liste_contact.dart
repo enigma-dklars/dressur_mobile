@@ -14,7 +14,6 @@ class ContactDS {
   final String id;
   final String pseudo;
   final String nom;
-  final bool afficheNom;
   final String mail;
   final String pays;
   final String tel;
@@ -28,7 +27,6 @@ class ContactDS {
     required this.id,
     required this.pseudo,
     required this.nom,
-    required this.afficheNom,
     required this.mail,
     required this.pays,
     required this.tel,
@@ -69,7 +67,6 @@ class _ContactPageState extends State<ContactPage> {
           id: data['id'],
           pseudo: data['pseudo'],
           nom: data['nom'],
-          afficheNom: data['afficheNom'],
           mail: data['mail'],
           pays: data['pays'],
           tel: data['tel'],
