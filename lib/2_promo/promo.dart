@@ -390,12 +390,12 @@ class _BoostPageState extends State<BoostPage> {
                                       ),
                                     ),
                                     onPressed: () {
-                                       Navigator.push(
+                                      Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                             builder: (context) =>
+                                            builder: (context) =>
                                                 PromotionReseauSociauxFormPage()),
-                                       );
+                                      );
                                     }),
                               )
                             ],
@@ -575,89 +575,101 @@ class _BoostPageState extends State<BoostPage> {
                           fontSize: 14,
                         ),
                       ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Column(
-                            children: [
-                              SizedBox(
-                                width: MediaQuery.of(context).size.width * 0.42,
-                                child: ElevatedButton(
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: primaryColor,
-                                      shape: const StadiumBorder(),
-                                      padding: const EdgeInsets.symmetric(
-                                        vertical: 10,
-                                      ),
-                                    ),
-                                    child: Text(
-                                      (langUserPhone == "fr")
-                                          ? "Démarrer"
-                                          : "To start up",
-                                      style: GoogleFonts.poppins(
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                    onPressed: () {
-                                      warningNoti(
-                                          (langUserPhone == "fr")
-                                              ? "Désoler"
-                                              : "Sorry",
-                                          (langUserPhone == "fr")
-                                              ? "Ce service est momentanément indisponible"
-                                              : "This service is temporarily unavailable",
-                                          context);
-                                      // Navigator.push(
-                                      //   context,
-                                      //   MaterialPageRoute(
-                                      //       builder: (context) =>
-                                      //           NewBoostContactPage()),
-                                      // );
-                                    }),
-                              )
-                            ],
-                          ),
-                          Column(
-                            children: [
-                              SizedBox(
-                                width: MediaQuery.of(context).size.width * 0.42,
-                                child: ElevatedButton(
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: secondaryColor,
-                                      shape: const StadiumBorder(),
-                                      padding: const EdgeInsets.symmetric(
-                                        vertical: 10,
-                                      ),
-                                    ),
-                                    child: Text(
-                                      (langUserPhone == "fr")
-                                          ? "Voir la liste"
-                                          : "See the list",
-                                      style: GoogleFonts.poppins(
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                    onPressed: () {
-                                      warningNoti(
-                                          (langUserPhone == "fr")
-                                              ? "Désoler"
-                                              : "Sorry",
-                                          (langUserPhone == "fr")
-                                              ? "Ce service est momentanément indisponible"
-                                              : "This service is temporarily unavailable",
-                                          context);
-                                      // Navigator.push(
-                                      //   context,
-                                      //   MaterialPageRoute(
-                                      //       builder: (context) =>
-                                      //           ListeBoostContactPage()),
-                                      // );
-                                    }),
-                              )
-                            ],
-                          ),
-                        ],
-                      )
+                      const SizedBox(height: 10),
+                      Text(
+                        (langUserPhone == "fr")
+                            ? "Ce service est actuellement en maintenance. Vous serez notifié dès lors qu'elle sera de nouveau disponible. Merci pour votre compréhension et votre confiance."
+                            : "This service is currently under maintenance. You will be notified when it is available again. Thank you for your understanding and trust.",
+                        style: GoogleFonts.poppins(
+                          color: Colors.red,
+                          fontWeight: FontWeight.w700,
+                          fontSize: 15,
+                        ),
+                      ),
+                      const SizedBox(height: 5),
+                      // Row(
+                      //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      //   children: [
+                      //     Column(
+                      //       children: [
+                      //         SizedBox(
+                      //           width: MediaQuery.of(context).size.width * 0.42,
+                      //           child: ElevatedButton(
+                      //               style: ElevatedButton.styleFrom(
+                      //                 backgroundColor: primaryColor,
+                      //                 shape: const StadiumBorder(),
+                      //                 padding: const EdgeInsets.symmetric(
+                      //                   vertical: 10,
+                      //                 ),
+                      //               ),
+                      //               child: Text(
+                      //                 (langUserPhone == "fr")
+                      //                     ? "Démarrer"
+                      //                     : "To start up",
+                      //                 style: GoogleFonts.poppins(
+                      //                   color: Colors.white,
+                      //                 ),
+                      //               ),
+                      //               onPressed: () {
+                      //                 warningNoti(
+                      //                     (langUserPhone == "fr")
+                      //                         ? "Désoler"
+                      //                         : "Sorry",
+                      //                     (langUserPhone == "fr")
+                      //                         ? "Ce service est momentanément indisponible"
+                      //                         : "This service is temporarily unavailable",
+                      //                     context);
+                      //                 // Navigator.push(
+                      //                 //   context,
+                      //                 //   MaterialPageRoute(
+                      //                 //       builder: (context) =>
+                      //                 //           NewBoostContactPage()),
+                      //                 // );
+                      //               }),
+                      //         )
+                      //       ],
+                      //     ),
+                      //     Column(
+                      //       children: [
+                      //         SizedBox(
+                      //           width: MediaQuery.of(context).size.width * 0.42,
+                      //           child: ElevatedButton(
+                      //               style: ElevatedButton.styleFrom(
+                      //                 backgroundColor: secondaryColor,
+                      //                 shape: const StadiumBorder(),
+                      //                 padding: const EdgeInsets.symmetric(
+                      //                   vertical: 10,
+                      //                 ),
+                      //               ),
+                      //               child: Text(
+                      //                 (langUserPhone == "fr")
+                      //                     ? "Voir la liste"
+                      //                     : "See the list",
+                      //                 style: GoogleFonts.poppins(
+                      //                   color: Colors.white,
+                      //                 ),
+                      //               ),
+                      //               onPressed: () {
+                      //                 warningNoti(
+                      //                     (langUserPhone == "fr")
+                      //                         ? "Désoler"
+                      //                         : "Sorry",
+                      //                     (langUserPhone == "fr")
+                      //                         ? "Ce service est momentanément indisponible"
+                      //                         : "This service is temporarily unavailable",
+                      //                     context);
+                      //                 // Navigator.push(
+                      //                 //   context,
+                      //                 //   MaterialPageRoute(
+                      //                 //       builder: (context) =>
+                      //                 //           ListeBoostContactPage()),
+                      //                 // );
+                      //               }),
+                      //         )
+                      //       ],
+                      //     ),
+                      //   ],
+                      // )
                     ],
                   ),
                 ),
