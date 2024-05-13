@@ -392,7 +392,7 @@ class _RegisterForm3State extends State<RegisterForm3> {
                   ),
                 ),
                 child: Text(
-                  _desactive2 ? "Wait..." : "ENVOYER",
+                  _desactive2 ? (langUserPhone == "fr") ? "Patientez ..." : "Wait ..." : (langUserPhone == "fr") ? "Payer et Démarrer" : "Pay and Get Started",
                   style: GoogleFonts.poppins(
                     color: Colors.white,
                   ),

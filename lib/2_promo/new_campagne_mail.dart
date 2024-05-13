@@ -435,7 +435,7 @@ class _RegisterForm2State extends State<RegisterForm2> {
                   ),
                 ),
                 child: Text(
-                  _desactive2 ? "Wait..." : "ENVOYER",
+                  _desactive2 ? (langUserPhone == "fr") ? "Patientez ..." : "Wait ..." : (langUserPhone == "fr") ? "Envoyer" : "Send",
                   style: GoogleFonts.poppins(
                     color: Colors.white,
                   ),

@@ -615,7 +615,7 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
                     ),
                   ),
                   child: Text(
-                    _desactive2 ? "Wait..." : "PAYER",
+                    _desactive2 ? (langUserPhone == "fr") ? "Patientez ..." : "Wait ..." : (langUserPhone == "fr") ? "Payer" : "Pay",
                     style: GoogleFonts.poppins(
                       color: Colors.white,
                     ),
