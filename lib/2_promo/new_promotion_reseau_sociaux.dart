@@ -60,12 +60,12 @@ class _PromotionReseauSociauxFormPageState
                         ? "Promotion Réseau Sociaux"
                         : "Social Network Promotion",
                     style: GoogleFonts.poppins(
-                      fontSize: 25,
+                      fontSize: 20,
                       fontWeight: FontWeight.w600,
                     ),
                     textAlign: TextAlign.center,
                   ),
-                  const SizedBox(height: 15),
+                  const SizedBox(height: 10),
 
                   // Formulaire
                   RegisterForm3(),
@@ -128,7 +128,31 @@ class _RegisterForm3State extends State<RegisterForm3> {
         });
       }
     }
+    calculerPrixTotal();
   }
+
+ void calculerPrixTotal() {
+  setState(() {
+          _message = "";
+        });
+    if(qte != 0) {
+      int qteDemander = int.tryParse(quantityController.text) ?? 0;
+      if (qteDemander >= qteMin && qteDemander <= qteMax) {
+        double prixQteDemander = (prix * qteDemander)/qte;
+        quantityController.text = "$qteDemander";
+        priceController.text = "$prixQteDemander";
+      } else {
+        setState(() {
+          _message = (langUserPhone == "fr") ? "La quantité doit être comprise entre $qteMin et $qteMax" : "The quantity must be between $qteMin and $qteMax";
+        });
+      }
+    } else {
+      setState(() {
+          _message = (langUserPhone == "fr") ? "Veuillez choisir un réseau social puis un service." : "Please choose a social network then a service.";
+        });
+    }
+  }
+
 
   void listeFormPromoReseau() async {
     dynamic youHaveNetWork = "";
@@ -184,6 +208,20 @@ class _RegisterForm3State extends State<RegisterForm3> {
     return Container(
       child: Column(
         children: [
+          if(_message != "")
+          DelayedAnimation(
+            delay: 0, // 1000,
+            child: Text(
+              _message,
+              style: GoogleFonts.poppins(
+                color: Colors.redAccent,
+                fontWeight: FontWeight.w600,
+                fontSize: 16,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+          if(_message != "") const SizedBox(height: 10),
           _loading_liste_formule
               ? const Center(
                   child: CircularProgressIndicator(),
@@ -290,19 +328,11 @@ class _RegisterForm3State extends State<RegisterForm3> {
                   ],
                 )),
           ),
-          const SizedBox(height: 10),
-          DelayedAnimation(
-            delay: 0, // 1500,
-            child: TextField(
-              controller: linkController,
-              decoration: InputDecoration(
-                labelText: (langUserPhone == "fr") ? "Lien" : "Link",
-                border: const OutlineInputBorder(),
-              ),
-            ),
-          ),
-          const SizedBox(height: 10),
-          DelayedAnimation(
+          const SizedBox(height: 15),
+          Row(
+            mainAxisAlignment : MainAxisAlignment.spaceBetween,
+            children: [
+            SizedBox(width: MediaQuery.of(context).size.width * 0.35,child: DelayedAnimation(
             delay: 0, // 1500,
             child: TextField(
               controller: quantityController,
@@ -312,19 +342,38 @@ class _RegisterForm3State extends State<RegisterForm3> {
                 helperText: "Min : $qteMin - Max : $qteMax",
                 border: const OutlineInputBorder(),
               ),
+              onChanged: (val) => calculerPrixTotal(),
             ),
-          ),
+          ),),
+          SizedBox(width: MediaQuery.of(context).size.width * 0.55,child: DelayedAnimation(
+            delay: 0,
+            child: TextField(
+  controller: priceController,
+  maxLines: 3,
+  minLines: 1,
+  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+  decoration: const InputDecoration(
+    labelText: "Prix",
+    helperText: "FCFA",
+    border: OutlineInputBorder(),
+    // Définir la couleur du texte lorsque le champ est désactivé
+    labelStyle: TextStyle(color: primaryColor), 
+  ),
+  style: const TextStyle(color: primaryColor),
+  enabled: false,
+),
+
+          ),),
+          ],),
+          
+          
           const SizedBox(height: 10),
           DelayedAnimation(
             delay: 0, // 1500,
             child: TextField(
-              maxLines: 3,
-              minLines: 1,
-              controller: priceController,
-              keyboardType:
-                  const TextInputType.numberWithOptions(decimal: true),
+              controller: linkController,
               decoration: InputDecoration(
-                labelText: (langUserPhone == "fr") ? "Prix" : "Price",
+                labelText: (langUserPhone == "fr") ? "Lien" : "Link",
                 border: const OutlineInputBorder(),
               ),
             ),
@@ -343,26 +392,13 @@ class _RegisterForm3State extends State<RegisterForm3> {
                   ),
                 ),
                 child: Text(
-                  _desactive2 ? "Wait..." : "ENVOYER",
+                  _desactive2 ? (langUserPhone == "fr") ? "Patientez ..." : "Wait ..." : (langUserPhone == "fr") ? "Payer et Démarrer" : "Pay and Get Started",
                   style: GoogleFonts.poppins(
                     color: Colors.white,
                   ),
                 ),
                 onPressed: () {},
               ),
-            ),
-          ),
-          const SizedBox(height: 20),
-          DelayedAnimation(
-            delay: 0, // 1000,
-            child: Text(
-              _message,
-              style: GoogleFonts.poppins(
-                color: Colors.blue[400],
-                fontWeight: FontWeight.w600,
-                fontSize: 12,
-              ),
-              textAlign: TextAlign.center,
             ),
           ),
           const SizedBox(height: 10),
