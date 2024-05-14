@@ -60,6 +60,17 @@ class _ChoixDesPaysState extends State<ChoixDesPays> {
         );
       }).toList();
 
+      // Tri des pays avec les pays sélectionnés en premier
+      countries.sort((a, b) {
+        if (a.isSelected && !b.isSelected) {
+          return -1; // a vient avant b
+        } else if (!a.isSelected && b.isSelected) {
+          return 1; // b vient avant a
+        } else {
+          return 0; // Pas de changement d'ordre
+        }
+      });
+
       setState(() {
         _countries = countries;
         WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -119,6 +130,17 @@ class _ChoixDesPaysState extends State<ChoixDesPays> {
         isSelected: dataIsselected,
       );
     }).toList();
+
+    // Tri des pays avec les pays sélectionnés en premier
+    countries.sort((a, b) {
+      if (a.isSelected && !b.isSelected) {
+        return -1; // a vient avant b
+      } else if (!a.isSelected && b.isSelected) {
+        return 1; // b vient avant a
+      } else {
+        return 0; // Pas de changement d'ordre
+      }
+    });
 
     setState(() {
       _countries = countries;
