@@ -173,7 +173,6 @@ class _PreferencePageState extends State<PreferencePage> {
             child: Column(
               children: [
                 const SizedBox(height: 5),
-                SpecialPub(),
                 Card(
                   margin: const EdgeInsets.only(
                       left: 10, top: 5, right: 10, bottom: 5),
@@ -183,21 +182,19 @@ class _PreferencePageState extends State<PreferencePage> {
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         Text(
-                          (langUserPhone == "fr")
-                              ? "Préférence Pays"
-                              : "Country Preference",
+                          (langUserPhone == "fr") ? "Pays" : "Country",
                           style: GoogleFonts.poppins(
                             fontWeight: FontWeight.w400,
                             color: primaryColor,
-                            fontSize: 24,
+                            fontSize: 22,
                           ),
                           textAlign: TextAlign.left,
                         ),
-                        const SizedBox(height: 5),
+                        const SizedBox(height: 3),
                         Text(
                           (langUserPhone == "fr")
-                              ? "Sélectionnez parmi les pays disponibles. Ces pays sélectionnés seront ceux à partir desquels vous recevrez des propositions de contacts et d'actualités, ainsi que vers lesquels seront orientées vos promotions commerciales et vos boosts contacts."
-                              : "Select from the available countries. These selected countries will be those from which you will receive contact and news proposals, as well as towards which your commercial promotions and contact boosts will be directed.",
+                              ? "NB : Sélectionnez parmi les pays disponibles. Ces pays sélectionnés seront ceux à partir desquels vous recevrez des propositions de contacts et d'actualités, ainsi que vers lesquels seront orientées vos promotions commerciales et vos boosts contacts."
+                              : "NB : Select from the available countries. These selected countries will be those from which you will receive contact and news proposals, as well as towards which your commercial promotions and contact boosts will be directed.",
                           style: GoogleFonts.poppins(
                             fontSize: 10,
                             fontWeight: FontWeight.w500,
@@ -218,12 +215,18 @@ class _PreferencePageState extends State<PreferencePage> {
                         ),
                         const SizedBox(height: 5),
                         Text(
-                          preferencePaysText.toString(),
+                          (preferencePaysText.toString() != "")
+                              ? preferencePaysText.toString()
+                              : (langUserPhone == 'fr')
+                                  ? 'Aucun Pays Choisi'
+                                  : 'No Country Chosen',
                           style: GoogleFonts.poppins(
                             fontSize: 16,
                             fontWeight: FontWeight.w400,
                           ),
                           textAlign: TextAlign.left,
+                          maxLines: 3,
+                          overflow: TextOverflow.ellipsis,
                         ),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.end,
@@ -260,6 +263,101 @@ class _PreferencePageState extends State<PreferencePage> {
                     ),
                   ),
                 ),
+                DressurDivider(),
+                Card(
+                  margin: const EdgeInsets.only(
+                      left: 10, top: 5, right: 10, bottom: 5),
+                  child: Container(
+                    padding: const EdgeInsets.fromLTRB(10, 5, 10, 2),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Text(
+                          (langUserPhone == "fr")
+                              ? "Centres d'intérêt, Loisirs, etc."
+                              : "Center of interest, Leisure, etc.",
+                          style: GoogleFonts.poppins(
+                            fontWeight: FontWeight.w400,
+                            color: primaryColor,
+                            fontSize: 22,
+                          ),
+                          textAlign: TextAlign.left,
+                        ),
+                        const SizedBox(height: 3),
+                        Text(
+                          (langUserPhone == "fr")
+                              ? "NB : Choisissez parmi les options disponibles. Les centres d'intérêt que vous sélectionnerez seront utilisés pour vous proposer des services, des opportunités, des recommandations personnalisées, etc."
+                              : "NB: Choose from the available options. The interests you select will be used to offer you services, opportunities, personalized recommendations, etc.",
+                          style: GoogleFonts.poppins(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w500,
+                          ),
+                          textAlign: TextAlign.left,
+                        ),
+                        const SizedBox(height: 5),
+                        Text(
+                          (langUserPhone == "fr")
+                              ? "Vos choix sont les suivants :"
+                              : "Your choices are :",
+                          style: GoogleFonts.poppins(
+                            fontWeight: FontWeight.w500,
+                            color: primaryColor,
+                            fontSize: 14,
+                          ),
+                          textAlign: TextAlign.left,
+                        ),
+                        const SizedBox(height: 5),
+                        Text(
+                          (preferencePaysText.toString() != "")
+                              ? preferencePaysText.toString()
+                              : (langUserPhone == 'fr')
+                                  ? 'Aucun Pays Choisi'
+                                  : 'No Country Chosen',
+                          style: GoogleFonts.poppins(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w400,
+                          ),
+                          textAlign: TextAlign.left,
+                          maxLines: 3,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            SizedBox(
+                              width: MediaQuery.of(context).size.width * 0.35,
+                              child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: primaryColor,
+                                  shape: const StadiumBorder(),
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 10,
+                                  ),
+                                ),
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => ChoixDesPays()),
+                                  );
+                                },
+                                child: Text(
+                                  (langUserPhone == "fr") ? 'Modifier' : 'Edit',
+                                  style: GoogleFonts.poppins(
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                            )
+                          ],
+                        ),
+                        const SizedBox(height: 3),
+                      ],
+                    ),
+                  ),
+                ),
+                DressurDivider(),
+                SpecialPub(),
                 DressurDivider(),
                 const SizedBox(height: 5),
                 SociauxPage(),

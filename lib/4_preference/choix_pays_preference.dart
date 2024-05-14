@@ -33,7 +33,7 @@ class _ChoixDesPaysState extends State<ChoixDesPays> {
       });
     } else {
       setState(() {
-        preferencePaysText = "$preferencePaysText ,$countryName";
+        preferencePaysText = "$preferencePaysText, $countryName";
       });
     }
   }
@@ -52,11 +52,11 @@ class _ChoixDesPaysState extends State<ChoixDesPays> {
       });
       final jsonData = jsonDecode(response.body) as List<dynamic>;
 
-      final countries = jsonData.map((data) {
+      final countries = countryCodes.entries.map((entry) {
         return Country(
-          name: data['name'],
-          paysName: getPaysNameWhithIndicatif(data['name']),
-          isSelected: data['isSelected'],
+          name: entry.key,
+          paysName: entry.value,
+          isSelected: jsonData.contains(entry.key) ? true : false,
         );
       }).toList();
 
@@ -91,37 +91,35 @@ class _ChoixDesPaysState extends State<ChoixDesPays> {
     setState(() {
       preferencePaysText = "";
     });
-    List<Map<String, dynamic>> json = [];
-    final jsonData = jsonDecode(paysChoisieJson) as List<dynamic>;
 
-    final countries = jsonData.map((data) {
-      if (data['name'] == country.name) {
+    List<dynamic> json = [];
+    final jsonData = jsonDecode(paysChoisieJson) as List<dynamic>;
+    print(jsonData);
+    final countries = countryCodes.entries.map((entry) {
+      var dataIsselected = jsonData.contains(entry.key) ? true : false;
+      if (entry.key == country.name) {
         if (isSelected == true) {
-          updatePreferencePaysText(data['name']);
+          updatePreferencePaysText(entry.key);
+          json.add(entry.key);
         }
-        json.add({
-          'name': data['name'],
-          'isSelected': isSelected,
-        });
         return Country(
-          name: data['name'],
-          paysName: getPaysNameWhithIndicatif(data['name']),
+          name: entry.key,
+          paysName: entry.value,
           isSelected: isSelected,
         );
       }
-      if (data['isSelected'] == true) {
-        updatePreferencePaysText(data['name']);
+      if (dataIsselected == true) {
+        updatePreferencePaysText(entry.key);
+        json.add(entry.key);
       }
-      json.add({
-        'name': data['name'],
-        'isSelected': data['isSelected'],
-      });
+      print(dataIsselected);
       return Country(
-        name: data['name'],
-        paysName: getPaysNameWhithIndicatif(data['name']),
-        isSelected: data['isSelected'],
+        name: entry.key,
+        paysName: entry.value,
+        isSelected: dataIsselected,
       );
     }).toList();
+
     setState(() {
       _countries = countries;
       paysChoisieJson = jsonEncode(json);
@@ -225,6 +223,7 @@ class _ChoixDesPaysState extends State<ChoixDesPays> {
                               updateCountrySelection(country, isSelected);
                             } else {
                               // Null
+                              print(isSelected);
                             }
                           },
                         ),
