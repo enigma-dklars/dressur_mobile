@@ -117,7 +117,7 @@ class _PageDepartState extends State<PageDepart> {
         for (var contact in jsonData) {
           if ((await SQLHelper.getOneNumsTelUser(contact['tel'])).isEmpty) {
             final newContact = Contact()
-              ..name.first = contact["pseudo"] + " #DS"
+              ..name.first = contact["nom"] + " #DS"
               ..phones = [Phone(contact["tel"])];
             await newContact.insert();
             await insertNumTelUserIntoDataBase(contact["tel"]);

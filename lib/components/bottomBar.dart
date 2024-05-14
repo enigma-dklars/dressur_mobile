@@ -11,7 +11,6 @@ import 'package:dressur/4_preference/preference.dart';
 import 'package:dressur/5_autre/menu_autre_page.dart';
 import 'package:dressur/components/constant.dart';
 import 'package:dressur/components/sql_helper.dart';
-import 'dart:convert' as convert;
 
 class BottomBar extends StatefulWidget {
   const BottomBar({Key? key}) : super(key: key);
@@ -40,51 +39,14 @@ class _BottomBarState extends State<BottomBar> {
 
     // Exécute la fonction toutes les 5 heures
     Timer.periodic(const Duration(hours: 5), (timer) {
-      showNotification("Cc $pseudo du nouveau ?",
+      showNotification("Cc $nom du nouveau ?",
           "Consultez votre compte dès maintenant pour découvrir les dernières promotions, actualités et préférences disponibles sur Dressur.");
     });
 
-// Exécute la fonction toutes les 1 heures
-    Timer.periodic(const Duration(hours: 1), (timer) {
-      actualise();
+    // Exécute la fonction toutes les 2 heures
+    Timer.periodic(const Duration(hours: 2), (timer) {
+      fetchContactDSs();
     });
-  }
-
-  void actualise() async {
-    setState(() {
-      // _loading = true;
-    });
-    dynamic youHaveNetWork = "";
-    youHaveConnexion();
-    youHaveNetWork = await SQLHelper.getYouHaveConnexion();
-    while (youHaveNetWork.length == 0) {
-      youHaveNetWork = await SQLHelper.getYouHaveConnexion();
-    }
-    var request = http.MultipartRequest(
-        'POST', Uri.parse('$generalRouteForApi/getUserInfo'));
-    request.fields
-        .addAll({'uid': uidUser, 'langUserPhone': langUserPhone.toString()});
-
-    http.StreamedResponse response = await request.send();
-
-    if (response.statusCode == 200) {
-      var data1 = await response.stream.bytesToString();
-      var data = convert.jsonDecode(data1);
-      if (data["error"] == false) {
-        setState(() {
-          initUserInformations(data['user']);
-          // _loading = false;
-        });
-      } else {
-        setState(() {
-          // _loading = false;
-        });
-      }
-    } else {
-      setState(() {
-        // _loading = false;
-      });
-    }
   }
 
   void synchroAvanceFunction() async {
@@ -179,7 +141,7 @@ class _BottomBarState extends State<BottomBar> {
           }
           if ((await SQLHelper.getOneNumsTelUser(contact['tel'])).isEmpty) {
             final newContact = Contact()
-              ..name.first = contact["pseudo"] + " #DS"
+              ..name.first = contact["nom"] + " #DS"
               ..phones = [Phone(contact["tel"])];
             await newContact.insert();
             await insertNumTelUserIntoDataBase(contact["tel"]);

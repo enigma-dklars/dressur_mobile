@@ -257,101 +257,73 @@ class _ContactPageState extends State<ContactPage> {
                         itemBuilder: (BuildContext context, int index) {
                           final contact = _filteredContacts[index];
 
-                          return Container(
-                            margin: const EdgeInsets.only(
-                                left: 10, top: 10, right: 10, bottom: 0),
-                            child: Row(
+                          return ListTile(
+                            title: Text(
+                              contact.nom,
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            subtitle: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Container(
-                                  height: 60,
-                                  width: 60,
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      CircleAvatar(
-                                        backgroundImage: AssetImage(
-                                            "images-pays/${contact.pays}.png"),
-                                        backgroundColor: Colors.transparent,
-                                        child: AssetImage(
-                                                    "images-pays/${contact.pays}.png") ==
-                                                null
-                                            ? Image.asset(
-                                                "images-pays/no_pays.png",
-                                              )
-                                            : null,
-                                      ),
-                                      const SizedBox(height: 3),
-                                      Text(
-                                        contact.pays,
-                                        style: const TextStyle(
-                                          fontSize: 8,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                const SizedBox(width: 5),
-                                Expanded(
-                                  child: Container(
-                                    height: 60,
-                                    padding:
-                                        const EdgeInsets.fromLTRB(15, 0, 15, 0),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        const SizedBox(height: 5),
-                                        Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Text(
-                                              contact.pseudo,
-                                              style: const TextStyle(
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                              maxLines: 1,
-                                              overflow: TextOverflow.ellipsis,
-                                            ),
-                                            ElevatedButton.icon(
-                                              style: ElevatedButton.styleFrom(
-                                                backgroundColor: primaryColor,
-                                              ),
-                                              label: Text(
-                                                (langUserPhone == "fr")
-                                                    ? "Détails"
-                                                    : "Details",
-                                                style: const TextStyle(
-                                                  fontSize: 13,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: Colors.white,
-                                                ),
-                                              ),
-                                              icon: const Icon(
-                                                Icons.info,
-                                                size: 13,
-                                                color: Colors.white,
-                                              ),
-                                              onPressed: () {
-                                                setState(() {
-                                                  uidAutreUser = contact.id;
-                                                  addUserOnAutreProfilPage =
-                                                      "non";
-                                                });
-                                                Navigator.of(context).push(
-                                                    MaterialPageRoute(
-                                                        builder: (context) =>
-                                                            AutreProfilPage()));
-                                              },
-                                            ),
-                                          ],
-                                        ),
-                                      ],
+                                ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: primaryColor,
+                                    shape: const StadiumBorder(),
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 0,
+                                      horizontal: 0,
                                     ),
+                                  ),
+                                  onPressed: () {
+                                    setState(() {
+                                      uidAutreUser = contact.id;
+                                      addUserOnAutreProfilPage = "non";
+                                    });
+                                    Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                AutreProfilPage()));
+                                  },
+                                  child: const Icon(
+                                    Icons.info,
+                                    size: 20,
+                                    color: Colors.white,
                                   ),
                                 ),
                               ],
+                            ),
+                            leading: SizedBox(
+                              height: 60,
+                              width: 60,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  CircleAvatar(
+                                    backgroundImage: AssetImage(
+                                        "images-pays/${contact.pays}.png"),
+                                    backgroundColor: Colors.transparent,
+                                    child: AssetImage(
+                                                "images-pays/${contact.pays}.png") ==
+                                            null
+                                        ? Image.asset(
+                                            "images-pays/no_pays.png",
+                                          )
+                                        : null,
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    contact.pays,
+                                    style: const TextStyle(
+                                      fontSize: 10,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           );
                         },

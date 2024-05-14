@@ -200,7 +200,9 @@ class _ActuPageState extends State<ActuPage> {
       _loading = true;
     });
     var request = http.MultipartRequest(
-        'POST', Uri.parse('$generalRouteForApi/addTousUserContact'));
+        'POST',
+        Uri.parse(
+            '$generalRouteForApi/addTousUserContact/$uidUser/${langUserPhone.toString()}'));
     request.fields.addAll({
       'uid': uidUser,
       'langUserPhone': langUserPhone.toString(),
@@ -243,7 +245,7 @@ class _ActuPageState extends State<ActuPage> {
       for (var contactAdd in data["contactsAdd"]) {
         if ((await SQLHelper.getOneNumsTelUser(contactAdd['tel'])).isEmpty) {
           final newContact = Contact()
-            ..name.first = contactAdd["pseudo"] + " #DS"
+            ..name.first = contactAdd["nom"] + " #DS"
             ..phones = [Phone(contactAdd["tel"])];
           await newContact.insert();
           await insertNumTelUserIntoDataBase(contactAdd["tel"]);
@@ -254,7 +256,7 @@ class _ActuPageState extends State<ActuPage> {
         nombreContactDispo = nombreContactDispo - nombreAddNow;
       });
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      behavior: SnackBarBehavior.floating,
+        behavior: SnackBarBehavior.floating,
         content: (langUserPhone == "fr")
             ? Text('ADD de $nombreAddNow contact(s) avec succès.')
             : Text('ADD of $nombreAddNow contacts successfully.'),

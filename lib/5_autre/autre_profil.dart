@@ -69,7 +69,7 @@ class _AutreProfilPageState extends State<AutreProfilPage> {
           autre_affUserName = userAutreInfos["affUserName"];
           _loading = false;
           if (addUserOnAutreProfilPage == "oui") {
-            addUserContact(autre_tel, autre_pseudo, context);
+            addUserContact(autre_tel, autre_nom, context);
           }
           addUserOnAutreProfilPage = "oui";
         });

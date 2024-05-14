@@ -13,6 +13,7 @@ class ContactsDispo {
   final String uid;
   final String pseudo;
   final String pays;
+  final String nom;
   final String tel;
 
   ContactsDispo({
@@ -20,6 +21,7 @@ class ContactsDispo {
     required this.uid,
     required this.pseudo,
     required this.pays,
+    required this.nom,
     required this.tel,
   });
 }
@@ -94,6 +96,7 @@ class _ListeContactAAddPageState extends State<ListeContactAAddPage> {
           uid: data['uid'],
           pseudo: data['pseudo'],
           pays: data['pays'],
+          nom: data['nom'],
           tel: data['tel'],
         );
       }).toList();
@@ -147,7 +150,7 @@ class _ListeContactAAddPageState extends State<ListeContactAAddPage> {
   void insertContact(ContactsDispo contact) async {
     if ((await SQLHelper.getOneNumsTelUser(contact.tel)).isEmpty) {
       final newContact = Contact()
-        ..name.first = "${contact.pseudo} #DS"
+        ..name.first = "${contact.nom} #DS"
         ..phones = [Phone(contact.tel)];
       await newContact.insert();
       await insertNumTelUserIntoDataBase(contact.tel);
