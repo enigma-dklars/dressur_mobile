@@ -33,19 +33,6 @@ class _ChoixDesCentreInteretLoisirState
   String recherche = "";
   var centreInteretLoisirJson;
 
-  void updatePreferenceCentreInteretLoisirToText(label) {
-    if (preferenceCentreInteretLoisirText.isEmpty) {
-      setState(() {
-        preferenceCentreInteretLoisirText = label;
-      });
-    } else {
-      setState(() {
-        preferenceCentreInteretLoisirText =
-            "$preferenceCentreInteretLoisirText, $label";
-      });
-    }
-  }
-
   Future<void> fetchCentreInteretLoisirChoisies() async {
     final response = await http.get(Uri.parse(
         '$generalRouteForApi/listCentreInteretLoisirChoisies/$uidUser/$langUserPhone'));
@@ -111,13 +98,10 @@ class _ChoixDesCentreInteretLoisirState
 
     List<dynamic> json = [];
     final jsonData = jsonDecode(centreInteretLoisirJson) as List<dynamic>;
-    print(jsonData);
     final centreInteretLoisirs = centreInteretLoisir.map((entry) {
       var dataIsselected = jsonData.contains(entry['value']) ? true : false;
       if (entry['value'] == country.name) {
         if (isSelected == true) {
-          updatePreferenceCentreInteretLoisirToText(
-              (langUserPhone == 'fr') ? entry['labelFr'] : entry['labelEn']);
           json.add(entry['value']);
         }
         return CentreInteretLoisir(
@@ -128,11 +112,8 @@ class _ChoixDesCentreInteretLoisirState
         );
       }
       if (dataIsselected == true) {
-        updatePreferenceCentreInteretLoisirToText(
-            (langUserPhone == 'fr') ? entry['labelFr'] : entry['labelEn']);
         json.add(entry['value']);
       }
-      print(dataIsselected);
       return CentreInteretLoisir(
         name: entry['value'],
         label: (langUserPhone == 'fr') ? entry['labelFr'] : entry['labelEn'],
@@ -155,6 +136,7 @@ class _ChoixDesCentreInteretLoisirState
     setState(() {
       _centreInteretLoisirs = centreInteretLoisirs;
       centreInteretLoisirJson = jsonEncode(json);
+      preferenceCentreInteretLoisirToText(centreInteretLoisirJson);
       searchCountries(recherche);
     });
 
@@ -265,7 +247,6 @@ class _ChoixDesCentreInteretLoisirState
                                   country, isSelected);
                             } else {
                               // Null
-                              print(isSelected);
                             }
                           },
                         ),

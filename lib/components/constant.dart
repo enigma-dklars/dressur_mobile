@@ -177,6 +177,9 @@ String preferencePaysToText(preferencePays) {
       }
     }
   }).toList();
+  if (preferencePaysText.isEmpty) {
+    preferencePaysText = (langUserPhone == 'fr') ? "Aucun Choix" : "No Choice";
+  }
   return preferencePaysText;
 }
 
@@ -195,6 +198,11 @@ String preferenceCentreInteretLoisirToText(preferenceCentreInteretLoisir) {
       }
     }
   }).toList();
+  if (preferenceCentreInteretLoisirText.isEmpty) {
+    preferenceCentreInteretLoisirText = (langUserPhone == 'fr')
+        ? "Aucun Choix"
+        : "No Choice";
+  }
   return preferenceCentreInteretLoisirText;
 }
 
@@ -685,6 +693,268 @@ List<Map<String, dynamic>> centreInteretLoisir = [
         "Donner de son temps pour aider les autres ou s'impliquer dans des causes sociales.",
     'descpEn':
         'Volunteering time to help others or getting involved in social causes.',
+  },
+  {
+    "value": "21",
+    "labelFr": "Arts plastiques",
+    "labelEn": "Visual Arts",
+    "descpFr":
+        "Exprimer sa créativité à travers la peinture, le dessin ou la sculpture.",
+    "descpEn": "Expressing creativity through painting, drawing, or sculpture."
+  },
+  {
+    "value": "22",
+    "labelFr": "Échecs",
+    "labelEn": "Chess",
+    "descpFr":
+        "Jouer à un jeu de stratégie qui demande réflexion et concentration.",
+    "descpEn":
+        "Playing a strategic game that requires thought and concentration."
+  },
+  {
+    "value": "23",
+    "labelFr": "Course à pied",
+    "labelEn": "Running",
+    "descpFr": "Courir pour la santé, le plaisir ou la compétition.",
+    "descpEn": "Running for health, enjoyment, or competition."
+  },
+  {
+    "value": "24",
+    "labelFr": "Pêche",
+    "labelEn": "Fishing",
+    "descpFr":
+        "Pratiquer la pêche en eau douce ou en mer pour se détendre et se reconnecter à la nature.",
+    "descpEn":
+        "Fishing in freshwater or saltwater to relax and reconnect with nature."
+  },
+  {
+    "value": "25",
+    "labelFr": "Équitation",
+    "labelEn": "Horseback Riding",
+    "descpFr":
+        "Faire de l'équitation pour le plaisir, l'exercice physique et le lien avec les animaux.",
+    "descpEn":
+        "Riding horses for pleasure, physical exercise, and connection with animals."
+  },
+  {
+    "value": "26",
+    "labelFr": "Jardinage vertical",
+    "labelEn": "Vertical Gardening",
+    "descpFr":
+        "Cultiver des plantes en hauteur sur des structures verticales comme des murs ou des treillis.",
+    "descpEn":
+        "Growing plants vertically on structures such as walls or trellises."
+  },
+  {
+    "value": "27",
+    "labelFr": "Méditation",
+    "labelEn": "Meditation",
+    "descpFr":
+        "Pratiquer la méditation pour la relaxation, la clarté mentale et la gestion du stress.",
+    "descpEn":
+        "Practicing meditation for relaxation, mental clarity, and stress management."
+  },
+  {
+    "value": "28",
+    "labelFr": "Plongée sous-marine",
+    "labelEn": "Scuba Diving",
+    "descpFr":
+        "Explorer les fonds marins et découvrir la vie aquatique en plongeant sous la surface de l'eau.",
+    "descpEn":
+        "Exploring underwater environments and discovering aquatic life by diving beneath the water's surface."
+  },
+  {
+    "value": "29",
+    "labelFr": "Jeu de rôle (RPG)",
+    "labelEn": "Role-playing Games (RPG)",
+    "descpFr":
+        "Participer à des aventures imaginaires en incarnant des personnages dans des mondes fictifs.",
+    "descpEn":
+        "Engaging in imaginative adventures by portraying characters in fictional worlds."
+  },
+  {
+    "value": "30",
+    "labelFr": "Photographie urbaine",
+    "labelEn": "Urban Photography",
+    "descpFr":
+        "Capturer la vie urbaine, l'architecture et l'atmosphère des villes à travers la photographie.",
+    "descpEn":
+        "Capturing urban life, architecture, and the atmosphere of cities through photography."
+  },
+  {
+    "value": "31",
+    "labelFr": "Escalade",
+    "labelEn": "Rock Climbing",
+    "descpFr":
+        "Pratiquer l'escalade en salle ou en plein air pour tester sa force et sa concentration.",
+    "descpEn":
+        "Practicing climbing indoors or outdoors to test strength and concentration."
+  },
+  {
+    "value": "32",
+    "labelFr": "Couture",
+    "labelEn": "Sewing",
+    "descpFr":
+        "Créer des vêtements, des accessoires ou des décorations en utilisant des techniques de couture.",
+    "descpEn":
+        "Creating clothing, accessories, or decorations using sewing techniques."
+  },
+  {
+    "value": "33",
+    "labelFr": "Course de drones",
+    "labelEn": "Drone Racing",
+    "descpFr":
+        "Participer à des courses de drones télécommandés à grande vitesse.",
+    "descpEn": "Participating in high-speed remote-controlled drone races."
+  },
+  {
+    "value": "34",
+    "labelFr": "Cuisine du monde",
+    "labelEn": "World Cuisine",
+    "descpFr":
+        "Explorer et cuisiner des plats traditionnels de différentes cultures à travers le monde.",
+    "descpEn":
+        "Exploring and cooking traditional dishes from different cultures around the world."
+  },
+  {
+    "value": "35",
+    "labelFr": "Camping",
+    "labelEn": "Camping",
+    "descpFr":
+        "S'installer en pleine nature pour camper, faire des feux de camp et explorer les environs.",
+    "descpEn":
+        "Setting up camp in nature to camp, make campfires, and explore the surroundings."
+  },
+  {
+    "value": "36",
+    "labelFr": "Astrophotographie",
+    "labelEn": "Astrophotography",
+    "descpFr":
+        "Photographier les objets célestes tels que les étoiles, les planètes et les galaxies.",
+    "descpEn":
+        "Photographing celestial objects such as stars, planets, and galaxies."
+  },
+  {
+    "value": "37",
+    "labelFr": "Cueillette de champignons",
+    "labelEn": "Mushroom Foraging",
+    "descpFr":
+        "Explorer la nature pour trouver et identifier des champignons comestibles.",
+    "descpEn": "Exploring nature to find and identify edible mushrooms."
+  },
+  {
+    "value": "38",
+    "labelFr": "Yoga aérien",
+    "labelEn": "Aerial Yoga",
+    "descpFr":
+        "Pratiquer le yoga en utilisant un hamac suspendu pour améliorer la flexibilité et la force.",
+    "descpEn":
+        "Practicing yoga using a suspended hammock to improve flexibility and strength."
+  },
+  {
+    "value": "39",
+    "labelFr": "Cuisine végétalienne",
+    "labelEn": "Vegan Cooking",
+    "descpFr":
+        "Cuisiner des plats délicieux et sains sans aucun produit d'origine animale.",
+    "descpEn":
+        "Cooking delicious and healthy dishes without any animal products."
+  },
+  {
+    "value": "40",
+    "labelFr": "Astronomie amateur",
+    "labelEn": "Amateur Astronomy",
+    "descpFr":
+        "Observer le ciel nocturne à l'aide d'un télescope pour découvrir les merveilles de l'univers.",
+    "descpEn":
+        "Observing the night sky using a telescope to discover the wonders of the universe."
+  },
+  {
+    "value": "41",
+    "labelFr": "Céramique",
+    "labelEn": "Pottery",
+    "descpFr":
+        "Créer des objets en argile comme des pots, des vases ou des sculptures.",
+    "descpEn": "Creating objects from clay such as pots, vases, or sculptures."
+  },
+  {
+    "value": "42",
+    "labelFr": "Jardinage aquatique",
+    "labelEn": "Aquatic Gardening",
+    "descpFr":
+        "Aménager et entretenir un jardin aquatique avec des plantes aquatiques et des poissons.",
+    "descpEn":
+        "Designing and maintaining an aquatic garden with aquatic plants and fish."
+  },
+  {
+    "value": "43",
+    "labelFr": "Graffiti",
+    "labelEn": "Graffiti Art",
+    "descpFr":
+        "Créer des œuvres d'art murales en utilisant des techniques de graffiti et de street art.",
+    "descpEn":
+        "Creating mural artworks using graffiti and street art techniques."
+  },
+  {
+    "value": "44",
+    "labelFr": "Escalade sur glace",
+    "labelEn": "Ice Climbing",
+    "descpFr":
+        "Pratiquer l'escalade sur des formations de glace naturelles ou artificielles.",
+    "descpEn": "Practicing climbing on natural or artificial ice formations."
+  },
+  {
+    "value": "45",
+    "labelFr": "Cueillette de fruits",
+    "labelEn": "Fruit Picking",
+    "descpFr":
+        "Récolter des fruits frais directement des arbres dans les vergers.",
+    "descpEn": "Harvesting fresh fruits directly from trees in orchards."
+  },
+  {
+    "value": "46",
+    "labelFr": "Tricot",
+    "labelEn": "Knitting",
+    "descpFr":
+        "Créer des vêtements, des écharpes ou des couvertures en tricotant avec des aiguilles.",
+    "descpEn":
+        "Creating clothing, scarves, or blankets by knitting with needles."
+  },
+  {
+    "value": "47",
+    "labelFr": "Calligraphie",
+    "labelEn": "Calligraphy",
+    "descpFr":
+        "Maîtriser l'art de l'écriture artistique en utilisant différentes techniques de calligraphie.",
+    "descpEn":
+        "Mastering the art of artistic writing using various calligraphy techniques."
+  },
+  {
+    "value": "48",
+    "labelFr": "Dessin animé",
+    "labelEn": "Animation",
+    "descpFr":
+        "Créer des animations en dessinant des images qui sont ensuite assemblées pour créer des mouvements.",
+    "descpEn":
+        "Creating animations by drawing images that are then assembled to create motion."
+  },
+  {
+    "value": "49",
+    "labelFr": "Élevage d'animaux",
+    "labelEn": "Animal Breeding",
+    "descpFr":
+        "Élever et prendre soin d'animaux domestiques ou d'élevage comme des chiens, des chats ou des poules.",
+    "descpEn":
+        "Raising and caring for domestic or farm animals such as dogs, cats, or chickens."
+  },
+  {
+    "value": "50",
+    "labelFr": "Géocaching",
+    "labelEn": "Geocaching",
+    "descpFr":
+        "Participer à une chasse au trésor moderne en utilisant un GPS pour trouver des cachettes cachées dans la nature.",
+    "descpEn":
+        "Engaging in modern treasure hunting using GPS to find hidden caches in nature."
   },
   // { 'value': "21", 'labelFr': "aaa", 'labelEn': "aaa", 'descpFr': "aaa", 'descpEn': "aaa", },
 ];

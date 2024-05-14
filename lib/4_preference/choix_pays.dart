@@ -29,18 +29,6 @@ class _ChoixDesPaysState extends State<ChoixDesPays> {
   String recherche = "";
   var paysChoisieJson;
 
-  void updatePreferencePaysText(countryName) {
-    if (preferencePaysText.isEmpty) {
-      setState(() {
-        preferencePaysText = countryName;
-      });
-    } else {
-      setState(() {
-        preferencePaysText = "$preferencePaysText, $countryName";
-      });
-    }
-  }
-
   Future<void> fetchCountries() async {
     final response = await http.get(Uri.parse(
         '$generalRouteForApi/listPaysChoisies/$uidUser/$langUserPhone'));
@@ -104,12 +92,10 @@ class _ChoixDesPaysState extends State<ChoixDesPays> {
 
     List<dynamic> json = [];
     final jsonData = jsonDecode(paysChoisieJson) as List<dynamic>;
-    print(jsonData);
     final countries = countryCodes.entries.map((entry) {
       var dataIsselected = jsonData.contains(entry.key) ? true : false;
       if (entry.key == country.name) {
         if (isSelected == true) {
-          updatePreferencePaysText(entry.value);
           json.add(entry.key);
         }
         return Country(
@@ -119,10 +105,8 @@ class _ChoixDesPaysState extends State<ChoixDesPays> {
         );
       }
       if (dataIsselected == true) {
-        updatePreferencePaysText(entry.value);
         json.add(entry.key);
       }
-      print(dataIsselected);
       return Country(
         name: entry.key,
         paysName: entry.value,
@@ -144,6 +128,7 @@ class _ChoixDesPaysState extends State<ChoixDesPays> {
     setState(() {
       _countries = countries;
       paysChoisieJson = jsonEncode(json);
+      preferencePaysToText(paysChoisieJson);
       searchCountries(recherche);
     });
 
@@ -244,7 +229,6 @@ class _ChoixDesPaysState extends State<ChoixDesPays> {
                               updateCountrySelection(country, isSelected);
                             } else {
                               // Null
-                              print(isSelected);
                             }
                           },
                         ),

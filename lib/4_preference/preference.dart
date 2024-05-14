@@ -216,11 +216,7 @@ class _PreferencePageState extends State<PreferencePage> {
                         ),
                         const SizedBox(height: 5),
                         Text(
-                          (preferencePaysText.toString() != "")
-                              ? preferencePaysText.toString()
-                              : (langUserPhone == 'fr')
-                                  ? 'Aucun Pays Choisi'
-                                  : 'No Country Chosen',
+                          preferencePaysText.toString(),
                           style: GoogleFonts.poppins(
                             fontSize: 16,
                             fontWeight: FontWeight.w400,
@@ -309,11 +305,7 @@ class _PreferencePageState extends State<PreferencePage> {
                         ),
                         const SizedBox(height: 5),
                         Text(
-                          (preferencePaysText.toString() != "")
-                              ? preferenceCentreInteretLoisirText.toString()
-                              : (langUserPhone == 'fr')
-                                  ? 'Aucun Pays Choisi'
-                                  : 'No Country Chosen',
+                          preferenceCentreInteretLoisirText.toString(),
                           style: GoogleFonts.poppins(
                             fontSize: 16,
                             fontWeight: FontWeight.w400,
