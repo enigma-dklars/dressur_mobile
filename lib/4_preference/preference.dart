@@ -1,12 +1,13 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'dart:io';
+import 'package:dressur/4_preference/choix_centre_interet_loisir.dart';
 import 'package:dressur/components/padding_and_divider.dart';
 import 'package:dressur/components/pub_smt_2024.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:dressur/4_preference/choix_pays_preference.dart';
+import 'package:dressur/4_preference/choix_pays.dart';
 import 'package:dressur/1_reception/liste_notification.dart';
 import 'package:dressur/components/constant.dart';
 import 'package:dressur/components/sociaux.dart';
@@ -309,7 +310,7 @@ class _PreferencePageState extends State<PreferencePage> {
                         const SizedBox(height: 5),
                         Text(
                           (preferencePaysText.toString() != "")
-                              ? preferencePaysText.toString()
+                              ? preferenceCentreInteretLoisirText.toString()
                               : (langUserPhone == 'fr')
                                   ? 'Aucun Pays Choisi'
                                   : 'No Country Chosen',
@@ -338,7 +339,8 @@ class _PreferencePageState extends State<PreferencePage> {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                        builder: (context) => ChoixDesPays()),
+                                        builder: (context) =>
+                                            ChoixDesCentreInteretLoisir()),
                                   );
                                 },
                                 child: Text(

@@ -7,61 +7,66 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:dressur/components/constant.dart';
 
-class Country {
+class CentreInteretLoisir {
   final String name;
-  final String paysName;
+  final String label;
+  final String descp;
   final bool isSelected;
 
-  Country(
-      {required this.name, required this.paysName, required this.isSelected});
+  CentreInteretLoisir({
+    required this.name,
+    required this.label,
+    required this.descp,
+    required this.isSelected,
+  });
 }
 
-class ChoixDesPays extends StatefulWidget {
+class ChoixDesCentreInteretLoisir extends StatefulWidget {
   @override
-  _ChoixDesPaysState createState() => _ChoixDesPaysState();
+  _ChoixDesCentreInteretLoisirState createState() =>
+      _ChoixDesCentreInteretLoisirState();
 }
 
-class _ChoixDesPaysState extends State<ChoixDesPays> {
-  List<Country> _countries = [];
+class _ChoixDesCentreInteretLoisirState
+    extends State<ChoixDesCentreInteretLoisir> {
+  List<CentreInteretLoisir> _centreInteretLoisirs = [];
   String recherche = "";
-  var paysChoisieJson;
+  var centreInteretLoisirJson;
 
-  void updatePreferencePaysText(countryName) {
-    if (preferencePaysText.isEmpty) {
+  void updatePreferenceCentreInteretLoisirToText(label) {
+    if (preferenceCentreInteretLoisirText.isEmpty) {
       setState(() {
-        preferencePaysText = countryName;
+        preferenceCentreInteretLoisirText = label;
       });
     } else {
       setState(() {
-        preferencePaysText = "$preferencePaysText, $countryName";
+        preferenceCentreInteretLoisirText =
+            "$preferenceCentreInteretLoisirText, $label";
       });
     }
   }
 
-  String getPaysNameWhithIndicatif(countryCode) {
-    return countryCodes[countryCode] ?? '';
-  }
-
-  Future<void> fetchCountries() async {
+  Future<void> fetchCentreInteretLoisirChoisies() async {
     final response = await http.get(Uri.parse(
-        '$generalRouteForApi/listPaysChoisies/$uidUser/$langUserPhone'));
+        '$generalRouteForApi/listCentreInteretLoisirChoisies/$uidUser/$langUserPhone'));
 
     if (response.statusCode == 200) {
       setState(() {
-        paysChoisieJson = response.body;
+        centreInteretLoisirJson = response.body;
       });
       final jsonData = jsonDecode(response.body) as List<dynamic>;
 
-      final countries = countryCodes.entries.map((entry) {
-        return Country(
-          name: entry.key,
-          paysName: entry.value,
-          isSelected: jsonData.contains(entry.key) ? true : false,
+      final centreInteretLoisirs = centreInteretLoisir.map((entry) {
+        return CentreInteretLoisir(
+          name: entry['value'],
+          label: (langUserPhone == 'fr') ? entry['labelFr'] : entry['labelEn'],
+          descp: (langUserPhone == 'fr') ? entry['descpFr'] : entry['descpEn'],
+          isSelected: jsonData.contains(entry['value']) ? true : false,
         );
       }).toList();
 
       // Tri des pays avec les pays sélectionnés en premier
-      countries.sort((a, b) {
+      centreInteretLoisirs.sort((a, b) {
         if (a.isSelected && !b.isSelected) {
           return -1; // a vient avant b
         } else if (!a.isSelected && b.isSelected) {
@@ -72,7 +77,7 @@ class _ChoixDesPaysState extends State<ChoixDesPays> {
       });
 
       setState(() {
-        _countries = countries;
+        _centreInteretLoisirs = centreInteretLoisirs;
         WidgetsBinding.instance.addPostFrameCallback((_) {
           searchCountries('');
         });
@@ -98,41 +103,46 @@ class _ChoixDesPaysState extends State<ChoixDesPays> {
     }
   }
 
-  void updateCountrySelection(Country country, bool isSelected) async {
+  void updateCentreInteretLoisirSelection(
+      CentreInteretLoisir country, bool isSelected) async {
     setState(() {
-      preferencePaysText = "";
+      preferenceCentreInteretLoisirText = "";
     });
 
     List<dynamic> json = [];
-    final jsonData = jsonDecode(paysChoisieJson) as List<dynamic>;
+    final jsonData = jsonDecode(centreInteretLoisirJson) as List<dynamic>;
     print(jsonData);
-    final countries = countryCodes.entries.map((entry) {
-      var dataIsselected = jsonData.contains(entry.key) ? true : false;
-      if (entry.key == country.name) {
+    final centreInteretLoisirs = centreInteretLoisir.map((entry) {
+      var dataIsselected = jsonData.contains(entry['value']) ? true : false;
+      if (entry['value'] == country.name) {
         if (isSelected == true) {
-          updatePreferencePaysText(entry.key);
-          json.add(entry.key);
+          updatePreferenceCentreInteretLoisirToText(
+              (langUserPhone == 'fr') ? entry['labelFr'] : entry['labelEn']);
+          json.add(entry['value']);
         }
-        return Country(
-          name: entry.key,
-          paysName: entry.value,
+        return CentreInteretLoisir(
+          name: entry['value'],
+          label: (langUserPhone == 'fr') ? entry['labelFr'] : entry['labelEn'],
+          descp: (langUserPhone == 'fr') ? entry['descpFr'] : entry['descpEn'],
           isSelected: isSelected,
         );
       }
       if (dataIsselected == true) {
-        updatePreferencePaysText(entry.key);
-        json.add(entry.key);
+        updatePreferenceCentreInteretLoisirToText(
+            (langUserPhone == 'fr') ? entry['labelFr'] : entry['labelEn']);
+        json.add(entry['value']);
       }
       print(dataIsselected);
-      return Country(
-        name: entry.key,
-        paysName: entry.value,
+      return CentreInteretLoisir(
+        name: entry['value'],
+        label: (langUserPhone == 'fr') ? entry['labelFr'] : entry['labelEn'],
+        descp: (langUserPhone == 'fr') ? entry['descpFr'] : entry['descpEn'],
         isSelected: dataIsselected,
       );
     }).toList();
 
     // Tri des pays avec les pays sélectionnés en premier
-    countries.sort((a, b) {
+    centreInteretLoisirs.sort((a, b) {
       if (a.isSelected && !b.isSelected) {
         return -1; // a vient avant b
       } else if (!a.isSelected && b.isSelected) {
@@ -143,31 +153,31 @@ class _ChoixDesPaysState extends State<ChoixDesPays> {
     });
 
     setState(() {
-      _countries = countries;
-      paysChoisieJson = jsonEncode(json);
+      _centreInteretLoisirs = centreInteretLoisirs;
+      centreInteretLoisirJson = jsonEncode(json);
       searchCountries(recherche);
     });
 
     final response = await http.get(Uri.parse(
-        '$generalRouteForApi/updateUserPaysChoisies/$uidUser/$langUserPhone/$paysChoisieJson'));
+        '$generalRouteForApi/updateCentreInteretLoisirChoisies/$uidUser/$langUserPhone/$centreInteretLoisirJson'));
 
     if (response.statusCode == 200) {
       // Mise à jour réussie, mettez à jour l'état du pays dans la liste
     }
   }
 
-  List<Country> _searchResults = [];
+  List<CentreInteretLoisir> _searchResults = [];
 
   void searchCountries(String query) {
     setState(() {
       recherche = query;
       if (query.isEmpty) {
-        _searchResults = List.from(_countries);
+        _searchResults = List.from(_centreInteretLoisirs);
       } else {
         final lowercaseQuery = query.toLowerCase();
-        _searchResults = _countries.where((country) {
-          final lowercaseName = country.name.toLowerCase();
-          final lowercasePaysName = country.paysName.toLowerCase();
+        _searchResults = _centreInteretLoisirs.where((country) {
+          final lowercaseName = country.descp.toLowerCase();
+          final lowercasePaysName = country.label.toLowerCase();
           return lowercaseName.contains(lowercaseQuery) ||
               lowercasePaysName.contains(lowercaseQuery);
         }).toList();
@@ -178,7 +188,7 @@ class _ChoixDesPaysState extends State<ChoixDesPays> {
   @override
   void initState() {
     super.initState();
-    fetchCountries();
+    fetchCentreInteretLoisirChoisies();
   }
 
   @override
@@ -187,7 +197,9 @@ class _ChoixDesPaysState extends State<ChoixDesPays> {
       appBar: AppBar(
         backgroundColor: primaryColor,
         title: Text(
-          (langUserPhone == "fr") ? 'Choix des Pays' : 'Choice of Countries',
+          (langUserPhone == "fr")
+              ? "Choix des centres d'intérêt, loisirs, etc."
+              : 'Choice of interests, hobbies, etc.',
           style: GoogleFonts.poppins(
             fontWeight: FontWeight.w400,
             color: Colors.white,
@@ -214,14 +226,14 @@ class _ChoixDesPaysState extends State<ChoixDesPays> {
               },
               decoration: InputDecoration(
                 labelText: (langUserPhone == "fr")
-                    ? 'Rechercher un pays ...'
-                    : 'Find a country with ...',
+                    ? "Rechercher un centre d'intérêt, loisirs, etc."
+                    : 'Search for a center of interest, hobbies, etc.',
                 prefixIcon: const Icon(Icons.search),
                 border: const OutlineInputBorder(),
               ),
             ),
           ),
-          _countries.isEmpty
+          _centreInteretLoisirs.isEmpty
               ? const Center(
                   child: CircularProgressIndicator(),
                 )
@@ -231,7 +243,14 @@ class _ChoixDesPaysState extends State<ChoixDesPays> {
                     itemBuilder: (BuildContext context, int index) {
                       final country = _searchResults[index];
                       return ListTile(
-                        title: Text("(${country.name}) ${country.paysName}"),
+                        title: Text(
+                          country.label,
+                          style: GoogleFonts.poppins(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        subtitle: Text(country.descp),
                         leading: Switch(
                           trackOutlineColor: MaterialStateColor.resolveWith(
                               (states) => primaryColor),
@@ -242,7 +261,8 @@ class _ChoixDesPaysState extends State<ChoixDesPays> {
                           value: country.isSelected,
                           onChanged: (bool? isSelected) {
                             if (isSelected != null) {
-                              updateCountrySelection(country, isSelected);
+                              updateCentreInteretLoisirSelection(
+                                  country, isSelected);
                             } else {
                               // Null
                               print(isSelected);

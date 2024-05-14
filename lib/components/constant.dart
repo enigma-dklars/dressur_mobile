@@ -50,6 +50,7 @@ List<dynamic> contactsUserBeforeDS = [];
 List<dynamic> contactsEnregistrer = [];
 String? langUserPhone = "en";
 String preferencePaysText = "";
+String preferenceCentreInteretLoisirText = "";
 int commissionBonus = 200;
 int nombreContacts = 0;
 int nombreContactDispo = 0;
@@ -148,7 +149,9 @@ Future<void> initUserInformations(userInfos) async {
   admin = userInfos["admin"];
   permissionAdd = userInfos["permissionAdd"];
   messageErreurPermissionAdd = userInfos["messageErreurPermissionAdd"];
-  preferencePaysText = userInfos["preferencePaysText"];
+  preferencePaysText = preferencePaysToText(userInfos["preferencePays"]);
+  preferenceCentreInteretLoisirText = preferenceCentreInteretLoisirToText(
+      userInfos["preferenceCentreInteretLoisir"]);
   nombreContactDispo = userInfos["nombreContactDispo"];
   lesPublicites = userInfos["lesPublicites"];
   havePublicites = userInfos["havePublicites"];
@@ -160,6 +163,39 @@ Future<void> initUserInformations(userInfos) async {
     'id': 0,
     'uid': userInfos["uid"],
   });
+}
+
+String preferencePaysToText(preferencePays) {
+  preferencePaysText = "";
+  countryCodes.entries.map((entry) {
+    var dataIsselected = preferencePays.contains(entry.key) ? true : false;
+    if (dataIsselected == true) {
+      if (preferencePaysText.isEmpty) {
+        preferencePaysText = entry.value;
+      } else {
+        preferencePaysText = "$preferencePaysText, ${entry.value}";
+      }
+    }
+  }).toList();
+  return preferencePaysText;
+}
+
+String preferenceCentreInteretLoisirToText(preferenceCentreInteretLoisir) {
+  preferenceCentreInteretLoisirText = "";
+  centreInteretLoisir.map((entry) {
+    var dataIsselected =
+        preferenceCentreInteretLoisir.contains(entry['value']) ? true : false;
+    var label = (langUserPhone == 'fr') ? entry['labelFr'] : entry['labelEn'];
+    if (dataIsselected == true) {
+      if (preferenceCentreInteretLoisirText.isEmpty) {
+        preferenceCentreInteretLoisirText = label;
+      } else {
+        preferenceCentreInteretLoisirText =
+            "$preferenceCentreInteretLoisirText, $label";
+      }
+    }
+  }).toList();
+  return preferenceCentreInteretLoisirText;
 }
 
 void insertDressurContact() async {
@@ -483,6 +519,175 @@ Map<String, String> countryCodes = {
   '260': 'Zambie',
   '263': 'Zimbabwe',
 };
+
+List<Map<String, dynamic>> centreInteretLoisir = [
+  {
+    'value': '1',
+    'labelFr': 'Lecture',
+    'labelEn': 'Reading',
+    'descpFr': 'Lecture de romans, de poésie ou de bandes dessinées.',
+    'descpEn': 'Reading novels, poetry, or comic books.',
+  },
+  {
+    'value': '2',
+    'labelFr': 'Cuisine',
+    'labelEn': 'Cooking',
+    'descpFr':
+        'Cuisiner des plats traditionnels ou expérimenter de nouvelles recettes.',
+    'descpEn': 'Cooking traditional dishes or experimenting with new recipes.',
+  },
+  {
+    'value': '3',
+    'labelFr': 'Musique',
+    'labelEn': 'Music',
+    'descpFr':
+        "Jouer d'un instrument de musique ou découvrir de nouveaux artistes.",
+    'descpEn': 'Playing a musical instrument or discovering new artists.',
+  },
+  {
+    'value': '4',
+    'labelFr': 'Randonnée',
+    'labelEn': 'Hiking',
+    'descpFr': 'Explorer la nature à pied et découvrir de nouveaux sentiers.',
+    'descpEn': 'Exploring nature on foot and discovering new trails.',
+  },
+  {
+    'value': '5',
+    'labelFr': 'Photographie',
+    'labelEn': 'Photography',
+    'descpFr':
+        'Capturer des moments précieux et explorer différents styles photographiques.',
+    'descpEn':
+        'Capturing precious moments and exploring different photographic styles.',
+  },
+  {
+    'value': '6',
+    'labelFr': 'Artisanat',
+    'labelEn': 'Crafting',
+    'descpFr':
+        'Fabriquer des objets à la main comme des bijoux, des vêtements ou de la poterie.',
+    'descpEn': 'Making handmade items such as jewelry, clothing, or pottery.',
+  },
+  {
+    'value': '7',
+    'labelFr': 'Jardinage',
+    'labelEn': 'Gardening',
+    'descpFr':
+        'Cultiver des plantes, des fleurs ou des légumes dans un jardin.',
+    'descpEn': 'Growing plants, flowers, or vegetables in a garden.',
+  },
+  {
+    'value': '8',
+    'labelFr': 'Yoga',
+    'labelEn': 'Yoga',
+    'descpFr':
+        'Pratiquer des postures et des exercices de respiration pour la relaxation et la santé.',
+    'descpEn':
+        'Practicing postures and breathing exercises for relaxation and health.',
+  },
+  {
+    'value': '9',
+    'labelFr': 'Langues étrangères',
+    'labelEn': 'Foreign Languages',
+    'descpFr':
+        'Apprendre une nouvelle langue étrangère et explorer différentes cultures.',
+    'descpEn':
+        'Learning a new foreign language and exploring different cultures.',
+  },
+  {
+    'value': '10',
+    'labelFr': 'Jeux de société',
+    'labelEn': 'Board Games',
+    'descpFr': 'Jouer à des jeux de société avec des amis ou en famille.',
+    'descpEn': 'Playing board games with friends or family.',
+  },
+  {
+    'value': '11',
+    'labelFr': 'Cinéma',
+    'labelEn': 'Cinema',
+    'descpFr':
+        'Regarder des films classiques, des nouveautés ou explorer des genres cinématographiques variés.',
+    'descpEn':
+        'Watching classic films, new releases, or exploring various film genres.',
+  },
+  {
+    'value': '12',
+    'labelFr': 'Sports',
+    'labelEn': 'Sports',
+    'descpFr':
+        'Pratiquer un sport comme le football, le tennis, ou le basketball.',
+    'descpEn': 'Playing a sport such as soccer, tennis, or basketball.',
+  },
+  {
+    'value': '13',
+    'labelFr': 'Écriture créative',
+    'labelEn': 'Creative Writing',
+    'descpFr':
+        'Écrire des histoires, des poèmes ou des articles pour exprimer sa créativité.',
+    'descpEn': 'Writing stories, poems, or articles to express creativity.',
+  },
+  {
+    'value': '14',
+    'labelFr': 'Voyage',
+    'labelEn': 'Travel',
+    'descpFr':
+        'Explorer de nouveaux pays, villes et cultures à travers le monde.',
+    'descpEn':
+        'Exploring new countries, cities, and cultures around the world.',
+  },
+  {
+    'value': '15',
+    'labelFr': 'Danse',
+    'labelEn': 'Dancing',
+    'descpFr':
+        'Apprendre à danser différents styles comme la salsa, le hip-hop ou la danse contemporaine.',
+    'descpEn':
+        'Learning to dance different styles such as salsa, hip-hop, or contemporary dance.',
+  },
+  {
+    'value': '16',
+    'labelFr': 'Observation des étoiles',
+    'labelEn': 'Stargazing',
+    'descpFr':
+        'Observer les étoiles, les planètes et les constellations dans le ciel nocturne.',
+    'descpEn': 'Observing stars, planets, and constellations in the night sky.',
+  },
+  {
+    'value': '17',
+    'labelFr': 'Arts martiaux',
+    'labelEn': 'Martial Arts',
+    'descpFr':
+        "Pratiquer des arts martiaux comme le karaté, le judo ou le taekwondo.",
+    'descpEn': 'Practicing martial arts such as karate, judo, or taekwondo.',
+  },
+  {
+    'value': '18',
+    'labelFr': 'Photographie animalière',
+    'labelEn': 'Wildlife Photography',
+    'descpFr':
+        'Photographier des animaux dans leur habitat naturel et capturer leur comportement.',
+    'descpEn':
+        'Photographing animals in their natural habitat and capturing their behavior.',
+  },
+  {
+    'value': '19',
+    'labelFr': 'Théâtre',
+    'labelEn': 'Theater',
+    'descpFr':
+        'Jouer dans des pièces de théâtre ou assister à des représentations théâtrales.',
+    'descpEn': 'Acting in plays or attending theatrical performances.',
+  },
+  {
+    'value': '20',
+    'labelFr': 'Volontariat',
+    'labelEn': 'Volunteering',
+    'descpFr':
+        "Donner de son temps pour aider les autres ou s'impliquer dans des causes sociales.",
+    'descpEn':
+        'Volunteering time to help others or getting involved in social causes.',
+  },
+  // { 'value': "21", 'labelFr': "aaa", 'labelEn': "aaa", 'descpFr': "aaa", 'descpEn': "aaa", },
+];
 
 String getCurrentYear() {
   // Obtenez la date actuelle
