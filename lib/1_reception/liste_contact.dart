@@ -1,4 +1,4 @@
-// ignore_for_file: unnecessary_null_comparison
+// ignore_for_file: unnecessary_null_comparison, prefer_const_constructors
 
 import 'dart:convert';
 import 'package:dressur/5_autre/autre_profil.dart';
@@ -44,6 +44,7 @@ class ContactPage extends StatefulWidget {
 }
 
 class _ContactPageState extends State<ContactPage> {
+  static const espaceEntreLesOptionsContact = 10.0;
   bool _loading = false;
   List<ContactDS> _contacts = [];
   List<ContactDS> _filteredContacts = [];
@@ -268,31 +269,87 @@ class _ContactPageState extends State<ContactPage> {
                               overflow: TextOverflow.ellipsis,
                             ),
                             subtitle: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: primaryColor,
-                                    shape: const StadiumBorder(),
-                                    padding: const EdgeInsets.symmetric(
-                                      vertical: 0,
-                                      horizontal: 0,
+                                GestureDetector(
+                                  onTap: () {
+                                    launchPhoneCall(contact.tel);
+                                  },
+                                  child: Container(
+                                    padding: EdgeInsets.fromLTRB(5, 5, 5, 5),
+                                    decoration: BoxDecoration(
+                                      color: primaryColor,
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: Icon(
+                                      Icons.phone,
+                                      size: 20,
+                                      color: Colors.white,
                                     ),
                                   ),
-                                  onPressed: () {
+                                ),
+                                const SizedBox(
+                                    width: espaceEntreLesOptionsContact),
+                                GestureDetector(
+                                  onTap: () {
+                                    launchSMS(contact.tel);
+                                  },
+                                  child: Container(
+                                    padding: EdgeInsets.fromLTRB(5, 5, 5, 5),
+                                    decoration: BoxDecoration(
+                                      color: primaryColor,
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: Icon(
+                                      Icons.message,
+                                      size: 20,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(
+                                    width: espaceEntreLesOptionsContact),
+                                GestureDetector(
+                                  onTap: () {
+                                    launchEmail(contact.mail);
+                                  },
+                                  child: Container(
+                                    padding: EdgeInsets.fromLTRB(5, 5, 5, 5),
+                                    decoration: BoxDecoration(
+                                      color: primaryColor,
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: Icon(
+                                      Icons.mail,
+                                      size: 20,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(
+                                    width: espaceEntreLesOptionsContact),
+                                GestureDetector(
+                                  onTap: () {
                                     setState(() {
                                       uidAutreUser = contact.id;
                                       addUserOnAutreProfilPage = "non";
                                     });
                                     Navigator.of(context).push(
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                AutreProfilPage()));
+                                      MaterialPageRoute(
+                                        builder: (context) => AutreProfilPage(),
+                                      ),
+                                    );
                                   },
-                                  child: const Icon(
-                                    Icons.info,
-                                    size: 20,
-                                    color: Colors.white,
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: primaryColor,
+                                    ),
+                                    padding: EdgeInsets.fromLTRB(5, 5, 5, 5),
+                                    child: Icon(
+                                      Icons.info,
+                                      size: 20,
+                                      color: Colors.white,
+                                    ),
                                   ),
                                 ),
                               ],

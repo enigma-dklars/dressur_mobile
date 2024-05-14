@@ -3,6 +3,7 @@ import 'package:dressur/components/111_generalApiDomaine.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:dressur/components/sql_helper.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 const versionApp = '1.0.0';
 const oldDatabaseName = 'un_dressur.db';
@@ -199,9 +200,8 @@ String preferenceCentreInteretLoisirToText(preferenceCentreInteretLoisir) {
     }
   }).toList();
   if (preferenceCentreInteretLoisirText.isEmpty) {
-    preferenceCentreInteretLoisirText = (langUserPhone == 'fr')
-        ? "Aucun Choix"
-        : "No Choice";
+    preferenceCentreInteretLoisirText =
+        (langUserPhone == 'fr') ? "Aucun Choix" : "No Choice";
   }
   return preferenceCentreInteretLoisirText;
 }
@@ -967,4 +967,25 @@ String getCurrentYear() {
   String currentYear = now.year.toString();
 
   return currentYear;
+}
+
+void launchPhoneCall(String phoneNumber) async {
+  final Uri _url = Uri.parse('tel:$phoneNumber');
+  if (!await launchUrl(_url, mode: LaunchMode.externalApplication)) {
+    throw 'Could not launch $_url';
+  }
+}
+
+void launchSMS(String phoneNumber) async {
+  final Uri _url = Uri.parse('sms:$phoneNumber');
+  if (!await launchUrl(_url, mode: LaunchMode.externalApplication)) {
+    throw 'Could not launch $_url';
+  }
+}
+
+void launchEmail(String emailAddress) async {
+  final Uri _url = Uri.parse('mailto:$emailAddress');
+  if (!await launchUrl(_url, mode: LaunchMode.externalApplication)) {
+    throw 'Could not launch $_url';
+  }
 }
