@@ -108,11 +108,13 @@ class _PromotionReseauSociauxListePageState extends State<PromotionReseauSociaux
   }
 
   Widget build(BuildContext context) {
-    return Scaffold(
+     return Scaffold(
       appBar: AppBar(
+        elevation: 0,
+        backgroundColor: primaryColor,
         title: Text(
           (langUserPhone == "fr")
-              ? 'Liste Promotion Réseau Sociaux'
+              ? "Liste Promotion Réseau Sociaux"
               : "Social Network Promotion List",
           style: GoogleFonts.poppins(
             fontWeight: FontWeight.w600,
@@ -129,7 +131,6 @@ class _PromotionReseauSociauxListePageState extends State<PromotionReseauSociaux
             color: Colors.white,
           ),
         ),
-        backgroundColor: primaryColor,
         actions: [
           PopupMenuButton<dynamic>(
             itemBuilder: (context) => [
@@ -191,8 +192,8 @@ class _PromotionReseauSociauxListePageState extends State<PromotionReseauSociaux
                   ? Center(
                       child: Text(
                         (langUserPhone == "fr")
-                            ? "Aucune promotion réseau sociaux trouvé."
-                            : "No social network promotion found.",
+                            ? "Aucun promotion réseau sociaux trouvé."
+                            : "No social network promotions found.",
                         style: const TextStyle(fontSize: 16),
                       ),
                     )
@@ -205,91 +206,144 @@ class _PromotionReseauSociauxListePageState extends State<PromotionReseauSociaux
                 return Card(
                   margin: const EdgeInsets.only(
                       left: 10, top: 10, right: 10, bottom: 0),
-                  child: Row(
-                    children: [
-                      const SizedBox(width: 5),
-                      Expanded(
-                        child: Container(
-                          // width: 80,
-                          height: 100,
-                          decoration: BoxDecoration(
-                            gradient: const LinearGradient(
-                              begin: Alignment.topCenter,
-                              end: Alignment.bottomCenter,
-                              colors: [
-                                primaryColor,
-                                secondaryColor,
+                  child: Container(
+                    width: MediaQuery.of(context).size.width * 0.95,
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          secondaryColor,
+                          primaryColor,
+                        ],
+                      ),
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                    padding: const EdgeInsets.fromLTRB(15, 10, 15, 10),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Column(
+                              children: [
+                                Text(
+                                  promotionReseauSociaux.titre,
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 14,
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w800,
+                                  ),
+                                  textAlign: TextAlign.end,
+                                ),
                               ],
                             ),
-                            borderRadius: BorderRadius.circular(5),
-                          ),
-                          padding: const EdgeInsets.fromLTRB(15, 10, 15, 0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Titre: ${promotionReseauSociaux.titre}',
-                                style: const TextStyle(
-                                  fontSize: 12.0,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
-                              ),
-                              const SizedBox(height: 5),
-                              Text(
-                                'Status: ${promotionReseauSociaux.status}',
-                                style: const TextStyle(
-                                  fontSize: 12.0,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
-                              ),
-                              const SizedBox(height: 5),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  Column(
-                                    children: [
-                                      SizedBox(
-                                        child: ElevatedButton.icon(
-                                          style: ElevatedButton.styleFrom(
-                                            backgroundColor: Colors.green,
-                                          ),
-                                          label: Text(
-                                            (langUserPhone == "fr")
-                                                ? 'Autres Informations'
-                                                : 'Other information',
-                                            style: GoogleFonts.poppins(
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.w600,
-                                            ),
-                                          ),
-                                          icon: const Icon(
-                                            Icons.info,
-                                            color: Colors.white,
-                                          ),
-                                          onPressed: () {
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (context) =>
-                                                   PromotionReseauSociauxDetailPage(
-                                                    promotionReseauSociaux: promotionReseauSociaux,
-                                                    ),
-                                              ),
-                                            );
-                                          },
-                                        ),
-                                      ),
-                                    ],
+                            Column(
+                              children: [
+                                Text(
+                                  promotionReseauSociaux.qteDemander,
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 14,
+                                    color: Colors.white,
                                   ),
-                                ],
-                              ),
-                            ],
+                                  textAlign: TextAlign.end,
+                                ),
+                              ],
+                            ),
+                             Column(
+                              children: [
+                                Text(
+                                  promotionReseauSociaux.prixFixer,
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 14,
+                                    color: Colors.white,
+                                  ),
+                                  textAlign: TextAlign.end,
+                                ),
+                              ],
+                            ),
+                            Column(
+                              children: [
+                                Text(
+                                  promotionReseauSociaux.url,
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 14,
+                                    color: Colors.white,
+                                  ),
+                                  textAlign: TextAlign.end,
+                                ),
+                              ],
+                            ),
+                            Column(
+                              children: [
+                                Text(
+                                  promotionReseauSociaux.reference,
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 14,
+                                    color: Colors.white,
+                                  ),
+                                  textAlign: TextAlign.end,
+                                ),
+                              ],
+                            ),
+                            Column(
+                              children: [
+                                Text(
+                                  promotionReseauSociaux.status,
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 14,
+                                    color: Colors.white,
+                                  ),
+                                  textAlign: TextAlign.end,
+                                ),
+                              ],
+                            ),
+                            Column(
+                              children: [
+                                Text(
+                                  promotionReseauSociaux.compteurDebut,
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 14,
+                                    color: Colors.white,
+                                  ),
+                                  textAlign: TextAlign.end,
+                                ),
+                              ],
+                            ),
+                            Column(
+                              children: [
+                                Text(
+                                  promotionReseauSociaux.compteurRestant,
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 14,
+                                    color: Colors.white,
+                                  ),
+                                  textAlign: TextAlign.end,
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 5),
+                        Text(
+                          promotionReseauSociaux.createdAt,
+                          style: GoogleFonts.poppins(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 18,
+                            color: Colors.white,
                           ),
                         ),
-                      ),
-                    ],
+                        const SizedBox(height: 5),
+                        Text(
+                          promotionReseauSociaux.updatedAt,
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 );
               },
@@ -299,13 +353,3 @@ class _PromotionReseauSociauxListePageState extends State<PromotionReseauSociaux
   }
 }
 
-class PromotionReseauSociauxDetailPage extends StatelessWidget {
-  final PromotionReseauSociaux promotionReseauSociaux;
-
-  PromotionReseauSociauxDetailPage({required this.promotionReseauSociaux});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container();
-  }
-}
