@@ -1,4 +1,4 @@
-// ignore_for_file: unnecessary_null_comparison, non_constant_identifier_names, prefer_final_fields
+// ignore_for_file: unnecessary_null_comparison, non_constant_identifier_names, prefer_final_fields, unused_field
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
@@ -92,11 +92,14 @@ class _RegisterForm3State extends State<RegisterForm3> {
   int? initialService;
   bool _loading_liste_formule = false;
   bool _desactive2 = false;
+  bool _desactive3 = false;
+  bool _isValidLink = true; // Flag to indicate link validity
   dynamic data;
   List<dynamic> listSocialNetworks = [];
   List<Map<String, dynamic>> listServices = [];
+  dynamic valueMethodePaiement = "mtn";
   String? titreFormuleFils;
-  dynamic idFormuleCampagneMail = 1;
+  dynamic idFormulePromoReseau = 1;
   var _message = "";
 
   String titre = "";
@@ -113,6 +116,7 @@ class _RegisterForm3State extends State<RegisterForm3> {
   final linkController = TextEditingController();
   final quantityController = TextEditingController(text: "0");
   final priceController = TextEditingController();
+  final telController = TextEditingController();
 
   void onChangeService(val) async {
     for (var service in listServices) {
@@ -200,10 +204,167 @@ class _RegisterForm3State extends State<RegisterForm3> {
     }
   }
 
+  void newPromoReseau() async {
+    if (telIsVerified == true) {
+      dynamic youHaveNetWork = "";
+      youHaveConnexion();
+      youHaveNetWork = await SQLHelper.getYouHaveConnexion();
+      while (youHaveNetWork.length == 0) {
+        youHaveNetWork = await SQLHelper.getYouHaveConnexion();
+      }
+      if (youHaveNetWork[0]['youHaveConnexion'] == "oui") {
+        setState(() {
+          _desactive3 = true;
+        });
+
+        var request = http.MultipartRequest(
+            'POST', Uri.parse('$generalRouteForApi/newPromoReseau'));
+        request.fields.addAll({
+          'langUserPhone': langUserPhone.toString(),
+          'uid': uidUser,
+          'idFormulePromoReseau': idFormulePromoReseau.toString(),
+          'qteDemander': quantityController.text,
+          'prixQteDemander': priceController.text,
+          'lien': linkController.text,
+          'valueMethodePaiement': valueMethodePaiement,
+          'tel': telController.text,
+        });
+
+        http.StreamedResponse response = await request.send();
+
+        if (response.statusCode == 200) {
+          var data1 = await response.stream.bytesToString();
+          var data = convert.jsonDecode(data1);
+          if (data["error"] == false) {
+            setState(() {
+              _desactive3 = false;
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                behavior: SnackBarBehavior.floating,
+                content: Text(
+                  (langUserPhone == "fr")
+                      ? 'Votre poste a déjà démarré.'
+                      : 'Your post has already started.',
+                ),
+              ));
+            });
+          } else {
+            dangerNoti(data["titre"], data["message"], context);
+            setState(() {
+              _desactive3 = false;
+            });
+          }
+        }
+      } else {
+        if (langUserPhone != "fr") {
+          dangerNoti(
+              "Mistake!", "You are not connected to the internet.", context);
+        } else {
+          dangerNoti(
+              "Erreur!", "Vous n'ètes pas connecté a internet.", context);
+        }
+        setState(() {
+          _desactive3 = false;
+        });
+      }
+    } else {
+      if (langUserPhone != "fr") {
+        dangerNoti("Access denied !",
+            "Please confirm your WhatsApp number first.", context);
+      } else {
+        dangerNoti("Accès Refusé !",
+            "Veuillez d'abord confirmer votre numéro WhatsApp.", context);
+      }
+    }
+  }
+
+  void checkTransaction(idTransaction) async {
+    if (telIsVerified == true) {
+      dynamic youHaveNetWork = "";
+      youHaveConnexion();
+      youHaveNetWork = await SQLHelper.getYouHaveConnexion();
+      while (youHaveNetWork.length == 0) {
+        youHaveNetWork = await SQLHelper.getYouHaveConnexion();
+      }
+      if (youHaveNetWork[0]['youHaveConnexion'] == "oui") {
+        setState(() {
+          _desactive3 = true;
+        });
+
+        var request = http.MultipartRequest(
+            'POST', Uri.parse('$generalRouteForApi/checkTransaction'));
+        request.fields.addAll({
+          'uid': uidUser,
+          'langUserPhone': langUserPhone.toString(),
+          'idTransaction': idTransaction.toString()
+        });
+
+        http.StreamedResponse response = await request.send();
+
+        if (response.statusCode == 200) {
+          var data1 = await response.stream.bytesToString();
+          var data = convert.jsonDecode(data1);
+          if (data["error"] == false) {
+            if (data["transaction"] == false) {
+              dangerNoti(data["titre"], data["message"], context);
+
+              setState(() {
+                _desactive3 = false;
+              });
+            } else if (data["transaction"] == true) {
+              successNoti(data["titre"], data["message"], context);
+
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                behavior: SnackBarBehavior.floating,
+                content: Text(data["message"]),
+              ));
+
+              setState(() {
+                _desactive3 = false;
+              });
+            }
+          } else {
+            dangerNoti(data["titre"], data["message"], context);
+            setState(() {
+              _desactive3 = false;
+            });
+          }
+        }
+      } else {
+        if (langUserPhone != "fr") {
+          dangerNoti(
+              "Mistake!", "You are not connected to the internet.", context);
+        } else {
+          dangerNoti(
+              "Erreur!", "Vous n'ètes pas connecté a internet.", context);
+        }
+        setState(() {
+          _desactive3 = false;
+        });
+      }
+    } else {
+      if (langUserPhone != "fr") {
+        dangerNoti("Access denied !",
+            "Please confirm your WhatsApp number first.", context);
+      } else {
+        dangerNoti("Accès Refusé !",
+            "Veuillez d'abord confirmer votre numéro WhatsApp.", context);
+      }
+      setState(() {
+        _desactive3 = false;
+      });
+    }
+  }
+
   @override
   void initState() {
     super.initState();
     listeFormPromoReseau();
+  }
+
+  onChangeMethodePaiement(val) async {
+    setState(() {
+      valueMethodePaiement = val;
+    });
   }
 
   @override
@@ -378,11 +539,50 @@ class _RegisterForm3State extends State<RegisterForm3> {
           ),
           const SizedBox(height: 10),
           DelayedAnimation(
-            delay: 0, // 1500,
+            delay: 0,
             child: TextField(
               controller: linkController,
               decoration: InputDecoration(
                 labelText: (langUserPhone == "fr") ? "Lien" : "Link",
+                border: const OutlineInputBorder(),
+                errorText: _isValidLink
+                    ? null
+                    : "Veuillez saisir un lien valide.", // Set error text if link is invalid
+              ),
+              onChanged: (text) {
+                setState(() {
+                  // Basic URL validation using a regular expression
+                  final RegExp urlRegex = RegExp(r"^(?:(?:https?|ftp)://)?\S+$",
+                      caseSensitive: false);
+                  _isValidLink = urlRegex.hasMatch(text);
+                });
+              },
+            ),
+          ),
+          const SizedBox(height: 10),
+          DelayedAnimation(
+            delay: 0, // 1500,
+            child: SelectFormField(
+              decoration: const InputDecoration(
+                labelText: 'Methode de paiement mobile',
+                border: OutlineInputBorder(),
+              ),
+              type: SelectFormFieldType.dropdown,
+              initialValue: 'mtn',
+              labelText: 'Methode de paiement mobile',
+              items: listeMethodePaiement,
+              onChanged: (val) => onChangeMethodePaiement(val),
+              onSaved: (val) => print(val),
+            ),
+          ),
+          const SizedBox(height: 10),
+          DelayedAnimation(
+            delay: 0, // 1500,
+            child: TextField(
+              controller: telController,
+              decoration: InputDecoration(
+                labelStyle: TextStyle(color: Colors.grey[400]),
+                labelText: 'Indicatif + Numéro du paiement',
                 border: const OutlineInputBorder(),
               ),
             ),
@@ -412,11 +612,52 @@ class _RegisterForm3State extends State<RegisterForm3> {
                     color: Colors.white,
                   ),
                 ),
-                onPressed: () {},
+                onPressed: () {
+                  if (!telIsVerified) {
+                    warningNoti(
+                        "Configuration du compte",
+                        "Patientez encore svp. Votre numéro WhatsApp n'a pas encore été confirmé par un administrateur. Il le sera dans les plus brefs délais.",
+                        context);
+                  } else if (!mailIsVerified) {
+                    warningNoti(
+                        "Configuration du compte",
+                        "Veuillez d'abord confirmer votre adresse mail...\n\nVous trouverez sur notre chaine YouTube des vidéos qui peuvent vous aider...",
+                        context);
+                  } else {
+                    _desactive3 ? null : newPromoReseau();
+                  }
+                },
               ),
             ),
           ),
+          const SizedBox(height: 20),
+          DelayedAnimation(
+            delay: 0, // 1000,
+            child: Text(
+              _message,
+              style: GoogleFonts.poppins(
+                color: Colors.blue[400],
+                fontWeight: FontWeight.w600,
+                fontSize: 12,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
           const SizedBox(height: 10),
+          DelayedAnimation(
+            delay: 0, // 1500,
+            child: Text(
+              (langUserPhone == "fr")
+                  ? "Pour payer par Wave ou Carte Bancaire, veuillez contacter l'Assistance Dressur par WhatsApp. Merci..."
+                  : "To pay by Wave or Credit Card, please contact Dressur Support by WhatsApp. THANKS...",
+              style: GoogleFonts.poppins(
+                fontWeight: FontWeight.w600,
+                fontSize: 12,
+                color: Colors.red[400],
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
         ],
       ),
     );
