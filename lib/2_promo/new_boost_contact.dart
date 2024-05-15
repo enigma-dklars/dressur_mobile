@@ -174,8 +174,13 @@ class _RegisterFormState extends State<RegisterForm> {
   var _message = "";
   dynamic data;
   dynamic idFormulBoost = 1;
-  List<Map<String, dynamic>> listeFormulBoost = [];
   String? boostId;
+
+  List<Map<String, dynamic>> listeDesFormules = [];
+  int value = 0;
+  var label = "";
+  int prix = 0;
+  int jours = 0;
 
   void listeFormuleBoost() async {
     dynamic youHaveNetWork = "";
@@ -199,21 +204,14 @@ class _RegisterFormState extends State<RegisterForm> {
         var data1 = await response.stream.bytesToString();
         var data = convert.jsonDecode(data1);
         if (data["error"] == false) {
-          SQLHelper.delete('listeFormulBoost');
-          for (var lesformuleboost in data["listeFormulBoost"]) {
-            SQLHelper.insert({
-              'tableName': "listeFormulBoost",
-              'value': lesformuleboost['id'],
-              'label': lesformuleboost['label'],
-              'prix': lesformuleboost['prix'],
-              'jours': lesformuleboost['jours']
-            });
-          }
-          final dataElements = await SQLHelper.getAll("listeFormulBoost");
           setState(() {
             _desactive = false;
-            listeFormulBoost = dataElements;
-            onChangeFormulBoost(1);
+            listeDesFormules = (data["listeFormulBoost"] as List<dynamic>)
+                .map((item) => item as Map<String, dynamic>)
+                .toList();
+            _message = (langUserPhone == "fr")
+                ? "Veuillez choisir une formule."
+                : "Please choose a plan.";
           });
         }
       }
@@ -304,13 +302,21 @@ class _RegisterFormState extends State<RegisterForm> {
   }
 
   onChangeFormulBoost(val) async {
-    var prix = (await SQLHelper.getFormulBoostWhithId(val))[0]['prix'];
-    var jours = (await SQLHelper.getFormulBoostWhithId(val))[0]['jours'];
+    for (var service in listeDesFormules) {
+      if ("$val" == "${service['value']}") {
+        setState(() {
+          value = service['value'];
+          label = service['label'];
+          prix = service['prix'];
+          jours = service['jours'];
+        });
+      }
+    }
     setState(() {
       idFormulBoost = val;
       _message = (langUserPhone == "fr")
-          ? "Cette formule vous offre un boost contact de $jours jour(s) pour $prix Points qui seront déduit de votre solde bonus."
-          : "This formula gives you a boost contact of $jours day(s) for Points $prix which will be deducted from your bonus balance.";
+          ? "Cette formule vous offre un boost de $jours jour(s) pour $prix FCFA."
+          : "This formula offers you a boost of $jours day(s) for $prix FCFA.";
     });
   }
 
@@ -333,9 +339,9 @@ class _RegisterFormState extends State<RegisterForm> {
                 border: OutlineInputBorder(),
               ),
               type: SelectFormFieldType.dropdown,
-              initialValue: '1',
+              initialValue: '0',
               labelText: 'Formules de Boost',
-              items: listeFormulBoost,
+              items: listeDesFormules,
               onChanged: (val) => onChangeFormulBoost(val),
               onSaved: (val) => print(val),
             ),
@@ -411,9 +417,14 @@ class _RegisterForm2State extends State<RegisterForm2> {
   dynamic data;
   dynamic idFormulBoost = 1;
   dynamic valueMethodePaiement = "mtn";
-  List<Map<String, dynamic>> listeFormulBoost = [];
   String? boostId;
   final telController = TextEditingController(text: tel);
+
+  List<Map<String, dynamic>> listeDesFormules = [];
+  int value = 0;
+  var label = "";
+  int prix = 0;
+  int jours = 0;
 
   void listeFormuleBoost() async {
     dynamic youHaveNetWork = "";
@@ -437,21 +448,14 @@ class _RegisterForm2State extends State<RegisterForm2> {
         var data1 = await response.stream.bytesToString();
         var data = convert.jsonDecode(data1);
         if (data["error"] == false) {
-          SQLHelper.delete('listeFormulBoost');
-          for (var lesformuleboost in data["listeFormulBoost"]) {
-            SQLHelper.insert({
-              'tableName': "listeFormulBoost",
-              'value': lesformuleboost['id'],
-              'label': lesformuleboost['label'],
-              'prix': lesformuleboost['prix'],
-              'jours': lesformuleboost['jours']
-            });
-          }
-          final dataElements = await SQLHelper.getAll("listeFormulBoost");
           setState(() {
             _desactive2 = false;
-            listeFormulBoost = dataElements;
-            onChangeFormulBoost(1);
+            listeDesFormules = (data["listeFormulBoost"] as List<dynamic>)
+                .map((item) => item as Map<String, dynamic>)
+                .toList();
+            _message = (langUserPhone == "fr")
+                ? "Veuillez choisir une formule."
+                : "Please choose a plan.";
           });
         }
       }
@@ -469,8 +473,16 @@ class _RegisterForm2State extends State<RegisterForm2> {
   }
 
   onChangeFormulBoost(val) async {
-    var prix = (await SQLHelper.getFormulBoostWhithId(val))[0]['prix'];
-    var jours = (await SQLHelper.getFormulBoostWhithId(val))[0]['jours'];
+    for (var service in listeDesFormules) {
+      if ("$val" == "${service['value']}") {
+        setState(() {
+          value = service['value'];
+          label = service['label'];
+          prix = service['prix'];
+          jours = service['jours'];
+        });
+      }
+    }
     setState(() {
       idFormulBoost = val;
       _message = (langUserPhone == "fr")
@@ -654,9 +666,9 @@ class _RegisterForm2State extends State<RegisterForm2> {
                 border: OutlineInputBorder(),
               ),
               type: SelectFormFieldType.dropdown,
-              initialValue: '1',
+              initialValue: '0',
               labelText: 'Formules de Boost Payant',
-              items: listeFormulBoost,
+              items: listeDesFormules,
               onChanged: (val) => onChangeFormulBoost(val),
               onSaved: (val) => print(val),
             ),

@@ -1,4 +1,4 @@
-// ignore_for_file: use_build_context_synchronously
+// ignore_for_file: use_build_context_synchronously, non_constant_identifier_names
 
 import 'package:dressur/2_promo/liste_campagne_mail.dart';
 import 'package:flutter/material.dart';
@@ -120,11 +120,9 @@ class RegisterForm2 extends StatefulWidget {
 }
 
 class _RegisterForm2State extends State<RegisterForm2> {
-  int nombreMail = 0;
   var nombreAdresseMailForm = 0;
   bool _desactive2 = false;
   dynamic data;
-  List<Map<String, dynamic>> listeFormuleCampagneMail = [];
   String? boostId;
   dynamic idFormuleCampagneMail = 1;
   var _message = "";
@@ -134,6 +132,12 @@ class _RegisterForm2State extends State<RegisterForm2> {
   final sujetController = TextEditingController();
   final sendtoController = TextEditingController();
   final contentmailController = TextEditingController();
+
+  List<Map<String, dynamic>> listeDesFormules = [];
+  int value = 0;
+  var label = "";
+  int prix = 0;
+  int nombre_mail = 0;
 
   String extraireAdressesEmail(String texte) {
     RegExp regex =
@@ -173,23 +177,15 @@ class _RegisterForm2State extends State<RegisterForm2> {
         var data1 = await response.stream.bytesToString();
         var data = convert.jsonDecode(data1);
         if (data["error"] == false) {
-          SQLHelper.delete('listeFormuleCampagneMail');
-          for (var listedesformules in data["listeFormuleCampagneMail"]) {
-            SQLHelper.insert({
-              'tableName': "listeFormuleCampagneMail",
-              'value': listedesformules['id'],
-              'label': listedesformules['label'],
-              'prix': listedesformules['prix'],
-              'jours': listedesformules['nombre_mail'],
-            });
-          }
-
-          final dataElements =
-              await SQLHelper.getAll("listeFormuleCampagneMail");
           setState(() {
             _desactive2 = false;
-            listeFormuleCampagneMail = dataElements;
-            onChangeFormulBoost(1);
+            listeDesFormules =
+                (data["listeFormuleCampagneMail"] as List<dynamic>)
+                    .map((item) => item as Map<String, dynamic>)
+                    .toList();
+            _message = (langUserPhone == "fr")
+                ? "Veuillez choisir une formule."
+                : "Please choose a plan.";
           });
         }
       }
@@ -209,16 +205,16 @@ class _RegisterForm2State extends State<RegisterForm2> {
   void newCampagneMail() async {
     // ignore: unused_local_variable
     final vmail = extraireAdressesEmail(sendtoController.text);
-    if (nombreAdresseMailForm > nombreMail) {
+    if (nombreAdresseMailForm > nombre_mail) {
       if (langUserPhone != "fr") {
         dangerNoti(
             "Error !",
-            "Maximum $nombreMail recipients for the plan you have chosen.",
+            "Maximum $nombre_mail recipients for the plan you have chosen.",
             context);
       } else {
         dangerNoti(
             "Erreur !",
-            "Maximum $nombreMail destinataires pour le plan que vous avez choisi.",
+            "Maximum $nombre_mail destinataires pour le plan que vous avez choisi.",
             context);
       }
     } else if (nombreAdresseMailForm < 10) {
@@ -310,18 +306,22 @@ class _RegisterForm2State extends State<RegisterForm2> {
   }
 
   void onChangeFormulBoost(val) async {
-    var boostDataList = await SQLHelper.getFormulBoostWhithId(val);
-    var boostData = boostDataList[0];
-    var joursAsString = boostData['jours'];
-    var prix = boostData['prix'];
-    int nombreMailFromDB = int.parse(joursAsString);
+    for (var service in listeDesFormules) {
+      if ("$val" == "${service['value']}") {
+        setState(() {
+          value = service['value'];
+          label = service['label'];
+          prix = service['prix'];
+          nombre_mail = service['nombre_mail'];
+        });
+      }
+    }
     setState(() {
       idFormuleCampagneMail = val;
       _message = (langUserPhone == "fr")
-          ? "Cette formule vous offre une Campagne Mail vers 10 à $nombreMailFromDB adresses mails au maximum à $prix FCFA."
-          : "This formula offers you an Email Campaign to 10 at $nombreMailFromDB email addresses at maximum at FCFA $prix.";
+          ? "Cette formule vous offre une Campagne Mail vers 10 à $nombre_mail adresses mails au maximum à $prix FCFA."
+          : "This formula offers you an Email Campaign to 10 at $nombre_mail email addresses at maximum at FCFA $prix.";
     });
-    nombreMail = nombreMailFromDB;
   }
 
   @override
@@ -343,9 +343,9 @@ class _RegisterForm2State extends State<RegisterForm2> {
                 border: OutlineInputBorder(),
               ),
               type: SelectFormFieldType.dropdown,
-              initialValue: '1',
+              initialValue: '0',
               labelText: 'Formules de Campagne Mail Payante',
-              items: listeFormuleCampagneMail,
+              items: listeDesFormules,
               onChanged: (val) => onChangeFormulBoost(val),
               onSaved: (val) => print(val),
             ),
