@@ -1,5 +1,6 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'package:dressur/2_promo/liste_boost_contact.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:dressur/components/delayed_animation.dart';
@@ -259,13 +260,18 @@ class _RegisterFormState extends State<RegisterForm> {
             setState(() {
               _desactive = false;
               ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      behavior: SnackBarBehavior.floating,
+                duration: const Duration(seconds: 15),
+                behavior: SnackBarBehavior.floating,
                 content: Text(
-                  (langUserPhone == "fr")
-                      ? 'Votre poste a déjà démarré.'
-                      : 'Your post has already started.',
+                  data["message"],
                 ),
               ));
+              Navigator.pop(context);
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => ListeBoostContactPage()),
+              );
             });
           } else {
             dangerNoti(data["titre"], data["message"], context);
@@ -324,7 +330,7 @@ class _RegisterFormState extends State<RegisterForm> {
             child: SelectFormField(
               decoration: const InputDecoration(
                 labelText: 'Formules de Boost',
-                border: const OutlineInputBorder(),
+                border: OutlineInputBorder(),
               ),
               type: SelectFormFieldType.dropdown,
               initialValue: '1',
@@ -591,7 +597,7 @@ class _RegisterForm2State extends State<RegisterForm2> {
               successNoti(data["titre"], data["message"], context);
 
               ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      behavior: SnackBarBehavior.floating,
+                behavior: SnackBarBehavior.floating,
                 content: Text(data["message"]),
               ));
 
@@ -656,6 +662,17 @@ class _RegisterForm2State extends State<RegisterForm2> {
               items: listeFormulBoost,
               onChanged: (val) => onChangeFormulBoost(val),
               onSaved: (val) => print(val),
+            ),
+          ),
+          const SizedBox(height: 10),
+          DelayedAnimation(
+            delay: 0, // 1000,
+            child: Text(
+              _message,
+              style: GoogleFonts.poppins(
+                fontSize: 16,
+              ),
+              textAlign: TextAlign.center,
             ),
           ),
           const SizedBox(height: 10),
@@ -728,19 +745,6 @@ class _RegisterForm2State extends State<RegisterForm2> {
                   }
                 },
               ),
-            ),
-          ),
-          const SizedBox(height: 20),
-          DelayedAnimation(
-            delay: 0, // 1000,
-            child: Text(
-              _message,
-              style: GoogleFonts.poppins(
-                color: Colors.blue[400],
-                fontWeight: FontWeight.w600,
-                fontSize: 12,
-              ),
-              textAlign: TextAlign.center,
             ),
           ),
           const SizedBox(height: 10),

@@ -46,27 +46,12 @@ class _PromotionFormPageState extends State<PromotionFormPage> {
       final fileSizeInMB = fileSize / (1024 * 1024);
 
       if (fileSizeInMB > 1) {
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: const Text('Erreur'),
-              content: Text(
-                (langUserPhone == "fr")
-                    ? "La taille de l'image ne peut pas dépasser 1 Mo."
-                    : "Image size cannot exceed 1 MB.",
-              ),
-              actions: <Widget>[
-                TextButton(
-                  child: const Text('OK'),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                ),
-              ],
-            );
-          },
-        );
+        dangerNoti(
+            "Attention !!!",
+            (langUserPhone == "fr")
+                ? "La taille de l'image ne peut pas dépasser 1 Mo."
+                : "Image size cannot exceed 1 MB.",
+            context);
         return;
       }
 
@@ -75,54 +60,24 @@ class _PromotionFormPageState extends State<PromotionFormPage> {
           _imageFile = imageFile;
         });
       } else {
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: const Text('Erreur'),
-              content: Text(
-                (langUserPhone == "fr")
-                    ? "L'image doit être proche d'un carré."
-                    : "The image should be close to a square.",
-              ),
-              actions: <Widget>[
-                TextButton(
-                  child: const Text('OK'),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                ),
-              ],
-            );
-          },
-        );
+        dangerNoti(
+            "Attention !!!",
+            (langUserPhone == "fr")
+                ? "L'image doit être proche d'un carré."
+                : "The image should be close to a square.",
+            context);
       }
     }
   }
 
   Future<void> _sendData() async {
     if (_textEditingController.text.isEmpty || _imageFile == null) {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text('Erreur'),
-            content: Text(
-              (langUserPhone == "fr")
-                  ? 'Veuillez entrer un texte et sélectionner une image.'
-                  : 'Please enter a text and select an image.',
-            ),
-            actions: <Widget>[
-              TextButton(
-                child: const Text('OK'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          );
-        },
-      );
+      dangerNoti(
+          "Attention !!!",
+          (langUserPhone == "fr")
+              ? 'Veuillez entrer un texte et sélectionner une image.'
+              : 'Please enter a text and select an image.',
+          context);
       return;
     }
 
@@ -164,25 +119,12 @@ class _PromotionFormPageState extends State<PromotionFormPage> {
       if (data["error"] == true) {
         dangerNoti(data["titre"], data["message"], context);
       } else {
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: const Text('Succès'),
-              content: Text((langUserPhone == "fr")
-                  ? 'Votre demande de promotion a été enregistrée, vous passerez au paiement si elle est acceptée.'
-                  : 'Your promotion request has been registered, you will proceed to payment if it is accepted.'),
-              actions: <Widget>[
-                TextButton(
-                  child: const Text('OK'),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                ),
-              ],
-            );
-          },
-        );
+        successNoti(
+            "Good",
+            (langUserPhone == "fr")
+                ? 'Votre demande de promotion a été enregistrée, vous passerez au paiement si elle est acceptée.'
+                : 'Your promotion request has been registered, you will proceed to payment if it is accepted.',
+            context);
       }
       setState(() {
         _textEditingController.clear();
@@ -190,23 +132,7 @@ class _PromotionFormPageState extends State<PromotionFormPage> {
         _isSending = false;
       });
     } else {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text('Erreur'),
-            content: Text('Erreur : ${response.statusCode}'),
-            actions: <Widget>[
-              TextButton(
-                child: const Text('OK'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          );
-        },
-      );
+      dangerNoti("Attention !!!", 'Erreur : ${response.statusCode}', context);
     }
   }
 

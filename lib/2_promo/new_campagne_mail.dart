@@ -1,5 +1,6 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'package:dressur/2_promo/liste_campagne_mail.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:dressur/components/delayed_animation.dart';
@@ -173,17 +174,13 @@ class _RegisterForm2State extends State<RegisterForm2> {
         var data = convert.jsonDecode(data1);
         if (data["error"] == false) {
           SQLHelper.delete('listeFormuleCampagneMail');
-          for (var listeFormuleCampagneMail
-              in data["listeFormuleCampagneMail"]) {
+          for (var listeFormule in data["listeFormuleCampagneMail"]) {
             SQLHelper.insert({
               'tableName': "listeFormuleCampagneMail",
-              'value': listeFormuleCampagneMail['id'],
-              'label': listeFormuleCampagneMail['label'] +
-                  " à " +
-                  (listeFormuleCampagneMail['prix']).toString() +
-                  " FCFA",
-              'prix': listeFormuleCampagneMail['prix'],
-              'jours': (listeFormuleCampagneMail['nombre_mail']).toString()
+              'value': listeFormule['id'],
+              'label': listeFormule['label'],
+              'prix': listeFormule['prix'],
+              'jours': listeFormule['nombre_mail'],
             });
           }
 
@@ -262,20 +259,22 @@ class _RegisterForm2State extends State<RegisterForm2> {
           if (data["error"] == false) {
             setState(() {
               _desactive2 = false;
-              successNoti(
-                  "",
-                  (langUserPhone == "fr")
-                      ? 'Votre campagne a été enregistrée, vous passerez au paiement si elle est acceptée.'
-                      : 'Your campaign has been saved, you will proceed to payment if it is accepted.',
-                  context);
               ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      behavior: SnackBarBehavior.floating,
+                duration : const Duration(seconds: 15),
+                behavior: SnackBarBehavior.floating,
                 content: Text(
                   (langUserPhone == "fr")
                       ? 'Votre campagne a été enregistrée, vous passerez au paiement si elle est acceptée.'
                       : 'Your campaign has been saved, you will proceed to payment if it is accepted.',
                 ),
               ));
+              Navigator.pop(context);
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => CampagneMailListePage(),
+                ),
+              );
             });
           } else {
             dangerNoti(data["titre"], data["message"], context);
@@ -314,12 +313,13 @@ class _RegisterForm2State extends State<RegisterForm2> {
     var boostDataList = await SQLHelper.getFormulBoostWhithId(val);
     var boostData = boostDataList[0];
     var joursAsString = boostData['jours'];
-    var nombreMailFromDB = int.parse(joursAsString);
+    var prix = boostData['prix'];
+    int nombreMailFromDB = int.parse(joursAsString);
     setState(() {
       idFormuleCampagneMail = val;
       _message = (langUserPhone == "fr")
-          ? "Cette formule vous offre une Campagne Mail vers 10 à $nombreMailFromDB adresses mails au maximum."
-          : "This formula offers you an Email Campaign to 10 to $nombreMailFromDB email addresses at most.";
+          ? "Cette formule vous offre une Campagne Mail vers 10 à $nombreMailFromDB adresses mails au maximum à $prix FCFA."
+          : "This formula offers you an Email Campaign to 10 at $nombreMailFromDB email addresses at maximum at FCFA $prix.";
     });
     nombreMail = nombreMailFromDB;
   }
@@ -352,11 +352,21 @@ class _RegisterForm2State extends State<RegisterForm2> {
           ),
           const SizedBox(height: 10),
           DelayedAnimation(
+            delay: 0, // 1000,
+            child: Text(
+              _message,
+              style: GoogleFonts.poppins(
+                fontSize: 16,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+          const SizedBox(height: 10),
+          DelayedAnimation(
             delay: 0, // 1500,
             child: TextField(
               controller: titreController,
               decoration: InputDecoration(
-                labelStyle: TextStyle(color: Colors.grey[400]),
                 labelText: (langUserPhone == "fr") ? "Titre" : "Title",
                 border: const OutlineInputBorder(),
               ),
@@ -368,7 +378,6 @@ class _RegisterForm2State extends State<RegisterForm2> {
             child: TextField(
               controller: sujetController,
               decoration: InputDecoration(
-                labelStyle: TextStyle(color: Colors.grey[400]),
                 labelText: (langUserPhone == "fr") ? "Sujet" : "Subject",
                 border: const OutlineInputBorder(),
               ),
@@ -381,7 +390,6 @@ class _RegisterForm2State extends State<RegisterForm2> {
               readOnly: true,
               controller: replytoController,
               decoration: InputDecoration(
-                labelStyle: TextStyle(color: Colors.grey[400]),
                 labelText: (langUserPhone == "fr") ? "Réponde à" : "Reply to",
                 border: const OutlineInputBorder(),
               ),
@@ -395,7 +403,6 @@ class _RegisterForm2State extends State<RegisterForm2> {
               minLines: 1,
               controller: sendtoController,
               decoration: InputDecoration(
-                labelStyle: TextStyle(color: Colors.grey[400]),
                 labelText:
                     (langUserPhone == "fr") ? "Destinataires" : "Recipients",
                 helperText: (langUserPhone == "fr")
@@ -413,7 +420,6 @@ class _RegisterForm2State extends State<RegisterForm2> {
               minLines: 1,
               controller: contentmailController,
               decoration: InputDecoration(
-                labelStyle: TextStyle(color: Colors.grey[400]),
                 labelText: (langUserPhone == "fr")
                     ? "Contenu du mail"
                     : "Content of the email",
@@ -435,7 +441,13 @@ class _RegisterForm2State extends State<RegisterForm2> {
                   ),
                 ),
                 child: Text(
-                  _desactive2 ? (langUserPhone == "fr") ? "Patientez ..." : "Wait ..." : (langUserPhone == "fr") ? "Envoyer" : "Send",
+                  _desactive2
+                      ? (langUserPhone == "fr")
+                          ? "Patientez ..."
+                          : "Wait ..."
+                      : (langUserPhone == "fr")
+                          ? "Envoyer"
+                          : "Send",
                   style: GoogleFonts.poppins(
                     color: Colors.white,
                   ),
@@ -456,19 +468,6 @@ class _RegisterForm2State extends State<RegisterForm2> {
                   }
                 },
               ),
-            ),
-          ),
-          const SizedBox(height: 20),
-          DelayedAnimation(
-            delay: 0, // 1000,
-            child: Text(
-              _message,
-              style: GoogleFonts.poppins(
-                color: Colors.blue[400],
-                fontWeight: FontWeight.w600,
-                fontSize: 12,
-              ),
-              textAlign: TextAlign.center,
             ),
           ),
           const SizedBox(height: 10),
