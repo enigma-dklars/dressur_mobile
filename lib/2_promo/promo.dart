@@ -1,6 +1,9 @@
+// ignore_for_file: unused_import
+
 import 'dart:io';
 import 'dart:async';
 import 'package:dressur/2_promo/liste_campagne_mail.dart';
+import 'package:dressur/2_promo/liste_promotion_reseau_sociaux.dart';
 import 'package:dressur/2_promo/new_campagne_mail.dart';
 import 'package:dressur/2_promo/new_promotion_reseau_sociaux.dart';
 import 'package:dressur/components/noti.dart';
@@ -421,20 +424,12 @@ class _BoostPageState extends State<BoostPage> {
                                       ),
                                     ),
                                     onPressed: () {
-                                      warningNoti(
-                                          (langUserPhone == "fr")
-                                              ? "Désoler"
-                                              : "Sorry",
-                                          (langUserPhone == "fr")
-                                              ? "Ce service est momentanément indisponible"
-                                              : "This service is temporarily unavailable",
-                                          context);
-                                      // Navigator.push(
-                                      //   context,
-                                      //   MaterialPageRoute(
-                                      //       builder: (context) =>
-                                      //           ListeBoostContactPage()),
-                                      // );
+                                       Navigator.push(
+                                        context,
+                                         MaterialPageRoute(
+                                             builder: (context) =>
+                                                 PromotionReseauSociauxListePage()),
+                                       );
                                     }),
                               )
                             ],
