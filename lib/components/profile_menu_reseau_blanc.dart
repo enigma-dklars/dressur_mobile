@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class ProfileMenuReseauBlanc extends StatelessWidget {
   const ProfileMenuReseauBlanc({
@@ -25,7 +26,14 @@ class ProfileMenuReseauBlanc extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(text),
+            Text(
+              text,
+              style: GoogleFonts.poppins(
+                color: Colors.white,
+                fontSize: 11,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
             const Icon(
               Icons.arrow_right,
               color: Colors.white,

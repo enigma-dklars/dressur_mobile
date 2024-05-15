@@ -2,15 +2,15 @@
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:whatsperson/components/delayed_animation.dart';
-import 'package:whatsperson/components/constant.dart';
+import 'package:dressur/components/delayed_animation.dart';
+import 'package:dressur/components/constant.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
-import 'package:whatsperson/components/sql_helper.dart';
+import 'package:dressur/components/sql_helper.dart';
 import 'package:flutter/services.dart';
+import 'package:dressur/components/noti.dart';
+import 'package:dressur/5_autre/support_assistance.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:whatsperson/components/noti.dart';
-import 'package:whatsperson/5_autre/support_assistance.dart';
 
 class AddFriendPage extends StatefulWidget {
   AddFriendPage({Key? key}) : super(key: key);
@@ -109,14 +109,20 @@ class _AddFriendPageState extends State<AddFriendPage> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            Text((langUserPhone == "fr")
-                ? 'Entrer le code promo'
-                : 'Enter promo code'),
+            const SizedBox(height: 20),
+            Text(
+              (langUserPhone == "fr")
+                  ? 'Entrer le code promo'
+                  : 'Enter promo code',
+              style: GoogleFonts.poppins(
+                fontWeight: FontWeight.w400,
+                fontSize: 16,
+              ),
+            ),
             const SizedBox(height: 10),
             TextField(
               controller: codePromoController,
               decoration: InputDecoration(
-                labelStyle: TextStyle(color: Colors.grey[400]),
                 labelText:
                     (langUserPhone == "fr") ? 'Code Promo' : 'Promo code',
                 border: const OutlineInputBorder(),
@@ -134,9 +140,17 @@ class _AddFriendPageState extends State<AddFriendPage> {
               onPressed: () async {
                 _loading ? null : addPromo(codePromoController.text);
               },
-              child: _loading
-                  ? const Text('Wait...')
-                  : Text((langUserPhone == "fr") ? 'Ajouter' : 'Add'),
+              child: Text(
+                _loading
+                    ? 'Wait...'
+                    : (langUserPhone == "fr")
+                        ? 'Ajouter'
+                        : 'Add',
+                style: GoogleFonts.poppins(
+                  fontWeight: FontWeight.w400,
+                  color: Colors.white,
+                ),
+              ),
             )
           ],
         ),
@@ -161,14 +175,20 @@ class _AddFriendPageState extends State<AddFriendPage> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            Text((langUserPhone == "fr")
-                ? 'Entrer le code reçu de votre parrain'
-                : 'Enter the code received from your sponsor'),
+            const SizedBox(height: 20),
+            Text(
+              (langUserPhone == "fr")
+                  ? 'Entrer le code reçu de votre parrain'
+                  : 'Enter the code received from your sponsor',
+              style: GoogleFonts.poppins(
+                fontWeight: FontWeight.w400,
+                fontSize: 16,
+              ),
+            ),
             const SizedBox(height: 10),
             TextField(
               controller: codeParrainController,
               decoration: InputDecoration(
-                labelStyle: TextStyle(color: Colors.grey[400]),
                 labelText: (langUserPhone == "fr")
                     ? 'Code de Parrainage'
                     : 'Referral Code',
@@ -187,7 +207,13 @@ class _AddFriendPageState extends State<AddFriendPage> {
               onPressed: () async {
                 _loading ? null : addParrain(codeParrainController.text);
               },
-              child: Text((langUserPhone == "fr") ? 'Ajouter' : 'Add'),
+              child: Text(
+                (langUserPhone == "fr") ? 'Ajouter' : 'Add',
+                style: GoogleFonts.poppins(
+                  fontWeight: FontWeight.w400,
+                  color: Colors.white,
+                ),
+              ),
             )
           ],
         ),
@@ -261,6 +287,14 @@ class _AddFriendPageState extends State<AddFriendPage> {
   }
 
   void actualiseNombreInvite() async {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      behavior: SnackBarBehavior.floating,
+      content: Text(
+        (langUserPhone == "fr")
+            ? 'Actualisation en cours…'
+            : 'Update in progress…',
+      ),
+    ));
     dynamic youHaveNetWork = "";
     youHaveConnexion();
     youHaveNetWork = await SQLHelper.getYouHaveConnexion();
@@ -299,6 +333,14 @@ class _AddFriendPageState extends State<AddFriendPage> {
         _loading = false;
       });
     }
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      behavior: SnackBarBehavior.floating,
+      content: Text(
+        (langUserPhone == "fr")
+            ? 'Actualisation terminer.'
+            : 'Refresh complete.',
+      ),
+    ));
   }
 
   @override
@@ -314,13 +356,17 @@ class _AddFriendPageState extends State<AddFriendPage> {
             icon: const Icon(
               Icons.arrow_back,
               size: 30,
+              color: Colors.white,
             ),
           ),
           title: Text(
             (langUserPhone == "fr")
                 ? "Invitez vos amis"
                 : "Invite your friends",
-            style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+            style: GoogleFonts.poppins(
+              fontWeight: FontWeight.w400,
+              color: Colors.white,
+            ),
           ),
           actions: [
             PopupMenuButton<int>(
@@ -434,7 +480,7 @@ class _AddFriendPageState extends State<AddFriendPage> {
                 delay: 0, // 500,
                 child: SizedBox(
                   height: 200,
-                  child: Image.asset("images/wp_img_9.png"),
+                  child: Image.asset("images/ds_img_9.png"),
                 ),
               ),
               const SizedBox(height: 20),
@@ -470,7 +516,7 @@ class _AddFriendPageState extends State<AddFriendPage> {
                     ),
                     RichText(
                       text: TextSpan(
-                        text: "WP",
+                        text: "Point(s)",
                         style: GoogleFonts.poppins(
                             color: Colors.white,
                             fontSize: 12,
@@ -491,7 +537,7 @@ class _AddFriendPageState extends State<AddFriendPage> {
                   style: GoogleFonts.poppins(
                       color: primaryColor,
                       fontSize: 25,
-                      fontWeight: FontWeight.w600),
+                      fontWeight: FontWeight.w500),
                   textAlign: TextAlign.center,
                 ),
               ),
@@ -526,6 +572,7 @@ class _FormParrainState extends State<FormParrain> {
                 setState(() {
                   Clipboard.setData(ClipboardData(text: codeBonus));
                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    behavior: SnackBarBehavior.floating,
                     content: Text((langUserPhone == "fr")
                         ? 'Code de Parrainage Copier ...'
                         : 'Referral Code Copy...'),
@@ -543,6 +590,7 @@ class _FormParrainState extends State<FormParrain> {
                     setState(() {
                       Clipboard.setData(ClipboardData(text: codeBonus));
                       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                        behavior: SnackBarBehavior.floating,
                         content: Text((langUserPhone == "fr")
                             ? 'Code de Parrainage Copier ...'
                             : 'Referral Code Copy...'),
@@ -566,16 +614,22 @@ class _FormParrainState extends State<FormParrain> {
                     vertical: 13,
                   ),
                 ),
-                label: Text((langUserPhone == "fr") ? 'PARTAGER' : 'SHARE'),
+                label: Text(
+                  (langUserPhone == "fr") ? 'PARTAGER' : 'SHARE',
+                  style: GoogleFonts.poppins(
+                    fontWeight: FontWeight.w400,
+                    color: Colors.white,
+                  ),
+                ),
                 icon: const Icon(
                   Icons.share,
+                  color: Colors.white,
                 ),
                 onPressed: () async {
                   var messageShare = (langUserPhone == "fr")
-                      ? "Utilise WhatsPerson, une application simple, sûr et fiable pour avoir de la visibilité sur tes différents réseaux sociaux et surtout sur tes statuts WhatsApp.\nGrâce à WhatsPerson, fait la promotion de tes produits et services qui seront visibles par des milliers d'utilisateurs en seulement 24H.\nElle te permet d'avoir plus facilement des contacts WhatsApp selon les pays de ton choix. De plus, ses contacts sont automatiquement enregistrés dans ton téléphone et ton contact dans les leurs, etc.\n\nA télécharger gratuitement sur Play Store : https://play.google.com/store/apps/details?id=com.wp.whatsperson\n\nVoici mon code parrainage : $codeBonus\n\nIl te donnera $commissionBonus WP bonus pour tester les services de l'application."
-                      : "Use WhatsPerson, a simple, safe and reliable application to have visibility on your various social networks and especially on your WhatsApp statuses.\nThanks to WhatsPerson, promote your products and services which will be visible to thousands of users in just 24 hours.\nIt makes it easier for you to have WhatsApp contacts according to the countries of your choice. In addition, its contacts are automatically saved in your phone and your contact in theirs, etc.\n\nA download for free on Play Store: https://play.google.com/store/apps/details?id=com.wp.whatsperson\n\nHere is my referral code: $codeBonus\n\nIt will give you $commissionBonus WP bonus to test the services of the app.";
-                  await Share.share(messageShare,
-                      subject: 'Partager WhatsPerson!');
+                      ? "Utilise Dressur, une application simple, sûr et fiable pour avoir de la visibilité sur tes différents réseaux sociaux et surtout sur tes statuts WhatsApp.\nGrâce à Dressur, fait la promotion de tes produits et services qui seront visibles par des milliers d'utilisateurs en seulement 24H.\nElle te permet d'avoir plus facilement des contacts WhatsApp selon les pays de ton choix. De plus, ses contacts sont automatiquement enregistrés dans ton téléphone et ton contact dans les leurs, etc.\n\nA télécharger gratuitement sur Play Store : https://play.google.com/store/apps/details?id=com.ds.dressur\n\nVoici mon code parrainage : $codeBonus\n\nIl te donnera $commissionBonus Points Bonus pour tester les services de l'application."
+                      : "Use Dressur, a simple, safe and reliable application to have visibility on your various social networks and especially on your WhatsApp statuses.\nThanks to Dressur, promote your products and services which will be visible to thousands of users in just 24 hours.\nIt makes it easier for you to have WhatsApp contacts according to the countries of your choice. In addition, its contacts are automatically saved in your phone and your contact in theirs, etc.\n\nA download for free on Play Store: https://play.google.com/store/apps/details?id=com.ds.dressur\n\nHere is my referral code: $codeBonus\n\nIt will give you $commissionBonus Points Bonus to test the services of the app.";
+                  await Share.share(messageShare, subject: 'Partager Dressur!');
                 },
               ),
             ),
@@ -597,12 +651,10 @@ class _FormParrainState extends State<FormParrain> {
             delay: 0, // 1500,
             child: Text(
               (langUserPhone == "fr")
-                  ? "RECEVEZ $commissionBonus WP PAR FILLEUL\n\nOFFREZ $commissionBonus WP A CHAQU'UN DE VOS FILLEULS"
-                  : "RECEIVE $commissionBonus WP PER REFERRAL\n\nGIVE $commissionBonus WP TO EACH OF YOUR REFERRALS",
+                  ? "RECEVEZ $commissionBonus Points PAR FILLEUL\n\nOFFREZ $commissionBonus Points A CHAQU'UN DE VOS FILLEULS"
+                  : "RECEIVE $commissionBonus Points PER REFERRAL\n\nGIVE $commissionBonus Points TO EACH OF YOUR REFERRALS",
               style: GoogleFonts.poppins(
-                  color: Colors.grey,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600),
+                  fontSize: 16, fontWeight: FontWeight.w600),
               textAlign: TextAlign.center,
             ),
           ),

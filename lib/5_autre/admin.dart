@@ -1,12 +1,15 @@
+// ignore_for_file: unnecessary_brace_in_string_interps
+
+import 'package:dressur/components/111_generalApiDomaine.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:whatsperson/components/constant.dart';
+import 'package:dressur/components/constant.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
-import 'package:whatsperson/components/sql_helper.dart';
-import 'package:whatsperson/components/noti.dart';
+import 'package:dressur/components/sql_helper.dart';
+import 'package:dressur/components/noti.dart';
 
 class AdministrationPage extends StatefulWidget {
   AdministrationPage({Key? key}) : super(key: key);
@@ -62,7 +65,7 @@ class _AdministrationPageState extends State<AdministrationPage> {
               if ((await SQLHelper.getOneNumsTelUser(contactAdd["telAdd"]))
                   .isEmpty) {
                 final newContact = Contact()
-                  ..name.first = contactAdd["nomAdd"] + " #WP"
+                  ..name.first = contactAdd["nomAdd"] + " #DS"
                   ..phones = [Phone(contactAdd["telAdd"])];
                 await newContact.insert();
                 await insertNumTelUserIntoDataBase(contactAdd["telAdd"]);
@@ -73,6 +76,7 @@ class _AdministrationPageState extends State<AdministrationPage> {
             setState(() {
               _desactive = false;
               ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                behavior: SnackBarBehavior.floating,
                 content: Text('${countContacts} Contact(s) Enregistré(s)'),
               ));
             });
@@ -145,7 +149,7 @@ class _AdministrationPageState extends State<AdministrationPage> {
                     ),
                     child: _desactive
                         ? const Text("Patientez")
-                        : const Text("Importer les contacts WP"),
+                        : const Text("Importer les contacts DS"),
                     onPressed: () {
                       _desactive ? null : importAllContacts();
                     },
@@ -164,7 +168,7 @@ class _AdministrationPageState extends State<AdministrationPage> {
                         vertical: 13,
                       ),
                     ),
-                    child: const Text("Liste des users WP"),
+                    child: const Text("Liste des users DS"),
                     onPressed: () async {
                       final Uri _url =
                           Uri.parse("$generalApiDomaine/admin/user");
@@ -188,7 +192,7 @@ class _AdministrationPageState extends State<AdministrationPage> {
                         vertical: 13,
                       ),
                     ),
-                    child: const Text("Conf. Tel Users WP"),
+                    child: const Text("Conf. Tel Users DS"),
                     onPressed: () async {
                       final Uri _url =
                           Uri.parse("$generalApiDomaine/admin/user/validation");
@@ -212,7 +216,7 @@ class _AdministrationPageState extends State<AdministrationPage> {
                         vertical: 13,
                       ),
                     ),
-                    child: const Text("Conf. Promo Users WP"),
+                    child: const Text("Conf. Promo Users DS"),
                     onPressed: () async {
                       final Uri _url = Uri.parse(
                           "$generalApiDomaine/admin/promotion/validation");

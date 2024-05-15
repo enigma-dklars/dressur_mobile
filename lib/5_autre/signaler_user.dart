@@ -2,12 +2,12 @@
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:whatsperson/components/delayed_animation.dart';
-import 'package:whatsperson/components/constant.dart';
+import 'package:dressur/components/delayed_animation.dart';
+import 'package:dressur/components/constant.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
-import 'package:whatsperson/components/sql_helper.dart';
-import 'package:whatsperson/components/noti.dart';
+import 'package:dressur/components/sql_helper.dart';
+import 'package:dressur/components/noti.dart';
 
 class SignalerPage extends StatelessWidget {
   @override
@@ -23,11 +23,15 @@ class SignalerPage extends StatelessWidget {
           icon: const Icon(
             Icons.arrow_back,
             size: 30,
+            color: Colors.white,
           ),
         ),
         title: Text(
           (langUserPhone == "fr") ? "Signaler un utilisateur" : "Report a user",
-          style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+          style: GoogleFonts.poppins(
+            color: Colors.white,
+            fontWeight: FontWeight.w400,
+          ),
         ),
       ),
       body: SingleChildScrollView(
@@ -50,7 +54,9 @@ class SignalerPage extends StatelessWidget {
                     child: Container(
                       padding: const EdgeInsets.all(5.0),
                       child: Text(
-                        (langUserPhone == "fr") ? "Signaler un utilisateur en remplissant le formulaire ci-dessous. Votre plainte sera étudier et des mesures seront prises conformément à nos conditions d'utilisations." : "Report a user by filling out the form below. Your complaint will be investigated and action will be taken in accordance with our Terms of Use.",
+                        (langUserPhone == "fr")
+                            ? "Signaler un utilisateur en remplissant le formulaire ci-dessous. Votre plainte sera étudier et des mesures seront prises conformément à nos conditions d'utilisations."
+                            : "Report a user by filling out the form below. Your complaint will be investigated and action will be taken in accordance with our Terms of Use.",
                         style: GoogleFonts.poppins(
                           fontSize: 16,
                         ),
@@ -160,9 +166,10 @@ class _SignalerFormState extends State<SignalerForm> {
             child: TextField(
               controller: telController,
               decoration: InputDecoration(
-                labelStyle: TextStyle(color: Colors.grey[400]),
                 border: const OutlineInputBorder(),
-                labelText: (langUserPhone == "fr") ? 'Numéro Whatsapp' : 'Whatsapp number',
+                labelText: (langUserPhone == "fr")
+                    ? 'Numéro Whatsapp'
+                    : 'Whatsapp number',
               ),
             ),
           ),
@@ -173,7 +180,6 @@ class _SignalerFormState extends State<SignalerForm> {
               maxLines: null,
               controller: motifController,
               decoration: InputDecoration(
-                labelStyle: TextStyle(color: Colors.grey[400]),
                 border: const OutlineInputBorder(),
                 labelText: (langUserPhone == "fr") ? 'Motif' : 'Pattern',
               ),
@@ -193,8 +199,17 @@ class _SignalerFormState extends State<SignalerForm> {
                   ),
                   minimumSize: const Size.fromHeight(50),
                 ),
-                child:
-                    _desactive ? const Text("Wait...") : Text((langUserPhone == "fr") ? "SIGNALER" : "REPORT",),
+                child: Text(
+                  _desactive
+                      ? "Wait..."
+                      : (langUserPhone == "fr")
+                          ? "SIGNALER"
+                          : "REPORT",
+                  style: GoogleFonts.poppins(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
                 onPressed: () {
                   _desactive
                       ? null

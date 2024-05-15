@@ -2,24 +2,26 @@
 
 import 'dart:io';
 
+import 'package:dressur/5_autre/cart_visite.dart';
+import 'package:dressur/components/pub_smt_2024.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
-import 'package:whatsperson/5_autre/admin.dart';
-import 'package:whatsperson/5_autre/a_propos_wp.dart';
-import 'package:whatsperson/5_autre/liste_bonus_recu.dart';
-import 'package:whatsperson/5_autre/delete_compte_user.dart';
-import 'package:whatsperson/5_autre/invitez_vos_amis.dart';
-import 'package:whatsperson/5_autre/modifier_mot_de_passe.dart';
-import 'package:whatsperson/5_autre/profil_user.dart';
-import 'package:whatsperson/5_autre/signaler_user.dart';
-import 'package:whatsperson/6_notification/liste_notification.dart';
-import 'package:whatsperson/7_login/connexion.dart';
-import 'package:whatsperson/components/profile_menu.dart';
-import 'package:whatsperson/5_autre/support_assistance.dart';
+import 'package:dressur/5_autre/admin.dart';
+import 'package:dressur/5_autre/a_propos_ds.dart';
+import 'package:dressur/5_autre/liste_bonus_recu.dart';
+import 'package:dressur/5_autre/delete_compte_user.dart';
+import 'package:dressur/5_autre/invitez_vos_amis.dart';
+import 'package:dressur/5_autre/modifier_mot_de_passe.dart';
+import 'package:dressur/5_autre/profil_user.dart';
+import 'package:dressur/5_autre/signaler_user.dart';
+import 'package:dressur/1_reception/liste_notification.dart';
+import 'package:dressur/6_login_register/connexion.dart';
+import 'package:dressur/components/profile_menu.dart';
+import 'package:dressur/5_autre/support_assistance.dart';
 import 'package:art_sweetalert/art_sweetalert.dart';
-import 'package:whatsperson/components/constant.dart';
-import 'package:whatsperson/components/sql_helper.dart';
+import 'package:dressur/components/constant.dart';
+import 'package:dressur/components/sql_helper.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class SettingPage extends StatefulWidget {
@@ -80,12 +82,16 @@ class _SettingPageState extends State<SettingPage> {
           title: Text(
             (langUserPhone == "fr") ? "Autres Pages" : "Other Pages",
             style: GoogleFonts.poppins(
-              fontWeight: FontWeight.w600,
+              color: Colors.white,
+              fontWeight: FontWeight.w400,
             ),
           ),
           actions: [
             IconButton(
-              icon: const Icon(Icons.notifications),
+              icon: const Icon(
+                Icons.notifications,
+                color: Colors.white,
+              ),
               onPressed: () {
                 Navigator.push(
                   context,
@@ -101,6 +107,7 @@ class _SettingPageState extends State<SettingPage> {
           child: Column(
             children: [
               const SizedBox(height: 5),
+              SpecialPub(),
               admin
                   ? ProfileMenu(
                       text: "Administration",
@@ -143,6 +150,18 @@ class _SettingPageState extends State<SettingPage> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) => ProfilPage()),
+                  );
+                },
+              ),
+              ProfileMenu(
+                text:
+                    (langUserPhone == "fr") ? "Carte de visite" : "Visit card",
+                Myicon: const Icon(Icons.card_membership),
+                press: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const CarteDeVisite()),
                   );
                 },
               ),
@@ -196,8 +215,8 @@ class _SettingPageState extends State<SettingPage> {
               ),
               ProfileMenu(
                 text: (langUserPhone == "fr")
-                    ? "Supprimer tous vos contacts WP"
-                    : "Delete all your WP contacts",
+                    ? "Supprimer tous vos contacts DS"
+                    : "Delete all your DS contacts",
                 Myicon: const Icon(Icons.contacts),
                 press: () async {
                   ArtDialogResponse response = await ArtSweetAlert.show(
@@ -208,8 +227,8 @@ class _SettingPageState extends State<SettingPage> {
                             ? "Cette action est irréversible"
                             : "This action is irreversible",
                         text: (langUserPhone == "fr")
-                            ? "Voulez vous vraiment supprimer tous vos contacts WP ?"
-                            : "Are you sure you want to delete all your WP contacts?",
+                            ? "Voulez vous vraiment supprimer tous vos contacts DS ?"
+                            : "Are you sure you want to delete all your DS contacts?",
                         confirmButtonText:
                             (langUserPhone == "fr") ? "Oui" : "Yes",
                         denyButtonText: (langUserPhone == "fr") ? "Non" : "No",
@@ -219,10 +238,11 @@ class _SettingPageState extends State<SettingPage> {
                   if (response.isTapConfirmButton) {
                     if (contactsEnregistrer.isNotEmpty) {
                       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      behavior: SnackBarBehavior.floating,
                         content: Text(
                           (langUserPhone == "fr")
-                              ? "WhatsPerson vas parcourir vos contacts un a un et supprimer les contacts WP.\n\nPatientez tous le long du processus.\n\nCe processus peut durée plusieurs minutes."
-                              : "WhatsPerson will go through your contacts one by one and delete WP contacts.\n\nWait all the way through the process.\n\nThis process may take several minutes.",
+                              ? "Dressur vas parcourir vos contacts un a un et supprimer les contacts DS.\n\nPatientez tous le long du processus.\n\nCe processus peut durée plusieurs minutes."
+                              : "Dressur will go through your contacts one by one and delete DS contacts.\n\nWait all the way through the process.\n\nThis process may take several minutes.",
                         ),
                         duration: const Duration(minutes: 1),
                       ));
@@ -241,24 +261,27 @@ class _SettingPageState extends State<SettingPage> {
                         }
                         nombreContact--;
                         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      behavior: SnackBarBehavior.floating,
                           content: Text((langUserPhone == "fr")
                               ? "$nombreContact contact(s) restant à parcourir."
                               : "$nombreContact contact(s) remaining to be scanned."),
                         ));
                       }
                       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      behavior: SnackBarBehavior.floating,
                         content: Text(
                           (langUserPhone == "fr")
-                              ? "${contactsEnregistrer.length} contact(s) WP supprimer."
-                              : "${contactsEnregistrer.length} WP contact(s) delete.",
+                              ? "${contactsEnregistrer.length} contact(s) DS supprimer."
+                              : "${contactsEnregistrer.length} DS contact(s) delete.",
                         ),
                       ));
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      behavior: SnackBarBehavior.floating,
                         content: Text(
                           (langUserPhone == "fr")
-                              ? "Vous n'avez aucun contact WP actuellement. Faite un boost pour en avoir."
-                              : "You don't currently have any WP Contacts. Boost to get some.",
+                              ? "Vous n'avez aucun contact DS actuellement. Faite un boost pour en avoir."
+                              : "You don't currently have any DS Contacts. Boost to get some.",
                         ),
                       ));
                     }
