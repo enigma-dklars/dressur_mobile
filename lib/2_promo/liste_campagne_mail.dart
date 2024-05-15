@@ -120,7 +120,7 @@ class _CampagneMailListePageState extends State<CampagneMailListePage> {
               ? 'Liste Campagne Mail'
               : "Email Campaign List",
           style: GoogleFonts.poppins(
-            fontWeight: FontWeight.w600,
+            fontWeight: FontWeight.w400,
             color: Colors.white,
           ),
         ),
@@ -193,113 +193,115 @@ class _CampagneMailListePageState extends State<CampagneMailListePage> {
               child: CircularProgressIndicator(),
             )
           : _campagneMails.isEmpty
-                  ? Center(
-                      child: Text(
-                        (langUserPhone == "fr")
-                            ? "Aucune campagne email trouvé."
-                            : "No email campaigns found.",
-                        style: const TextStyle(fontSize: 16),
-                      ),
-                    )
-                  : Expanded(
-                      child: ListView.builder(
-              itemCount: _campagneMails.length,
-              itemBuilder: (BuildContext context, int index) {
-                final campagneMail = _campagneMails[index];
+              ? Center(
+                  child: Text(
+                    (langUserPhone == "fr")
+                        ? "Aucune campagne email trouvé."
+                        : "No email campaigns found.",
+                    style: const TextStyle(fontSize: 16),
+                  ),
+                )
+              : Expanded(
+                  child: ListView.builder(
+                    itemCount: _campagneMails.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      final campagneMail = _campagneMails[index];
 
-                return Card(
-                  margin: const EdgeInsets.only(
-                      left: 10, top: 10, right: 10, bottom: 0),
-                  child: Row(
-                    children: [
-                      const SizedBox(width: 5),
-                      Expanded(
-                        child: Container(
-                          // width: 80,
-                          height: 100,
-                          decoration: BoxDecoration(
-                            gradient: const LinearGradient(
-                              begin: Alignment.topCenter,
-                              end: Alignment.bottomCenter,
-                              colors: [
-                                primaryColor,
-                                secondaryColor,
-                              ],
-                            ),
-                            borderRadius: BorderRadius.circular(5),
-                          ),
-                          padding: const EdgeInsets.fromLTRB(15, 10, 15, 0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Titre: ${campagneMail.titre}',
-                                style: const TextStyle(
-                                  fontSize: 12.0,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
-                              ),
-                              const SizedBox(height: 5),
-                              Text(
-                                'Status: ${campagneMail.status}',
-                                style: const TextStyle(
-                                  fontSize: 12.0,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
-                              ),
-                              const SizedBox(height: 5),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  Column(
-                                    children: [
-                                      SizedBox(
-                                        child: ElevatedButton.icon(
-                                          style: ElevatedButton.styleFrom(
-                                            backgroundColor: Colors.green,
-                                          ),
-                                          label: Text(
-                                            (langUserPhone == "fr")
-                                                ? 'Autres Informations'
-                                                : 'Other information',
-                                            style: GoogleFonts.poppins(
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.w600,
-                                            ),
-                                          ),
-                                          icon: const Icon(
-                                            Icons.info,
-                                            color: Colors.white,
-                                          ),
-                                          onPressed: () {
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (context) =>
-                                                    CampagneMailDetailPage(
-                                                  campagneMail: campagneMail,
-                                                ),
-                                              ),
-                                            );
-                                          },
-                                        ),
-                                      ),
+                      return Card(
+                        margin: const EdgeInsets.only(
+                            left: 10, top: 10, right: 10, bottom: 0),
+                        child: Row(
+                          children: [
+                            const SizedBox(width: 5),
+                            Expanded(
+                              child: Container(
+                                // width: 80,
+                                height: 100,
+                                decoration: BoxDecoration(
+                                  gradient: const LinearGradient(
+                                    begin: Alignment.topCenter,
+                                    end: Alignment.bottomCenter,
+                                    colors: [
+                                      primaryColor,
+                                      secondaryColor,
                                     ],
                                   ),
-                                ],
+                                  borderRadius: BorderRadius.circular(5),
+                                ),
+                                padding:
+                                    const EdgeInsets.fromLTRB(15, 10, 15, 0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Titre: ${campagneMail.titre}',
+                                      style: const TextStyle(
+                                        fontSize: 12.0,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 5),
+                                    Text(
+                                      'Status: ${campagneMail.status}',
+                                      style: const TextStyle(
+                                        fontSize: 12.0,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 5),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      children: [
+                                        Column(
+                                          children: [
+                                            SizedBox(
+                                              child: ElevatedButton.icon(
+                                                style: ElevatedButton.styleFrom(
+                                                  backgroundColor: Colors.green,
+                                                ),
+                                                label: Text(
+                                                  (langUserPhone == "fr")
+                                                      ? 'Autres Informations'
+                                                      : 'Other information',
+                                                  style: GoogleFonts.poppins(
+                                                    color: Colors.white,
+                                                    fontWeight: FontWeight.w600,
+                                                  ),
+                                                ),
+                                                icon: const Icon(
+                                                  Icons.info,
+                                                  color: Colors.white,
+                                                ),
+                                                onPressed: () {
+                                                  Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          CampagneMailDetailPage(
+                                                        campagneMail:
+                                                            campagneMail,
+                                                      ),
+                                                    ),
+                                                  );
+                                                },
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
-                      ),
-                    ],
+                      );
+                    },
                   ),
-                );
-              },
-            ),
-            ),
+                ),
     );
   }
 }
@@ -318,7 +320,7 @@ class CampagneMailDetailPage extends StatelessWidget {
               ? 'Détails de la campagne Mail'
               : 'Details of the campagne Mail',
           style: GoogleFonts.poppins(
-            fontWeight: FontWeight.w600,
+            fontWeight: FontWeight.w400,
             color: Colors.white,
           ),
         ),
@@ -364,7 +366,7 @@ class CampagneMailDetailPage extends StatelessWidget {
                     textAlign: TextAlign.center,
                   ),
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
                       ElevatedButton(
                         onPressed: () {
@@ -541,7 +543,7 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
         title: Text(
           'Page de Démarrage Payant',
           style: GoogleFonts.poppins(
-            fontWeight: FontWeight.w600,
+            fontWeight: FontWeight.w400,
             color: Colors.white,
           ),
         ),
@@ -615,7 +617,13 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
                     ),
                   ),
                   child: Text(
-                    _desactive2 ? (langUserPhone == "fr") ? "Patientez ..." : "Wait ..." : (langUserPhone == "fr") ? "Payer" : "Pay",
+                    _desactive2
+                        ? (langUserPhone == "fr")
+                            ? "Patientez ..."
+                            : "Wait ..."
+                        : (langUserPhone == "fr")
+                            ? "Payer"
+                            : "Pay",
                     style: GoogleFonts.poppins(
                       color: Colors.white,
                     ),

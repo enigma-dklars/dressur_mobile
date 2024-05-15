@@ -117,7 +117,7 @@ class _PromotionListPageState extends State<PromotionListPage> {
               ? 'Liste Promotion Affaire'
               : "Business Promotion List",
           style: GoogleFonts.poppins(
-            fontWeight: FontWeight.w600,
+            fontWeight: FontWeight.w400,
             color: Colors.white,
           ),
         ),
@@ -343,7 +343,7 @@ class PromotionDetailPage extends StatelessWidget {
               ? 'Détails de la promotion'
               : 'Details of the promotion',
           style: GoogleFonts.poppins(
-            fontWeight: FontWeight.w600,
+            fontWeight: FontWeight.w400,
             color: Colors.white,
           ),
         ),
@@ -390,7 +390,7 @@ class PromotionDetailPage extends StatelessWidget {
                     textAlign: TextAlign.center,
                   ),
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
                       ElevatedButton(
                         onPressed: () {
@@ -506,13 +506,13 @@ class _PaymentGratuitPageState extends State<PaymentGratuitPage> {
         var data = convert.jsonDecode(data1);
         if (data["error"] == false) {
           SQLHelper.delete('listeFormulBoost');
-          for (var listeFormulBoost in data["listeFormulBoost"]) {
+          for (var listefboost in data["listeFormulBoost"]) {
             SQLHelper.insert({
               'tableName': "listeFormulBoost",
-              'value': listeFormulBoost['id'],
-              'label': listeFormulBoost['label'],
-              'prix': listeFormulBoost['prix'],
-              'jours': listeFormulBoost['jours']
+              'value': listefboost['id'],
+              'label': listefboost['label'],
+              'prix': listefboost['prix'],
+              'jours': listefboost['jours']
             });
           }
           final dataElements = await SQLHelper.getAll("listeFormulBoost");
@@ -619,7 +619,7 @@ class _PaymentGratuitPageState extends State<PaymentGratuitPage> {
         title: Text(
           'Page de Démarrage Gratuit',
           style: GoogleFonts.poppins(
-            fontWeight: FontWeight.w600,
+            fontWeight: FontWeight.w400,
             color: Colors.white,
           ),
         ),
@@ -750,16 +750,13 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
         var data = convert.jsonDecode(data1);
         if (data["error"] == false) {
           SQLHelper.delete('listeFormulBoost');
-          for (var listeFormulBoost in data["listeFormulBoost"]) {
+          for (var listefboostpay in data["listeFormulBoost"]) {
             SQLHelper.insert({
               'tableName': "listeFormulBoost",
-              'value': listeFormulBoost['id'],
-              'label': listeFormulBoost['label'] +
-                  " à " +
-                  (listeFormulBoost['prix']).toString() +
-                  " FCFA",
-              'prix': listeFormulBoost['prix'],
-              'jours': listeFormulBoost['jours']
+              'value': listefboostpay['id'],
+              'label': listefboostpay['label'],
+              'prix': listefboostpay['prix'],
+              'jours': listefboostpay['jours']
             });
           }
           final dataElements = await SQLHelper.getAll("listeFormulBoost");
@@ -880,7 +877,7 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
         title: Text(
           'Page de Démarrage Payant',
           style: GoogleFonts.poppins(
-            fontWeight: FontWeight.w600,
+            fontWeight: FontWeight.w400,
             color: Colors.white,
           ),
         ),
@@ -913,6 +910,17 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
                 items: listeFormulBoost,
                 onChanged: (val) => onChangeFormulBoost(val),
                 onSaved: (val) => print(val),
+              ),
+            ),
+            const SizedBox(height: 20),
+            DelayedAnimation(
+              delay: 0, // 1000,
+              child: Text(
+                _message,
+                style: GoogleFonts.poppins(
+                  fontSize: 16,
+                ),
+                textAlign: TextAlign.center,
               ),
             ),
             const SizedBox(height: 20),
@@ -956,7 +964,13 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
                     ),
                   ),
                   child: Text(
-                    _desactive2 ? (langUserPhone == "fr") ? "Patientez ..." : "Wait ..." : (langUserPhone == "fr") ? "Payer et Booster" : "Pay and Boost",
+                    _desactive2
+                        ? (langUserPhone == "fr")
+                            ? "Patientez ..."
+                            : "Wait ..."
+                        : (langUserPhone == "fr")
+                            ? "Payer et Booster"
+                            : "Pay and Boost",
                     style: GoogleFonts.poppins(
                       color: Colors.white,
                     ),
@@ -977,19 +991,6 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
                     }
                   },
                 ),
-              ),
-            ),
-            const SizedBox(height: 20),
-            DelayedAnimation(
-              delay: 0, // 1000,
-              child: Text(
-                _message,
-                style: GoogleFonts.poppins(
-                  color: Colors.blue[400],
-                  fontWeight: FontWeight.w600,
-                  fontSize: 12,
-                ),
-                textAlign: TextAlign.center,
               ),
             ),
             const SizedBox(height: 10),

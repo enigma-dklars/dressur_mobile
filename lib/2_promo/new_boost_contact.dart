@@ -200,13 +200,13 @@ class _RegisterFormState extends State<RegisterForm> {
         var data = convert.jsonDecode(data1);
         if (data["error"] == false) {
           SQLHelper.delete('listeFormulBoost');
-          for (var listeFormulBoost in data["listeFormulBoost"]) {
+          for (var lesformuleboost in data["listeFormulBoost"]) {
             SQLHelper.insert({
               'tableName': "listeFormulBoost",
-              'value': listeFormulBoost['id'],
-              'label': listeFormulBoost['label'],
-              'prix': listeFormulBoost['prix'],
-              'jours': listeFormulBoost['jours']
+              'value': lesformuleboost['id'],
+              'label': lesformuleboost['label'],
+              'prix': lesformuleboost['prix'],
+              'jours': lesformuleboost['jours']
             });
           }
           final dataElements = await SQLHelper.getAll("listeFormulBoost");
@@ -438,16 +438,13 @@ class _RegisterForm2State extends State<RegisterForm2> {
         var data = convert.jsonDecode(data1);
         if (data["error"] == false) {
           SQLHelper.delete('listeFormulBoost');
-          for (var listeFormulBoost in data["listeFormulBoost"]) {
+          for (var lesformuleboost in data["listeFormulBoost"]) {
             SQLHelper.insert({
               'tableName': "listeFormulBoost",
-              'value': listeFormulBoost['id'],
-              'label': listeFormulBoost['label'] +
-                  " à " +
-                  (listeFormulBoost['prix']).toString() +
-                  " FCFA",
-              'prix': listeFormulBoost['prix'],
-              'jours': listeFormulBoost['jours']
+              'value': lesformuleboost['id'],
+              'label': lesformuleboost['label'],
+              'prix': lesformuleboost['prix'],
+              'jours': lesformuleboost['jours']
             });
           }
           final dataElements = await SQLHelper.getAll("listeFormulBoost");

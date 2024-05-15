@@ -102,7 +102,7 @@ class _ListeBoostContactPageState extends State<ListeBoostContactPage> {
               ? "Liste Boost Contact"
               : "Boost List Contact",
           style: GoogleFonts.poppins(
-            fontWeight: FontWeight.w600,
+            fontWeight: FontWeight.w400,
             color: Colors.white,
           ),
         ),

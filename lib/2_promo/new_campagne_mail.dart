@@ -28,7 +28,7 @@ class _NewCampagneMailPageState extends State<NewCampagneMailPage> {
               ? "Nouvelle Campagne Mail"
               : "New Email Campaign",
           style: GoogleFonts.poppins(
-            fontWeight: FontWeight.w600,
+            fontWeight: FontWeight.w400,
             color: Colors.white,
           ),
         ),
@@ -174,13 +174,13 @@ class _RegisterForm2State extends State<RegisterForm2> {
         var data = convert.jsonDecode(data1);
         if (data["error"] == false) {
           SQLHelper.delete('listeFormuleCampagneMail');
-          for (var listeFormule in data["listeFormuleCampagneMail"]) {
+          for (var listedesformules in data["listeFormuleCampagneMail"]) {
             SQLHelper.insert({
               'tableName': "listeFormuleCampagneMail",
-              'value': listeFormule['id'],
-              'label': listeFormule['label'],
-              'prix': listeFormule['prix'],
-              'jours': listeFormule['nombre_mail'],
+              'value': listedesformules['id'],
+              'label': listedesformules['label'],
+              'prix': listedesformules['prix'],
+              'jours': listedesformules['nombre_mail'],
             });
           }
 
@@ -260,7 +260,7 @@ class _RegisterForm2State extends State<RegisterForm2> {
             setState(() {
               _desactive2 = false;
               ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                duration : const Duration(seconds: 15),
+                duration: const Duration(seconds: 15),
                 behavior: SnackBarBehavior.floating,
                 content: Text(
                   (langUserPhone == "fr")

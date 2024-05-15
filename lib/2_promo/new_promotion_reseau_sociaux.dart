@@ -31,7 +31,7 @@ class _PromotionReseauSociauxFormPageState
               ? "Nouvelle Promotion Réseau Sociaux"
               : "New Social Network Promotion",
           style: GoogleFonts.poppins(
-            fontWeight: FontWeight.w600,
+            fontWeight: FontWeight.w400,
             color: Colors.white,
           ),
         ),
@@ -131,28 +131,31 @@ class _RegisterForm3State extends State<RegisterForm3> {
     calculerPrixTotal();
   }
 
- void calculerPrixTotal() {
-  setState(() {
-          _message = "";
-        });
-    if(qte != 0) {
+  void calculerPrixTotal() {
+    setState(() {
+      _message = "";
+    });
+    if (qte != 0) {
       int qteDemander = int.tryParse(quantityController.text) ?? 0;
       if (qteDemander >= qteMin && qteDemander <= qteMax) {
-        double prixQteDemander = (prix * qteDemander)/qte;
+        double prixQteDemander = (prix * qteDemander) / qte;
         quantityController.text = "$qteDemander";
         priceController.text = "$prixQteDemander";
       } else {
         setState(() {
-          _message = (langUserPhone == "fr") ? "La quantité doit être comprise entre $qteMin et $qteMax" : "The quantity must be between $qteMin and $qteMax";
+          _message = (langUserPhone == "fr")
+              ? "La quantité doit être comprise entre $qteMin et $qteMax"
+              : "The quantity must be between $qteMin and $qteMax";
         });
       }
     } else {
       setState(() {
-          _message = (langUserPhone == "fr") ? "Veuillez choisir un réseau social puis un service." : "Please choose a social network then a service.";
-        });
+        _message = (langUserPhone == "fr")
+            ? "Veuillez choisir un réseau social puis un service."
+            : "Please choose a social network then a service.";
+      });
     }
   }
-
 
   void listeFormPromoReseau() async {
     dynamic youHaveNetWork = "";
@@ -208,20 +211,20 @@ class _RegisterForm3State extends State<RegisterForm3> {
     return Container(
       child: Column(
         children: [
-          if(_message != "")
-          DelayedAnimation(
-            delay: 0, // 1000,
-            child: Text(
-              _message,
-              style: GoogleFonts.poppins(
-                color: Colors.redAccent,
-                fontWeight: FontWeight.w600,
-                fontSize: 16,
+          if (_message != "")
+            DelayedAnimation(
+              delay: 0, // 1000,
+              child: Text(
+                _message,
+                style: GoogleFonts.poppins(
+                  color: Colors.redAccent,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 16,
+                ),
+                textAlign: TextAlign.center,
               ),
-              textAlign: TextAlign.center,
             ),
-          ),
-          if(_message != "") const SizedBox(height: 10),
+          if (_message != "") const SizedBox(height: 10),
           _loading_liste_formule
               ? const Center(
                   child: CircularProgressIndicator(),
@@ -330,43 +333,49 @@ class _RegisterForm3State extends State<RegisterForm3> {
           ),
           const SizedBox(height: 15),
           Row(
-            mainAxisAlignment : MainAxisAlignment.spaceBetween,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-            SizedBox(width: MediaQuery.of(context).size.width * 0.35,child: DelayedAnimation(
-            delay: 0, // 1500,
-            child: TextField(
-              controller: quantityController,
-              keyboardType: TextInputType.number,
-              decoration: InputDecoration(
-                labelText: (langUserPhone == "fr") ? "Quantité" : "Quantity",
-                helperText: "Min : $qteMin - Max : $qteMax",
-                border: const OutlineInputBorder(),
+              SizedBox(
+                width: MediaQuery.of(context).size.width * 0.35,
+                child: DelayedAnimation(
+                  delay: 0, // 1500,
+                  child: TextField(
+                    controller: quantityController,
+                    keyboardType: TextInputType.number,
+                    decoration: InputDecoration(
+                      labelText:
+                          (langUserPhone == "fr") ? "Quantité" : "Quantity",
+                      helperText: "Min : $qteMin - Max : $qteMax",
+                      border: const OutlineInputBorder(),
+                    ),
+                    onChanged: (val) => calculerPrixTotal(),
+                  ),
+                ),
               ),
-              onChanged: (val) => calculerPrixTotal(),
-            ),
-          ),),
-          SizedBox(width: MediaQuery.of(context).size.width * 0.55,child: DelayedAnimation(
-            delay: 0,
-            child: TextField(
-  controller: priceController,
-  maxLines: 3,
-  minLines: 1,
-  keyboardType: const TextInputType.numberWithOptions(decimal: true),
-  decoration: const InputDecoration(
-    labelText: "Prix",
-    helperText: "FCFA",
-    border: OutlineInputBorder(),
-    // Définir la couleur du texte lorsque le champ est désactivé
-    labelStyle: TextStyle(color: primaryColor), 
-  ),
-  style: const TextStyle(color: primaryColor),
-  enabled: false,
-),
-
-          ),),
-          ],),
-          
-          
+              SizedBox(
+                width: MediaQuery.of(context).size.width * 0.55,
+                child: DelayedAnimation(
+                  delay: 0,
+                  child: TextField(
+                    controller: priceController,
+                    maxLines: 3,
+                    minLines: 1,
+                    keyboardType:
+                        const TextInputType.numberWithOptions(decimal: true),
+                    decoration: const InputDecoration(
+                      labelText: "Prix",
+                      helperText: "FCFA",
+                      border: OutlineInputBorder(),
+                      // Définir la couleur du texte lorsque le champ est désactivé
+                      labelStyle: TextStyle(color: primaryColor),
+                    ),
+                    style: const TextStyle(color: primaryColor),
+                    enabled: false,
+                  ),
+                ),
+              ),
+            ],
+          ),
           const SizedBox(height: 10),
           DelayedAnimation(
             delay: 0, // 1500,
@@ -392,7 +401,13 @@ class _RegisterForm3State extends State<RegisterForm3> {
                   ),
                 ),
                 child: Text(
-                  _desactive2 ? (langUserPhone == "fr") ? "Patientez ..." : "Wait ..." : (langUserPhone == "fr") ? "Payer et Démarrer" : "Pay and Get Started",
+                  _desactive2
+                      ? (langUserPhone == "fr")
+                          ? "Patientez ..."
+                          : "Wait ..."
+                      : (langUserPhone == "fr")
+                          ? "Payer et Démarrer"
+                          : "Pay and Get Started",
                   style: GoogleFonts.poppins(
                     color: Colors.white,
                   ),
