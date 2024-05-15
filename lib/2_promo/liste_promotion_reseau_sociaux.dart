@@ -37,69 +37,70 @@ class PromotionReseauSociaux {
 
 class PromotionReseauSociauxListePage extends StatefulWidget {
   @override
-  State<PromotionReseauSociauxListePage> createState() => _PromotionReseauSociauxListePageState();
+  State<PromotionReseauSociauxListePage> createState() =>
+      _PromotionReseauSociauxListePageState();
 }
 
-class _PromotionReseauSociauxListePageState extends State<PromotionReseauSociauxListePage> {
+class _PromotionReseauSociauxListePageState
+    extends State<PromotionReseauSociauxListePage> {
   bool _loading = false;
   List<PromotionReseauSociaux> _promotionReseauSociaux = [];
 
-  Future<void> fetchPromotionReseauSociaux() async{
+  Future<void> fetchPromotionReseauSociaux() async {
     setState(() {
       _loading = true;
     });
-        final url = Uri.parse(
+    final url = Uri.parse(
         '$generalRouteForApi/listPromoReseau/$uidUser/$langUserPhone');
 
-        final response = await http.get(url);
+    final response = await http.get(url);
 
-        if (response.statusCode == 200) {
-          final jsonData = jsonDecode(response.body) as List<dynamic>;
+    if (response.statusCode == 200) {
+      final jsonData = jsonDecode(response.body) as List<dynamic>;
 
-          final promotionReseauSociaux = jsonData.map((data) {
-            return PromotionReseauSociaux(
-              id: data['id'],
-              titre: data['titre'],
-              qteDemander: data['qteDemander'],
-              prixFixer: data['prixFixer'],
-              url: data['url'],
-              reference: data['reference'],
-              status: data['status'],
-              compteurDebut: data['compteurDebut'],
-              compteurRestant: data['compteurRestant'],
-              createdAt: data['createdAt'],
-              updatedAt: data['updatedAt'],
-            );
-          }).toList();
+      final promotionReseauSociaux = jsonData.map((data) {
+        return PromotionReseauSociaux(
+          id: data['id'],
+          titre: data['titre'],
+          qteDemander: data['qteDemander'],
+          prixFixer: data['prixFixer'],
+          url: data['url'],
+          reference: data['reference'],
+          status: data['status'],
+          compteurDebut: data['compteurDebut'],
+          compteurRestant: data['compteurRestant'],
+          createdAt: data['createdAt'],
+          updatedAt: data['updatedAt'],
+        );
+      }).toList();
 
-          setState(() {
-            _promotionReseauSociaux = promotionReseauSociaux;
-            _loading = false;
-          });
-        } else {
-          showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return AlertDialog(
-                title: const Text('Erreur'),
-                content: Text((langUserPhone == "fr")
-                    ? "Échec de récupération des promotionReseauSociaux. Code d'erreur:"
-                    : "Failed to retrieve promotionReseauSociaux. Error code:"
-                        "${response.statusCode}"),
-                actions: <Widget>[
-                  TextButton(
-                    child: const Text('OK'),
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                  ),
-                ],
-              );
-            },
+      setState(() {
+        _promotionReseauSociaux = promotionReseauSociaux;
+        _loading = false;
+      });
+    } else {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('Erreur'),
+            content: Text((langUserPhone == "fr")
+                ? "Échec de récupération des promotionReseauSociaux. Code d'erreur:"
+                : "Failed to retrieve promotionReseauSociaux. Error code:"
+                    "${response.statusCode}"),
+            actions: <Widget>[
+              TextButton(
+                child: const Text('OK'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
           );
-       }
+        },
+      );
+    }
   }
-
 
   @override
   void initState() {
@@ -108,7 +109,7 @@ class _PromotionReseauSociauxListePageState extends State<PromotionReseauSociaux
   }
 
   Widget build(BuildContext context) {
-     return Scaffold(
+    return Scaffold(
       appBar: AppBar(
         elevation: 0,
         backgroundColor: primaryColor,
@@ -189,124 +190,128 @@ class _PromotionReseauSociauxListePageState extends State<PromotionReseauSociaux
               child: CircularProgressIndicator(),
             )
           : _promotionReseauSociaux.isEmpty
-                  ? Center(
-                      child: Text(
-                        (langUserPhone == "fr")
-                            ? "Aucun promotion réseau sociaux trouvé."
-                            : "No social network promotions found.",
-                        style: const TextStyle(fontSize: 16),
-                      ),
-                    )
-                  : Expanded(
-                      child: ListView.builder(
-              itemCount: _promotionReseauSociaux.length,
-              itemBuilder: (BuildContext context, int index) {
-                final promotionReseauSociaux = _promotionReseauSociaux[index];
-
-                return Card(
-                  margin: const EdgeInsets.only(
-                      left: 10, top: 10, right: 10, bottom: 0),
-                  child: Container(
-                    width: MediaQuery.of(context).size.width * 0.95,
-                    decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [
-                          secondaryColor,
-                          primaryColor,
-                        ],
-                      ),
-                      borderRadius: BorderRadius.circular(5),
-                    ),
-                    padding: const EdgeInsets.fromLTRB(15, 10, 15, 10),
-                    
-                     child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              promotionReseauSociaux.titre,
-                              style: GoogleFonts.poppins(
-                                fontSize: 18,
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                InfoColumn(
-                                  label: "Quantité Demandée",
-                                  value: promotionReseauSociaux.qteDemander,
-                                ),
-                                InfoColumn(
-                                  label: "Prix Fixé",
-                                  value: promotionReseauSociaux.prixFixer,
-                                ),
-                              ],
-                            ),
-                            const Divider(color: Colors.white, height: 20),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                InfoColumn(
-                                  label: "URL",
-                                  value: promotionReseauSociaux.url,
-                                ),
-                                InfoColumn(
-                                  label: "Référence",
-                                  value: promotionReseauSociaux.reference,
-                                ),
-                              ],
-                            ),
-                            const Divider(color: Colors.white, height: 20),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                InfoColumn(
-                                  label: "Compteur Début",
-                                  value: promotionReseauSociaux.compteurDebut,
-                                ),
-                                InfoColumn(
-                                  label: "Compteur Restant",
-                                  value: promotionReseauSociaux.compteurRestant,
-                                ),
-                              ],
-                            ),
-                            const Divider(color: Colors.white, height: 20),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                InfoColumn(
-                                  label: "Statut",
-                                  value: promotionReseauSociaux.status,
-                                ),
-                              ],
-                            ),
-                            const Divider(color: Colors.white, height: 20),
-                            Text(
-                              "Créé le: ${promotionReseauSociaux.createdAt}",
-                              style: GoogleFonts.poppins(
-                                fontSize: 12,
-                                color: Colors.white,
-                              ),
-                            ),
-                            Text(
-                              "Mis à jour le: ${promotionReseauSociaux.updatedAt}",
-                              style: GoogleFonts.poppins(
-                                fontSize: 12,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ],
-                        ),
-
+              ? Center(
+                  child: Text(
+                    (langUserPhone == "fr")
+                        ? "Aucun promotion réseau sociaux trouvé."
+                        : "No social network promotions found.",
+                    style: const TextStyle(fontSize: 16),
                   ),
-                );
-              },
-            ),
-            ),
+                )
+              : Expanded(
+                  child: ListView.builder(
+                    itemCount: _promotionReseauSociaux.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      final promotionReseauSociaux =
+                          _promotionReseauSociaux[index];
+
+                      return Card(
+                        margin: const EdgeInsets.only(
+                            left: 10, top: 10, right: 10, bottom: 0),
+                        child: Container(
+                          width: MediaQuery.of(context).size.width * 0.95,
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                              colors: [
+                                secondaryColor,
+                                primaryColor,
+                              ],
+                            ),
+                            borderRadius: BorderRadius.circular(5),
+                          ),
+                          padding: const EdgeInsets.fromLTRB(15, 10, 15, 10),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                promotionReseauSociaux.titre,
+                                style: GoogleFonts.poppins(
+                                  fontSize: 18,
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  InfoColumn(
+                                    label: "Quantité Demandée",
+                                    value: promotionReseauSociaux.qteDemander,
+                                  ),
+                                  InfoColumn(
+                                    label: "Prix Fixé",
+                                    value: promotionReseauSociaux.prixFixer,
+                                  ),
+                                ],
+                              ),
+                              const Divider(color: Colors.white, height: 20),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  InfoColumn(
+                                    label: "URL",
+                                    value: promotionReseauSociaux.url,
+                                  ),
+                                  InfoColumn(
+                                    label: "Référence",
+                                    value: promotionReseauSociaux.reference,
+                                  ),
+                                ],
+                              ),
+                              const Divider(color: Colors.white, height: 20),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  InfoColumn(
+                                    label: "Compteur Début",
+                                    value: promotionReseauSociaux.compteurDebut,
+                                  ),
+                                  InfoColumn(
+                                    label: "Compteur Restant",
+                                    value:
+                                        promotionReseauSociaux.compteurRestant,
+                                  ),
+                                ],
+                              ),
+                              const Divider(color: Colors.white, height: 20),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  InfoColumn(
+                                    label: "Statut",
+                                    value: promotionReseauSociaux.status,
+                                  ),
+                                ],
+                              ),
+                              const Divider(color: Colors.white, height: 20),
+                              Text(
+                                "Créé le: ${promotionReseauSociaux.createdAt}",
+                                style: GoogleFonts.poppins(
+                                  fontSize: 12,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              Text(
+                                "Mis à jour le: ${promotionReseauSociaux.updatedAt}",
+                                style: GoogleFonts.poppins(
+                                  fontSize: 12,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
     );
   }
 }
