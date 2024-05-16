@@ -1,4 +1,4 @@
-// ignore_for_file: use_build_context_synchronously
+// ignore_for_file: use_build_context_synchronously, prefer_const_constructors
 
 import 'dart:convert';
 import 'dart:convert' as convert;
@@ -210,93 +210,109 @@ class _CampagneMailListePageState extends State<CampagneMailListePage> {
                       return Card(
                         margin: const EdgeInsets.only(
                             left: 10, top: 10, right: 10, bottom: 0),
-                        child: Row(
-                          children: [
-                            const SizedBox(width: 5),
-                            Expanded(
-                              child: Container(
-                                // width: 80,
-                                height: 100,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(5),
+                          ),
+                          padding: const EdgeInsets.fromLTRB(10, 10, 10, 6),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Container(
+                                padding: EdgeInsets.fromLTRB(8, 1, 8, 1),
                                 decoration: BoxDecoration(
-                                  gradient: const LinearGradient(
-                                    begin: Alignment.topCenter,
-                                    end: Alignment.bottomCenter,
-                                    colors: [
-                                      primaryColor,
-                                      secondaryColor,
-                                    ],
-                                  ),
-                                  borderRadius: BorderRadius.circular(5),
+                                  color: ([
+                                    "Completed",
+                                    "Terminé",
+                                    "Accept and in progress",
+                                    "Accepter et en cours"
+                                  ].contains(campagneMail.status))
+                                      ? Colors.green
+                                      : ([
+                                          "Waiting for validation",
+                                          "En Attente de validation",
+                                          "Accept and pending payment",
+                                          "Accepter et en attente de paiement"
+                                        ].contains(campagneMail.status))
+                                          ? Colors.orange
+                                          : Colors.red,
+                                  borderRadius: BorderRadius.circular(10.0),
                                 ),
-                                padding:
-                                    const EdgeInsets.fromLTRB(15, 10, 15, 0),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'Titre: ${campagneMail.titre}',
-                                      style: const TextStyle(
-                                        fontSize: 12.0,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 5),
-                                    Text(
-                                      'Status: ${campagneMail.status}',
-                                      style: const TextStyle(
-                                        fontSize: 12.0,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 5),
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.end,
-                                      children: [
-                                        Column(
-                                          children: [
-                                            SizedBox(
-                                              child: ElevatedButton.icon(
-                                                style: ElevatedButton.styleFrom(
-                                                  backgroundColor: Colors.green,
-                                                ),
-                                                label: Text(
-                                                  (langUserPhone == "fr")
-                                                      ? 'Autres Informations'
-                                                      : 'Other information',
-                                                  style: GoogleFonts.poppins(
-                                                    color: Colors.white,
-                                                    fontWeight: FontWeight.w600,
-                                                  ),
-                                                ),
-                                                icon: const Icon(
-                                                  Icons.info,
-                                                  color: Colors.white,
-                                                ),
-                                                onPressed: () {
-                                                  Navigator.push(
-                                                    context,
-                                                    MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          CampagneMailDetailPage(
-                                                        campagneMail:
-                                                            campagneMail,
-                                                      ),
-                                                    ),
-                                                  );
-                                                },
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                  ],
+                                child: Text(
+                                  campagneMail.status,
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
                                 ),
                               ),
-                            ),
-                          ],
+                              const SizedBox(height: 5),
+                              Text(
+                                campagneMail.sujet,
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              const SizedBox(height: 5),
+                              Text(
+                                campagneMail.contentmail,
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                ),
+                                maxLines: 3,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              const SizedBox(height: 5),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  Column(
+                                    children: [
+                                      SizedBox(
+                                        child: ElevatedButton.icon(
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor: secondaryColor,
+                                            padding: const EdgeInsets.symmetric(
+                                                vertical: 0, horizontal: 15),
+                                          ),
+                                          label: Text(
+                                            (langUserPhone == "fr")
+                                                ? 'Autres Informations'
+                                                : 'Other information',
+                                            style: GoogleFonts.poppins(
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.w400,
+                                              fontSize: 13,
+                                            ),
+                                          ),
+                                          icon: const Icon(
+                                            Icons.info,
+                                            color: Colors.white,
+                                            size: 13,
+                                          ),
+                                          onPressed: () {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) =>
+                                                    CampagneMailDetailPage(
+                                                  campagneMail: campagneMail,
+                                                ),
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
                       );
                     },
