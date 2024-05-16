@@ -116,7 +116,7 @@ class _RegisterForm3State extends State<RegisterForm3> {
   final linkController = TextEditingController();
   final quantityController = TextEditingController(text: "0");
   final priceController = TextEditingController();
-  final telController = TextEditingController();
+  final telController = TextEditingController(text: tel);
 
   void onChangeService(val) async {
     for (var service in listServices) {
@@ -129,6 +129,11 @@ class _RegisterForm3State extends State<RegisterForm3> {
           qteMin = service['qteMin'];
           qteMax = service['qteMax'];
           description = service['description'];
+
+          if (quantityController.text == "0" ||
+              int.parse(quantityController.text) < qteMin) {
+            quantityController.text = qteMin.toString();
+          }
         });
       }
     }
@@ -142,9 +147,16 @@ class _RegisterForm3State extends State<RegisterForm3> {
     if (qte != 0) {
       int qteDemander = int.tryParse(quantityController.text) ?? 0;
       if (qteDemander >= qteMin && qteDemander <= qteMax) {
-        double prixQteDemander = (prix * qteDemander) / qte;
+        int prixQteDemander = ((prix * qteDemander) / qte).round();
         quantityController.text = "$qteDemander";
         priceController.text = "$prixQteDemander";
+        if (prixQteDemander < 100) {
+          setState(() {
+            _message = (langUserPhone == "fr")
+                ? "Le prix minimum pour une transaction est de 100 FCFA."
+                : "The minimum price for a transaction is 100 FCFA.";
+          });
+        }
       } else {
         setState(() {
           _message = (langUserPhone == "fr")
@@ -205,75 +217,68 @@ class _RegisterForm3State extends State<RegisterForm3> {
   }
 
   void newPromoReseau() async {
-    if (telIsVerified == true) {
-      dynamic youHaveNetWork = "";
-      youHaveConnexion();
+    setState(() {
+      _desactive3 = true;
+    });
+    dynamic youHaveNetWork = "";
+    youHaveConnexion();
+    youHaveNetWork = await SQLHelper.getYouHaveConnexion();
+    while (youHaveNetWork.length == 0) {
       youHaveNetWork = await SQLHelper.getYouHaveConnexion();
-      while (youHaveNetWork.length == 0) {
-        youHaveNetWork = await SQLHelper.getYouHaveConnexion();
-      }
-      if (youHaveNetWork[0]['youHaveConnexion'] == "oui") {
-        setState(() {
-          _desactive3 = true;
-        });
+    }
+    if (youHaveNetWork[0]['youHaveConnexion'] == "oui") {
+      var request = http.MultipartRequest(
+          'POST', Uri.parse('$generalRouteForApi/newPromoReseau'));
+      request.fields.addAll({
+        'langUserPhone': langUserPhone.toString(),
+        'uid': uidUser,
+        'idFormulePromoReseau': idFormulePromoReseau.toString(),
+        'qteDemander': quantityController.text,
+        'prixQteDemander': priceController.text,
+        'lien': linkController.text,
+        'valueMethodePaiement': valueMethodePaiement,
+        'tel': telController.text,
+      });
 
-        var request = http.MultipartRequest(
-            'POST', Uri.parse('$generalRouteForApi/newPromoReseau'));
-        request.fields.addAll({
-          'langUserPhone': langUserPhone.toString(),
-          'uid': uidUser,
-          'idFormulePromoReseau': idFormulePromoReseau.toString(),
-          'qteDemander': quantityController.text,
-          'prixQteDemander': priceController.text,
-          'lien': linkController.text,
-          'valueMethodePaiement': valueMethodePaiement,
-          'tel': telController.text,
-        });
+      http.StreamedResponse response = await request.send();
 
-        http.StreamedResponse response = await request.send();
-
-        if (response.statusCode == 200) {
-          var data1 = await response.stream.bytesToString();
-          var data = convert.jsonDecode(data1);
-          if (data["error"] == false) {
-            setState(() {
-              _desactive3 = false;
-              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                behavior: SnackBarBehavior.floating,
-                content: Text(
-                  (langUserPhone == "fr")
-                      ? 'Votre poste a déjà démarré.'
-                      : 'Your post has already started.',
-                ),
-              ));
-            });
-          } else {
-            dangerNoti(data["titre"], data["message"], context);
-            setState(() {
-              _desactive3 = false;
-            });
-          }
+      if (response.statusCode == 200) {
+        var data1 = await response.stream.bytesToString();
+        var data = convert.jsonDecode(data1);
+        if (data["error"] == false) {
+          setState(() {
+            _desactive3 = false;
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              behavior: SnackBarBehavior.floating,
+              content: Text(
+                (langUserPhone == "fr")
+                    ? 'Votre poste a déjà démarré.'
+                    : 'Your post has already started.',
+              ),
+            ));
+          });
+        } else {
+          dangerNoti(data["titre"], data["message"], context);
+          setState(() {
+            _desactive3 = false;
+          });
         }
       } else {
-        if (langUserPhone != "fr") {
-          dangerNoti(
-              "Mistake!", "You are not connected to the internet.", context);
-        } else {
-          dangerNoti(
-              "Erreur!", "Vous n'ètes pas connecté a internet.", context);
-        }
+        dangerNoti("ERROR", "ERROR", context);
         setState(() {
           _desactive3 = false;
         });
       }
     } else {
       if (langUserPhone != "fr") {
-        dangerNoti("Access denied !",
-            "Please confirm your WhatsApp number first.", context);
+        dangerNoti(
+            "Mistake!", "You are not connected to the internet.", context);
       } else {
-        dangerNoti("Accès Refusé !",
-            "Veuillez d'abord confirmer votre numéro WhatsApp.", context);
+        dangerNoti("Erreur!", "Vous n'ètes pas connecté a internet.", context);
       }
+      setState(() {
+        _desactive3 = false;
+      });
     }
   }
 
@@ -559,7 +564,7 @@ class _RegisterForm3State extends State<RegisterForm3> {
               },
             ),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 15),
           DelayedAnimation(
             delay: 0, // 1500,
             child: SelectFormField(
@@ -575,7 +580,7 @@ class _RegisterForm3State extends State<RegisterForm3> {
               onSaved: (val) => print(val),
             ),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 15),
           DelayedAnimation(
             delay: 0, // 1500,
             child: TextField(
@@ -587,7 +592,21 @@ class _RegisterForm3State extends State<RegisterForm3> {
               ),
             ),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 15),
+          if (_message != "")
+            DelayedAnimation(
+              delay: 0, // 1000,
+              child: Text(
+                _message,
+                style: GoogleFonts.poppins(
+                  color: Colors.redAccent,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 16,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          if (_message != "") const SizedBox(height: 10),
           DelayedAnimation(
             delay: 0,
             child: SizedBox(
@@ -601,7 +620,7 @@ class _RegisterForm3State extends State<RegisterForm3> {
                   ),
                 ),
                 child: Text(
-                  _desactive2
+                  _desactive3
                       ? (langUserPhone == "fr")
                           ? "Patientez ..."
                           : "Wait ..."
@@ -630,20 +649,7 @@ class _RegisterForm3State extends State<RegisterForm3> {
               ),
             ),
           ),
-          const SizedBox(height: 20),
-          DelayedAnimation(
-            delay: 0, // 1000,
-            child: Text(
-              _message,
-              style: GoogleFonts.poppins(
-                color: Colors.blue[400],
-                fontWeight: FontWeight.w600,
-                fontSize: 12,
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 15),
           DelayedAnimation(
             delay: 0, // 1500,
             child: Text(
@@ -653,7 +659,7 @@ class _RegisterForm3State extends State<RegisterForm3> {
               style: GoogleFonts.poppins(
                 fontWeight: FontWeight.w600,
                 fontSize: 12,
-                color: Colors.red[400],
+                color: Colors.red,
               ),
               textAlign: TextAlign.center,
             ),
