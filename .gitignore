@@ -46,13 +46,10 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 
-
+/lib/components/111_generalApiDomaine.dart
 
 # n'est pas ignorer de base
 /macos/Flutter/GeneratedPluginRegistrant.swift
-
-/lib/components/111_generalApiDomaine.dart
-
 /linux/flutter/generated_plugin_registrant.cc
 /linux/flutter/generated_plugin_registrant.h
 /linux/flutter/generated_plugins.cmake

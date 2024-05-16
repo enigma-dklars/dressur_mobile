@@ -104,7 +104,8 @@ class _PromotionReseauSociauxListePageState
   }
 
   Future<void> fetchPromotionDetails(Item item) async {
-    final url = Uri.parse('$generalRouteForApi/promoDetails/${item.expandedValue.id}');
+    final url =
+        Uri.parse('$generalRouteForApi/promoDetails/${item.expandedValue.id}');
 
     final response = await http.get(url);
 
@@ -165,7 +166,7 @@ class _PromotionReseauSociauxListePageState
               ? "Liste Promotion Réseau Sociaux"
               : "Social Network Promotion List",
           style: GoogleFonts.poppins(
-            fontWeight: FontWeight.w600,
+            fontWeight: FontWeight.w400,
             color: Colors.white,
           ),
         ),
@@ -258,8 +259,7 @@ class _PromotionReseauSociauxListePageState
                     },
                     children: _data.map<ExpansionPanel>((Item item) {
                       return ExpansionPanel(
-                        headerBuilder:
-                            (BuildContext context, bool isExpanded) {
+                        headerBuilder: (BuildContext context, bool isExpanded) {
                           return ListTile(
                             title: Text(
                               item.headerValue,
