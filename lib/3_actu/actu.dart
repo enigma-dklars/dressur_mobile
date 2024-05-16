@@ -63,9 +63,9 @@ class _ActuPageState extends State<ActuPage> {
   Timer? _timer;
 
   bool havePublicites = false;
-  var lesPublicites;
   bool rechercheEnCours = true;
   late Future<List<Advertisement>> _futureAdvertisements;
+  bool _firstLoad = true;
 
   @override
   void initState() {
@@ -153,11 +153,10 @@ class _ActuPageState extends State<ActuPage> {
       if (data["error"] == false) {
         setState(() {
           initUserInformations(data['user']);
-          lesPublicites = data['user']["lesPublicites"];
           havePublicites = data['user']["havePublicites"];
-          _futureAdvertisements = fetchAdvertisements();
+          _futureAdvertisements =
+              fetchAdvertisements(data['user']["lesPublicites"]);
           _loading = false;
-          print(lesPublicites);
         });
       } else {
         setState(() {
@@ -181,8 +180,7 @@ class _ActuPageState extends State<ActuPage> {
     );
   }
 
-  Future<List<Advertisement>> fetchAdvertisements() async {
-    // Votre logique pour récupérer les annonces
+  Future<List<Advertisement>> fetchAdvertisements(lesPublicites) async {
     if (lesPublicites.toString().isNotEmpty) {
       final jsonData = jsonDecode(lesPublicites) as List<dynamic>;
 
@@ -404,6 +402,14 @@ class _ActuPageState extends State<ActuPage> {
 
   @override
   Widget build(BuildContext context) {
+    if (_firstLoad) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        actualise();
+      });
+      setState(() {
+        _firstLoad = false;
+      });
+    }
     return WillPopScope(
       onWillPop: _onWillPop,
       child: Scaffold(
