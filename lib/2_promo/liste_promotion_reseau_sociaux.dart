@@ -1,4 +1,6 @@
+// ignore_for_file: use_key_in_widget_constructors, prefer_const_constructors
 import 'dart:convert';
+
 import 'package:dressur/5_autre/support_assistance.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
@@ -31,22 +33,6 @@ class PromotionReseauSociaux {
     required this.createdAt,
     required this.updatedAt,
   });
-
-  factory PromotionReseauSociaux.fromJson(Map<String, dynamic> json) {
-    return PromotionReseauSociaux(
-      id: json['id'],
-      titre: json['titre'],
-      qteDemander: json['qteDemander'],
-      prixFixer: json['prixFixer'],
-      url: json['url'],
-      reference: json['reference'],
-      status: json['status'],
-      compteurDebut: json['compteurDebut'],
-      compteurRestant: json['compteurRestant'],
-      createdAt: json['createdAt'],
-      updatedAt: json['updatedAt'],
-    );
-  }
 }
 
 class PromotionReseauSociauxListePage extends StatefulWidget {
@@ -58,7 +44,7 @@ class PromotionReseauSociauxListePage extends StatefulWidget {
 class _PromotionReseauSociauxListePageState
     extends State<PromotionReseauSociauxListePage> {
   bool _loading = false;
-  List<Item> _data = [];
+  List<PromotionReseauSociaux> _promotionReseauSociaux = [];
 
   Future<void> fetchPromotionReseauSociaux() async {
     setState(() {
@@ -73,11 +59,23 @@ class _PromotionReseauSociauxListePageState
       final jsonData = jsonDecode(response.body) as List<dynamic>;
 
       final promotionReseauSociaux = jsonData.map((data) {
-        return PromotionReseauSociaux.fromJson(data);
+        return PromotionReseauSociaux(
+          id: data['id'],
+          titre: data['titre'],
+          qteDemander: data['qteDemander'],
+          prixFixer: data['prixFixer'],
+          url: data['url'],
+          reference: data['reference'],
+          status: data['status'],
+          compteurDebut: data['compteurDebut'],
+          compteurRestant: data['compteurRestant'],
+          createdAt: data['createdAt'],
+          updatedAt: data['updatedAt'],
+        );
       }).toList();
 
       setState(() {
-        _data = generateItems(promotionReseauSociaux);
+        _promotionReseauSociaux = promotionReseauSociaux;
         _loading = false;
       });
     } else {
@@ -87,8 +85,9 @@ class _PromotionReseauSociauxListePageState
           return AlertDialog(
             title: const Text('Erreur'),
             content: Text((langUserPhone == "fr")
-                ? "Échec de récupération des promotions réseau sociaux. Code d'erreur: ${response.statusCode}"
-                : "Failed to retrieve social network promotions. Error code: ${response.statusCode}"),
+                ? "Échec de récupération des promotionReseauSociaux. Code d'erreur:"
+                : "Failed to retrieve promotionReseauSociaux. Error code:"
+                    "${response.statusCode}"),
             actions: <Widget>[
               TextButton(
                 child: const Text('OK'),
@@ -101,61 +100,14 @@ class _PromotionReseauSociauxListePageState
         },
       );
     }
-  }
-
-  Future<void> fetchPromotionDetails(Item item) async {
-    final url =
-        Uri.parse('$generalRouteForApi/promoDetails/${item.expandedValue.id}');
-
-    final response = await http.get(url);
-
-    if (response.statusCode == 200) {
-      final jsonData = jsonDecode(response.body);
-
-      setState(() {
-        item.expandedValue = PromotionReseauSociaux.fromJson(jsonData);
-      });
-    } else {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text('Erreur'),
-            content: Text((langUserPhone == "fr")
-                ? "Échec de récupération des détails de la promotion. Code d'erreur: ${response.statusCode}"
-                : "Failed to retrieve promotion details. Error code: ${response.statusCode}"),
-            actions: <Widget>[
-              TextButton(
-                child: const Text('OK'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          );
-        },
-      );
-    }
-  }
-
-  List<Item> generateItems(List<PromotionReseauSociaux> promotions) {
-    return List<Item>.generate(promotions.length, (index) {
-      final promotion = promotions[index];
-      return Item(
-        headerValue: promotion.titre,
-        expandedValue: promotion,
-        isExpanded: false,
-      );
-    });
   }
 
   @override
   void initState() {
     super.initState();
-    fetchPromotionReseauSociaux();
+    fetchPromotionReseauSociaux(); // Loading the diary when the app starts
   }
 
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -166,7 +118,7 @@ class _PromotionReseauSociauxListePageState
               ? "Liste Promotion Réseau Sociaux"
               : "Social Network Promotion List",
           style: GoogleFonts.poppins(
-            fontWeight: FontWeight.w400,
+            fontWeight: FontWeight.w600,
             color: Colors.white,
           ),
         ),
@@ -237,7 +189,7 @@ class _PromotionReseauSociauxListePageState
           ? const Center(
               child: CircularProgressIndicator(),
             )
-          : _data.isEmpty
+          : _promotionReseauSociaux.isEmpty
               ? Center(
                   child: Text(
                     (langUserPhone == "fr")
@@ -246,112 +198,142 @@ class _PromotionReseauSociauxListePageState
                     style: const TextStyle(fontSize: 16),
                   ),
                 )
-              : SingleChildScrollView(
-                  child: ExpansionPanelList(
-                    expansionCallback: (int index, bool isExpanded) async {
-                      setState(() {
-                        _data[index].isExpanded = !isExpanded;
-                      });
+              : Expanded(
+                  child: ListView.builder(
+                    itemCount: _promotionReseauSociaux.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      final promotionReseauSociaux =
+                          _promotionReseauSociaux[index];
 
-                      if (!_data[index].isExpanded) {
-                        await fetchPromotionDetails(_data[index]);
-                      }
-                    },
-                    children: _data.map<ExpansionPanel>((Item item) {
-                      return ExpansionPanel(
-                        headerBuilder: (BuildContext context, bool isExpanded) {
-                          return ListTile(
-                            title: Text(
-                              item.headerValue,
-                              style: GoogleFonts.poppins(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          );
-                        },
-                        body: Padding(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 15, vertical: 10),
+                      return Card(
+                        margin: const EdgeInsets.only(
+                            left: 10, top: 10, right: 10, bottom: 0),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(5),
+                          ),
+                          padding: const EdgeInsets.fromLTRB(10, 10, 10, 6),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
+                              Row(
+                                children: [
+                                  Container(
+                                    padding: EdgeInsets.fromLTRB(8, 1, 8, 1),
+                                    decoration: BoxDecoration(
+                                      color: ([
+                                        "Completed",
+                                        "Terminé",
+                                        "In progress",
+                                        "En cours"
+                                      ].contains(promotionReseauSociaux.status))
+                                          ? Colors.green
+                                          : (["On hold", "En attente"].contains(
+                                                  promotionReseauSociaux
+                                                      .status))
+                                              ? Colors.orange
+                                              : Colors.red,
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    child: Text(
+                                      promotionReseauSociaux.status,
+                                      style: const TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 5),
+                                  Expanded(
+                                    child: Text(
+                                      promotionReseauSociaux.titre,
+                                      style: GoogleFonts.poppins(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 5),
                               Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
                                   InfoColumn(
                                     label: "Compteur Début",
-                                    value: item.expandedValue.compteurDebut,
+                                    value: promotionReseauSociaux.compteurDebut,
                                   ),
                                   InfoColumn(
                                     label: "Compteur Restant",
-                                    value: item.expandedValue.compteurRestant,
+                                    value:
+                                        promotionReseauSociaux.compteurRestant,
                                   ),
                                 ],
                               ),
-                              const Divider(color: Colors.black),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  InfoColumn(
-                                    label: "Statut",
-                                    value: item.expandedValue.status,
-                                  ),
-                                  InfoColumn(
-                                    label: "Référence",
-                                    value: item.expandedValue.reference,
-                                  ),
-                                ],
-                              ),
-                              const Divider(color: Colors.black),
+                              const Divider(height: 5),
                               Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
                                   InfoColumn(
                                     label: "Quantité Demandée",
-                                    value: item.expandedValue.qteDemander,
+                                    value: promotionReseauSociaux.qteDemander,
                                   ),
                                   InfoColumn(
                                     label: "Prix Fixé",
-                                    value: item.expandedValue.prixFixer,
+                                    value: promotionReseauSociaux.prixFixer,
                                   ),
                                 ],
                               ),
-                              const Divider(color: Colors.black),
+                              const Divider(height: 5),
                               Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Flexible(
+                                  InfoColumn(
+                                    label: "Référence",
+                                    value: promotionReseauSociaux.reference,
+                                  ),
+                                  const SizedBox(width: 5),
+                                  Expanded(
                                     child: InfoColumn(
                                       label: "URL",
-                                      value: item.expandedValue.url,
+                                      value: promotionReseauSociaux.url,
                                     ),
                                   ),
                                 ],
                               ),
-                              const Divider(color: Colors.black),
-                              Text(
-                                "Créé le: ${item.expandedValue.createdAt}",
-                                style: GoogleFonts.poppins(
-                                  fontSize: 12,
-                                ),
-                              ),
-                              Text(
-                                "Mis à jour le: ${item.expandedValue.updatedAt}",
-                                style: GoogleFonts.poppins(
-                                  fontSize: 12,
-                                ),
+                              const Divider(height: 5),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    "Créé : ${promotionReseauSociaux.createdAt}",
+                                    style: GoogleFonts.poppins(
+                                      fontSize: 10,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Expanded(
+                                    child: Text(
+                                      "Modifier : ${promotionReseauSociaux.updatedAt}",
+                                      style: GoogleFonts.poppins(
+                                        fontSize: 10,
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ],
                           ),
                         ),
-                        isExpanded: item.isExpanded,
                       );
-                    }).toList(),
+                    },
                   ),
                 ),
     );
@@ -376,30 +358,21 @@ class InfoColumn extends StatelessWidget {
           label,
           style: GoogleFonts.poppins(
             fontSize: 14,
-            color: Colors.black54,
             fontWeight: FontWeight.w600,
           ),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
         ),
-        const SizedBox(height: 4),
+        const SizedBox(height: 1),
         Text(
           value,
           style: GoogleFonts.poppins(
             fontSize: 14,
           ),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
         ),
       ],
     );
   }
-}
-
-class Item {
-  Item({
-    required this.expandedValue,
-    required this.headerValue,
-    this.isExpanded = false,
-  });
-
-  PromotionReseauSociaux expandedValue;
-  String headerValue;
-  bool isExpanded;
 }
