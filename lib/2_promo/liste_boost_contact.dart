@@ -1,4 +1,4 @@
-// ignore_for_file: use_build_context_synchronously
+// ignore_for_file: use_build_context_synchronously, prefer_const_constructors
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -174,94 +174,122 @@ class _ListeBoostContactPageState extends State<ListeBoostContactPage> {
               child: CircularProgressIndicator(),
             )
           : _boosts.isEmpty
-                  ? Center(
-                      child: Text(
-                        (langUserPhone == "fr")
-                            ? "Aucun boost contact trouvé."
-                            : "No contact boost found.",
-                        style: const TextStyle(fontSize: 16),
-                      ),
-                    )
-                  : Expanded(
-                      child: ListView.builder(
-              itemCount: _boosts.length,
-              itemBuilder: (BuildContext context, int index) {
-                final boost = _boosts[index];
-
-                return Card(
-                  margin: const EdgeInsets.only(
-                      left: 10, top: 10, right: 10, bottom: 0),
-                  child: Container(
-                    width: MediaQuery.of(context).size.width * 0.95,
-                    decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [
-                          secondaryColor,
-                          primaryColor,
-                        ],
-                      ),
-                      borderRadius: BorderRadius.circular(5),
-                    ),
-                    padding: const EdgeInsets.fromLTRB(15, 10, 15, 10),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Column(
-                              children: [
-                                Text(
-                                  boost.modeBoostFormule,
-                                  style: GoogleFonts.poppins(
-                                    fontSize: 14,
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w800,
-                                  ),
-                                  textAlign: TextAlign.end,
-                                ),
-                              ],
-                            ),
-                            Column(
-                              children: [
-                                Text(
-                                  boost.statutFormule,
-                                  style: GoogleFonts.poppins(
-                                    fontSize: 14,
-                                    color: Colors.white,
-                                  ),
-                                  textAlign: TextAlign.end,
-                                ),
-                              ],
-                            )
-                          ],
-                        ),
-                        const SizedBox(height: 5),
-                        Text(
-                          "${boost.nomFormule} (${boost.prixFormule})",
-                          style: GoogleFonts.poppins(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 18,
-                            color: Colors.white,
-                          ),
-                        ),
-                        const SizedBox(height: 5),
-                        Text(
-                          boost.dateDebutFormule,
-                          style: const TextStyle(
-                            fontSize: 12,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ],
-                    ),
+              ? Center(
+                  child: Text(
+                    (langUserPhone == "fr")
+                        ? "Aucun boost contact trouvé."
+                        : "No contact boost found.",
+                    style: const TextStyle(fontSize: 16),
                   ),
-                );
-              },
-            ),
-            ),
+                )
+              : Expanded(
+                  child: ListView.builder(
+                    itemCount: _boosts.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      final boost = _boosts[index];
+
+                      return Card(
+                        margin: const EdgeInsets.only(
+                            left: 10, top: 10, right: 10, bottom: 0),
+                        child: Container(
+                          width: MediaQuery.of(context).size.width * 0.95,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(5),
+                          ),
+                          padding: const EdgeInsets.fromLTRB(15, 10, 15, 10),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Column(
+                                    children: [
+                                      Container(
+                                        padding:
+                                            EdgeInsets.fromLTRB(8, 1, 8, 1),
+                                        decoration: BoxDecoration(
+                                          color: ([
+                                            "Gratuit",
+                                            "Free"
+                                          ].contains(boost.modeBoostFormule))
+                                              ? Colors.green
+                                              : Colors.red,
+                                          borderRadius:
+                                              BorderRadius.circular(10.0),
+                                        ),
+                                        child: Text(
+                                          boost.modeBoostFormule,
+                                          style: GoogleFonts.poppins(
+                                            fontSize: 14,
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.w800,
+                                          ),
+                                          textAlign: TextAlign.end,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  Column(
+                                    children: [
+                                      Container(
+                                        padding:
+                                            EdgeInsets.fromLTRB(8, 1, 8, 1),
+                                        decoration: BoxDecoration(
+                                          color: ([
+                                            "Completed",
+                                            "Terminé"
+                                          ].contains(boost.statutFormule))
+                                              ? Colors.green
+                                              : ([
+                                                  "In progress",
+                                                  "En cours"
+                                                ].contains(boost.statutFormule))
+                                                  ? Colors.orange
+                                                  : Colors.red,
+                                          borderRadius:
+                                              BorderRadius.circular(10.0),
+                                        ),
+                                        child: Text(
+                                          boost.statutFormule,
+                                          style: GoogleFonts.poppins(
+                                            fontSize: 14,
+                                            color: Colors.white,
+                                          ),
+                                          textAlign: TextAlign.end,
+                                        ),
+                                      ),
+                                    ],
+                                  )
+                                ],
+                              ),
+                              const SizedBox(height: 5),
+                              Text(
+                                "${boost.nomFormule} (${boost.prixFormule})",
+                                style: GoogleFonts.poppins(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 18,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              const SizedBox(height: 5),
+                              Text(
+                                boost.dateDebutFormule,
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
     );
   }
 }

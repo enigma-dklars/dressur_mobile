@@ -62,7 +62,6 @@ bool mailIsVerified = false;
 bool ihaveConnexion = false;
 bool admin = false;
 bool permissionAdd = false;
-bool havePublicites = false;
 var modeMotDePasseOublier = false;
 var mailConnexion = "";
 var textChargementEvolution = "Chargement ...";
@@ -84,8 +83,6 @@ var tiktok;
 var instagram;
 var facebook;
 var youtube;
-// ignore: prefer_typing_uninitialized_variables
-var lesPublicites;
 
 void youHaveConnexion() async {
   SQLHelper.delete('youHaveConnexion');
@@ -154,8 +151,6 @@ Future<void> initUserInformations(userInfos) async {
   preferenceCentreInteretLoisirText = preferenceCentreInteretLoisirToText(
       userInfos["preferenceCentreInteretLoisir"]);
   nombreContactDispo = userInfos["nombreContactDispo"];
-  lesPublicites = userInfos["lesPublicites"];
-  havePublicites = userInfos["havePublicites"];
 
   SQLHelper.viderLaBaseDeDonneeLocal();
 
