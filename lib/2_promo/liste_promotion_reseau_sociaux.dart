@@ -198,143 +198,133 @@ class _PromotionReseauSociauxListePageState
                     style: const TextStyle(fontSize: 16),
                   ),
                 )
-              : Expanded(
-                  child: ListView.builder(
-                    itemCount: _promotionReseauSociaux.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      final promotionReseauSociaux =
-                          _promotionReseauSociaux[index];
+              : ListView.builder(
+                  itemCount: _promotionReseauSociaux.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    final promotionReseauSociaux =
+                        _promotionReseauSociaux[index];
 
-                      return Card(
-                        margin: const EdgeInsets.only(
-                            left: 10, top: 10, right: 10, bottom: 0),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(5),
-                          ),
-                          padding: const EdgeInsets.fromLTRB(10, 10, 10, 6),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: [
-                                  Container(
-                                    padding: EdgeInsets.fromLTRB(8, 1, 8, 1),
-                                    decoration: BoxDecoration(
-                                      color: ([
-                                        "Completed",
-                                        "Terminé",
-                                        "In progress",
-                                        "En cours"
-                                      ].contains(promotionReseauSociaux.status))
-                                          ? Colors.green
-                                          : (["On hold", "En attente"].contains(
-                                                  promotionReseauSociaux
-                                                      .status))
-                                              ? Colors.orange
-                                              : Colors.red,
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                    child: Text(
-                                      promotionReseauSociaux.status,
-                                      style: const TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 5),
-                                  Expanded(
-                                    child: Text(
-                                      promotionReseauSociaux.titre,
-                                      style: GoogleFonts.poppins(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 5),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  InfoColumn(
-                                    label: "Compteur Début",
-                                    value: promotionReseauSociaux.compteurDebut,
-                                  ),
-                                  InfoColumn(
-                                    label: "Compteur Restant",
-                                    value:
-                                        promotionReseauSociaux.compteurRestant,
-                                  ),
-                                ],
-                              ),
-                              const Divider(height: 5),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  InfoColumn(
-                                    label: "Quantité Demandée",
-                                    value: promotionReseauSociaux.qteDemander,
-                                  ),
-                                  InfoColumn(
-                                    label: "Prix Fixé",
-                                    value: promotionReseauSociaux.prixFixer,
-                                  ),
-                                ],
-                              ),
-                              const Divider(height: 5),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  InfoColumn(
-                                    label: "Référence",
-                                    value: promotionReseauSociaux.reference,
-                                  ),
-                                  const SizedBox(width: 5),
-                                  Expanded(
-                                    child: InfoColumn(
-                                      label: "URL",
-                                      value: promotionReseauSociaux.url,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const Divider(height: 5),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    "Créé : ${promotionReseauSociaux.createdAt}",
-                                    style: GoogleFonts.poppins(
-                                      fontSize: 10,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 10),
-                                  Expanded(
-                                    child: Text(
-                                      "Modifier : ${promotionReseauSociaux.updatedAt}",
-                                      style: GoogleFonts.poppins(
-                                        fontSize: 10,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
+                    return Card(
+                      margin: const EdgeInsets.only(
+                          left: 10, top: 10, right: 10, bottom: 0),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(5),
                         ),
-                      );
-                    },
-                  ),
+                        padding: const EdgeInsets.fromLTRB(10, 10, 10, 6),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Container(
+                                  padding: EdgeInsets.fromLTRB(8, 1, 8, 1),
+                                  decoration: BoxDecoration(
+                                    color: ([
+                                      "Completed",
+                                      "Terminé",
+                                      "In progress",
+                                      "En cours"
+                                    ].contains(promotionReseauSociaux.status))
+                                        ? Colors.green
+                                        : (["On hold", "En attente"].contains(
+                                                promotionReseauSociaux.status))
+                                            ? Colors.orange
+                                            : Colors.red,
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: Text(
+                                    promotionReseauSociaux.status,
+                                    style: const TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 5),
+                                Expanded(
+                                  child: Text(
+                                    promotionReseauSociaux.titre,
+                                    style: GoogleFonts.poppins(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 5),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                InfoColumn(
+                                  label: "Compteur Début",
+                                  value: promotionReseauSociaux.compteurDebut,
+                                ),
+                                InfoColumn(
+                                  label: "Compteur Restant",
+                                  value: promotionReseauSociaux.compteurRestant,
+                                ),
+                              ],
+                            ),
+                            const Divider(height: 5),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                InfoColumn(
+                                  label: "Quantité Demandée",
+                                  value: promotionReseauSociaux.qteDemander,
+                                ),
+                                InfoColumn(
+                                  label: "Prix Fixé",
+                                  value: promotionReseauSociaux.prixFixer,
+                                ),
+                              ],
+                            ),
+                            const Divider(height: 5),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                InfoColumn(
+                                  label: "Référence",
+                                  value: promotionReseauSociaux.reference,
+                                ),
+                                const SizedBox(width: 20),
+                                Expanded(
+                                  child: InfoColumn(
+                                    label: "URL",
+                                    value: promotionReseauSociaux.url,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const Divider(height: 5),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  "Créé : ${promotionReseauSociaux.createdAt}",
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 10,
+                                  ),
+                                ),
+                                const SizedBox(width: 10),
+                                Text(
+                                  "Modifier : ${promotionReseauSociaux.updatedAt}",
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 10,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
                 ),
     );
   }
