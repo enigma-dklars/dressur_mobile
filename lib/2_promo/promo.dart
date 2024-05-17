@@ -424,12 +424,12 @@ class _BoostPageState extends State<BoostPage> {
                                       ),
                                     ),
                                     onPressed: () {
-                                       Navigator.push(
+                                      Navigator.push(
                                         context,
-                                         MaterialPageRoute(
-                                             builder: (context) =>
-                                                 PromotionReseauSociauxListePage()),
-                                       );
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                PromotionReseauSociauxListePage()),
+                                      );
                                     }),
                               )
                             ],
@@ -669,8 +669,6 @@ class _BoostPageState extends State<BoostPage> {
                   ),
                 ),
               ),
-              DressurDivider(),
-              SpecialPub(),
               DressurDivider(),
               const SizedBox(height: 5),
               SociauxPage(),

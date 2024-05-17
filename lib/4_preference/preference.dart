@@ -3,7 +3,6 @@
 import 'dart:io';
 import 'package:dressur/4_preference/choix_centre_interet_loisir.dart';
 import 'package:dressur/components/padding_and_divider.dart';
-import 'package:dressur/components/pub_smt_2024.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -350,8 +349,6 @@ class _PreferencePageState extends State<PreferencePage> {
                     ),
                   ),
                 ),
-                DressurDivider(),
-                SpecialPub(),
                 DressurDivider(),
                 const SizedBox(height: 5),
                 SociauxPage(),

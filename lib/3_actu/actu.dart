@@ -6,7 +6,6 @@ import 'dart:io';
 import 'package:dressur/2_promo/new_boost_contact.dart';
 import 'package:dressur/5_autre/cart_visite.dart';
 import 'package:dressur/components/padding_and_divider.dart';
-import 'package:dressur/components/pub_smt_2024.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
@@ -762,8 +761,6 @@ class _ActuPageState extends State<ActuPage> {
                           ),
                         ),
                       ),
-                    DressurDivider(),
-                    SpecialPub(),
                     DressurDivider(),
                     if (havePublicites == true)
                       FutureBuilder<List<Advertisement>>(
