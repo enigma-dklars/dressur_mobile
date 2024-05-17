@@ -27,7 +27,7 @@ const dressurConditionUtilisation =
 const dressurPolitiqueConfidentialite =
     "https://www.bluelife.tech/realisations/dressur/politique";
 const dressurUrlPlaystore =
-    "https://play.google.com/store/apps/details?id=com.ds.dressur";
+    "https://play.google.com/store/apps/details?id=com.dressur.ds";
 
 const primaryColor = Color(0xFF2a4b9a);
 const secondaryColor = Colors.indigoAccent;

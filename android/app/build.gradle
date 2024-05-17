@@ -49,7 +49,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "com.ds.dressur"
+        applicationId "com.dressur.ds"
         minSdkVersion 20
         targetSdkVersion 33
         versionCode flutterVersionCode.toInteger()
