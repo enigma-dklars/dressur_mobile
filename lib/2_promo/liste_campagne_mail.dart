@@ -268,8 +268,45 @@ class _CampagneMailListePageState extends State<CampagneMailListePage> {
                               ),
                               const SizedBox(height: 5),
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
+                                mainAxisAlignment: (campagneMail.peutPayer)
+                                    ? MainAxisAlignment.spaceBetween
+                                    : MainAxisAlignment.end,
                                 children: [
+                                  if (campagneMail.peutPayer)
+                                    ElevatedButton.icon(
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.orange,
+                                        padding: const EdgeInsets.symmetric(
+                                          vertical: 0,
+                                          horizontal: 15,
+                                        ),
+                                      ),
+                                      onPressed: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                PaymentPayantPage(
+                                                    campagneMail: campagneMail),
+                                          ),
+                                        );
+                                      },
+                                      label: Text(
+                                        (langUserPhone == "fr")
+                                            ? 'Payer'
+                                            : "Pay",
+                                        style: GoogleFonts.poppins(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w400,
+                                          fontSize: 13,
+                                        ),
+                                      ),
+                                      icon: const Icon(
+                                        Icons.payment,
+                                        color: Colors.white,
+                                        size: 13,
+                                      ),
+                                    ),
                                   Column(
                                     children: [
                                       SizedBox(
@@ -360,17 +397,6 @@ class CampagneMailDetailPage extends StatelessWidget {
             if (campagneMail.peutPayer)
               Column(
                 children: [
-                  const SizedBox(height: 5),
-                  const Padding(
-                    padding:
-                        EdgeInsets.only(left: 50, top: 5, right: 50, bottom: 5),
-                    child: Divider(
-                      height: 1,
-                      thickness: 1,
-                      color: Colors.grey,
-                    ),
-                  ),
-                  const SizedBox(height: 5),
                   Text(
                     (langUserPhone == "fr")
                         ? 'Votre demande de campagne Mail a été acceptée. Vous pouvez démarrer la campagne Mail payante.'

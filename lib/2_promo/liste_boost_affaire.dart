@@ -278,8 +278,45 @@ class _PromotionListPageState extends State<PromotionListPage> {
                               ),
                               const SizedBox(height: 3),
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
+                                mainAxisAlignment: (promotion.peutPayer)
+                                    ? MainAxisAlignment.spaceBetween
+                                    : MainAxisAlignment.end,
                                 children: [
+                                  if (promotion.peutPayer)
+                                    ElevatedButton.icon(
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.orange,
+                                        padding: const EdgeInsets.symmetric(
+                                          vertical: 0,
+                                          horizontal: 15,
+                                        ),
+                                      ),
+                                      onPressed: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                PaymentPayantPage(
+                                                    promotion: promotion),
+                                          ),
+                                        );
+                                      },
+                                      label: Text(
+                                        (langUserPhone == "fr")
+                                            ? 'Payer'
+                                            : "Pay",
+                                        style: GoogleFonts.poppins(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w400,
+                                          fontSize: 13,
+                                        ),
+                                      ),
+                                      icon: const Icon(
+                                        Icons.payment,
+                                        color: Colors.white,
+                                        size: 13,
+                                      ),
+                                    ),
                                   Column(
                                     children: [
                                       SizedBox(
