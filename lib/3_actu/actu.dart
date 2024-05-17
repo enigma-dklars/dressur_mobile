@@ -207,7 +207,7 @@ class _ActuPageState extends State<ActuPage> {
     // Faites votre requête HTTP ici
     if (advertisement.uidUser != uidUser) {
       final response = await http.get(Uri.parse(
-          '$generalRouteForApi/setPromotionToWatch/${advertisement.id}'));
+          '$generalRouteForApi/setPromotionToWatch/${advertisement.id}/$uidUser'));
       if (response.statusCode == 200) {
         // print(advertisement.id);
       }
