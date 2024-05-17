@@ -329,6 +329,25 @@ class _ContactPageState extends State<ContactPage> {
                                     width: espaceEntreLesOptionsContact),
                                 GestureDetector(
                                   onTap: () {
+                                    launchWhatsApp(contact.tel);
+                                  },
+                                  child: Container(
+                                    padding: EdgeInsets.fromLTRB(5, 5, 5, 5),
+                                    decoration: BoxDecoration(
+                                      color: primaryColor,
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: Image.asset(
+                                      'images/logo_whatsapp.png',
+                                      width: 20,
+                                      height: 20,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(
+                                    width: espaceEntreLesOptionsContact),
+                                GestureDetector(
+                                  onTap: () {
                                     setState(() {
                                       uidAutreUser = contact.id;
                                       addUserOnAutreProfilPage = "non";

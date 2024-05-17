@@ -984,3 +984,10 @@ void launchEmail(String emailAddress) async {
     throw 'Could not launch $_url';
   }
 }
+
+void launchWhatsApp(String phoneNumber) async {
+  final Uri _url = Uri.parse('https://wa.me/$phoneNumber');
+  if (!await launchUrl(_url, mode: LaunchMode.externalApplication)) {
+    throw 'Could not launch $_url';
+  }
+}
