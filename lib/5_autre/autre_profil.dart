@@ -138,7 +138,7 @@ class _AutreProfilPageState extends State<AutreProfilPage> {
       } else {
         insertContact(tel, pseudo);
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      behavior: SnackBarBehavior.floating,
+          behavior: SnackBarBehavior.floating,
           backgroundColor: Colors.green,
           padding: const EdgeInsets.fromLTRB(5, 20, 5, 20),
           content: Text(
@@ -298,6 +298,7 @@ class _AutreProfilPageState extends State<AutreProfilPage> {
                       const SizedBox(height: 10),
                     ],
                     if (autre_tiktok != null) ...[
+                      const SizedBox(height: 5),
                       Text(
                         "TikTok",
                         style: GoogleFonts.poppins(
@@ -322,6 +323,7 @@ class _AutreProfilPageState extends State<AutreProfilPage> {
                       ),
                     ],
                     if (autre_youtube != null) ...[
+                      const SizedBox(height: 5),
                       Text(
                         "Youtube",
                         style: GoogleFonts.poppins(
@@ -346,6 +348,7 @@ class _AutreProfilPageState extends State<AutreProfilPage> {
                       ),
                     ],
                     if (autre_facebook != null) ...[
+                      const SizedBox(height: 5),
                       Text(
                         "Facebook",
                         style: GoogleFonts.poppins(
@@ -370,6 +373,7 @@ class _AutreProfilPageState extends State<AutreProfilPage> {
                       ),
                     ],
                     if (autre_instagram != null) ...[
+                      const SizedBox(height: 5),
                       Text(
                         "Instagram",
                         style: GoogleFonts.poppins(

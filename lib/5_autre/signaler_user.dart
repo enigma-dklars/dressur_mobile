@@ -114,7 +114,6 @@ class _SignalerFormState extends State<SignalerForm> {
 
       if (response.statusCode == 200) {
         var data1 = await response.stream.bytesToString();
-        print(data1);
         data = convert.jsonDecode(data1);
         if (data["error"] == true) {
           dangerNoti(data["titre"], data["message"], context);

@@ -133,8 +133,18 @@ class _RegisterFormState extends State<RegisterForm> {
           setState(() {
             _desactive = false;
             initUserInformations(data['user']);
-            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-              content: Text('Profil mis à jours ...'),
+            Navigator.pop(context);
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              backgroundColor: Colors.green,
+              behavior: SnackBarBehavior.floating,
+              content: Text(
+                (langUserPhone == "fr")
+                    ? 'Profil mis à jour…'
+                    : 'Profile updated…',
+                style: GoogleFonts.poppins(
+                  color: Colors.white,
+                ),
+              ),
             ));
           });
         }
