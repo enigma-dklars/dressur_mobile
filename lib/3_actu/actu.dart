@@ -964,11 +964,17 @@ class AdvertisementDetailPage extends StatelessWidget {
             ),
             const SizedBox(height: 5),
             Container(
-              margin: const EdgeInsets.only(
-                  left: 10, top: 0, right: 10, bottom: 20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
+              margin:
+                  const EdgeInsets.only(left: 10, top: 0, right: 10, bottom: 0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
+                  const Icon(Icons.visibility),
+                  Text(advertisement.nombreImpression.toString()),
+                  const SizedBox(width: 10),
+                  const Icon(Icons.touch_app),
+                  Text(advertisement.nombreDeVues.toString()),
+                  const SizedBox(width: 10),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: primaryColor,
@@ -986,12 +992,19 @@ class AdvertisementDetailPage extends StatelessWidget {
                       ),
                     ),
                   ),
+                ],
+              ),
+            ),
+            Container(
+              margin: const EdgeInsets.only(
+                  left: 10, top: 0, right: 10, bottom: 20),
+              child: Column(
+                children: [
                   const SizedBox(height: 5),
                   Text(
                     advertisement.description,
                     style: GoogleFonts.poppins(
                       fontSize: 16,
-                      fontWeight: FontWeight.w600,
                     ),
                   ),
                 ],
