@@ -1,5 +1,3 @@
-// ignore_for_file: use_build_context_synchronously, prefer_const_constructors
-
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:dressur/5_autre/support_assistance.dart';
@@ -38,60 +36,136 @@ class _ListeBoostContactPageState extends State<ListeBoostContactPage> {
     setState(() {
       _loading = true;
     });
-    final url =
-        Uri.parse('$generalRouteForApi/listBoost/$uidUser/$langUserPhone');
+    try {
+      final url =
+          Uri.parse('$generalRouteForApi/listBoost/$uidUser/$langUserPhone');
+      final response = await http.get(url);
 
-    final response = await http.get(url);
+      if (response.statusCode == 200) {
+        final jsonData = convert.jsonDecode(response.body) as List<dynamic>;
+        final boosts = jsonData.map((data) {
+          return Boost(
+            id: data['id'],
+            modeBoostFormule: data['modeBoostFormule'],
+            statutFormule: data['statutFormule'],
+            nomFormule: data['nomFormule'],
+            prixFormule: data['prixFormule'],
+            dateDebutFormule: data['dateDebutFormule'],
+          );
+        }).toList();
 
-    if (response.statusCode == 200) {
-      final jsonData = convert.jsonDecode(response.body) as List<dynamic>;
-
-      final boosts = jsonData.map((data) {
-        return Boost(
-          id: data['id'],
-          modeBoostFormule: data['modeBoostFormule'],
-          statutFormule: data['statutFormule'],
-          nomFormule: data['nomFormule'],
-          prixFormule: data['prixFormule'],
-          dateDebutFormule: data['dateDebutFormule'],
-        );
-      }).toList();
-
+        setState(() {
+          _boosts = boosts;
+        });
+      } else {
+        _showErrorDialog(
+            'Failed to retrieve boosts. Error code: ${response.statusCode}');
+      }
+    } catch (e) {
+      _showErrorDialog(
+          'An error occurred while fetching boosts. Please try again.');
+    } finally {
       setState(() {
-        _boosts = boosts;
         _loading = false;
       });
-    } else {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text('Erreur'),
-            content: (langUserPhone == "fr")
-                ? Text(
-                    'Échec de récupération des boosts. Code d\'erreur: ${response.statusCode}')
-                : Text(
-                    'Failed to retrieve boosts. Error code: ${response.statusCode}'),
-            actions: <Widget>[
-              TextButton(
-                child: Text('OK'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          );
-        },
-      );
     }
+  }
+
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Erreur'),
+          content: Text(message),
+          actions: <Widget>[
+            TextButton(
+              child: Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
   void initState() {
     super.initState();
-    fetchBoosts(); // Loading the diary when the app starts
+    fetchBoosts();
   }
 
+  Widget _buildBoostCard(Boost boost) {
+    return Card(
+      margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      child: Padding(
+        padding: const EdgeInsets.all(15.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                _buildStatusLabel(boost.modeBoostFormule, isMode: true),
+                _buildStatusLabel(boost.statutFormule),
+              ],
+            ),
+            const SizedBox(height: 5),
+            Text(
+              "${boost.nomFormule} (${boost.prixFormule})",
+              style: GoogleFonts.poppins(
+                fontWeight: FontWeight.w600,
+                fontSize: 18,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+            const SizedBox(height: 5),
+            Text(
+              boost.dateDebutFormule,
+              style: const TextStyle(fontSize: 12),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStatusLabel(String status, {bool isMode = false}) {
+    Color backgroundColor;
+    if (isMode) {
+      backgroundColor =
+          (status == "Gratuit" || status == "Free") ? Colors.green : Colors.red;
+    } else {
+      backgroundColor = (status == "Completed" || status == "Terminé")
+          ? Colors.green
+          : (status == "In progress" || status == "En cours")
+              ? Colors.orange
+              : Colors.red;
+    }
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 1),
+      decoration: BoxDecoration(
+        color: backgroundColor,
+        borderRadius: BorderRadius.circular(10.0),
+      ),
+      child: Text(
+        status,
+        style: GoogleFonts.poppins(
+          fontSize: 14,
+          color: Colors.white,
+          fontWeight: FontWeight.w800,
+        ),
+        textAlign: TextAlign.end,
+      ),
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -170,9 +244,7 @@ class _ListeBoostContactPageState extends State<ListeBoostContactPage> {
         ],
       ),
       body: _loading
-          ? const Center(
-              child: CircularProgressIndicator(),
-            )
+          ? const Center(child: CircularProgressIndicator())
           : _boosts.isEmpty
               ? Center(
                   child: Text(
@@ -182,113 +254,11 @@ class _ListeBoostContactPageState extends State<ListeBoostContactPage> {
                     style: const TextStyle(fontSize: 16),
                   ),
                 )
-              : Expanded(
-                  child: ListView.builder(
-                    itemCount: _boosts.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      final boost = _boosts[index];
-
-                      return Card(
-                        margin: const EdgeInsets.only(
-                            left: 10, top: 10, right: 10, bottom: 0),
-                        child: Container(
-                          width: MediaQuery.of(context).size.width * 0.95,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(5),
-                          ),
-                          padding: const EdgeInsets.fromLTRB(15, 10, 15, 10),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Column(
-                                    children: [
-                                      Container(
-                                        padding:
-                                            EdgeInsets.fromLTRB(8, 1, 8, 1),
-                                        decoration: BoxDecoration(
-                                          color: ([
-                                            "Gratuit",
-                                            "Free"
-                                          ].contains(boost.modeBoostFormule))
-                                              ? Colors.green
-                                              : Colors.red,
-                                          borderRadius:
-                                              BorderRadius.circular(10.0),
-                                        ),
-                                        child: Text(
-                                          boost.modeBoostFormule,
-                                          style: GoogleFonts.poppins(
-                                            fontSize: 14,
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.w800,
-                                          ),
-                                          textAlign: TextAlign.end,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  Column(
-                                    children: [
-                                      Container(
-                                        padding:
-                                            EdgeInsets.fromLTRB(8, 1, 8, 1),
-                                        decoration: BoxDecoration(
-                                          color: ([
-                                            "Completed",
-                                            "Terminé"
-                                          ].contains(boost.statutFormule))
-                                              ? Colors.green
-                                              : ([
-                                                  "In progress",
-                                                  "En cours"
-                                                ].contains(boost.statutFormule))
-                                                  ? Colors.orange
-                                                  : Colors.red,
-                                          borderRadius:
-                                              BorderRadius.circular(10.0),
-                                        ),
-                                        child: Text(
-                                          boost.statutFormule,
-                                          style: GoogleFonts.poppins(
-                                            fontSize: 14,
-                                            color: Colors.white,
-                                          ),
-                                          textAlign: TextAlign.end,
-                                        ),
-                                      ),
-                                    ],
-                                  )
-                                ],
-                              ),
-                              const SizedBox(height: 5),
-                              Text(
-                                "${boost.nomFormule} (${boost.prixFormule})",
-                                style: GoogleFonts.poppins(
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 18,
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                              const SizedBox(height: 5),
-                              Text(
-                                boost.dateDebutFormule,
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ],
-                          ),
-                        ),
-                      );
-                    },
-                  ),
+              : ListView.builder(
+                  itemCount: _boosts.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    return _buildBoostCard(_boosts[index]);
+                  },
                 ),
     );
   }

@@ -1,16 +1,14 @@
-// ignore_for_file: use_build_context_synchronously, prefer_const_constructors
-
 import 'dart:convert';
 import 'dart:convert' as convert;
-import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:http/http.dart' as http;
-import 'package:select_form_field/select_form_field.dart';
-import 'package:dressur/5_autre/support_assistance.dart';
-import 'package:dressur/components/constant.dart';
 import 'package:dressur/components/delayed_animation.dart';
 import 'package:dressur/components/noti.dart';
 import 'package:dressur/components/sql_helper.dart';
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:http/http.dart' as http;
+import 'package:dressur/5_autre/support_assistance.dart';
+import 'package:dressur/components/constant.dart';
+import 'package:select_form_field/select_form_field.dart';
 
 class Promotion {
   final String id;
@@ -51,61 +49,202 @@ class _PromotionListPageState extends State<PromotionListPage> {
     setState(() {
       _loading = true;
     });
-    final url =
-        Uri.parse('$generalRouteForApi/listPromotion/$uidUser/$langUserPhone');
+    try {
+      final url = Uri.parse(
+          '$generalRouteForApi/listPromotion/$uidUser/$langUserPhone');
+      final response = await http.get(url);
 
-    final response = await http.get(url);
+      if (response.statusCode == 200) {
+        final jsonData = jsonDecode(response.body) as List<dynamic>;
+        final promotions = jsonData.map((data) {
+          return Promotion(
+            id: data['id'],
+            image: generalRouteForPromotionImage + data['image'],
+            nombreDeVues: data['nombreDeVues'],
+            nombreImpression: data['nombreImpression'],
+            description: data['description'],
+            status: data['status'],
+            dateDebut: data['dateDebut'],
+            dateExp: data['dateExp'],
+            formulePromotion: data['formulePromotion'],
+            peutPayer: data['peutPayer'],
+          );
+        }).toList();
 
-    if (response.statusCode == 200) {
-      final jsonData = jsonDecode(response.body) as List<dynamic>;
-
-      final promotions = jsonData.map((data) {
-        return Promotion(
-          id: data['id'],
-          image: generalRouteForPromotionImage + data['image'],
-          nombreDeVues: data['nombreDeVues'],
-          nombreImpression: data['nombreImpression'],
-          description: data['description'],
-          status: data['status'],
-          dateDebut: data['dateDebut'],
-          dateExp: data['dateExp'],
-          formulePromotion: data['formulePromotion'],
-          peutPayer: data['peutPayer'],
-        );
-      }).toList();
-
+        setState(() {
+          _promotions = promotions;
+        });
+      } else {
+        _showErrorDialog(
+            'Failed to retrieve promotions. Error code: ${response.statusCode}');
+      }
+    } catch (e) {
+      _showErrorDialog(
+          'An error occurred while fetching promotions. Please try again.');
+    } finally {
       setState(() {
-        _promotions = promotions;
         _loading = false;
       });
-    } else {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text('Erreur'),
-            content: Text((langUserPhone == "fr")
-                ? "Échec de récupération des promotions. Code d'erreur:"
-                : "Failed to retrieve promotions. Error code:"
-                    "${response.statusCode}"),
-            actions: <Widget>[
-              TextButton(
-                child: const Text('OK'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          );
-        },
-      );
     }
+  }
+
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Erreur'),
+          content: Text(message),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
   void initState() {
     super.initState();
     fetchPromotions();
+  }
+
+  Widget _buildPromotionCard(Promotion promotion) {
+    return Card(
+      margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      child: Padding(
+        padding: const EdgeInsets.all(15.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildStatusLabel(promotion.status),
+            const SizedBox(height: 5),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Impressions: ${promotion.nombreImpression}',
+                  style: const TextStyle(
+                      fontSize: 14, fontWeight: FontWeight.bold),
+                ),
+                Text(
+                  (langUserPhone == "fr")
+                      ? 'Vues: ${promotion.nombreDeVues}'
+                      : 'Views: ${promotion.nombreDeVues}',
+                  style: const TextStyle(
+                      fontSize: 14, fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
+            const SizedBox(height: 5),
+            Text(
+              promotion.description,
+              style: GoogleFonts.poppins(fontSize: 14),
+              maxLines: 3,
+              overflow: TextOverflow.ellipsis,
+            ),
+            const SizedBox(height: 5),
+            Row(
+              mainAxisAlignment: promotion.peutPayer
+                  ? MainAxisAlignment.spaceBetween
+                  : MainAxisAlignment.end,
+              children: [
+                if (promotion.peutPayer)
+                  ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.orange,
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 0, horizontal: 15),
+                    ),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              PaymentPayantPage(promotion: promotion),
+                        ),
+                      );
+                    },
+                    label: Text(
+                      (langUserPhone == "fr") ? 'Payer' : 'Pay',
+                      style: GoogleFonts.poppins(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w400,
+                          fontSize: 13),
+                    ),
+                    icon: const Icon(Icons.payment,
+                        color: Colors.white, size: 13),
+                  ),
+                ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: secondaryColor,
+                    padding:
+                        const EdgeInsets.symmetric(vertical: 0, horizontal: 15),
+                  ),
+                  label: Text(
+                    (langUserPhone == "fr")
+                        ? 'Autres Informations'
+                        : 'Other information',
+                    style: GoogleFonts.poppins(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w400,
+                        fontSize: 13),
+                  ),
+                  icon: const Icon(Icons.info, color: Colors.white, size: 13),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            PromotionDetailPage(promotion: promotion),
+                      ),
+                    );
+                  },
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStatusLabel(String status) {
+    Color backgroundColor;
+    if ([
+      "Completed",
+      "Terminé",
+      "Accept and in progress",
+      "Accepter et en cours"
+    ].contains(status)) {
+      backgroundColor = Colors.green;
+    } else if ([
+      "Waiting for validation",
+      "En Attente de validation",
+      "Accept and pending payment",
+      "Accepter et en attente de paiement"
+    ].contains(status)) {
+      backgroundColor = Colors.orange;
+    } else {
+      backgroundColor = Colors.red;
+    }
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 1),
+      decoration: BoxDecoration(
+        color: backgroundColor,
+        borderRadius: BorderRadius.circular(10.0),
+      ),
+      child: Text(
+        status,
+        style: GoogleFonts.poppins(
+            fontSize: 14, color: Colors.white, fontWeight: FontWeight.bold),
+      ),
+    );
   }
 
   @override
@@ -115,21 +254,15 @@ class _PromotionListPageState extends State<PromotionListPage> {
         title: Text(
           (langUserPhone == "fr")
               ? 'Liste Promotion Affaire'
-              : "Business Promotion List",
+              : 'Business Promotion List',
           style: GoogleFonts.poppins(
-            fontWeight: FontWeight.w400,
-            color: Colors.white,
-          ),
+              fontWeight: FontWeight.w400, color: Colors.white),
         ),
         leading: IconButton(
           onPressed: () {
             Navigator.pop(context);
           },
-          icon: const Icon(
-            Icons.arrow_back,
-            size: 30,
-            color: Colors.white,
-          ),
+          icon: const Icon(Icons.arrow_back, size: 30, color: Colors.white),
         ),
         backgroundColor: primaryColor,
         actions: [
@@ -137,58 +270,38 @@ class _PromotionListPageState extends State<PromotionListPage> {
             itemBuilder: (context) => [
               PopupMenuItem(
                 value: 1,
-                onTap: () {
-                  fetchPromotions();
-                },
-                child: Row(
-                  children: [
-                    Text(
-                      (langUserPhone == "fr") ? "Actualiser" : "Refresh",
-                      style: GoogleFonts.poppins(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
+                child: Text(
+                  (langUserPhone == "fr") ? "Actualiser" : "Refresh",
+                  style: GoogleFonts.poppins(
+                      color: Colors.white, fontWeight: FontWeight.w600),
                 ),
               ),
               PopupMenuItem(
                 value: 2,
-                child: Row(
-                  children: [
-                    Text(
-                      (langUserPhone == "fr") ? "Aide" : "Help",
-                      style: GoogleFonts.poppins(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
+                child: Text(
+                  (langUserPhone == "fr") ? "Aide" : "Help",
+                  style: GoogleFonts.poppins(
+                      color: Colors.white, fontWeight: FontWeight.w600),
                 ),
               ),
             ],
             offset: const Offset(0, 60),
             color: primaryColor,
-            icon: const Icon(
-              Icons.menu,
-              color: Colors.white,
-            ),
+            icon: const Icon(Icons.menu, color: Colors.white),
             elevation: 2,
             onSelected: (value) {
-              if (value == 2) {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => SupportPage()),
-                );
+              if (value == 1) {
+                fetchPromotions();
+              } else if (value == 2) {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => SupportPage()));
               }
             },
           ),
         ],
       ),
       body: _loading
-          ? const Center(
-              child: CircularProgressIndicator(),
-            )
+          ? const Center(child: CircularProgressIndicator())
           : _promotions.isEmpty
               ? Center(
                   child: Text(
@@ -198,172 +311,11 @@ class _PromotionListPageState extends State<PromotionListPage> {
                     style: const TextStyle(fontSize: 16),
                   ),
                 )
-              : Expanded(
-                  child: ListView.builder(
-                    itemCount: _promotions.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      final promotion = _promotions[index];
-
-                      return Card(
-                        margin: const EdgeInsets.only(
-                            left: 10, top: 10, right: 10, bottom: 0),
-                        child: Container(
-                          padding: const EdgeInsets.fromLTRB(10, 10, 10, 6),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(5),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Container(
-                                padding: EdgeInsets.fromLTRB(8, 1, 8, 1),
-                                decoration: BoxDecoration(
-                                  color: ([
-                                    "Completed",
-                                    "Terminé",
-                                    "Accept and in progress",
-                                    "Accepter et en cours"
-                                  ].contains(promotion.status))
-                                      ? Colors.green
-                                      : ([
-                                          "Waiting for validation",
-                                          "En Attente de validation",
-                                          "Accept and pending payment",
-                                          "Accepter et en attente de paiement"
-                                        ].contains(promotion.status))
-                                          ? Colors.orange
-                                          : Colors.red,
-                                  borderRadius: BorderRadius.circular(10.0),
-                                ),
-                                child: Text(
-                                  promotion.status,
-                                  style: const TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(height: 3),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    'Impressions: ${promotion.nombreImpression}',
-                                    style: const TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  Text(
-                                    (langUserPhone == "fr")
-                                        ? 'Vues: ${promotion.nombreDeVues}'
-                                        : 'Views: ${promotion.nombreDeVues}',
-                                    style: const TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 3),
-                              Text(
-                                promotion.description,
-                                style: GoogleFonts.poppins(
-                                  fontSize: 14,
-                                ),
-                                maxLines: 3,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                              const SizedBox(height: 3),
-                              Row(
-                                mainAxisAlignment: (promotion.peutPayer)
-                                    ? MainAxisAlignment.spaceBetween
-                                    : MainAxisAlignment.end,
-                                children: [
-                                  if (promotion.peutPayer)
-                                    ElevatedButton.icon(
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.orange,
-                                        padding: const EdgeInsets.symmetric(
-                                          vertical: 0,
-                                          horizontal: 15,
-                                        ),
-                                      ),
-                                      onPressed: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) =>
-                                                PaymentPayantPage(
-                                                    promotion: promotion),
-                                          ),
-                                        );
-                                      },
-                                      label: Text(
-                                        (langUserPhone == "fr")
-                                            ? 'Payer'
-                                            : "Pay",
-                                        style: GoogleFonts.poppins(
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.w400,
-                                          fontSize: 13,
-                                        ),
-                                      ),
-                                      icon: const Icon(
-                                        Icons.payment,
-                                        color: Colors.white,
-                                        size: 13,
-                                      ),
-                                    ),
-                                  Column(
-                                    children: [
-                                      SizedBox(
-                                        child: ElevatedButton.icon(
-                                          style: ElevatedButton.styleFrom(
-                                            backgroundColor: secondaryColor,
-                                            padding: const EdgeInsets.symmetric(
-                                                vertical: 0, horizontal: 15),
-                                          ),
-                                          label: Text(
-                                            (langUserPhone == "fr")
-                                                ? 'Autres Informations'
-                                                : 'Other information',
-                                            style: GoogleFonts.poppins(
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.w400,
-                                              fontSize: 13,
-                                            ),
-                                          ),
-                                          icon: const Icon(
-                                            Icons.info,
-                                            color: Colors.white,
-                                            size: 13,
-                                          ),
-                                          onPressed: () {
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (context) =>
-                                                    PromotionDetailPage(
-                                                  promotion: promotion,
-                                                ),
-                                              ),
-                                            );
-                                          },
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                      );
-                    },
-                  ),
+              : ListView.builder(
+                  itemCount: _promotions.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    return _buildPromotionCard(_promotions[index]);
+                  },
                 ),
     );
   }
@@ -383,19 +335,13 @@ class PromotionDetailPage extends StatelessWidget {
               ? 'Détails de la promotion'
               : 'Details of the promotion',
           style: GoogleFonts.poppins(
-            fontWeight: FontWeight.w400,
-            color: Colors.white,
-          ),
+              fontWeight: FontWeight.w400, color: Colors.white),
         ),
         leading: IconButton(
           onPressed: () {
             Navigator.pop(context);
           },
-          icon: const Icon(
-            Icons.arrow_back,
-            size: 30,
-            color: Colors.white,
-          ),
+          icon: const Icon(Icons.arrow_back, size: 30, color: Colors.white),
         ),
         backgroundColor: primaryColor,
       ),
@@ -409,24 +355,14 @@ class PromotionDetailPage extends StatelessWidget {
               Column(
                 children: [
                   const SizedBox(height: 5),
-                  const Padding(
-                    padding:
-                        EdgeInsets.only(left: 50, top: 5, right: 50, bottom: 5),
-                    child: Divider(
-                      height: 1,
-                      thickness: 1,
-                      color: Colors.grey,
-                    ),
-                  ),
+                  const Divider(height: 1, thickness: 1, color: Colors.grey),
                   const SizedBox(height: 5),
                   Text(
                     (langUserPhone == "fr")
                         ? 'Votre demande de promotion a été acceptée. Vous pouvez démarrer la promotion à titre gratuite ou payante.'
-                        : "Your promotion request has been accepted. You can start the promotion for free or paid.",
+                        : 'Your promotion request has been accepted. You can start the promotion for free or paid.',
                     style: GoogleFonts.poppins(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                    ),
+                        fontSize: 16, fontWeight: FontWeight.w600),
                     textAlign: TextAlign.center,
                   ),
                   Row(
@@ -442,9 +378,8 @@ class PromotionDetailPage extends StatelessWidget {
                             ),
                           );
                         },
-                        child: Text(
-                          (langUserPhone == "fr") ? 'Gratuite' : "Free",
-                        ),
+                        child:
+                            Text((langUserPhone == "fr") ? 'Gratuite' : 'Free'),
                       ),
                       ElevatedButton(
                         onPressed: () {
@@ -456,47 +391,40 @@ class PromotionDetailPage extends StatelessWidget {
                             ),
                           );
                         },
-                        child: Text(
-                          (langUserPhone == "fr") ? 'Payante' : "Paid",
-                        ),
+                        child:
+                            Text((langUserPhone == "fr") ? 'Payante' : 'Paid'),
                       ),
                     ],
                   ),
-                  const Padding(
-                    padding:
-                        EdgeInsets.only(left: 50, top: 5, right: 50, bottom: 5),
-                    child: Divider(
-                      height: 1,
-                      thickness: 1,
-                      color: Colors.grey,
-                    ),
-                  ),
+                  const Divider(height: 1, thickness: 1, color: Colors.grey),
                 ],
               ),
             const SizedBox(height: 16.0),
             Text(
               (langUserPhone == "fr")
                   ? 'Formule de promotion : ${promotion.formulePromotion}'
-                  : 'Promo formula: : ${promotion.formulePromotion}',
+                  : 'Promo formula: ${promotion.formulePromotion}',
             ),
             const SizedBox(height: 16.0),
             Text(
               (langUserPhone == "fr")
                   ? 'Nombre de vues : ${promotion.nombreDeVues}'
-                  : 'Number of views : ${promotion.nombreDeVues}',
+                  : 'Number of views: ${promotion.nombreDeVues}',
             ),
             const SizedBox(height: 16.0),
-            Text('Status : ${promotion.status}'),
+            Text('Status: ${promotion.status}'),
             const SizedBox(height: 16.0),
             Text(
               (langUserPhone == "fr")
                   ? 'Date de début : ${promotion.dateDebut}'
-                  : 'Start date : ${promotion.dateDebut}',
+                  : 'Start date: ${promotion.dateDebut}',
             ),
             const SizedBox(height: 16.0),
-            Text((langUserPhone == "fr")
-                ? "Date d'expiration : ${promotion.dateExp}"
-                : "Expiration date : ${promotion.dateExp}"),
+            Text(
+              (langUserPhone == "fr")
+                  ? "Date d'expiration : ${promotion.dateExp}"
+                  : "Expiration date: ${promotion.dateExp}",
+            ),
             const SizedBox(height: 16.0),
             Text(promotion.description),
           ],

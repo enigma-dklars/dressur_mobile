@@ -2,14 +2,14 @@
 
 import 'dart:convert';
 import 'dart:convert' as convert;
+import 'package:dressur/components/delayed_animation.dart';
+import 'package:dressur/components/noti.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:select_form_field/select_form_field.dart';
 import 'package:dressur/5_autre/support_assistance.dart';
 import 'package:dressur/components/constant.dart';
-import 'package:dressur/components/delayed_animation.dart';
-import 'package:dressur/components/noti.dart';
 import 'package:dressur/components/sql_helper.dart';
 
 class CampagneMail {
@@ -49,6 +49,12 @@ class _CampagneMailListePageState extends State<CampagneMailListePage> {
   bool _loading = false;
   List<CampagneMail> _campagneMails = [];
 
+  @override
+  void initState() {
+    super.initState();
+    fetchCampagneMails();
+  }
+
   Future<void> fetchCampagneMails() async {
     setState(() {
       _loading = true;
@@ -56,59 +62,59 @@ class _CampagneMailListePageState extends State<CampagneMailListePage> {
     final url = Uri.parse(
         '$generalRouteForApi/listCampagneMail/$uidUser/$langUserPhone');
 
-    final response = await http.get(url);
-
-    if (response.statusCode == 200) {
-      final jsonData = jsonDecode(response.body) as List<dynamic>;
-
-      final campagneMails = jsonData.map((data) {
-        return CampagneMail(
-          id: data['id'],
-          idFormuleCampagneMail: data['idFormuleCampagneMail'],
-          prixFormuleCampagneMail: data['prixFormuleCampagneMail'],
-          titre: data['titre'],
-          sujet: data['sujet'],
-          replyto: data['replyto'],
-          sendto: data['sendto'],
-          contentmail: data['contentmail'],
-          status: data['status'],
-          createdAt: data['createdAt'],
-          peutPayer: data['peutPayer'],
-        );
-      }).toList();
-
-      setState(() {
-        _campagneMails = campagneMails;
-        _loading = false;
-      });
-    } else {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text('Erreur'),
-            content: Text((langUserPhone == "fr")
-                ? "Échec de récupération des campagneMails. Code d'erreur:"
-                : "Failed to retrieve campagneMails. Error code:"
-                    "${response.statusCode}"),
-            actions: <Widget>[
-              TextButton(
-                child: const Text('OK'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
+    try {
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        final jsonData = jsonDecode(response.body) as List<dynamic>;
+        final campagneMails = jsonData.map((data) {
+          return CampagneMail(
+            id: data['id'],
+            idFormuleCampagneMail: data['idFormuleCampagneMail'],
+            prixFormuleCampagneMail: data['prixFormuleCampagneMail'],
+            titre: data['titre'],
+            sujet: data['sujet'],
+            replyto: data['replyto'],
+            sendto: data['sendto'],
+            contentmail: data['contentmail'],
+            status: data['status'],
+            createdAt: data['createdAt'],
+            peutPayer: data['peutPayer'],
           );
-        },
-      );
+        }).toList();
+        setState(() {
+          _campagneMails = campagneMails;
+          _loading = false;
+        });
+      } else {
+        showErrorDialog(response.statusCode);
+      }
+    } catch (e) {
+      showErrorDialog(-1); // Handle network errors
     }
   }
 
-  @override
-  void initState() {
-    super.initState();
-    fetchCampagneMails();
+  void showErrorDialog(int statusCode) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Erreur'),
+          content: Text(
+            (langUserPhone == "fr")
+                ? "Échec de récupération des campagneMails. Code d'erreur: $statusCode"
+                : "Failed to retrieve campagneMails. Error code: $statusCode",
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -201,159 +207,155 @@ class _CampagneMailListePageState extends State<CampagneMailListePage> {
                     style: const TextStyle(fontSize: 16),
                   ),
                 )
-              : Expanded(
-                  child: ListView.builder(
-                    itemCount: _campagneMails.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      final campagneMail = _campagneMails[index];
+              : ListView.builder(
+                  itemCount: _campagneMails.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    final campagneMail = _campagneMails[index];
 
-                      return Card(
-                        margin: const EdgeInsets.only(
-                            left: 10, top: 10, right: 10, bottom: 0),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(5),
-                          ),
-                          padding: const EdgeInsets.fromLTRB(10, 10, 10, 6),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Container(
-                                padding: EdgeInsets.fromLTRB(8, 1, 8, 1),
-                                decoration: BoxDecoration(
-                                  color: ([
-                                    "Completed",
-                                    "Terminé",
-                                    "Accept and in progress",
-                                    "Accepter et en cours"
-                                  ].contains(campagneMail.status))
-                                      ? Colors.green
-                                      : ([
-                                          "Waiting for validation",
-                                          "En Attente de validation",
-                                          "Accept and pending payment",
-                                          "Accepter et en attente de paiement"
-                                        ].contains(campagneMail.status))
-                                          ? Colors.orange
-                                          : Colors.red,
-                                  borderRadius: BorderRadius.circular(10.0),
-                                ),
-                                child: Text(
-                                  campagneMail.status,
-                                  style: const TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
-                                  ),
-                                ),
+                    return Card(
+                      margin: const EdgeInsets.only(
+                          left: 10, top: 10, right: 10, bottom: 0),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(5),
+                        ),
+                        padding: const EdgeInsets.fromLTRB(10, 10, 10, 6),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                              padding: EdgeInsets.fromLTRB(8, 1, 8, 1),
+                              decoration: BoxDecoration(
+                                color: ([
+                                  "Completed",
+                                  "Terminé",
+                                  "Accept and in progress",
+                                  "Accepter et en cours"
+                                ].contains(campagneMail.status))
+                                    ? Colors.green
+                                    : ([
+                                        "Waiting for validation",
+                                        "En Attente de validation",
+                                        "Accept and pending payment",
+                                        "Accepter et en attente de paiement"
+                                      ].contains(campagneMail.status))
+                                        ? Colors.orange
+                                        : Colors.red,
+                                borderRadius: BorderRadius.circular(10.0),
                               ),
-                              const SizedBox(height: 5),
-                              Text(
-                                campagneMail.sujet,
+                              child: Text(
+                                campagneMail.status,
                                 style: const TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.bold,
+                                  color: Colors.white,
                                 ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
                               ),
-                              const SizedBox(height: 5),
-                              Text(
-                                campagneMail.contentmail,
-                                style: const TextStyle(
-                                  fontSize: 14,
-                                ),
-                                maxLines: 3,
-                                overflow: TextOverflow.ellipsis,
+                            ),
+                            const SizedBox(height: 5),
+                            Text(
+                              campagneMail.sujet,
+                              style: const TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
                               ),
-                              const SizedBox(height: 5),
-                              Row(
-                                mainAxisAlignment: (campagneMail.peutPayer)
-                                    ? MainAxisAlignment.spaceBetween
-                                    : MainAxisAlignment.end,
-                                children: [
-                                  if (campagneMail.peutPayer)
-                                    ElevatedButton.icon(
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.orange,
-                                        padding: const EdgeInsets.symmetric(
-                                          vertical: 0,
-                                          horizontal: 15,
-                                        ),
-                                      ),
-                                      onPressed: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) =>
-                                                PaymentPayantPage(
-                                                    campagneMail: campagneMail),
-                                          ),
-                                        );
-                                      },
-                                      label: Text(
-                                        (langUserPhone == "fr")
-                                            ? 'Payer'
-                                            : "Pay",
-                                        style: GoogleFonts.poppins(
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.w400,
-                                          fontSize: 13,
-                                        ),
-                                      ),
-                                      icon: const Icon(
-                                        Icons.payment,
-                                        color: Colors.white,
-                                        size: 13,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            const SizedBox(height: 5),
+                            Text(
+                              campagneMail.contentmail,
+                              style: const TextStyle(
+                                fontSize: 14,
+                              ),
+                              maxLines: 3,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            const SizedBox(height: 5),
+                            Row(
+                              mainAxisAlignment: (campagneMail.peutPayer)
+                                  ? MainAxisAlignment.spaceBetween
+                                  : MainAxisAlignment.end,
+                              children: [
+                                if (campagneMail.peutPayer)
+                                  ElevatedButton.icon(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.orange,
+                                      padding: const EdgeInsets.symmetric(
+                                        vertical: 0,
+                                        horizontal: 15,
                                       ),
                                     ),
-                                  Column(
-                                    children: [
-                                      SizedBox(
-                                        child: ElevatedButton.icon(
-                                          style: ElevatedButton.styleFrom(
-                                            backgroundColor: secondaryColor,
-                                            padding: const EdgeInsets.symmetric(
-                                                vertical: 0, horizontal: 15),
-                                          ),
-                                          label: Text(
-                                            (langUserPhone == "fr")
-                                                ? 'Autres Informations'
-                                                : 'Other information',
-                                            style: GoogleFonts.poppins(
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.w400,
-                                              fontSize: 13,
-                                            ),
-                                          ),
-                                          icon: const Icon(
-                                            Icons.info,
-                                            color: Colors.white,
-                                            size: 13,
-                                          ),
-                                          onPressed: () {
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (context) =>
-                                                    CampagneMailDetailPage(
-                                                  campagneMail: campagneMail,
-                                                ),
-                                              ),
-                                            );
-                                          },
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              PaymentPayantPage(
+                                                  campagneMail: campagneMail),
                                         ),
+                                      );
+                                    },
+                                    label: Text(
+                                      (langUserPhone == "fr") ? 'Payer' : "Pay",
+                                      style: GoogleFonts.poppins(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w400,
+                                        fontSize: 13,
                                       ),
-                                    ],
+                                    ),
+                                    icon: const Icon(
+                                      Icons.payment,
+                                      color: Colors.white,
+                                      size: 13,
+                                    ),
                                   ),
-                                ],
-                              ),
-                            ],
-                          ),
+                                Column(
+                                  children: [
+                                    SizedBox(
+                                      child: ElevatedButton.icon(
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: secondaryColor,
+                                          padding: const EdgeInsets.symmetric(
+                                              vertical: 0, horizontal: 15),
+                                        ),
+                                        label: Text(
+                                          (langUserPhone == "fr")
+                                              ? 'Autres Informations'
+                                              : 'Other information',
+                                          style: GoogleFonts.poppins(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.w400,
+                                            fontSize: 13,
+                                          ),
+                                        ),
+                                        icon: const Icon(
+                                          Icons.info,
+                                          color: Colors.white,
+                                          size: 13,
+                                        ),
+                                        onPressed: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  CampagneMailDetailPage(
+                                                campagneMail: campagneMail,
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ],
                         ),
-                      );
-                    },
-                  ),
+                      ),
+                    );
+                  },
                 ),
     );
   }
