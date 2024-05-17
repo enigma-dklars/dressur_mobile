@@ -114,6 +114,7 @@ class _SignalerFormState extends State<SignalerForm> {
 
       if (response.statusCode == 200) {
         var data1 = await response.stream.bytesToString();
+        print(data1);
         data = convert.jsonDecode(data1);
         if (data["error"] == true) {
           dangerNoti(data["titre"], data["message"], context);
@@ -123,13 +124,25 @@ class _SignalerFormState extends State<SignalerForm> {
         } else {
           setState(() {
             _desactive = false;
-            //initUserInformations(data['user']);
-            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-              content: Text('Utilisateur signaler avec succès ...'),
+            Navigator.pop(context);
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              backgroundColor: Colors.green,
+              behavior: SnackBarBehavior.floating,
+              content: Text(
+                (langUserPhone == "fr")
+                    ? 'Utilisateur signaler avec succès…'
+                    : 'User report successfully…',
+                style: GoogleFonts.poppins(
+                  color: Colors.white,
+                ),
+              ),
             ));
           });
         }
       } else {
+        setState(() {
+          _desactive = false;
+        });
         if (langUserPhone != "fr") {
           dangerNoti("Mistake!",
               "We encountered a problem, contact the administrators.", context);
@@ -139,20 +152,17 @@ class _SignalerFormState extends State<SignalerForm> {
               "Nous avons rencontré un problème, contacter les administrateurs.",
               context);
         }
-        setState(() {
-          _desactive = false;
-        });
       }
     } else {
+      setState(() {
+        _desactive = false;
+      });
       if (langUserPhone != "fr") {
         dangerNoti(
             "Mistake!", "You are not connected to the internet.", context);
       } else {
         dangerNoti("Erreur!", "Vous n'ètes pas connecté a internet.", context);
       }
-      setState(() {
-        _desactive = false;
-      });
     }
   }
 
