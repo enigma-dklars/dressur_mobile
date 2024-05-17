@@ -248,14 +248,12 @@ class _RegisterForm3State extends State<RegisterForm3> {
         if (data["error"] == false) {
           setState(() {
             _desactive3 = false;
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-              behavior: SnackBarBehavior.floating,
-              content: Text(
+            dangerNoti(
+                (langUserPhone == "fr") ? "Attention !!!" : "Attention !!!",
                 (langUserPhone == "fr")
-                    ? 'Votre poste a déjà démarré.'
-                    : 'Your post has already started.',
-              ),
-            ));
+                    ? "Après confirmation du paiement, veuillez consulter la liste de vos promotions réseaux sociaux."
+                    : "After payment confirmation, please view the list of your social media promotions.",
+                context);
           });
         } else {
           dangerNoti(data["titre"], data["message"], context);
