@@ -73,7 +73,6 @@ class _ActuPageState extends State<ActuPage> {
     _scrollController.addListener(_scrollListener);
     // Démarre le timer lors de l'initialisation du widget
     _startTimer();
-    actualise();
   }
 
   @override
@@ -98,7 +97,7 @@ class _ActuPageState extends State<ActuPage> {
 
   Future<void> _refreshData() async {
     setState(() {
-      actualise();
+      actualise(true);
     });
   }
 
@@ -122,15 +121,21 @@ class _ActuPageState extends State<ActuPage> {
     });
   }
 
-  void actualise() async {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      behavior: SnackBarBehavior.floating,
-      content: Text(
-        (langUserPhone == "fr")
-            ? 'Actualisation en cours…'
-            : 'Update in progress…',
-      ),
-    ));
+  void actualise(affMessage) async {
+    if (affMessage == true) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: Colors.red,
+        behavior: SnackBarBehavior.floating,
+        content: Text(
+          (langUserPhone == "fr")
+              ? 'Actualisation en cours…'
+              : 'Update in progress…',
+          style: GoogleFonts.poppins(
+            color: Colors.white,
+          ),
+        ),
+      ));
+    }
     setState(() {
       _loading = true;
     });
@@ -168,16 +173,22 @@ class _ActuPageState extends State<ActuPage> {
         _loading = false;
       });
     }
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        behavior: SnackBarBehavior.floating,
-        content: Text(
-          (langUserPhone == "fr")
-              ? 'Actualisation terminée.'
-              : 'Refresh complete.',
+    if (affMessage == true) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: Colors.green,
+          behavior: SnackBarBehavior.floating,
+          content: Text(
+            (langUserPhone == "fr")
+                ? 'Actualisation terminée.'
+                : 'Refresh complete.',
+            style: GoogleFonts.poppins(
+              color: Colors.white,
+            ),
+          ),
         ),
-      ),
-    );
+      );
+    }
   }
 
   Future<List<Advertisement>> fetchAdvertisements(lesPublicites) async {
@@ -404,7 +415,7 @@ class _ActuPageState extends State<ActuPage> {
   Widget build(BuildContext context) {
     if (_firstLoad) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        actualise();
+        actualise(false);
       });
       setState(() {
         _firstLoad = false;
@@ -474,7 +485,7 @@ class _ActuPageState extends State<ActuPage> {
                 PopupMenuItem(
                   value: 1,
                   onTap: () {
-                    _loading ? '' : actualise();
+                    _loading ? '' : actualise(true);
                   },
                   child: Row(
                     children: [
@@ -632,7 +643,7 @@ class _ActuPageState extends State<ActuPage> {
                                   ),
                                   IconButton(
                                     onPressed: () {
-                                      _loading ? '' : actualise();
+                                      _loading ? '' : actualise(true);
                                     },
                                     icon: const Icon(
                                       color: primaryColor,
