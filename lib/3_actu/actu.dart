@@ -815,11 +815,16 @@ class _ActuPageState extends State<ActuPage> {
                                               ClipRRect(
                                                 borderRadius:
                                                     BorderRadius.circular(3),
-                                                child: Image.network(
-                                                  advertisement.image,
-                                                  // height: 300,
-                                                  // width: double.infinity,
-                                                  // fit: BoxFit.cover,
+                                                child: FadeInImage.assetNetwork(
+                                                  placeholder:
+                                                      'images/placeholder.png',
+                                                  image: advertisement.image,
+                                                  fit: BoxFit.cover,
+                                                  imageErrorBuilder: (context,
+                                                      error, stackTrace) {
+                                                    return Image.asset(
+                                                        'images/error_image.png');
+                                                  },
                                                 ),
                                               ),
                                               const SizedBox(height: 10),
