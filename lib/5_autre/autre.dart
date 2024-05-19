@@ -7,7 +7,7 @@ import 'package:dressur/components/pub_smt_2024.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
-import 'package:dressur/5_autre/admin.dart';
+import 'package:dressur/8_admin/admin.dart';
 import 'package:dressur/5_autre/a_propos_ds.dart';
 import 'package:dressur/5_autre/liste_bonus_recu.dart';
 import 'package:dressur/5_autre/delete_compte_user.dart';
