@@ -418,7 +418,13 @@ class _ContactPageState extends State<ContactPage> {
     } else {
       final filteredList = _contacts
           .where((contact) =>
-              contact.pseudo.toLowerCase().contains(_searchText.toLowerCase()))
+              contact.pseudo
+                  .toLowerCase()
+                  .contains(_searchText.toLowerCase()) ||
+              contact.nom.toLowerCase().contains(_searchText.toLowerCase()) ||
+              contact.mail.toLowerCase().contains(_searchText.toLowerCase()) ||
+              contact.pays.toLowerCase().contains(_searchText.toLowerCase()) ||
+              contact.tel.toLowerCase().contains(_searchText.toLowerCase()))
           .toList();
 
       setState(() {
