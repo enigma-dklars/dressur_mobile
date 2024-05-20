@@ -147,8 +147,6 @@ class _RegisterFormState extends State<RegisterForm> {
     }
   }
 
-  // REGISTER ERROR
-
   @override
   Widget build(BuildContext context) {
     return Container(
