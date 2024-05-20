@@ -33,36 +33,38 @@ class _PrettyQrHomePageState extends State<PrettyQrHomePage> {
 
   @protected
   late PrettyQrDecoration decoration;
+  bool _firstLoad = true;
 
   @override
   void initState() {
     super.initState();
-
-    List<String> qrData = ['dressur', uidUser];
-    String concatenatedData = qrData.join(',');
-
-    QrCode qrCode = QrCode.fromData(
-      data: concatenatedData,
-      errorCorrectLevel: QrErrorCorrectLevel.H,
-    );
-
-    qrImage = QrImage(qrCode);
-
-    const kDefaultPrettyQrDecorationImage = PrettyQrDecorationImage(
-      image: AssetImage('images/dressur_logo.png'),
-      position: PrettyQrDecorationImagePosition.embedded,
-    );
-
-    decoration = const PrettyQrDecoration(
-      shape: PrettyQrSmoothSymbol(
-        color: primaryColor,
-      ),
-      image: kDefaultPrettyQrDecorationImage,
-    );
   }
 
   @override
   Widget build(BuildContext context) {
+    if (_firstLoad) {
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        String data = await shortenUrl("$dressurUrlPlaystore&appref=$uidUser");
+        QrCode qrCode = QrCode.fromData(
+          data: data,
+          errorCorrectLevel: QrErrorCorrectLevel.H,
+        );
+        qrImage = QrImage(qrCode);
+        const kDefaultPrettyQrDecorationImage = PrettyQrDecorationImage(
+          image: AssetImage('images/dressur_logo.png'),
+          position: PrettyQrDecorationImagePosition.embedded,
+        );
+        decoration = const PrettyQrDecoration(
+          shape: PrettyQrSmoothSymbol(
+            color: primaryColor,
+          ),
+          image: kDefaultPrettyQrDecorationImage,
+        );
+        setState(() {
+          _firstLoad = false;
+        });
+      });
+    }
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
@@ -85,90 +87,95 @@ class _PrettyQrHomePageState extends State<PrettyQrHomePage> {
           ),
         ),
       ),
-      body: Align(
-        alignment: Alignment.topCenter,
-        child: SizedBox(
-          width: MediaQuery.of(context).size.width * 0.80,
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(
-              maxWidth: 1024,
-            ),
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                final safePadding = MediaQuery.of(context).padding;
-                return Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: safePadding.copyWith(
-                        top: 0,
-                        bottom: 0,
-                      ),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(12.0),
-                        ),
-                        child: _PrettyQrAnimatedView(
-                          qrImage: qrImage,
-                          decoration: decoration,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    Padding(
-                      padding: safePadding.copyWith(
-                        right: 10,
-                        left: 10,
-                      ),
-                      child: Text(
-                        (langUserPhone == "fr")
-                            ? "Le code QR que vous avez généré est confidentiel. En le partageant avec une personne, elle pourra le scanner à l'aide de la caméra Dressur et vous ajoutera automatiquement à ses contacts."
-                            : "The QR code you generated is confidential. By sharing it with someone, they will be able to scan it using the Dressur camera and will automatically add you to their contacts.",
-                        style: GoogleFonts.poppins(
-                          fontSize: 12,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                    const SizedBox(height: 50),
-                    SizedBox(
-                      width: MediaQuery.of(context).size.width * 0.90,
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: primaryColor,
-                          shape: const StadiumBorder(),
-                          padding: const EdgeInsets.symmetric(
-                            vertical: 18,
+      body: _firstLoad
+          ? const Center(
+              child: CircularProgressIndicator(),
+            )
+          : Align(
+              alignment: Alignment.topCenter,
+              child: SizedBox(
+                width: MediaQuery.of(context).size.width * 0.80,
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(
+                    maxWidth: 1024,
+                  ),
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      final safePadding = MediaQuery.of(context).padding;
+                      return Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding: safePadding.copyWith(
+                              top: 0,
+                              bottom: 0,
+                            ),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(12.0),
+                              ),
+                              child: _PrettyQrAnimatedView(
+                                qrImage: qrImage,
+                                decoration: decoration,
+                              ),
+                            ),
                           ),
-                        ),
-                        child: Text(
-                          (langUserPhone == "fr")
-                              ? "Scanner un Code QR"
-                              : "Scan a QR Code",
-                          style: GoogleFonts.poppins(
-                            fontSize: 18,
-                            color: Colors.white,
+                          const SizedBox(height: 10),
+                          Padding(
+                            padding: safePadding.copyWith(
+                              right: 10,
+                              left: 10,
+                            ),
+                            child: Text(
+                              (langUserPhone == "fr")
+                                  ? "Le code QR que vous avez généré est confidentiel. En le partageant avec une personne, elle pourra le scanner à l'aide de la caméra Dressur et vous ajoutera automatiquement à ses contacts."
+                                  : "The QR code you generated is confidential. By sharing it with someone, they will be able to scan it using the Dressur camera and will automatically add you to their contacts.",
+                              style: GoogleFonts.poppins(
+                                fontSize: 12,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
                           ),
-                          textAlign: TextAlign.center,
-                        ),
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const ScannerCodeQR()),
-                          );
-                        },
-                      ),
-                    ),
-                  ],
-                );
-              },
+                          const SizedBox(height: 50),
+                          SizedBox(
+                            width: MediaQuery.of(context).size.width * 0.90,
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: primaryColor,
+                                shape: const StadiumBorder(),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 18,
+                                ),
+                              ),
+                              child: Text(
+                                (langUserPhone == "fr")
+                                    ? "Scanner un Code QR"
+                                    : "Scan a QR Code",
+                                style: GoogleFonts.poppins(
+                                  fontSize: 18,
+                                  color: Colors.white,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          const ScannerCodeQR()),
+                                );
+                              },
+                            ),
+                          ),
+                        ],
+                      );
+                    },
+                  ),
+                ),
+              ),
             ),
-          ),
-        ),
-      ),
     );
   }
 }

@@ -8,6 +8,7 @@ import 'package:dressur/components/sql_helper.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:http/http.dart' as http;
 
 const versionApp = '1.0.0';
 const oldDatabaseName = 'un_dressur.db';
@@ -1021,4 +1022,27 @@ Future<void> shareMessageWithImage(BuildContext context, String codeBonus,
   // Share the image and the message
   await Share.shareFiles([file.path, file2.path],
       text: messageShare, subject: 'Partager Dressur!');
+}
+
+Future<String> shortenUrl(String longUrl) async {
+  final url = 'https://tinyurl.com/api-create.php?url=$longUrl';
+  final response = await http.get(Uri.parse(url));
+  if (response.statusCode == 200) {
+    print(response.body);
+    return response.body;
+  } else {
+    // throw Exception('Failed to shorten URL: ${response.body}');
+    return longUrl;
+  }
+}
+
+Future<String> expandShortUrl(String shortUrl) async {
+  final url = 'https://unshorten.me/s/$shortUrl';
+  final response = await http.get(Uri.parse(url));
+  if (response.statusCode == 200) {
+    return response.body;
+  } else {
+    // throw Exception('Failed to expand short URL: ${response.body}');
+    return shortUrl;
+  }
 }

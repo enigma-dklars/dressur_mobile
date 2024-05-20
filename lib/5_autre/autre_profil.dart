@@ -21,6 +21,7 @@ class AutreProfilPage extends StatefulWidget {
 
 class _AutreProfilPageState extends State<AutreProfilPage> {
   bool _loading = false;
+  bool _firstLoad = true;
   var autre_pseudo;
   var autre_nom;
   var autre_mail;
@@ -34,6 +35,8 @@ class _AutreProfilPageState extends State<AutreProfilPage> {
   var autre_affUserName;
 
   Future<void> fetchAutreProfil() async {
+    print("qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq");
+    print(uidAutreUser);
     setState(() {
       _loading = true;
     });
@@ -44,7 +47,9 @@ class _AutreProfilPageState extends State<AutreProfilPage> {
       youHaveNetWork = await SQLHelper.getYouHaveConnexion();
     }
     var request = http.MultipartRequest(
-        'POST', Uri.parse('$generalRouteForApi/getUserInfo'));
+        'POST',
+        Uri.parse(
+            '$generalRouteForApi/getUserInfo/$uidAutreUser/$langUserPhone'));
     request.fields.addAll(
         {'uid': uidAutreUser, 'langUserPhone': langUserPhone.toString()});
 
@@ -53,6 +58,7 @@ class _AutreProfilPageState extends State<AutreProfilPage> {
     if (response.statusCode == 200) {
       var data1 = await response.stream.bytesToString();
       var data = convert.jsonDecode(data1);
+      print(data);
       if (data["error"] == false) {
         setState(() {
           var userAutreInfos = data['user'];
@@ -82,7 +88,7 @@ class _AutreProfilPageState extends State<AutreProfilPage> {
           builder: (BuildContext context) {
             return AlertDialog(
               title: Text('Erreur'),
-              content: Text('Erreur: ${response.statusCode}'),
+              content: Text('Erreur AFTER 200: ${response.statusCode}'),
               actions: <Widget>[
                 TextButton(
                   child: const Text('OK'),
@@ -170,11 +176,18 @@ class _AutreProfilPageState extends State<AutreProfilPage> {
 
   @override
   void initState() {
-    super.initState();
-    fetchAutreProfil(); // Loading the diary when the app starts
+    super.initState(); // Loading the diary when the app starts
   }
 
   Widget build(BuildContext context) {
+    if (_firstLoad) {
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        fetchAutreProfil();
+        setState(() {
+          _firstLoad = false;
+        });
+      });
+    }
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
@@ -199,223 +212,227 @@ class _AutreProfilPageState extends State<AutreProfilPage> {
           ),
         ),
       ),
-      body: _loading
+      body: _firstLoad
           ? const Center(
               child: CircularProgressIndicator(),
             )
-          : SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(15, 10, 15, 10),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    if (autre_pseudo != null) ...[
-                      Text(
-                        (langUserPhone == "fr") ? "Pseudo" : "Username",
-                        style: GoogleFonts.poppins(
-                          fontSize: 10,
-                        ),
-                      ),
-                      Text(
-                        autre_pseudo,
-                        style: GoogleFonts.poppins(
-                          fontSize: 20,
-                        ),
-                      ),
-                      const SizedBox(height: 5),
-                      const Divider(
-                        height: 1,
-                        thickness: 1,
-                        color: Colors.grey,
-                      ),
-                      const SizedBox(height: 10),
-                    ],
-                    if (autre_nom != null) ...[
-                      Text(
-                        (langUserPhone == "fr")
-                            ? "Nom et Prénom(s)"
-                            : "Last name and first names",
-                        style: GoogleFonts.poppins(
-                          fontSize: 10,
-                        ),
-                      ),
-                      Text(
-                        autre_nom,
-                        style: GoogleFonts.poppins(
-                          fontSize: 20,
-                        ),
-                      ),
-                      const SizedBox(height: 5),
-                      const Divider(
-                        height: 1,
-                        thickness: 1,
-                        color: Colors.grey,
-                      ),
-                      const SizedBox(height: 10),
-                    ],
-                    if (autre_mail != null) ...[
-                      Text(
-                        (langUserPhone == "fr") ? "E-Mail" : "E-Mail",
-                        style: GoogleFonts.poppins(
-                          fontSize: 10,
-                        ),
-                      ),
-                      Text(
-                        autre_mail,
-                        style: GoogleFonts.poppins(
-                          fontSize: 20,
-                        ),
-                      ),
-                      const SizedBox(height: 5),
-                      const Divider(
-                        height: 1,
-                        thickness: 1,
-                        color: Colors.grey,
-                      ),
-                      const SizedBox(height: 10),
-                    ],
-                    if (autre_tel != null) ...[
-                      Text(
-                        (langUserPhone == "fr")
-                            ? "Numéro de Téléphone"
-                            : "Phone number",
-                        style: GoogleFonts.poppins(
-                          fontSize: 10,
-                        ),
-                      ),
-                      Text(
-                        autre_tel,
-                        style: GoogleFonts.poppins(
-                          fontSize: 20,
-                        ),
-                      ),
-                      const SizedBox(height: 5),
-                      const Divider(
-                        height: 1,
-                        thickness: 1,
-                        color: Colors.grey,
-                      ),
-                      const SizedBox(height: 10),
-                    ],
-                    if (autre_tiktok != null) ...[
-                      const SizedBox(height: 5),
-                      Text(
-                        "TikTok",
-                        style: GoogleFonts.poppins(
-                          fontSize: 10,
-                        ),
-                      ),
-                      ProfileMenuReseau(
-                        text: "Tiktok",
-                        press: () async {
-                          final Uri _url = Uri.parse(autre_tiktok);
-                          if (!await launchUrl(_url,
-                              mode: LaunchMode.externalApplication)) {
-                            throw 'Could not launch $_url';
-                          }
-                        },
-                      ),
-                      const SizedBox(height: 5),
-                      const Divider(
-                        height: 1,
-                        thickness: 1,
-                        color: Colors.grey,
-                      ),
-                    ],
-                    if (autre_youtube != null) ...[
-                      const SizedBox(height: 5),
-                      Text(
-                        "Youtube",
-                        style: GoogleFonts.poppins(
-                          fontSize: 10,
-                        ),
-                      ),
-                      ProfileMenuReseau(
-                        text: "Youtube",
-                        press: () async {
-                          final Uri _url = Uri.parse(autre_youtube);
-                          if (!await launchUrl(_url,
-                              mode: LaunchMode.externalApplication)) {
-                            throw 'Could not launch $_url';
-                          }
-                        },
-                      ),
-                      const SizedBox(height: 5),
-                      const Divider(
-                        height: 1,
-                        thickness: 1,
-                        color: Colors.grey,
-                      ),
-                    ],
-                    if (autre_facebook != null) ...[
-                      const SizedBox(height: 5),
-                      Text(
-                        "Facebook",
-                        style: GoogleFonts.poppins(
-                          fontSize: 10,
-                        ),
-                      ),
-                      ProfileMenuReseau(
-                        text: "Facebook",
-                        press: () async {
-                          final Uri _url = Uri.parse(autre_facebook);
-                          if (!await launchUrl(_url,
-                              mode: LaunchMode.externalApplication)) {
-                            throw 'Could not launch $_url';
-                          }
-                        },
-                      ),
-                      const SizedBox(height: 5),
-                      const Divider(
-                        height: 1,
-                        thickness: 1,
-                        color: Colors.grey,
-                      ),
-                    ],
-                    if (autre_instagram != null) ...[
-                      const SizedBox(height: 5),
-                      Text(
-                        "Instagram",
-                        style: GoogleFonts.poppins(
-                          fontSize: 10,
-                        ),
-                      ),
-                      ProfileMenuReseau(
-                        text: "Instagram",
-                        press: () async {
-                          final Uri _url = Uri.parse(autre_instagram);
-                          if (!await launchUrl(_url,
-                              mode: LaunchMode.externalApplication)) {
-                            throw 'Could not launch $_url';
-                          }
-                        },
-                      ),
-                      const SizedBox(height: 5),
-                      const Divider(
-                        height: 1,
-                        thickness: 1,
-                        color: Colors.grey,
-                      ),
-                    ],
-                    if (autre_apropos != null) ...[
-                      Text(
-                        (langUserPhone == "fr") ? "À propos" : "About",
-                        style: GoogleFonts.poppins(
-                          fontSize: 10,
-                        ),
-                      ),
-                      Text(
-                        autre_apropos,
-                        style: GoogleFonts.poppins(
-                          fontSize: 20,
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                    ],
-                  ],
+          : _loading
+              ? const Center(
+                  child: CircularProgressIndicator(),
+                )
+              : SingleChildScrollView(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(15, 10, 15, 10),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (autre_pseudo != null) ...[
+                          Text(
+                            (langUserPhone == "fr") ? "Pseudo" : "Username",
+                            style: GoogleFonts.poppins(
+                              fontSize: 10,
+                            ),
+                          ),
+                          Text(
+                            autre_pseudo,
+                            style: GoogleFonts.poppins(
+                              fontSize: 20,
+                            ),
+                          ),
+                          const SizedBox(height: 5),
+                          const Divider(
+                            height: 1,
+                            thickness: 1,
+                            color: Colors.grey,
+                          ),
+                          const SizedBox(height: 10),
+                        ],
+                        if (autre_nom != null) ...[
+                          Text(
+                            (langUserPhone == "fr")
+                                ? "Nom et Prénom(s)"
+                                : "Last name and first names",
+                            style: GoogleFonts.poppins(
+                              fontSize: 10,
+                            ),
+                          ),
+                          Text(
+                            autre_nom,
+                            style: GoogleFonts.poppins(
+                              fontSize: 20,
+                            ),
+                          ),
+                          const SizedBox(height: 5),
+                          const Divider(
+                            height: 1,
+                            thickness: 1,
+                            color: Colors.grey,
+                          ),
+                          const SizedBox(height: 10),
+                        ],
+                        if (autre_mail != null) ...[
+                          Text(
+                            (langUserPhone == "fr") ? "E-Mail" : "E-Mail",
+                            style: GoogleFonts.poppins(
+                              fontSize: 10,
+                            ),
+                          ),
+                          Text(
+                            autre_mail,
+                            style: GoogleFonts.poppins(
+                              fontSize: 20,
+                            ),
+                          ),
+                          const SizedBox(height: 5),
+                          const Divider(
+                            height: 1,
+                            thickness: 1,
+                            color: Colors.grey,
+                          ),
+                          const SizedBox(height: 10),
+                        ],
+                        if (autre_tel != null) ...[
+                          Text(
+                            (langUserPhone == "fr")
+                                ? "Numéro de Téléphone"
+                                : "Phone number",
+                            style: GoogleFonts.poppins(
+                              fontSize: 10,
+                            ),
+                          ),
+                          Text(
+                            autre_tel,
+                            style: GoogleFonts.poppins(
+                              fontSize: 20,
+                            ),
+                          ),
+                          const SizedBox(height: 5),
+                          const Divider(
+                            height: 1,
+                            thickness: 1,
+                            color: Colors.grey,
+                          ),
+                          const SizedBox(height: 10),
+                        ],
+                        if (autre_tiktok != null) ...[
+                          const SizedBox(height: 5),
+                          Text(
+                            "TikTok",
+                            style: GoogleFonts.poppins(
+                              fontSize: 10,
+                            ),
+                          ),
+                          ProfileMenuReseau(
+                            text: "Tiktok",
+                            press: () async {
+                              final Uri _url = Uri.parse(autre_tiktok);
+                              if (!await launchUrl(_url,
+                                  mode: LaunchMode.externalApplication)) {
+                                throw 'Could not launch $_url';
+                              }
+                            },
+                          ),
+                          const SizedBox(height: 5),
+                          const Divider(
+                            height: 1,
+                            thickness: 1,
+                            color: Colors.grey,
+                          ),
+                        ],
+                        if (autre_youtube != null) ...[
+                          const SizedBox(height: 5),
+                          Text(
+                            "Youtube",
+                            style: GoogleFonts.poppins(
+                              fontSize: 10,
+                            ),
+                          ),
+                          ProfileMenuReseau(
+                            text: "Youtube",
+                            press: () async {
+                              final Uri _url = Uri.parse(autre_youtube);
+                              if (!await launchUrl(_url,
+                                  mode: LaunchMode.externalApplication)) {
+                                throw 'Could not launch $_url';
+                              }
+                            },
+                          ),
+                          const SizedBox(height: 5),
+                          const Divider(
+                            height: 1,
+                            thickness: 1,
+                            color: Colors.grey,
+                          ),
+                        ],
+                        if (autre_facebook != null) ...[
+                          const SizedBox(height: 5),
+                          Text(
+                            "Facebook",
+                            style: GoogleFonts.poppins(
+                              fontSize: 10,
+                            ),
+                          ),
+                          ProfileMenuReseau(
+                            text: "Facebook",
+                            press: () async {
+                              final Uri _url = Uri.parse(autre_facebook);
+                              if (!await launchUrl(_url,
+                                  mode: LaunchMode.externalApplication)) {
+                                throw 'Could not launch $_url';
+                              }
+                            },
+                          ),
+                          const SizedBox(height: 5),
+                          const Divider(
+                            height: 1,
+                            thickness: 1,
+                            color: Colors.grey,
+                          ),
+                        ],
+                        if (autre_instagram != null) ...[
+                          const SizedBox(height: 5),
+                          Text(
+                            "Instagram",
+                            style: GoogleFonts.poppins(
+                              fontSize: 10,
+                            ),
+                          ),
+                          ProfileMenuReseau(
+                            text: "Instagram",
+                            press: () async {
+                              final Uri _url = Uri.parse(autre_instagram);
+                              if (!await launchUrl(_url,
+                                  mode: LaunchMode.externalApplication)) {
+                                throw 'Could not launch $_url';
+                              }
+                            },
+                          ),
+                          const SizedBox(height: 5),
+                          const Divider(
+                            height: 1,
+                            thickness: 1,
+                            color: Colors.grey,
+                          ),
+                        ],
+                        if (autre_apropos != null) ...[
+                          Text(
+                            (langUserPhone == "fr") ? "À propos" : "About",
+                            style: GoogleFonts.poppins(
+                              fontSize: 10,
+                            ),
+                          ),
+                          Text(
+                            autre_apropos,
+                            style: GoogleFonts.poppins(
+                              fontSize: 20,
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                        ],
+                      ],
+                    ),
+                  ),
                 ),
-              ),
-            ),
     );
   }
 }

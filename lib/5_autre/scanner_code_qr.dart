@@ -2,11 +2,9 @@
 
 import 'dart:developer';
 import 'dart:io';
-
 import 'package:dressur/5_autre/autre_profil.dart';
 import 'package:dressur/components/constant.dart';
 import 'package:dressur/components/noti.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 
@@ -68,15 +66,6 @@ class _QRViewExampleState extends State<QRViewExample> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      // TextButton(
-                      //   onPressed: () {
-                      //     // au click ....
-                      //   },
-                      //   child: const Icon(
-                      //     Icons.image,
-                      //     color: primaryColor,
-                      //   ),
-                      // ),
                       TextButton(
                         onPressed: () async {
                           await controller?.toggleFlash();
@@ -130,23 +119,31 @@ class _QRViewExampleState extends State<QRViewExample> {
     );
   }
 
+  Future<String> convertScanDataToString(scanData) async {
+    try {
+      return scanData.toString();
+    } catch (e) {
+      // return 'Failed to convert the scan data: $e';
+      return 'NOT_DRESSUR_QR_CODE';
+    }
+  }
+
   void _onQRViewCreated(QRViewController controller) {
     setState(() {
       this.controller = controller;
     });
     controller.scannedDataStream.listen((scanData) async {
-      // Vous pouvez accéder aux données du code QR scanné ici
-      print('QR Code Data: ${scanData.code}');
-
-      // Vérifiez la provenance et récupérez l'ID utilisateur si nécessaire
-      List<String> qrData = scanData.code!.split(',');
-      if (qrData.length == 2 && qrData[0] == 'dressur') {
-        String idUser = qrData[1];
+      String dataQRCODE = await expandShortUrl(scanData.code.toString());
+      Uri uri = Uri.parse(dataQRCODE);
+      String idUser = uri.queryParameters['appref'] ?? 'NOT_DRESSUR_QR_CODE';
+      await controller.pauseCamera();
+      await controller.stopCamera();
+      if (idUser != 'NOT_DRESSUR_QR_CODE') {
         if (idUser != uidUser) {
           setState(() {
             uidAutreUser = idUser;
+            addUserOnAutreProfilPage = "oui";
           });
-          await controller.pauseCamera();
           Navigator.pop(context);
           Navigator.of(context)
               .push(MaterialPageRoute(builder: (context) => AutreProfilPage()));
@@ -157,14 +154,12 @@ class _QRViewExampleState extends State<QRViewExample> {
                   ? "Il s'agit de votre propre Code QR."
                   : "This is your own QR Code.",
               context);
-          await controller.pauseCamera();
         }
       } else {
         warningNoti(
             (langUserPhone == "fr") ? "Code QR" : "QR Code",
             (langUserPhone == "fr") ? "Code QR Invalide" : "Invalid QR Code",
             context);
-        await controller.pauseCamera();
       }
     });
   }
