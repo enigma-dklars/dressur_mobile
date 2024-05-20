@@ -1,8 +1,12 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:dressur/components/111_generaleApiDomaine.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show ByteData, Uint8List, rootBundle;
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:dressur/components/sql_helper.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 const versionApp = '1.0.0';
@@ -990,4 +994,31 @@ void launchWhatsApp(String phoneNumber) async {
   if (!await launchUrl(_url, mode: LaunchMode.externalApplication)) {
     throw 'Could not launch $_url';
   }
+}
+
+Future<void> shareMessageWithImage(BuildContext context, String codeBonus,
+    String commissionBonus, String langUserPhone) async {
+  var messageShare = (langUserPhone == "fr")
+      ? "Utilise Dressur, une application simple, sûr et fiable pour avoir de la visibilité sur tes différents réseaux sociaux et surtout sur tes statuts WhatsApp.\nGrâce à Dressur, fait la promotion de tes produits et services qui seront visibles par des milliers d'utilisateurs en seulement 24H.\nElle te permet d'avoir plus facilement des contacts WhatsApp selon les pays de ton choix. De plus, ses contacts sont automatiquement enregistrés dans ton téléphone et ton contact dans les leurs, etc.\n\nA télécharger gratuitement sur Play Store : https://play.google.com/store/apps/details?id=com.dressur.ds\n\nVoici mon code parrainage : $codeBonus\n\nIl te donnera $commissionBonus Points Bonus pour tester les services de l'application."
+      : "Use Dressur, a simple, safe and reliable application to have visibility on your various social networks and especially on your WhatsApp statuses.\nThanks to Dressur, promote your products and services which will be visible to thousands of users in just 24 hours.\nIt makes it easier for you to have WhatsApp contacts according to the countries of your choice. In addition, its contacts are automatically saved in your phone and your contact in theirs, etc.\n\nA download for free on Play Store: https://play.google.com/store/apps/details?id=com.dressur.ds\n\nHere is my referral code: $codeBonus\n\nIt will give you $commissionBonus Points Bonus to test the services of the app.";
+
+  // Load the image from assets
+  final ByteData bytes = await rootBundle.load('images/flyers_dressur_fr.jpg');
+  final Uint8List list = bytes.buffer.asUint8List();
+
+  final ByteData bytes2 = await rootBundle.load('images/flyers_dressur_en.jpg');
+  final Uint8List list2 = bytes2.buffer.asUint8List();
+
+  // Get the temporary directory
+  final tempDir = await getTemporaryDirectory();
+
+  final file = await File('${tempDir.path}/flyers_dressur_fr.jpg').create();
+  file.writeAsBytesSync(list);
+
+  final file2 = await File('${tempDir.path}/flyers_dressur_en.jpg').create();
+  file2.writeAsBytesSync(list2);
+
+  // Share the image and the message
+  await Share.shareFiles([file.path, file2.path],
+      text: messageShare, subject: 'Partager Dressur!');
 }
