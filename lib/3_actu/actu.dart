@@ -22,7 +22,6 @@ import 'package:dressur/components/sql_helper.dart';
 import 'package:dressur/5_autre/support_assistance.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'liste_contact_add_disponible.dart';
-import 'package:share_plus/share_plus.dart';
 
 class Advertisement {
   final String uidUser;
