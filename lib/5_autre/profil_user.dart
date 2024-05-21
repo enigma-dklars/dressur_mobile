@@ -110,7 +110,6 @@ class _RegisterFormState extends State<RegisterForm> {
     if (youHaveNetWork[0]['youHaveConnexion'] == "oui") {
       setState(() {
         _desactive = true;
-        // UserClass.getItem('userInfos', 0);
       });
 
       var request = http.MultipartRequest(

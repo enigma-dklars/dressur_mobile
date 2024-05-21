@@ -9,7 +9,7 @@ import 'dart:convert' as convert;
 import 'package:dressur/components/sql_helper.dart';
 import 'package:dressur/components/noti.dart';
 
-class SignalerPage extends StatelessWidget {
+class SuggestionsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -27,7 +27,7 @@ class SignalerPage extends StatelessWidget {
           ),
         ),
         title: Text(
-          (langUserPhone == "fr") ? "Signaler un utilisateur" : "Report a user",
+          "Suggestions",
           style: GoogleFonts.poppins(
             color: Colors.white,
             fontWeight: FontWeight.w400,
@@ -39,9 +39,9 @@ class SignalerPage extends StatelessWidget {
           children: [
             const SizedBox(height: 30),
             const Icon(
-              Icons.dangerous,
+              Icons.lightbulb,
               size: 120,
-              color: Colors.redAccent,
+              color: Colors.amber,
             ),
             const SizedBox(height: 30),
             Container(
@@ -55,8 +55,8 @@ class SignalerPage extends StatelessWidget {
                       padding: const EdgeInsets.all(0),
                       child: Text(
                         (langUserPhone == "fr")
-                            ? "Signaler un utilisateur en remplissant le formulaire ci-dessous. Votre plainte sera étudier et des mesures seront prises conformément à nos conditions d'utilisations."
-                            : "Report a user by filling out the form below. Your complaint will be investigated and action will be taken in accordance with our Terms of Use.",
+                            ? "Nous cherchons constamment à améliorer notre application pour vous. Votre opinion est précieuse ! Que vous ayez une idée, une suggestion de fonctionnalité ou des commentaires, faites-nous en part."
+                            : "We are constantly looking to improve our app for you. Your opinion is valuable! Whether you have an idea, feature suggestion, or feedback, let us know.",
                         style: GoogleFonts.poppins(
                           fontSize: 16,
                         ),
@@ -65,7 +65,7 @@ class SignalerPage extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 30),
-                  SignalerForm(),
+                  SuggestionsForm(),
                 ],
               ),
             ),
@@ -76,19 +76,19 @@ class SignalerPage extends StatelessWidget {
   }
 }
 
-class SignalerForm extends StatefulWidget {
+class SuggestionsForm extends StatefulWidget {
   @override
-  State<SignalerForm> createState() => _SignalerFormState();
+  State<SuggestionsForm> createState() => _SuggestionsFormState();
 }
 
-class _SignalerFormState extends State<SignalerForm> {
+class _SuggestionsFormState extends State<SuggestionsForm> {
   bool _desactive = false;
   var data;
   final telController = TextEditingController();
   final motifController = TextEditingController();
 
   //HTTP REQUEST REGISTER
-  void signaleUser(String tel, String motif) async {
+  void addSuggestion(String suggestion) async {
     dynamic youHaveNetWork = "";
     youHaveConnexion();
     youHaveNetWork = await SQLHelper.getYouHaveConnexion();
@@ -101,12 +101,11 @@ class _SignalerFormState extends State<SignalerForm> {
       });
 
       var request = http.MultipartRequest(
-          'POST', Uri.parse('$generalRouteForApi/addSignalement'));
+          'POST', Uri.parse('$generalRouteForApi/addSuggestion'));
       request.fields.addAll({
         'uid': uidUser,
         'langUserPhone': langUserPhone.toString(),
-        'telSignaler': tel,
-        'motifSignaler': motif
+        'suggestion': suggestion
       });
 
       http.StreamedResponse response = await request.send();
@@ -128,8 +127,8 @@ class _SignalerFormState extends State<SignalerForm> {
               behavior: SnackBarBehavior.floating,
               content: Text(
                 (langUserPhone == "fr")
-                    ? 'Utilisateur signaler avec succès…'
-                    : 'User report successfully…',
+                    ? 'Merci pour votre suggestion ! Nous apprécions votre contribution pour améliorer notre application.'
+                    : 'Thanks for your suggestion! We appreciate your contribution to improve our app.',
                 style: GoogleFonts.poppins(
                   color: Colors.white,
                 ),
@@ -169,15 +168,15 @@ class _SignalerFormState extends State<SignalerForm> {
     return Container(
       child: Column(
         children: [
+          const SizedBox(height: 10),
           DelayedAnimation(
-            delay: 0, // 1500,
-            child: TextField(
-              controller: telController,
-              decoration: InputDecoration(
-                border: const OutlineInputBorder(),
-                labelText: (langUserPhone == "fr")
-                    ? 'Numéro Whatsapp'
-                    : 'Whatsapp number',
+            delay: 0, // 1000,
+            child: Text(
+              (langUserPhone == "fr")
+                  ? 'Votre ou vos suggestions ci-dessous'
+                  : 'Your suggestion(s) below',
+              style: GoogleFonts.poppins(
+                fontSize: 16,
               ),
             ),
           ),
@@ -185,11 +184,11 @@ class _SignalerFormState extends State<SignalerForm> {
           DelayedAnimation(
             delay: 0, // 2250,
             child: TextField(
-              maxLines: null,
+              maxLines: 100,
+              minLines: 8,
               controller: motifController,
-              decoration: InputDecoration(
-                border: const OutlineInputBorder(),
-                labelText: (langUserPhone == "fr") ? 'Motif' : 'Pattern',
+              decoration: const InputDecoration(
+                border: OutlineInputBorder(),
               ),
             ),
           ),
@@ -200,7 +199,7 @@ class _SignalerFormState extends State<SignalerForm> {
               width: MediaQuery.of(context).size.width * 0.90,
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.redAccent,
+                  backgroundColor: Colors.amber,
                   shape: const StadiumBorder(),
                   padding: const EdgeInsets.symmetric(
                     vertical: 13,
@@ -211,17 +210,15 @@ class _SignalerFormState extends State<SignalerForm> {
                   _desactive
                       ? "Wait..."
                       : (langUserPhone == "fr")
-                          ? "SIGNALER"
-                          : "REPORT",
+                          ? "SUGGÉRER"
+                          : "SUGGEST",
                   style: GoogleFonts.poppins(
                     color: Colors.white,
                     fontWeight: FontWeight.w400,
                   ),
                 ),
                 onPressed: () {
-                  _desactive
-                      ? null
-                      : signaleUser(telController.text, motifController.text);
+                  _desactive ? null : addSuggestion(motifController.text);
                 },
               ),
             ),

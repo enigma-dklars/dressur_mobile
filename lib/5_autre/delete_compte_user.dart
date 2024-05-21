@@ -105,7 +105,6 @@ class _DeletecompteFormState extends State<DeletecompteForm> {
     if (youHaveNetWork[0]['youHaveConnexion'] == "oui") {
       setState(() {
         _desactive = true;
-        // UserClass.getItem('userInfos', 0);
       });
 
       var request = http.MultipartRequest(

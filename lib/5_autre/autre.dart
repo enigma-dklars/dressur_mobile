@@ -3,6 +3,7 @@
 import 'dart:io';
 
 import 'package:dressur/5_autre/cart_visite.dart';
+import 'package:dressur/5_autre/suggestions.dart';
 import 'package:dressur/components/pub_smt_2024.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -122,16 +123,6 @@ class _SettingPageState extends State<SettingPage> {
                     )
                   : const SizedBox(height: 0),
               ProfileMenu(
-                text: (langUserPhone == "fr") ? "À Propos" : "About Us",
-                Myicon: const Icon(Icons.bookmark),
-                press: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => AproposPage()),
-                  );
-                },
-              ),
-              ProfileMenu(
                 text: (langUserPhone == "fr")
                     ? "Support, Assistance Technique"
                     : "Support, Technical Assistance",
@@ -202,6 +193,16 @@ class _SettingPageState extends State<SettingPage> {
                 },
               ),
               ProfileMenu(
+                text: "Suggestions",
+                Myicon: const Icon(Icons.help),
+                press: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => SuggestionsPage()),
+                  );
+                },
+              ),
+              ProfileMenu(
                 text: (langUserPhone == "fr")
                     ? "Signaler un utilisateur"
                     : "Report a user",
@@ -238,7 +239,7 @@ class _SettingPageState extends State<SettingPage> {
                   if (response.isTapConfirmButton) {
                     if (contactsEnregistrer.isNotEmpty) {
                       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      behavior: SnackBarBehavior.floating,
+                        behavior: SnackBarBehavior.floating,
                         content: Text(
                           (langUserPhone == "fr")
                               ? "Dressur vas parcourir vos contacts un a un et supprimer les contacts DS.\n\nPatientez tous le long du processus.\n\nCe processus peut durée plusieurs minutes."
@@ -261,14 +262,14 @@ class _SettingPageState extends State<SettingPage> {
                         }
                         nombreContact--;
                         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      behavior: SnackBarBehavior.floating,
+                          behavior: SnackBarBehavior.floating,
                           content: Text((langUserPhone == "fr")
                               ? "$nombreContact contact(s) restant à parcourir."
                               : "$nombreContact contact(s) remaining to be scanned."),
                         ));
                       }
                       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      behavior: SnackBarBehavior.floating,
+                        behavior: SnackBarBehavior.floating,
                         content: Text(
                           (langUserPhone == "fr")
                               ? "${contactsEnregistrer.length} contact(s) DS supprimer."
@@ -277,7 +278,7 @@ class _SettingPageState extends State<SettingPage> {
                       ));
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      behavior: SnackBarBehavior.floating,
+                        behavior: SnackBarBehavior.floating,
                         content: Text(
                           (langUserPhone == "fr")
                               ? "Vous n'avez aucun contact DS actuellement. Faite un boost pour en avoir."
@@ -302,7 +303,7 @@ class _SettingPageState extends State<SettingPage> {
               ),
               ProfileMenu(
                 text: (langUserPhone == "fr") ? "Se déconnecter" : "Sign out",
-                Myicon: const Icon(Icons.offline_bolt),
+                Myicon: const Icon(Icons.logout),
                 press: () async {
                   ArtDialogResponse response = await ArtSweetAlert.show(
                       barrierDismissible: false,
@@ -327,6 +328,16 @@ class _SettingPageState extends State<SettingPage> {
                       MaterialPageRoute(builder: (context) => LoginPage()),
                     );
                   }
+                },
+              ),
+              ProfileMenu(
+                text: (langUserPhone == "fr") ? "À Propos" : "About Us",
+                Myicon: const Icon(Icons.bookmark),
+                press: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => AproposPage()),
+                  );
                 },
               ),
               const SizedBox(height: 5),
