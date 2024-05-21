@@ -1028,7 +1028,6 @@ Future<String> shortenUrl(String longUrl) async {
   final url = 'https://tinyurl.com/api-create.php?url=$longUrl';
   final response = await http.get(Uri.parse(url));
   if (response.statusCode == 200) {
-    print(response.body);
     return response.body;
   } else {
     // throw Exception('Failed to shorten URL: ${response.body}');

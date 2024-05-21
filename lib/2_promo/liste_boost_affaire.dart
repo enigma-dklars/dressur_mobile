@@ -925,7 +925,7 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
               delay: 0, // 1500,
               child: TextField(
                 controller: telController,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: 'Indicatif + Numéro du paiement',
                   border: OutlineInputBorder(),
                 ),

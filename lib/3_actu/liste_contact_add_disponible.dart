@@ -168,7 +168,6 @@ class _ListeContactAAddPageState extends State<ListeContactAAddPage> {
     setState(() {
       _contactsDispo.insert(0, contact);
       nombreContactDispo = _contactsDispo.length;
-      print(nombreContactDispo);
     });
   }
 

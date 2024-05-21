@@ -35,8 +35,6 @@ class _AutreProfilPageState extends State<AutreProfilPage> {
   var autre_affUserName;
 
   Future<void> fetchAutreProfil() async {
-    print("qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq");
-    print(uidAutreUser);
     setState(() {
       _loading = true;
     });
@@ -58,7 +56,6 @@ class _AutreProfilPageState extends State<AutreProfilPage> {
     if (response.statusCode == 200) {
       var data1 = await response.stream.bytesToString();
       var data = convert.jsonDecode(data1);
-      print(data);
       if (data["error"] == false) {
         setState(() {
           var userAutreInfos = data['user'];
