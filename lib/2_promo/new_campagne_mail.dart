@@ -443,8 +443,8 @@ class _RegisterForm2State extends State<RegisterForm2> {
                 child: Text(
                   _desactive2
                       ? (langUserPhone == "fr")
-                          ? "Patientez ..."
-                          : "Wait ..."
+                          ? "Patientez..."
+                          : "Wait..."
                       : (langUserPhone == "fr")
                           ? "Envoyer"
                           : "Send",

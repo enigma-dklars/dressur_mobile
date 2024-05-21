@@ -211,7 +211,9 @@ class _DeletecompteFormState extends State<DeletecompteForm> {
                 ),
                 child: Text(
                   _desactive
-                      ? "Wait..."
+                      ? (langUserPhone == "fr")
+                            ? "Patientez..."
+                            : "Wait..."
                       : (langUserPhone == "fr")
                           ? "SUPPRIMER"
                           : "DELETE",

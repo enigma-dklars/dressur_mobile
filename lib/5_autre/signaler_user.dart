@@ -209,7 +209,9 @@ class _SignalerFormState extends State<SignalerForm> {
                 ),
                 child: Text(
                   _desactive
-                      ? "Wait..."
+                      ? (langUserPhone == "fr")
+                            ? "Patientez..."
+                            : "Wait..."
                       : (langUserPhone == "fr")
                           ? "SIGNALER"
                           : "REPORT",

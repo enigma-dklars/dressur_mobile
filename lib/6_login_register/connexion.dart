@@ -319,17 +319,19 @@ class _LoginFormState extends State<LoginForm> {
                                 ),
                                 minimumSize: const Size.fromHeight(50),
                               ),
-                              child: _desactive
-                                  ? const Text("Wait...")
-                                  : Text(
-                                      (langUserPhone == "fr")
-                                          ? "CONNEXION"
-                                          : "LOGIN",
-                                      style: const TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.bold),
-                                    ),
+                              child: Text(
+                                _desactive
+                                    ? (langUserPhone == "fr")
+                                        ? "Patientez..."
+                                        : "Wait..."
+                                    : (langUserPhone == "fr")
+                                        ? "CONNEXION"
+                                        : "LOGIN",
+                                style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold),
+                              ),
                               onPressed: () {
                                 _desactive
                                     ? null

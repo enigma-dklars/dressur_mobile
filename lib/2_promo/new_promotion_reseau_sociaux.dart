@@ -620,8 +620,8 @@ class _RegisterForm3State extends State<RegisterForm3> {
                 child: Text(
                   _desactive3
                       ? (langUserPhone == "fr")
-                          ? "Patientez ..."
-                          : "Wait ..."
+                          ? "Patientez..."
+                          : "Wait..."
                       : (langUserPhone == "fr")
                           ? "Payer et Démarrer"
                           : "Pay and Get Started",

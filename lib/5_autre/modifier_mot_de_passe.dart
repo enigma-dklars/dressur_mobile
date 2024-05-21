@@ -351,7 +351,9 @@ class _RegisterFormState extends State<RegisterForm> {
                 ),
                 child: Text(
                   _desactive
-                      ? "Wait..."
+                      ? (langUserPhone == "fr")
+                            ? "Patientez..."
+                            : "Wait..."
                       : (langUserPhone == "fr")
                           ? "MODIFIER"
                           : "EDIT",
@@ -387,7 +389,9 @@ class _RegisterFormState extends State<RegisterForm> {
                 ),
                 child: Text(
                   _desactivePasseForgetButton
-                      ? "Wait..."
+                      ? (langUserPhone == "fr")
+                            ? "Patientez..."
+                            : "Wait..."
                       : (langUserPhone == "fr")
                           ? "Mot de passe oublié ?"
                           : "Forgot your password ?",

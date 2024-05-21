@@ -208,7 +208,9 @@ class _SuggestionsFormState extends State<SuggestionsForm> {
                 ),
                 child: Text(
                   _desactive
-                      ? "Wait..."
+                      ? (langUserPhone == "fr")
+                            ? "Patientez..."
+                            : "Wait..."
                       : (langUserPhone == "fr")
                           ? "SUGGÉRER"
                           : "SUGGEST",

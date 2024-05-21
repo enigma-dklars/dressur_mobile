@@ -700,8 +700,8 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
                   child: Text(
                     _desactive2
                         ? (langUserPhone == "fr")
-                            ? "Patientez ..."
-                            : "Wait ..."
+                            ? "Patientez..."
+                            : "Wait..."
                         : (langUserPhone == "fr")
                             ? "Payer"
                             : "Pay",

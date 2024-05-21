@@ -296,7 +296,9 @@ class _RegisterFormState extends State<RegisterForm> {
                 ),
                 child: Text(
                   _desactive
-                      ? "Wait..."
+                      ? (langUserPhone == "fr")
+                            ? "Patientez..."
+                            : "Wait..."
                       : (langUserPhone == "fr")
                           ? "ENREGISTRER"
                           : "SAVED",

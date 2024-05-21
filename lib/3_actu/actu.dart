@@ -684,7 +684,9 @@ class _ActuPageState extends State<ActuPage> {
                                             ),
                                             child: Text(
                                               (_loading == true)
-                                                  ? "Wait..."
+                                                  ? (langUserPhone == "fr")
+                                                      ? "Patientez..."
+                                                      : "Wait..."
                                                   : (langUserPhone == "fr")
                                                       ? "Enregistrer Tous"
                                                       : "Save All",

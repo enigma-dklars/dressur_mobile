@@ -403,17 +403,19 @@ class _RegisterFormState extends State<RegisterForm> {
                                 ),
                                 minimumSize: const Size.fromHeight(50),
                               ),
-                              child: _desactive
-                                  ? const Text("Wait...")
-                                  : Text(
-                                      (langUserPhone == "fr")
-                                          ? "INSCRIPTION"
-                                          : "REGISTRATION",
-                                      style: const TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.bold),
-                                    ),
+                              child: Text(
+                                _desactive
+                                    ? (langUserPhone == "fr")
+                                        ? "Patientez..."
+                                        : "Wait..."
+                                    : (langUserPhone == "fr")
+                                        ? "INSCRIPTION"
+                                        : "REGISTRATION",
+                                style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold),
+                              ),
                               onPressed: () {
                                 _desactive
                                     ? null

@@ -273,16 +273,18 @@ class _ConfirmeFormeState extends State<ConfirmeForme> {
                   // vertical: 13,
                 ),
               ),
-              child: _desactive
-                  ? const Text("Wait...")
-                  : Text(
-                      (langUserPhone == "fr")
+              child: Text(
+                  _desactive
+                      ? (langUserPhone == "fr")
+                          ? "Patientez..."
+                          : "Wait..."
+                      : (langUserPhone == "fr")
                           ? "Renvoyer le code"
                           : "Return the code",
-                      style: GoogleFonts.poppins(
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
-                      )),
+                  style: GoogleFonts.poppins(
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white,
+                  )),
               onPressed: () {
                 _desactive ? null : sendMail();
               },
@@ -343,13 +345,18 @@ class _ConfirmeFormeState extends State<ConfirmeForme> {
                     vertical: 13,
                   ),
                 ),
-                child: _desactive
-                    ? const Text("Wait...")
-                    : Text((langUserPhone == "fr") ? "CONFIRMER" : "CONFIRM",
-                        style: GoogleFonts.poppins(
-                          fontWeight: FontWeight.w600,
-                          color: Colors.white,
-                        )),
+                child: Text(
+                    _desactive
+                        ? (langUserPhone == "fr")
+                            ? "Patientez..."
+                            : "Wait..."
+                        : (langUserPhone == "fr")
+                            ? "CONFIRMER"
+                            : "CONFIRM",
+                    style: GoogleFonts.poppins(
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                    )),
                 onPressed: () {
                   _desactive ? null : codeVerif(_codeMailVerifyController.text);
                 },

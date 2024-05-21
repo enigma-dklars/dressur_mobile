@@ -292,17 +292,19 @@ class _RecuperationFormState extends State<RecuperationForm> {
                                 ),
                                 minimumSize: const Size.fromHeight(50),
                               ),
-                              child: _desactive
-                                  ? const Text("Wait...")
-                                  : Text(
-                                      (langUserPhone == "fr")
-                                          ? "CONFIRMER"
-                                          : "CONFIRM",
-                                      style: const TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.bold),
-                                    ),
+                              child: Text(
+                                _desactive
+                                    ? (langUserPhone == "fr")
+                                        ? "Patientez..."
+                                        : "Wait..."
+                                    : (langUserPhone == "fr")
+                                        ? "CONFIRMER"
+                                        : "CONFIRM",
+                                style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold),
+                              ),
                               onPressed: () {
                                 _desactive
                                     ? null

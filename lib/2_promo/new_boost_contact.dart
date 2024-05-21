@@ -370,19 +370,16 @@ class _RegisterFormState extends State<RegisterForm> {
                       vertical: 13,
                     ),
                   ),
-                  child: _desactive
-                      ? Text(
-                          "Wait...",
-                          style: GoogleFonts.poppins(
-                            color: Colors.white,
-                          ),
-                        )
-                      : Text(
-                          "BOOSTER",
-                          style: GoogleFonts.poppins(
-                            color: Colors.white,
-                          ),
-                        ),
+                  child: Text(
+                    _desactive
+                        ? (langUserPhone == "fr")
+                            ? "Patientez..."
+                            : "Wait..."
+                        : "BOOSTER",
+                    style: GoogleFonts.poppins(
+                      color: Colors.white,
+                    ),
+                  ),
                   onPressed: () {
                     if (!telIsVerified) {
                       warningNoti(
@@ -725,19 +722,18 @@ class _RegisterForm2State extends State<RegisterForm2> {
                     vertical: 13,
                   ),
                 ),
-                child: _desactive2
-                    ? Text(
-                        "Wait...",
-                        style: GoogleFonts.poppins(
-                          color: Colors.white,
-                        ),
-                      )
-                    : Text(
-                        "PAYER & BOOSTER",
-                        style: GoogleFonts.poppins(
-                          color: Colors.white,
-                        ),
-                      ),
+                child: Text(
+                  _desactive2
+                      ? (langUserPhone == "fr")
+                          ? "Patientez..."
+                          : "Wait..."
+                      : (langUserPhone == "fr")
+                          ? "Payer et Booster"
+                          : "Pay and Boost",
+                  style: GoogleFonts.poppins(
+                    color: Colors.white,
+                  ),
+                ),
                 onPressed: () {
                   if (!telIsVerified) {
                     warningNoti(
