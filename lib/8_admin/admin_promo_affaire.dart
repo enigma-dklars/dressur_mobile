@@ -44,12 +44,82 @@ class AdminPromotionListPage extends StatefulWidget {
 class _AdminPromotionListPageState extends State<AdminPromotionListPage> {
   bool _loading = false;
   List<Promotion> _promotions = [];
+  var motifRefusController = TextEditingController();
 
-  Future<void> refuser(String id) async {
+  void _showModalRefuser(String id, BuildContext context) async {
+    setState(() {
+      motifRefusController.text = "";
+    });
+
+    showModalBottomSheet(
+      context: context,
+      elevation: 5,
+      isScrollControlled: true,
+      builder: (BuildContext context) {
+        return Padding(
+          padding: EdgeInsets.only(
+            top: 15,
+            left: 15,
+            right: 15,
+            bottom: MediaQuery.of(context).viewInsets.bottom + 15,
+          ),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                const SizedBox(height: 20),
+                Text(
+                  "Motif Refus",
+                  style: GoogleFonts.poppins(
+                    fontWeight: FontWeight.w400,
+                    fontSize: 16,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                TextField(
+                  controller: motifRefusController,
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 55,
+                      vertical: 13,
+                    ),
+                  ),
+                  onPressed: () async {
+                    _loading ? null : refuser(id, motifRefusController.text);
+                  },
+                  child: Text(
+                    "Envoyer",
+                    style: GoogleFonts.poppins(
+                      fontWeight: FontWeight.w400,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+                const SizedBox(
+                    height: 10), // Added bottom padding to avoid overlap
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> refuser(String id, String motif) async {
+    print(motif);
     setState(() {
       _loading = true;
     });
-    final url = Uri.parse('$generalRouteForApi/adminListPromotion/refuser/$id');
+    final url =
+        Uri.parse('$generalRouteForApi/adminListPromotion/refuser/$id/$motif');
 
     try {
       final response = await http.get(url);
@@ -57,6 +127,7 @@ class _AdminPromotionListPageState extends State<AdminPromotionListPage> {
         setState(() {
           _promotions.removeWhere((promotion) => promotion.id == id);
           _loading = false;
+          Navigator.of(context).pop();
         });
       } else {
         showErrorDialog(response.statusCode);
@@ -326,7 +397,7 @@ class _AdminPromotionListPageState extends State<AdminPromotionListPage> {
                       size: 13,
                     ),
                     onPressed: () {
-                      refuser(promotion.id);
+                      _showModalRefuser(promotion.id, context);
                     },
                   ),
                 ),
@@ -1047,7 +1118,7 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
               delay: 0, // 1500,
               child: TextField(
                 controller: telController,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: 'Indicatif + Numéro du paiement',
                   border: OutlineInputBorder(),
                 ),

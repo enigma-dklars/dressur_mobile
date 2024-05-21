@@ -50,6 +50,7 @@ class _AdminCampagneMailListePageState
     extends State<AdminCampagneMailListePage> {
   bool _loading = false;
   List<CampagneMail> _campagneMails = [];
+  var motifRefusController = TextEditingController();
 
   @override
   void initState() {
@@ -57,12 +58,79 @@ class _AdminCampagneMailListePageState
     fetchCampagneMails();
   }
 
-  Future<void> refuser(String id) async {
+  void _showModalRefuser(String id, BuildContext context) async {
+    setState(() {
+      motifRefusController.text = "";
+    });
+
+    showModalBottomSheet(
+      context: context,
+      elevation: 5,
+      isScrollControlled: true,
+      builder: (BuildContext context) {
+        return Padding(
+          padding: EdgeInsets.only(
+            top: 15,
+            left: 15,
+            right: 15,
+            bottom: MediaQuery.of(context).viewInsets.bottom + 15,
+          ),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                const SizedBox(height: 20),
+                Text(
+                  "Motif Refus",
+                  style: GoogleFonts.poppins(
+                    fontWeight: FontWeight.w400,
+                    fontSize: 16,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                TextField(
+                  controller: motifRefusController,
+                  decoration: InputDecoration(
+                    border: const OutlineInputBorder(),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 55,
+                      vertical: 13,
+                    ),
+                  ),
+                  onPressed: () async {
+                    _loading ? null : refuser(id, motifRefusController.text);
+                  },
+                  child: Text(
+                    "Envoyer",
+                    style: GoogleFonts.poppins(
+                      fontWeight: FontWeight.w400,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+                const SizedBox(
+                    height: 10), // Added bottom padding to avoid overlap
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> refuser(String id, String motif) async {
     setState(() {
       _loading = true;
     });
-    final url =
-        Uri.parse('$generalRouteForApi/adminListCampagneMail/refuser/$id');
+    final url = Uri.parse(
+        '$generalRouteForApi/adminListCampagneMail/refuser/$id/$motif');
 
     try {
       final response = await http.get(url);
@@ -70,6 +138,7 @@ class _AdminCampagneMailListePageState
         setState(() {
           _campagneMails.removeWhere((campagneMail) => campagneMail.id == id);
           _loading = false;
+          Navigator.of(context).pop();
         });
       } else {
         showErrorDialog(response.statusCode);
@@ -448,7 +517,8 @@ class _AdminCampagneMailListePageState
                                       size: 13,
                                     ),
                                     onPressed: () {
-                                      refuser(campagneMail.id);
+                                      _showModalRefuser(
+                                          campagneMail.id, context);
                                     },
                                   ),
                                 ),

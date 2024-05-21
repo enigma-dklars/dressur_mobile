@@ -21,6 +21,7 @@ class Promotion {
   final String dateExp;
   final String formulePromotion;
   final bool peutPayer;
+  final String motif;
 
   Promotion({
     required this.id,
@@ -33,6 +34,7 @@ class Promotion {
     required this.dateExp,
     required this.formulePromotion,
     required this.peutPayer,
+    required this.motif,
   });
 }
 
@@ -68,6 +70,7 @@ class _PromotionListPageState extends State<PromotionListPage> {
             dateExp: data['dateExp'],
             formulePromotion: data['formulePromotion'],
             peutPayer: data['peutPayer'],
+            motif: data['motif'],
           );
         }).toList();
 
@@ -124,30 +127,63 @@ class _PromotionListPageState extends State<PromotionListPage> {
           children: [
             _buildStatusLabel(promotion.status),
             const SizedBox(height: 5),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Impressions: ${promotion.nombreImpression}',
-                  style: const TextStyle(
-                      fontSize: 14, fontWeight: FontWeight.bold),
+            if ([
+              "Completed",
+              "Terminé",
+              "Accept and in progress",
+              "Accepter et en cours",
+              "Waiting for validation",
+              "En Attente de validation",
+              "Accept and pending payment",
+              "Accepter et en attente de paiement"
+            ].contains(promotion.status)) ...[
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Impressions: ${promotion.nombreImpression}',
+                    style: const TextStyle(
+                        fontSize: 14, fontWeight: FontWeight.bold),
+                  ),
+                  Text(
+                    (langUserPhone == "fr")
+                        ? 'Vues: ${promotion.nombreDeVues}'
+                        : 'Views: ${promotion.nombreDeVues}',
+                    style: const TextStyle(
+                        fontSize: 14, fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 5),
+              Text(
+                promotion.description,
+                style: GoogleFonts.poppins(fontSize: 14),
+                maxLines: 3,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ] else ...[
+              Text(
+                (langUserPhone == "fr")
+                    ? "Motif : ${promotion.motif}"
+                    : "Pattern : ${promotion.motif}",
+                style: const TextStyle(
+                  color: Colors.red,
+                  fontWeight: FontWeight.w500,
+                  fontSize: 16,
                 ),
-                Text(
-                  (langUserPhone == "fr")
-                      ? 'Vues: ${promotion.nombreDeVues}'
-                      : 'Views: ${promotion.nombreDeVues}',
-                  style: const TextStyle(
-                      fontSize: 14, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 5),
+              Text(
+                (langUserPhone == "fr")
+                    ? "Tenez compte du motif de refus pour soumettre une nouvelle demande. Merci..."
+                    : "Take the reason for refusal into account when submitting a new request. THANKS...",
+                style: const TextStyle(
+                  color: Colors.green,
+                  fontWeight: FontWeight.w500,
+                  fontSize: 16,
                 ),
-              ],
-            ),
-            const SizedBox(height: 5),
-            Text(
-              promotion.description,
-              style: GoogleFonts.poppins(fontSize: 14),
-              maxLines: 3,
-              overflow: TextOverflow.ellipsis,
-            ),
+              ),
+            ],
             const SizedBox(height: 5),
             Row(
               mainAxisAlignment: promotion.peutPayer

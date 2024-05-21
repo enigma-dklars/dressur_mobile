@@ -5,6 +5,7 @@ import 'dart:convert' as convert;
 import 'package:dressur/components/delayed_animation.dart';
 import 'package:dressur/components/noti.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:select_form_field/select_form_field.dart';
@@ -24,6 +25,7 @@ class CampagneMail {
   final String status;
   final String createdAt;
   final bool peutPayer;
+  final String motif;
 
   CampagneMail({
     required this.id,
@@ -37,6 +39,7 @@ class CampagneMail {
     required this.status,
     required this.createdAt,
     required this.peutPayer,
+    required this.motif,
   });
 }
 
@@ -79,6 +82,7 @@ class _CampagneMailListePageState extends State<CampagneMailListePage> {
             status: data['status'],
             createdAt: data['createdAt'],
             peutPayer: data['peutPayer'],
+            motif: data['motif'],
           );
         }).toList();
         setState(() {
@@ -253,24 +257,57 @@ class _CampagneMailListePageState extends State<CampagneMailListePage> {
                               ),
                             ),
                             const SizedBox(height: 5),
-                            Text(
-                              campagneMail.sujet,
-                              style: const TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold,
+                            if ([
+                              "Completed",
+                              "Terminé",
+                              "Accept and in progress",
+                              "Accepter et en cours",
+                              "Waiting for validation",
+                              "En Attente de validation",
+                              "Accept and pending payment",
+                              "Accepter et en attente de paiement"
+                            ].contains(campagneMail.status)) ...[
+                              Text(
+                                campagneMail.sujet,
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
                               ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            const SizedBox(height: 5),
-                            Text(
-                              campagneMail.contentmail,
-                              style: const TextStyle(
-                                fontSize: 14,
+                              const SizedBox(height: 5),
+                              Text(
+                                campagneMail.contentmail,
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                ),
+                                maxLines: 3,
+                                overflow: TextOverflow.ellipsis,
                               ),
-                              maxLines: 3,
-                              overflow: TextOverflow.ellipsis,
-                            ),
+                            ] else ...[
+                              Text(
+                                (langUserPhone == "fr")
+                                    ? "Motif : ${campagneMail.motif}"
+                                    : "Pattern : ${campagneMail.motif}",
+                                style: const TextStyle(
+                                  color: Colors.red,
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 16,
+                                ),
+                              ),
+                              const SizedBox(height: 5),
+                              Text(
+                                (langUserPhone == "fr")
+                                    ? "Tenez compte du motif de refus pour soumettre une nouvelle demande. Merci..."
+                                    : "Take the reason for refusal into account when submitting a new request. THANKS...",
+                                style: const TextStyle(
+                                  color: Colors.green,
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 16,
+                                ),
+                              ),
+                            ],
                             const SizedBox(height: 5),
                             Row(
                               mainAxisAlignment: (campagneMail.peutPayer)
