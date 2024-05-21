@@ -1024,6 +1024,34 @@ Future<void> shareMessageWithImage(BuildContext context, String codeBonus,
       text: messageShare, subject: 'Partager Dressur!');
 }
 
+Future<void> sharePromotion(BuildContext context, String imageLink,
+    String imageName, String messageShare) async {
+  messageShare += "\n\n";
+  messageShare +=
+      (langUserPhone == "fr") ? "Depuis Dressur : " : "From Dressur : ";
+  messageShare += dressurUrlPlaystore;
+
+  // Télécharger l'image depuis le lien HTTP
+  final http.Response response = await http.get(Uri.parse(imageLink));
+
+  if (response.statusCode == 200) {
+    // Obtenir le répertoire temporaire
+    final tempDir = await getTemporaryDirectory();
+
+    // Créer un fichier et écrire l'image téléchargée
+    final file = await File('${tempDir.path}/$imageName').create();
+    await file.writeAsBytes(response.bodyBytes);
+
+    // Partager l'image et le message
+    await Share.shareFiles([file.path],
+        text: messageShare, subject: 'Partager Promotion!');
+  } else {
+    // Gérer les erreurs de téléchargement
+    ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Erreur de téléchargement de l\'image')));
+  }
+}
+
 Future<String> shortenUrl(String longUrl) async {
   final url = 'https://tinyurl.com/api-create.php?url=$longUrl';
   final response = await http.get(Uri.parse(url));

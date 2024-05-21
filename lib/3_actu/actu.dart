@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_const_constructors, use_build_context_synchronously, deprecated_member_use
+// ignore_for_file: prefer_const_constructors, use_build_context_synchronously, deprecated_member_use, sort_child_properties_last
 
 import 'dart:async';
 import 'dart:convert';
@@ -9,6 +9,7 @@ import 'package:dressur/components/padding_and_divider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:dressur/5_autre/confirme_mail_user.dart';
 import 'package:dressur/1_reception/liste_notification.dart';
@@ -27,6 +28,7 @@ class Advertisement {
   final String uidUser;
   final int id;
   final String image;
+  final String imageName;
   final String description;
   final String whatsappNumber;
   final String pseudoAnnonceur;
@@ -37,6 +39,7 @@ class Advertisement {
     required this.uidUser,
     required this.id,
     required this.image,
+    required this.imageName,
     required this.description,
     required this.whatsappNumber,
     required this.pseudoAnnonceur,
@@ -197,6 +200,7 @@ class _ActuPageState extends State<ActuPage> {
         return Advertisement(
           uidUser: data['uidUser'],
           id: data['id'],
+          imageName: data['image'],
           image: generalRouteForPromotionImage + data['image'],
           description: data['description'],
           whatsappNumber: data['whatsappNumber'],
@@ -849,23 +853,66 @@ class _ActuPageState extends State<ActuPage> {
                                                       ),
                                                       const SizedBox(height: 5),
                                                       Row(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .spaceBetween,
                                                         children: [
-                                                          const Icon(
-                                                              Icons.visibility),
-                                                          const SizedBox(
-                                                              width: 4),
-                                                          Text(advertisement
-                                                              .nombreImpression
-                                                              .toString()),
-                                                          const SizedBox(
-                                                              width: 16),
-                                                          const Icon(
-                                                              Icons.touch_app),
-                                                          const SizedBox(
-                                                              width: 4),
-                                                          Text(advertisement
-                                                              .nombreDeVues
-                                                              .toString()),
+                                                          Row(
+                                                            children: [
+                                                              const Icon(Icons
+                                                                  .visibility),
+                                                              const SizedBox(
+                                                                  width: 4),
+                                                              Text(advertisement
+                                                                  .nombreImpression
+                                                                  .toString()),
+                                                              const SizedBox(
+                                                                  width: 16),
+                                                              const Icon(Icons
+                                                                  .touch_app),
+                                                              const SizedBox(
+                                                                  width: 4),
+                                                              Text(advertisement
+                                                                  .nombreDeVues
+                                                                  .toString()),
+                                                            ],
+                                                          ),
+                                                          Row(
+                                                            children: [
+                                                              GestureDetector(
+                                                                child: Row(
+                                                                  children: [
+                                                                    Icon(Icons
+                                                                        .share),
+                                                                    const SizedBox(
+                                                                        width:
+                                                                            5),
+                                                                    Text(
+                                                                      (langUserPhone ==
+                                                                              "fr")
+                                                                          ? "Partager"
+                                                                          : "Share",
+                                                                      style: GoogleFonts
+                                                                          .poppins(
+                                                                        fontSize:
+                                                                            15,
+                                                                      ),
+                                                                    ),
+                                                                  ],
+                                                                ),
+                                                                onTap: (() {
+                                                                  sharePromotion(
+                                                                      context,
+                                                                      advertisement
+                                                                          .image,
+                                                                      advertisement
+                                                                          .imageName,
+                                                                      advertisement
+                                                                          .description);
+                                                                }),
+                                                              ),
+                                                            ],
+                                                          ),
                                                         ],
                                                       )
                                                     ],
