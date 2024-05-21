@@ -4,6 +4,7 @@ import 'package:dressur/8_admin/admin_campagne_mail.dart';
 import 'package:dressur/8_admin/admin_liste_user.dart';
 import 'package:dressur/8_admin/admin_num_whatsapp.dart';
 import 'package:dressur/8_admin/admin_promo_affaire.dart';
+import 'package:dressur/components/111_generaleApiDomaine.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -12,6 +13,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
 import 'package:dressur/components/sql_helper.dart';
 import 'package:dressur/components/noti.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class AdministrationPage extends StatefulWidget {
   AdministrationPage({Key? key}) : super(key: key);
@@ -148,7 +150,33 @@ class _AdministrationPageState extends State<AdministrationPage> {
                     backgroundColor: Colors.red,
                     shape: const StadiumBorder(),
                     padding: const EdgeInsets.symmetric(
-                      vertical: 15,
+                      vertical: 13,
+                    ),
+                  ),
+                  child: Text(
+                    "Les valeurs Env",
+                    style: GoogleFonts.poppins(
+                      color: Colors.white,
+                      fontSize: 15,
+                    ),
+                  ),
+                  onPressed: () async {
+                    final Uri _url =
+                        Uri.parse("$generalApiDomaine/admin/interface");
+                    if (!await launchUrl(_url, mode: LaunchMode.inAppWebView)) {
+                      throw 'Could not launch $_url';
+                    }
+                  },
+                ),
+              ),
+              const SizedBox(height: 5),
+              GestureDetector(
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red,
+                    shape: const StadiumBorder(),
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 13,
                     ),
                   ),
                   child: Text(
