@@ -148,9 +148,7 @@ class _PageDepartState extends State<PageDepart> {
     });
 
     var request = http.MultipartRequest(
-        'POST',
-        Uri.parse(
-            '$generalRouteForApi/getUserInfo/$uidAutreUser/$langUserPhone'));
+        'POST', Uri.parse('$generalRouteForApi/getUserInfo'));
     request.fields
         .addAll({'uid': uidUser, 'langUserPhone': langUserPhone.toString()});
 

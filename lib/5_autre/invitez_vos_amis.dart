@@ -305,9 +305,7 @@ class _AddFriendPageState extends State<AddFriendPage> {
         _loading = true;
       });
       var request = http.MultipartRequest(
-          'POST',
-          Uri.parse(
-              '$generalRouteForApi/getUserInfo/$uidAutreUser/$langUserPhone'));
+          'POST', Uri.parse('$generalRouteForApi/getUserInfo'));
       request.fields
           .addAll({'uid': uidUser, 'langUserPhone': langUserPhone.toString()});
 

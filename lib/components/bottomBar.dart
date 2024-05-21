@@ -47,6 +47,27 @@ class _BottomBarState extends State<BottomBar> {
     Timer.periodic(const Duration(hours: 2), (timer) {
       fetchContactDSs();
     });
+
+    // si le user est un admin, il sera notifier des traitement en attente de validation
+    if (admin) {
+      traitementAdmin();
+      Timer.periodic(const Duration(minutes: 30), (timer) async {
+        await traitementAdmin();
+      });
+    }
+  }
+
+  Future<void> traitementAdmin() async {
+    final url = Uri.parse('$generalRouteForApi/traitementAdmin');
+    final response = await http.get(url);
+    if (response.statusCode == 200) {
+      final jsonData = jsonDecode(response.body) as List<dynamic>;
+      if (jsonData.isNotEmpty) {
+        for (var element in jsonData) {
+          showNotification(element, "Dressur Admin Traitement");
+        }
+      }
+    }
   }
 
   void synchroAvanceFunction() async {

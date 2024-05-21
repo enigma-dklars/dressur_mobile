@@ -45,9 +45,7 @@ class _AutreProfilPageState extends State<AutreProfilPage> {
       youHaveNetWork = await SQLHelper.getYouHaveConnexion();
     }
     var request = http.MultipartRequest(
-        'POST',
-        Uri.parse(
-            '$generalRouteForApi/getUserInfo/$uidAutreUser/$langUserPhone'));
+        'POST', Uri.parse('$generalRouteForApi/getUserInfo'));
     request.fields.addAll(
         {'uid': uidAutreUser, 'langUserPhone': langUserPhone.toString()});
 
