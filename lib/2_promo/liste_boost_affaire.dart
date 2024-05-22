@@ -568,8 +568,15 @@ class _PaymentGratuitPageState extends State<PaymentGratuitPage> {
           if (data["error"] == false) {
             setState(() {
               _desactive = false;
-              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                content: Text('Votre Promo a déja démarer.'),
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                backgroundColor: Colors.red,
+                behavior: SnackBarBehavior.floating,
+                content: Text(
+                  'Votre Promo a déja démarer.',
+                  style: GoogleFonts.poppins(
+                    color: Colors.white,
+                  ),
+                ),
               ));
             });
           } else {

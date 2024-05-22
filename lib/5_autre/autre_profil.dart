@@ -139,8 +139,9 @@ class _AutreProfilPageState extends State<AutreProfilPage> {
       } else {
         insertContact(tel, pseudo);
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          behavior: SnackBarBehavior.floating,
           backgroundColor: Colors.green,
+          behavior: SnackBarBehavior.floating,
+          duration: const Duration(seconds: 5),
           padding: const EdgeInsets.fromLTRB(5, 20, 5, 20),
           content: Text(
             (langUserPhone == "fr")
@@ -153,7 +154,6 @@ class _AutreProfilPageState extends State<AutreProfilPage> {
             ),
             textAlign: TextAlign.center,
           ),
-          duration: const Duration(milliseconds: 5000),
         ));
       }
     }

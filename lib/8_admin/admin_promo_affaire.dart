@@ -725,8 +725,15 @@ class _PaymentGratuitPageState extends State<PaymentGratuitPage> {
           if (data["error"] == false) {
             setState(() {
               _desactive = false;
-              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                content: Text('Votre Promo a déja démarer.'),
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                backgroundColor: Colors.green,
+                behavior: SnackBarBehavior.floating,
+                content: Text(
+                  'Votre Promo a déja démarer.',
+                  style: GoogleFonts.poppins(
+                    color: Colors.white,
+                  ),
+                ),
               ));
             });
           } else {
@@ -846,9 +853,11 @@ class _PaymentGratuitPageState extends State<PaymentGratuitPage> {
                       ),
                     ),
                     child: Text(
-                      _desactive ? (langUserPhone == "fr")
-                            ? "Patientez..."
-                            : "Wait..." : "BOOSTER",
+                      _desactive
+                          ? (langUserPhone == "fr")
+                              ? "Patientez..."
+                              : "Wait..."
+                          : "BOOSTER",
                       style: GoogleFonts.poppins(
                         color: Colors.white,
                       ),

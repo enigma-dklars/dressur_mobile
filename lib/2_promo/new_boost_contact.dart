@@ -258,10 +258,14 @@ class _RegisterFormState extends State<RegisterForm> {
             setState(() {
               _desactive = false;
               ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                duration: const Duration(seconds: 15),
+                backgroundColor: Colors.green,
                 behavior: SnackBarBehavior.floating,
+                duration: const Duration(seconds: 15),
                 content: Text(
                   data["message"],
+                  style: GoogleFonts.poppins(
+                    color: Colors.white,
+                  ),
                 ),
               ));
               Navigator.pop(context);

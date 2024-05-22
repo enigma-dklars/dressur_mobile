@@ -256,12 +256,16 @@ class _RegisterForm2State extends State<RegisterForm2> {
             setState(() {
               _desactive2 = false;
               ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                duration: const Duration(seconds: 15),
+                backgroundColor: Colors.green,
                 behavior: SnackBarBehavior.floating,
+                duration: const Duration(seconds: 15),
                 content: Text(
                   (langUserPhone == "fr")
                       ? 'Votre campagne a été enregistrée, vous passerez au paiement si elle est acceptée.'
                       : 'Your campaign has been saved, you will proceed to payment if it is accepted.',
+                  style: GoogleFonts.poppins(
+                    color: Colors.white,
+                  ),
                 ),
               ));
               Navigator.pop(context);

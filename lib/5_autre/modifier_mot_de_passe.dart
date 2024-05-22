@@ -150,10 +150,16 @@ class _RegisterFormState extends State<RegisterForm> {
             passwordController.text = "";
             passwordVerifController.text = "";
             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      behavior: SnackBarBehavior.floating,
-              content: Text((langUserPhone == "fr")
-                  ? 'Mot de passe modifié avec succès.'
-                  : 'Password changed successfully.'),
+              backgroundColor: Colors.green,
+              behavior: SnackBarBehavior.floating,
+              content: Text(
+                (langUserPhone == "fr")
+                    ? 'Mot de passe modifié avec succès.'
+                    : 'Password changed successfully.',
+                style: GoogleFonts.poppins(
+                  color: Colors.white,
+                ),
+              ),
             ));
           });
         }
@@ -352,8 +358,8 @@ class _RegisterFormState extends State<RegisterForm> {
                 child: Text(
                   _desactive
                       ? (langUserPhone == "fr")
-                            ? "Patientez..."
-                            : "Wait..."
+                          ? "Patientez..."
+                          : "Wait..."
                       : (langUserPhone == "fr")
                           ? "MODIFIER"
                           : "EDIT",
@@ -390,8 +396,8 @@ class _RegisterFormState extends State<RegisterForm> {
                 child: Text(
                   _desactivePasseForgetButton
                       ? (langUserPhone == "fr")
-                            ? "Patientez..."
-                            : "Wait..."
+                          ? "Patientez..."
+                          : "Wait..."
                       : (langUserPhone == "fr")
                           ? "Mot de passe oublié ?"
                           : "Forgot your password ?",

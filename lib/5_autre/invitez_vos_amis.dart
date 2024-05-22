@@ -59,8 +59,15 @@ class _AddFriendPageState extends State<AddFriendPage> {
             _loading = false;
             initUserInformations(data['user']);
             Navigator.of(context).pop();
-            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-              content: Text('Code Promo Accepter'),
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              backgroundColor: Colors.green,
+              behavior: SnackBarBehavior.floating,
+              content: Text(
+                'Code Promo Accepter',
+                style: GoogleFonts.poppins(
+                  color: Colors.white,
+                ),
+              ),
             ));
           });
         }
@@ -333,11 +340,15 @@ class _AddFriendPageState extends State<AddFriendPage> {
       });
     }
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      backgroundColor: Colors.green,
       behavior: SnackBarBehavior.floating,
       content: Text(
         (langUserPhone == "fr")
             ? 'Actualisation terminer.'
             : 'Refresh complete.',
+        style: GoogleFonts.poppins(
+          color: Colors.white,
+        ),
       ),
     ));
   }

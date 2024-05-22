@@ -137,11 +137,17 @@ class _ListeContactAAddPageState extends State<ListeContactAAddPage> {
       } else {
         insertContact(contact);
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          backgroundColor: Colors.green,
           behavior: SnackBarBehavior.floating,
-          content: Text((langUserPhone == "fr")
-              ? 'ADD ${contact.pseudo} avec succès.'
-              : 'ADD ${contact.pseudo} successfully.'),
-          duration: const Duration(milliseconds: 500),
+          duration: const Duration(seconds: 2),
+          content: Text(
+            (langUserPhone == "fr")
+                ? 'ADD ${contact.pseudo} avec succès.'
+                : 'ADD ${contact.pseudo} successfully.',
+            style: GoogleFonts.poppins(
+              color: Colors.white,
+            ),
+          ),
         ));
       }
     }

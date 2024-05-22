@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show ByteData, Uint8List, rootBundle;
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:dressur/components/sql_helper.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -1047,8 +1048,15 @@ Future<void> sharePromotion(BuildContext context, String imageLink,
         text: messageShare, subject: 'Partager Promotion!');
   } else {
     // Gérer les erreurs de téléchargement
-    ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erreur de téléchargement de l\'image')));
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: Colors.red,
+        behavior: SnackBarBehavior.floating,
+        content: Text(
+          'Erreur de téléchargement de l\'image',
+          style: GoogleFonts.poppins(
+            color: Colors.white,
+          ),
+        )));
   }
 }
 

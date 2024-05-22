@@ -332,11 +332,17 @@ class _ActuPageState extends State<ActuPage> {
         nombreContactDispo = nombreContactDispo - nombreAddNow;
       });
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: Colors.green,
         behavior: SnackBarBehavior.floating,
-        content: (langUserPhone == "fr")
-            ? Text('ADD de $nombreAddNow contact(s) avec succès.')
-            : Text('ADD of $nombreAddNow contacts successfully.'),
-        duration: const Duration(milliseconds: 15000),
+        duration: const Duration(seconds: 15),
+        content: Text(
+          (langUserPhone == "fr")
+              ? 'ADD de $nombreAddNow contact(s) avec succès.'
+              : 'ADD of $nombreAddNow contacts successfully.',
+          style: GoogleFonts.poppins(
+            color: Colors.white,
+          ),
+        ),
       ));
     }
   }
