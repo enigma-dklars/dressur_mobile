@@ -44,11 +44,6 @@ const databaseSqlCode = """
     id INTEGER,
     uid TEXT,
     contactTel TEXT,
-    titreBonus TEXT,
-    value TEXT,
-    label TEXT,
-    prix TEXT,
-    jours TEXT,
     youHaveConnexion TEXT
   )
 """;
