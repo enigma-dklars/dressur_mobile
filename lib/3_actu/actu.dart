@@ -140,12 +140,7 @@ class _ActuPageState extends State<ActuPage> {
     setState(() {
       _loading = true;
     });
-    dynamic youHaveNetWork = "";
-    youHaveConnexion();
-    youHaveNetWork = await SQLHelper.getYouHaveConnexion();
-    while (youHaveNetWork.length == 0) {
-      youHaveNetWork = await SQLHelper.getYouHaveConnexion();
-    }
+
     var request = http.MultipartRequest(
         'POST', Uri.parse('$generalRouteForApi/getUserInfo'));
     request.fields

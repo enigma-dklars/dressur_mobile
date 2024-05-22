@@ -43,8 +43,7 @@ const databaseSqlCode = """
     tableName TEXT,
     id INTEGER,
     uid TEXT,
-    contactTel TEXT,
-    youHaveConnexion TEXT
+    contactTel TEXT
   )
 """;
 
@@ -85,37 +84,16 @@ var instagram;
 var facebook;
 var youtube;
 
-void youHaveConnexion() async {
-  SQLHelper.delete('youHaveConnexion');
-  SQLHelper.insert({
-    'tableName': "youHaveConnexion",
-    'youHaveConnexion': "oui",
-  });
-  // try {
-  //   final result = await InternetAddress.lookup("google.com");
-  //   if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
-  //     // oui
-  //     SQLHelper.delete('youHaveConnexion');
-  //     SQLHelper.insert({
-  //       'tableName': "youHaveConnexion",
-  //       'youHaveConnexion': "oui",
-  //     });
-  //   } else {
-  //     // non
-  //     SQLHelper.delete('youHaveConnexion');
-  //     SQLHelper.insert({
-  //       'tableName': "youHaveConnexion",
-  //       'youHaveConnexion': "non",
-  //     });
-  //   }
-  // } on SocketException catch (_) {
-  //   // non
-  //   SQLHelper.delete('youHaveConnexion');
-  //   SQLHelper.insert({
-  //     'tableName': "youHaveConnexion",
-  //     'youHaveConnexion': "non",
-  //   });
-  // }
+Future<bool> isConnectedToInternet() async {
+  try {
+    final result = await InternetAddress.lookup('google.com');
+    if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
+      return true;
+    }
+  } catch (e) {
+    return false;
+  }
+  return false;
 }
 
 Future<void> insertNumTelUserIntoDataBase(numberTel) async {

@@ -8,7 +8,6 @@ import 'package:dressur/components/delayed_animation.dart';
 import 'package:dressur/components/constant.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
-import 'package:dressur/components/sql_helper.dart';
 import 'package:dressur/components/noti.dart';
 
 class CodeMailConfirmePage extends StatelessWidget {
@@ -106,13 +105,8 @@ class _ConfirmeFormeState extends State<ConfirmeForme> {
   var data;
   final _codeMailVerifyController = TextEditingController();
   void sendMail() async {
-    dynamic youHaveNetWork = "";
-    youHaveConnexion();
-    youHaveNetWork = await SQLHelper.getYouHaveConnexion();
-    while (youHaveNetWork.length == 0) {
-      youHaveNetWork = await SQLHelper.getYouHaveConnexion();
-    }
-    if (youHaveNetWork[0]['youHaveConnexion'] == "oui") {
+    bool isConnected = await isConnectedToInternet();
+    if (isConnected) {
       setState(() {
         _desactive = true;
       });
@@ -176,13 +170,8 @@ class _ConfirmeFormeState extends State<ConfirmeForme> {
   }
 
   void codeVerif(String codeForVerifMail) async {
-    dynamic youHaveNetWork = "";
-    youHaveConnexion();
-    youHaveNetWork = await SQLHelper.getYouHaveConnexion();
-    while (youHaveNetWork.length == 0) {
-      youHaveNetWork = await SQLHelper.getYouHaveConnexion();
-    }
-    if (youHaveNetWork[0]['youHaveConnexion'] == "oui") {
+    bool isConnected = await isConnectedToInternet();
+    if (isConnected) {
       setState(() {
         _desactive = true;
       });

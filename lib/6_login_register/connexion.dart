@@ -3,7 +3,6 @@
 import 'package:flutter/material.dart';
 import 'package:dressur/6_login_register/mot_de_passe_oublier.dart';
 import 'package:dressur/components/constant.dart';
-import 'package:dressur/components/sql_helper.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
 import 'package:dressur/components/noti.dart';
@@ -75,13 +74,8 @@ class _LoginFormState extends State<LoginForm> {
 
   //HTTP REQUEST
   void loginIn(String email, String pass) async {
-    dynamic youHaveNetWork = "";
-    youHaveConnexion();
-    youHaveNetWork = await SQLHelper.getYouHaveConnexion();
-    while (youHaveNetWork.length == 0) {
-      youHaveNetWork = await SQLHelper.getYouHaveConnexion();
-    }
-    if (youHaveNetWork[0]['youHaveConnexion'] == "oui") {
+    bool isConnected = await isConnectedToInternet();
+    if (isConnected) {
       setState(() {
         _desactive = true;
       });

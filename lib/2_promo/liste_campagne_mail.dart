@@ -11,7 +11,6 @@ import 'package:http/http.dart' as http;
 import 'package:select_form_field/select_form_field.dart';
 import 'package:dressur/5_autre/support_assistance.dart';
 import 'package:dressur/components/constant.dart';
-import 'package:dressur/components/sql_helper.dart';
 
 class CampagneMail {
   final String id;
@@ -546,13 +545,8 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
 
   void newCampageMailPayant() async {
     if (telIsVerified == true) {
-      dynamic youHaveNetWork = "";
-      youHaveConnexion();
-      youHaveNetWork = await SQLHelper.getYouHaveConnexion();
-      while (youHaveNetWork.length == 0) {
-        youHaveNetWork = await SQLHelper.getYouHaveConnexion();
-      }
-      if (youHaveNetWork[0]['youHaveConnexion'] == "oui") {
+      bool isConnected = await isConnectedToInternet();
+      if (isConnected) {
         setState(() {
           _desactive2 = true;
         });

@@ -8,7 +8,6 @@ import 'package:dressur/components/delayed_animation.dart';
 import 'package:dressur/components/constant.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
-import 'package:dressur/components/sql_helper.dart';
 import 'package:dressur/components/noti.dart';
 import 'package:select_form_field/select_form_field.dart';
 
@@ -174,13 +173,8 @@ class _RegisterForm3State extends State<RegisterForm3> {
   }
 
   void listeFormPromoReseau() async {
-    dynamic youHaveNetWork = "";
-    youHaveConnexion();
-    youHaveNetWork = await SQLHelper.getYouHaveConnexion();
-    while (youHaveNetWork.length == 0) {
-      youHaveNetWork = await SQLHelper.getYouHaveConnexion();
-    }
-    if (youHaveNetWork[0]['youHaveConnexion'] == "oui") {
+    bool isConnected = await isConnectedToInternet();
+    if (isConnected) {
       setState(() {
         _loading_liste_formule = true;
       });
@@ -220,13 +214,9 @@ class _RegisterForm3State extends State<RegisterForm3> {
     setState(() {
       _desactive3 = true;
     });
-    dynamic youHaveNetWork = "";
-    youHaveConnexion();
-    youHaveNetWork = await SQLHelper.getYouHaveConnexion();
-    while (youHaveNetWork.length == 0) {
-      youHaveNetWork = await SQLHelper.getYouHaveConnexion();
-    }
-    if (youHaveNetWork[0]['youHaveConnexion'] == "oui") {
+
+    bool isConnected = await isConnectedToInternet();
+    if (isConnected) {
       var request = http.MultipartRequest(
           'POST', Uri.parse('$generalRouteForApi/newPromoReseau'));
       request.fields.addAll({
@@ -282,13 +272,8 @@ class _RegisterForm3State extends State<RegisterForm3> {
 
   void checkTransaction(idTransaction) async {
     if (telIsVerified == true) {
-      dynamic youHaveNetWork = "";
-      youHaveConnexion();
-      youHaveNetWork = await SQLHelper.getYouHaveConnexion();
-      while (youHaveNetWork.length == 0) {
-        youHaveNetWork = await SQLHelper.getYouHaveConnexion();
-      }
-      if (youHaveNetWork[0]['youHaveConnexion'] == "oui") {
+      bool isConnected = await isConnectedToInternet();
+      if (isConnected) {
         setState(() {
           _desactive3 = true;
         });
