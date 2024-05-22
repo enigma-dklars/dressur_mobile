@@ -47,6 +47,7 @@ const databaseSqlCode = """
   )
 """;
 
+List<dynamic> userChatInfo = [];
 List<dynamic> contactsUserBeforeDS = [];
 List<dynamic> contactsEnregistrer = [];
 String? langUserPhone = "en";
