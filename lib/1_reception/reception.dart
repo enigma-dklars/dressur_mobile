@@ -1,9 +1,8 @@
 import 'dart:io';
 import 'dart:async';
 import 'package:dressur/1_reception/liste_contact.dart';
+import 'package:dressur/1_reception/liste_contact_message.dart';
 import 'package:dressur/components/padding_and_divider.dart';
-import 'package:dressur/components/pub_smt_2024.dart';
-import 'package:dressur/components/sociaux.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -133,7 +132,6 @@ class _ReceptionPageState extends State<ReceptionPage> {
           child: Column(
             children: [
               const SizedBox(height: 5),
-              SpecialPub(),
               GestureDetector(
                 onTap: () {
                   Navigator.push(
@@ -278,9 +276,24 @@ class _ReceptionPageState extends State<ReceptionPage> {
               ),
               DressurDivider(),
               const SizedBox(height: 5),
-              SociauxPage(),
               const SizedBox(height: 5),
             ],
+          ),
+        ),
+        floatingActionButton: FloatingActionButton(
+          backgroundColor: primaryColor,
+          tooltip: (langUserPhone == "fr")
+              ? "Nouvelle discussion"
+              : "New discussion",
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => ContactForMessagePage()),
+            );
+          },
+          child: const Icon(
+            Icons.chat,
+            color: Colors.white,
           ),
         ),
       ),
