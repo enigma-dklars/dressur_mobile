@@ -1,7 +1,9 @@
 import 'package:dressur/5_autre/autre_profil.dart';
 import 'package:dressur/components/constant.dart';
+import 'package:dressur/components/sql_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 
 class ChatPage extends StatelessWidget {
   @override
@@ -17,16 +19,7 @@ class ChatScreen extends StatefulWidget {
 
 class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
   final TextEditingController _messageController = TextEditingController();
-  final List<String> _messages = [
-    "Bonjour!",
-    "Comment ça va?",
-    "Ça va bien, merci!",
-    "Que fais-tu?",
-    "Vous cherchez des solutions informatiques innovantes? Vous êtes passionné par la technologie et le numérique? Ou peut-être êtes-vous à la recherche d'une opportunité pour développer vos compétences dans le domaine de l'informatique? Ne cherchez plus, BLUE LIFE TECH est là pour répondre à tous vos besoins!",
-    "💼 Nos Services 💼\nConception de Sites Web 🌐\nDéveloppement d'Applications Mobiles 📱\nMaintenance Informatique 💻\nGénie Logiciel 🧠\nRéseaux Informatiques & Sécurité 🔒\nGraphisme & Communication 🎨\nÉlectricité & Énergie ⚡",
-    "💼 Nos Services 💼\nConception de Sites Web 🌐\nDéveloppement d'Applications Mobiles 📱\nMaintenance Informatique 💻\nGénie Logiciel 🧠\nRéseaux Informatiques & Sécurité 🔒\nGraphisme & Communication 🎨\nÉlectricité & Énergie ⚡",
-    "Vous cherchez des solutions informatiques innovantes? Vous êtes passionné par la technologie et le numérique? Ou peut-être êtes-vous à la recherche d'une opportunité pour développer vos compétences dans le domaine de l'informatique? Ne cherchez plus, BLUE LIFE TECH est là pour répondre à tous vos besoins!",
-  ];
+  final List<Map<String, dynamic>> _messages = [];
   final ScrollController _scrollController = ScrollController();
 
   @override
@@ -34,6 +27,7 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
+    _loadMessages();
   }
 
   @override
@@ -49,10 +43,38 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
     WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
   }
 
-  void _sendMessage() {
+  Future<void> _loadMessages() async {
+    final List<Map<String, dynamic>> messages =
+        await SQLHelper.getAllMessages(uidUser, userChatInfo[0]);
+    setState(() {
+      _messages.addAll(messages);
+    });
+    _scrollToBottom();
+  }
+
+  Future<void> _sendMessage() async {
     if (_messageController.text.isNotEmpty) {
+      DateTime now = DateTime.now();
+      DateFormat formatter = DateFormat('dd/MM/yyyy HH:mm');
+      if ((await SQLHelper.getOneDiscussion(userChatInfo[0])).isEmpty) {
+        SQLHelper.insert("discussion", {
+          'uid': userChatInfo[0],
+          'nom': userChatInfo[2],
+        });
+      }
+      SQLHelper.insert("message", {
+        'emetteur': uidUser,
+        'recepteur': userChatInfo[0],
+        'message': _messageController.text,
+        'dateEnvoi': formatter.format(now),
+        'vue': "oui",
+      });
       setState(() {
-        _messages.add(_messageController.text);
+        _messages.insert(0, {
+          'emetteur': uidUser,
+          'message': _messageController.text,
+          'dateEnvoi': formatter.format(now),
+        });
         _messageController.clear();
       });
       _scrollToBottom();
@@ -61,8 +83,8 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
 
   void _scrollToBottom() {
     _scrollController.animateTo(
-      _scrollController.position.maxScrollExtent,
-      duration: const Duration(milliseconds: 1),
+      _scrollController.position.minScrollExtent,
+      duration: const Duration(milliseconds: 300),
       curve: Curves.easeOut,
     );
   }
@@ -112,31 +134,35 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
         children: [
           Expanded(
             child: ListView.builder(
+              reverse: true,
               controller: _scrollController,
               padding: const EdgeInsets.all(8.0),
               itemCount: _messages.length,
               itemBuilder: (context, index) {
+                final message = _messages[index];
                 return Align(
-                  alignment: index % 2 == 0
-                      ? Alignment.centerLeft
-                      : Alignment.centerRight,
+                  alignment: message['emetteur'] == uidUser
+                      ? Alignment.centerRight
+                      : Alignment.centerLeft,
                   child: Container(
                     margin: const EdgeInsets.symmetric(vertical: 5.0),
                     padding: const EdgeInsets.all(10.0),
                     decoration: BoxDecoration(
-                      color: index % 2 == 0
-                          ? Colors.grey[200]
-                          : Colors.indigoAccent[200],
+                      color: message['emetteur'] == uidUser
+                          ? Colors.indigoAccent[200]
+                          : Colors.grey[200],
                       borderRadius: BorderRadius.circular(10.0),
                     ),
                     constraints: BoxConstraints(
                       maxWidth: MediaQuery.of(context).size.width * 0.8,
                     ),
                     child: Text(
-                      _messages[index],
+                      message['message'],
                       style: GoogleFonts.poppins(
                         fontSize: 16.0,
-                        color: index % 2 == 0 ? Colors.black : Colors.white,
+                        color: message['emetteur'] == uidUser
+                            ? Colors.white
+                            : Colors.black,
                       ),
                     ),
                   ),

@@ -4,7 +4,9 @@ import 'package:sqflite/sqflite.dart' as sql;
 
 class SQLHelper {
   static Future<void> createTables(sql.Database database) async {
-    await database.execute(databaseSqlCode);
+    await database.execute(createUserInfosTable);
+    await database.execute(createDiscussionTable);
+    await database.execute(createMessageTable);
   }
 
   static Future<sql.Database> dbOLD() async {
@@ -27,11 +29,34 @@ class SQLHelper {
     );
   }
 
-  static Future<int> insert(var data) async {
+  static Future<int> insert(var tableName, var data) async {
     final db = await SQLHelper.db();
-    final result = await db.insert("userInfos", data,
+    final result = await db.insert(tableName, data,
         conflictAlgorithm: sql.ConflictAlgorithm.replace);
     return result;
+  }
+
+  static Future<List<Map<String, dynamic>>> getOneDiscussion(var uid) async {
+    final db = await SQLHelper.db();
+    return db.query(
+      "discussion",
+      where: "uid = ?",
+      whereArgs: [uid],
+      orderBy: "id",
+      limit: 1,
+    );
+  }
+
+  static Future<List<Map<String, dynamic>>> getAllMessages(
+      String uid, String uid2) async {
+    final db = await SQLHelper.db();
+    return db.query(
+      "message",
+      where:
+          "(emetteur = ? AND recepteur = ?) OR (emetteur = ? AND recepteur = ?)",
+      whereArgs: [uid, uid2, uid2, uid],
+      orderBy: "id DESC",
+    );
   }
 
   static Future<void> delete(String tableName) async {
