@@ -99,7 +99,7 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
             'vue': "oui",
           });
           setState(() {
-            _messages.insert(0, {
+            _messages.insert(_messages.length, {
               'emetteur': uidUser,
               'message': _messageController.text,
               'dateEnvoi': formatter.format(now),
@@ -120,11 +120,22 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
   }
 
   void _scrollToBottom() {
-    _scrollController.animateTo(
-      _scrollController.position.minScrollExtent,
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeOut,
-    );
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_scrollController.hasClients) {
+        _scrollController.animateTo(
+          _scrollController.position.maxScrollExtent,
+          duration: const Duration(microseconds: 1),
+          curve: Curves.easeOut,
+        );
+      }
+    });
+    if (_scrollController.hasClients) {
+      _scrollController.animateTo(
+        _scrollController.position.maxScrollExtent,
+        duration: const Duration(milliseconds: 1),
+        curve: Curves.easeOut,
+      );
+    }
   }
 
   @override
@@ -172,7 +183,7 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
         children: [
           Expanded(
             child: ListView.builder(
-              reverse: true,
+              // reverse: true,
               controller: _scrollController,
               padding: const EdgeInsets.all(8.0),
               itemCount: _messages.length,
@@ -180,21 +191,32 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
                 final message = _messages[index];
                 final isCurrentUser = message['emetteur'] == uidUser;
                 var isUnread = message['vue'] == 'non';
+                if (isUnread == true && isFirstUnreadMessage == true) {
+                  isFirstUnreadMessage = false;
+                } else {
+                  isUnread = false;
+                }
                 return Align(
                   alignment: isCurrentUser
                       ? Alignment.centerRight
                       : Alignment.centerLeft,
                   child: Column(
                     children: [
+                      if (isUnread)
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 5.0),
+                          child: Text(
+                            'NON LUE',
+                            style: TextStyle(color: Colors.red),
+                          ),
+                        ),
                       Container(
                         margin: const EdgeInsets.symmetric(vertical: 5.0),
                         padding: const EdgeInsets.all(10.0),
                         decoration: BoxDecoration(
-                          color: isUnread
-                              ? Colors.green[400]
-                              : isCurrentUser
-                                  ? Colors.indigoAccent[200]
-                                  : Colors.grey[200],
+                          color: isCurrentUser
+                              ? Colors.indigoAccent[200]
+                              : Colors.grey[200],
                           borderRadius: BorderRadius.circular(10.0),
                         ),
                         constraints: BoxConstraints(

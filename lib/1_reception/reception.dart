@@ -168,9 +168,12 @@ class _ReceptionPageState extends State<ReceptionPage> {
       }
     }
 
-    setState(() {
-      _discussions = updatedDiscussions;
-    });
+    // Vérifier si le widget est toujours monté avant d'appeler setState
+    if (mounted) {
+      setState(() {
+        _discussions = updatedDiscussions;
+      });
+    }
   }
 
   @override

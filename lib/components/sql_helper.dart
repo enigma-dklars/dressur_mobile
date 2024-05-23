@@ -100,11 +100,23 @@ class SQLHelper {
     final unreadMessagesQuery = await db.query(
       "message",
       where:
-          "(emetteur = ? AND recepteur = ?) OR (emetteur = ? AND recepteur = ?) AND vue = ?",
+          "((emetteur = ? AND recepteur = ?) OR (emetteur = ? AND recepteur = ?)) AND vue = ?",
       whereArgs: [uid, uid2, uid2, uid, "non"],
     );
 
     return [lastMessage, ...unreadMessagesQuery];
+  }
+
+  static Future<void> markAllMessagesAsRead(
+      String uidUser, String uidOtherUser) async {
+    final db = await SQLHelper.db();
+    await db.update(
+      'message',
+      {'vue': 'oui'},
+      where:
+          "(emetteur = ? AND recepteur = ?) OR (emetteur = ? AND recepteur = ?)",
+      whereArgs: [uidUser, uidOtherUser, uidOtherUser, uidUser],
+    );
   }
 
   static Future<void> delete(String tableName) async {
