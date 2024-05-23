@@ -12,8 +12,8 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:http/http.dart' as http;
 
 const versionApp = '1.0.0';
-const oldDatabaseName = 'cinq_dressur.db';
-const nowDataBaseName = 'sixe_dressur.db';
+const oldDatabaseName = 'sixe_dressur.db';
+const nowDataBaseName = 'huit_dressur.db';
 bool modeReconnaissanceContactArrierePlan = false;
 // const generalApiDomaine = 'http://dressur.rf.gd/public';
 const generalRouteForApi = '$generalApiDomaine/api';
@@ -51,7 +51,8 @@ const String createDiscussionTable = """
     CREATE TABLE discussion(
       id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
       uid TEXT,
-      nom TEXT
+      nom TEXT,
+      date INTEGER
     );
   """;
 

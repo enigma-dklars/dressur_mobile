@@ -62,6 +62,9 @@ class _ReceptionPageState extends State<ReceptionPage> {
   void initState() {
     super.initState();
     _loadDiscussions();
+    Timer.periodic(const Duration(seconds: 1), (timer) {
+      _loadDiscussions();
+    });
   }
 
   Future<void> _loadDiscussions() async {
@@ -90,15 +93,10 @@ class _ReceptionPageState extends State<ReceptionPage> {
           ),
           actions: [
             IconButton(
-              icon: const Icon(Icons.notifications),
+              icon: const Icon(Icons.refresh),
               color: Colors.white,
               onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => ListeNotification(),
-                  ),
-                );
+                _loadDiscussions();
               },
             ),
             const Padding(

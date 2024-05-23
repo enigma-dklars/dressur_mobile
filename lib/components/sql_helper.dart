@@ -61,8 +61,24 @@ class SQLHelper {
 
   static Future<List<Map<String, dynamic>>> getAllDiscussions() async {
     final db = await SQLHelper.db();
-    return db.query("discussion", orderBy: "id DESC");
+    return db.query("discussion", orderBy: "date DESC");
   }
+
+  static Future<int> updateDiscussionDate(var uid, int newDate) async {
+    final db = await SQLHelper.db();
+    final data = {'date': newDate};
+    return db.update(
+      'discussion',
+      data,
+      where: 'uid = ?',
+      whereArgs: [uid],
+      conflictAlgorithm: sql.ConflictAlgorithm.replace,
+    );
+  }
+
+
+
+
 
   static Future<void> delete(String tableName) async {
     final db = await SQLHelper.db();

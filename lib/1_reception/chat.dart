@@ -1,9 +1,12 @@
 import 'package:dressur/5_autre/autre_profil.dart';
 import 'package:dressur/components/constant.dart';
+import 'package:dressur/components/noti.dart';
 import 'package:dressur/components/sql_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'dart:convert' as convert;
+import 'package:http/http.dart' as http;
 
 class ChatPage extends StatelessWidget {
   @override
@@ -56,28 +59,57 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
     if (_messageController.text.isNotEmpty) {
       DateTime now = DateTime.now();
       DateFormat formatter = DateFormat('dd/MM/yyyy HH:mm');
-      if ((await SQLHelper.getOneDiscussion(userChatInfo[0])).isEmpty) {
-        SQLHelper.insert("discussion", {
-          'uid': userChatInfo[0],
-          'nom': userChatInfo[2],
-        });
-      }
-      SQLHelper.insert("message", {
+
+      var request = http.MultipartRequest(
+          'POST', Uri.parse('$generalRouteForApi/addMessage'));
+      request.fields.addAll({
+        'langUserPhone': langUserPhone.toString(),
         'emetteur': uidUser,
         'recepteur': userChatInfo[0],
         'message': _messageController.text,
-        'dateEnvoi': formatter.format(now),
-        'vue': "oui",
+        'dateEnvoi': now.millisecondsSinceEpoch.toString()
       });
-      setState(() {
-        _messages.insert(0, {
-          'emetteur': uidUser,
-          'message': _messageController.text,
-          'dateEnvoi': formatter.format(now),
-        });
-        _messageController.clear();
-      });
-      _scrollToBottom();
+
+      http.StreamedResponse response = await request.send();
+
+      if (response.statusCode == 200) {
+        var data1 = await response.stream.bytesToString();
+        var data = convert.jsonDecode(data1);
+        if (data["error"] == false) {
+          if ((await SQLHelper.getOneDiscussion(userChatInfo[0])).isEmpty) {
+            SQLHelper.insert("discussion", {
+              'uid': userChatInfo[0],
+              'nom': userChatInfo[2],
+              'date': now.millisecondsSinceEpoch,
+            });
+          }
+          SQLHelper.updateDiscussionDate(
+              userChatInfo[0], now.millisecondsSinceEpoch);
+          SQLHelper.insert("message", {
+            'emetteur': uidUser,
+            'recepteur': userChatInfo[0],
+            'message': _messageController.text,
+            'dateEnvoi': formatter.format(now),
+            'vue': "oui",
+          });
+          setState(() {
+            _messages.insert(0, {
+              'emetteur': uidUser,
+              'message': _messageController.text,
+              'dateEnvoi': formatter.format(now),
+            });
+            _messageController.clear();
+          });
+          _scrollToBottom();
+        } else {
+          dangerNoti(
+              "Error",
+              (langUserPhone == "fr")
+                  ? "Erreur lors de l'envoi du message..."
+                  : "An error happened while sending the message...",
+              context);
+        }
+      }
     }
   }
 
