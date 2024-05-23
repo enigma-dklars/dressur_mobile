@@ -24,9 +24,12 @@ class ReceptionPage extends StatefulWidget {
   State<ReceptionPage> createState() => _ReceptionPageState();
 }
 
-class _ReceptionPageState extends State<ReceptionPage> {
+class _ReceptionPageState extends State<ReceptionPage>
+    with SingleTickerProviderStateMixin {
   List<Map<String, dynamic>> _discussions = [];
   bool _desactive = false;
+  late AnimationController _controller;
+
   Future<bool> _onWillPop() async {
     return (await showDialog(
           context: context,
@@ -66,18 +69,43 @@ class _ReceptionPageState extends State<ReceptionPage> {
   @override
   void initState() {
     super.initState();
+    _controller = AnimationController(
+      duration: const Duration(seconds: 1),
+      vsync: this,
+    );
     _loadDiscussions();
-    getMessageEnAttente();
+    getMessageEnAttente(false);
     Timer.periodic(const Duration(seconds: 1), (timer) {
       _loadDiscussions();
     });
   }
 
-  void getMessageEnAttente() async {
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void getMessageEnAttente(affMessage) async {
+    if (affMessage == true) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: Colors.red,
+        behavior: SnackBarBehavior.floating,
+        content: Text(
+          (langUserPhone == "fr")
+              ? 'Actualisation en cours…'
+              : 'Update in progress…',
+          style: GoogleFonts.poppins(
+            color: Colors.white,
+          ),
+        ),
+      ));
+    }
     bool isConnected = await isConnectedToInternet();
     if (isConnected) {
       setState(() {
         _desactive = true;
+        _controller.repeat();
       });
 
       DateFormat formatter = DateFormat('dd/MM/yyyy HH:mm');
@@ -128,6 +156,7 @@ class _ReceptionPageState extends State<ReceptionPage> {
 
           setState(() {
             _desactive = false;
+            _controller.stop();
           });
         }
       }
@@ -140,7 +169,24 @@ class _ReceptionPageState extends State<ReceptionPage> {
       }
       setState(() {
         _desactive = false;
+        _controller.stop();
       });
+    }
+    if (affMessage == true) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: Colors.green,
+          behavior: SnackBarBehavior.floating,
+          content: Text(
+            (langUserPhone == "fr")
+                ? 'Actualisation terminée.'
+                : 'Refresh complete.',
+            style: GoogleFonts.poppins(
+              color: Colors.white,
+            ),
+          ),
+        ),
+      );
     }
   }
 
@@ -194,10 +240,18 @@ class _ReceptionPageState extends State<ReceptionPage> {
           ),
           actions: [
             IconButton(
-              icon: const Icon(Icons.refresh),
+              icon: _desactive
+                  ? RotationTransition(
+                      turns: Tween(begin: 0.0, end: 1.0).animate(_controller),
+                      child: const Icon(
+                        Icons.refresh,
+                        color: Colors.white,
+                      ),
+                    )
+                  : const Icon(Icons.refresh),
               color: Colors.white,
               onPressed: () {
-                getMessageEnAttente();
+                _desactive ? null : getMessageEnAttente(true);
               },
             ),
             const Padding(
