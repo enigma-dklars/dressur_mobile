@@ -1,10 +1,11 @@
-// ignore_for_file: sort_child_properties_last
+// ignore_for_file: sort_child_properties_last, prefer_const_constructors
 
 import 'dart:io';
 import 'dart:async';
 import 'package:dressur/1_reception/chat.dart';
 import 'package:dressur/1_reception/liste_contact.dart';
 import 'package:dressur/1_reception/liste_contact_message.dart';
+import 'package:dressur/components/noti.dart';
 import 'package:dressur/components/padding_and_divider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -13,6 +14,10 @@ import 'package:dressur/5_autre/support_assistance.dart';
 import 'package:dressur/1_reception/liste_notification.dart';
 import 'package:dressur/components/constant.dart';
 import 'package:dressur/components/sql_helper.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert' as convert;
+
+import 'package:intl/intl.dart';
 
 class ReceptionPage extends StatefulWidget {
   @override
@@ -21,7 +26,7 @@ class ReceptionPage extends StatefulWidget {
 
 class _ReceptionPageState extends State<ReceptionPage> {
   List<Map<String, dynamic>> _discussions = [];
-
+  bool _desactive = false;
   Future<bool> _onWillPop() async {
     return (await showDialog(
           context: context,
@@ -62,17 +67,99 @@ class _ReceptionPageState extends State<ReceptionPage> {
   void initState() {
     super.initState();
     _loadDiscussions();
+    getMessageEnAttente();
     Timer.periodic(const Duration(seconds: 1), (timer) {
       _loadDiscussions();
     });
   }
 
+  void getMessageEnAttente() async {
+    bool isConnected = await isConnectedToInternet();
+    if (isConnected) {
+      setState(() {
+        _desactive = true;
+      });
+
+      DateFormat formatter = DateFormat('dd/MM/yyyy HH:mm');
+
+      var request = http.MultipartRequest(
+          'POST', Uri.parse('$generalRouteForApi/getMessageEnAttente'));
+      request.fields.addAll({
+        'uidUser': uidUser.toString(),
+        'langUserPhone': langUserPhone.toString(),
+      });
+
+      http.StreamedResponse response = await request.send();
+
+      if (response.statusCode == 200) {
+        var lastIdMessage = 0;
+        var data1 = await response.stream.bytesToString();
+        var data = convert.jsonDecode(data1);
+        if (data["error"] == false) {
+          data["lesMessages"].forEach((message) {
+            lastIdMessage = message["idMessage"];
+            print(lastIdMessage);
+            SQLHelper.insert("message", {
+              'emetteur': message["emetteur"],
+              'recepteur': message["recepteur"],
+              'message': message["message"],
+              'dateEnvoi': formatter.format(
+                  DateTime.fromMillisecondsSinceEpoch(message["dateEnvoi"])),
+              'vue': "non",
+            });
+          });
+
+          var request = http.MultipartRequest(
+              'POST',
+              Uri.parse(
+                  '$generalRouteForApi/deleteMessageEnAttente/$lastIdMessage/$uidUser'));
+          request.fields.addAll({});
+          http.StreamedResponse response = await request.send();
+          if (response.statusCode == 200) {}
+
+          setState(() {
+            _desactive = false;
+          });
+        }
+      }
+    } else {
+      if (langUserPhone != "fr") {
+        dangerNoti(
+            "Mistake!", "You are not connected to the internet.", context);
+      } else {
+        dangerNoti("Erreur!", "Vous n'ètes pas connecté a internet.", context);
+      }
+      setState(() {
+        _desactive = false;
+      });
+    }
+  }
+
   Future<void> _loadDiscussions() async {
     final List<Map<String, dynamic>> discussions =
         await SQLHelper.getAllDiscussions();
-    setState(() {
-      _discussions = discussions;
-    });
+
+    List<Map<String, dynamic>> updatedDiscussions = [];
+
+    for (var discussion in discussions) {
+      final String uid = discussion['uid'];
+      final List<Map<String, dynamic>> messages =
+          await SQLHelper.getLastMessageAndUnreadCount(uid, uidUser);
+
+      if (messages.isNotEmpty) {
+        final Map<String, dynamic> lastMessage = messages.first;
+        final int unreadCount = messages.length - 1;
+
+        // Ajouter le dernier message et le nombre de messages non lus à la discussion
+        updatedDiscussions.add({
+          ...discussion,
+          'lastMessage': lastMessage,
+          'unreadCount': unreadCount,
+        });
+      }
+    }
+
+    _discussions = updatedDiscussions;
   }
 
   @override
@@ -96,7 +183,7 @@ class _ReceptionPageState extends State<ReceptionPage> {
               icon: const Icon(Icons.refresh),
               color: Colors.white,
               onPressed: () {
-                _loadDiscussions();
+                getMessageEnAttente();
               },
             ),
             const Padding(
@@ -239,6 +326,9 @@ class _ReceptionPageState extends State<ReceptionPage> {
                 itemCount: _discussions.length,
                 itemBuilder: (context, index) {
                   final discussion = _discussions[index];
+                  final lastMessage = discussion['lastMessage'];
+                  final unreadCount = discussion['unreadCount'];
+
                   return GestureDetector(
                     onTap: () {
                       setState(() {
@@ -267,16 +357,37 @@ class _ReceptionPageState extends State<ReceptionPage> {
                           ),
                           backgroundColor: primaryColor,
                         ),
-                        title: Text(
-                          discussion['nom'],
-                          style: GoogleFonts.poppins(
-                            color: primaryColor,
-                            fontSize: 18,
-                            fontWeight: FontWeight.w400,
-                          ),
+                        title: Row(
+                          children: [
+                            Text(
+                              discussion['nom'],
+                              style: GoogleFonts.poppins(
+                                color: primaryColor,
+                                fontSize: 18,
+                                fontWeight: FontWeight.w400,
+                              ),
+                            ),
+                            if (unreadCount > 0)
+                              Container(
+                                padding: const EdgeInsets.all(4),
+                                margin: const EdgeInsets.only(left: 5),
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: Colors.red,
+                                ),
+                                child: Text(
+                                  '$unreadCount',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                          ],
                         ),
                         subtitle: Text(
-                          discussion['uid'],
+                          lastMessage['message'],
                           style: GoogleFonts.poppins(
                             fontSize: 13,
                             fontWeight: FontWeight.w300,
@@ -284,7 +395,7 @@ class _ReceptionPageState extends State<ReceptionPage> {
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
-                        trailing: const Icon(Icons.chevron_right),
+                        trailing: Icon(Icons.chevron_right),
                       ),
                     ),
                   );

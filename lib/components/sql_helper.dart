@@ -76,9 +76,36 @@ class SQLHelper {
     );
   }
 
+  static Future<List<Map<String, dynamic>>> getLastMessageAndUnreadCount(
+      String uid, String uid2) async {
+    final db = await SQLHelper.db();
 
+    // Récupérer le dernier message de la discussion
+    final lastMessageQuery = await db.query(
+      "message",
+      where:
+          "(emetteur = ? AND recepteur = ?) OR (emetteur = ? AND recepteur = ?)",
+      whereArgs: [uid, uid2, uid2, uid],
+      orderBy: "dateEnvoi DESC",
+      limit: 1,
+    );
 
+    if (lastMessageQuery.isEmpty) {
+      return []; // Aucun message trouvé
+    }
 
+    final lastMessage = lastMessageQuery.first;
+
+    // Récupérer le nombre de messages non lus
+    final unreadMessagesQuery = await db.query(
+      "message",
+      where:
+          "(emetteur = ? AND recepteur = ?) OR (emetteur = ? AND recepteur = ?) AND vue = ?",
+      whereArgs: [uid, uid2, uid2, uid, "non"],
+    );
+
+    return [lastMessage, ...unreadMessagesQuery];
+  }
 
   static Future<void> delete(String tableName) async {
     final db = await SQLHelper.db();
