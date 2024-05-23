@@ -59,6 +59,11 @@ class SQLHelper {
     );
   }
 
+  static Future<List<Map<String, dynamic>>> getAllDiscussions() async {
+    final db = await SQLHelper.db();
+    return db.query("discussion", orderBy: "id DESC");
+  }
+
   static Future<void> delete(String tableName) async {
     final db = await SQLHelper.db();
     try {

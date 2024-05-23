@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:async';
+import 'package:dressur/1_reception/chat.dart';
 import 'package:dressur/1_reception/liste_contact.dart';
 import 'package:dressur/1_reception/liste_contact_message.dart';
 import 'package:dressur/components/padding_and_divider.dart';
@@ -9,6 +10,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:dressur/5_autre/support_assistance.dart';
 import 'package:dressur/1_reception/liste_notification.dart';
 import 'package:dressur/components/constant.dart';
+import 'package:dressur/components/sql_helper.dart';
 
 class ReceptionPage extends StatefulWidget {
   @override
@@ -16,6 +18,8 @@ class ReceptionPage extends StatefulWidget {
 }
 
 class _ReceptionPageState extends State<ReceptionPage> {
+  List<Map<String, dynamic>> _discussions = [];
+
   Future<bool> _onWillPop() async {
     return (await showDialog(
           context: context,
@@ -55,8 +59,18 @@ class _ReceptionPageState extends State<ReceptionPage> {
   @override
   void initState() {
     super.initState();
+    _loadDiscussions();
   }
 
+  Future<void> _loadDiscussions() async {
+    final List<Map<String, dynamic>> discussions =
+        await SQLHelper.getAllDiscussions();
+    setState(() {
+      _discussions = discussions;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: _onWillPop,
@@ -276,7 +290,63 @@ class _ReceptionPageState extends State<ReceptionPage> {
               ),
               DressurDivider(),
               const SizedBox(height: 5),
-              const SizedBox(height: 5),
+              ListView.builder(
+                shrinkWrap: true,
+                physics: NeverScrollableScrollPhysics(),
+                itemCount: _discussions.length,
+                itemBuilder: (context, index) {
+                  final discussion = _discussions[index];
+                  return GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        uidAutreUser = discussion['uid'];
+                        userChatInfo = [
+                          discussion['uid'],
+                          discussion['nom'],
+                          discussion['nom']
+                        ];
+                      });
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ChatPage(),
+                        ),
+                      );
+                    },
+                    child: Card(
+                      margin: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 5),
+                      child: ListTile(
+                        leading: CircleAvatar(
+                          child: Icon(
+                            Icons.person,
+                            color: Colors.white,
+                          ),
+                          backgroundColor: primaryColor,
+                        ),
+                        title: Text(
+                          discussion['nom'],
+                          style: GoogleFonts.poppins(
+                            color: primaryColor,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                        subtitle: Text(
+                          discussion['uid'],
+                          style: GoogleFonts.poppins(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w300,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        trailing: const Icon(Icons.chevron_right),
+                      ),
+                    ),
+                  );
+                },
+              ),
             ],
           ),
         ),
