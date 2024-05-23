@@ -1,3 +1,5 @@
+// ignore_for_file: sort_child_properties_last
+
 import 'dart:io';
 import 'dart:async';
 import 'package:dressur/1_reception/chat.dart';
@@ -156,65 +158,36 @@ class _ReceptionPageState extends State<ReceptionPage> {
                   );
                 },
                 child: Card(
-                  margin: const EdgeInsets.only(
-                      left: 10, top: 5, right: 10, bottom: 5),
-                  child: Container(
-                    padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        // Première colonne avec une icône centrée dans un cercle vert
-                        Container(
-                          padding: const EdgeInsets.all(10.0),
-                          margin: const EdgeInsets.all(10.0),
-                          decoration: const BoxDecoration(
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Icon(
-                            Icons.contacts,
-                            color: primaryColor,
-                            size: 20,
-                          ),
-                        ),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                "Contacts",
-                                style: GoogleFonts.poppins(
-                                  color: primaryColor,
-                                  fontSize: 22,
-                                  fontWeight: FontWeight.w400,
-                                ),
-                              ),
-                              const SizedBox(height: 5),
-                              Text(
-                                (langUserPhone == "fr")
-                                    ? "Contacts ajouter et scanner"
-                                    : "Contacts add and scan",
-                                style: GoogleFonts.poppins(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w300,
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ],
-                          ),
-                        ),
-
-                        Container(
-                          padding: const EdgeInsets.all(5),
-                          margin: const EdgeInsets.all(5),
-                          child: const Icon(
-                            Icons.chevron_right,
-                            size: 24,
-                          ),
-                        ),
-                      ],
+                  margin:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  child: ListTile(
+                    leading: const CircleAvatar(
+                      child: Icon(
+                        Icons.contacts,
+                        color: Colors.white,
+                      ),
+                      backgroundColor: primaryColor,
                     ),
+                    title: Text(
+                      "Contacts",
+                      style: GoogleFonts.poppins(
+                        color: primaryColor,
+                        fontSize: 22,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    subtitle: Text(
+                      (langUserPhone == "fr")
+                          ? "Contacts ajouter et scanner"
+                          : "Contacts add and scan",
+                      style: GoogleFonts.poppins(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w300,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    trailing: const Icon(Icons.chevron_right),
                   ),
                 ),
               ),
@@ -228,68 +201,40 @@ class _ReceptionPageState extends State<ReceptionPage> {
                   );
                 },
                 child: Card(
-                  margin: const EdgeInsets.only(
-                      left: 10, top: 5, right: 10, bottom: 5),
-                  child: Container(
-                    padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(10.0),
-                          margin: const EdgeInsets.all(10.0),
-                          decoration: const BoxDecoration(
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Icon(
-                            Icons.notifications,
-                            color: primaryColor,
-                            size: 20,
-                          ),
-                        ),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                "Notifications",
-                                style: GoogleFonts.poppins(
-                                  color: primaryColor,
-                                  fontSize: 22,
-                                  fontWeight: FontWeight.w400,
-                                ),
-                              ),
-                              const SizedBox(height: 5),
-                              Text(
-                                (langUserPhone == "fr")
-                                    ? "Cadeaux, Astuces, Recommandations, Informations, Avertissements, "
-                                    : "Gifts, Tips, Recommendations, Information, Warnings, ",
-                                style: GoogleFonts.poppins(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w300,
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ],
-                          ),
-                        ),
-                        Container(
-                          padding: const EdgeInsets.all(5),
-                          margin: const EdgeInsets.all(5),
-                          child: const Icon(
-                            Icons.chevron_right,
-                            size: 24,
-                          ),
-                        ),
-                      ],
+                  margin:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  child: ListTile(
+                    leading: const CircleAvatar(
+                      child: Icon(
+                        Icons.notifications,
+                        color: Colors.white,
+                      ),
+                      backgroundColor: primaryColor,
                     ),
+                    title: Text(
+                      "Notifications",
+                      style: GoogleFonts.poppins(
+                        color: primaryColor,
+                        fontSize: 22,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    subtitle: Text(
+                      (langUserPhone == "fr")
+                          ? "Cadeaux, Astuces, Recommandations, Informations, Avertissements, "
+                          : "Gifts, Tips, Recommendations, Information, Warnings, ",
+                      style: GoogleFonts.poppins(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w300,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    trailing: const Icon(Icons.chevron_right),
                   ),
                 ),
               ),
               DressurDivider(),
-              const SizedBox(height: 5),
               ListView.builder(
                 shrinkWrap: true,
                 physics: NeverScrollableScrollPhysics(),
