@@ -67,16 +67,22 @@ class _ReceptionPageState extends State<ReceptionPage>
   }
 
   @override
+  @override
   void initState() {
     super.initState();
+    _loadDiscussions();
     _controller = AnimationController(
       duration: const Duration(seconds: 1),
       vsync: this,
     );
-    _loadDiscussions();
     getMessageEnAttente(false);
-    Timer.periodic(const Duration(seconds: 1), (timer) {
+    // Démarrez le Timer après un délai de 1 seconde pour éviter les problèmes potentiels avec la construction du widget initial
+    Timer(Duration(seconds: 1), () {
       _loadDiscussions();
+      // Appelez _loadDiscussions toutes les 5 secondes
+      Timer.periodic(const Duration(seconds: 1), (timer) {
+        _loadDiscussions();
+      });
     });
   }
 

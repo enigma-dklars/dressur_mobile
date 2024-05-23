@@ -46,6 +46,7 @@ class _BottomBarState extends State<BottomBar> {
     // Exécute la fonction toutes les 2 heures
     Timer.periodic(const Duration(hours: 2), (timer) {
       fetchContactDSs();
+      // getMessageEnAttente(false);
     });
 
     // si le user est un admin, il sera notifier des traitement en attente de validation
