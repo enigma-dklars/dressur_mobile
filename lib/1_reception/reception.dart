@@ -96,9 +96,18 @@ class _ReceptionPageState extends State<ReceptionPage> {
         var data1 = await response.stream.bytesToString();
         var data = convert.jsonDecode(data1);
         if (data["error"] == false) {
-          data["lesMessages"].forEach((message) {
+          data["lesMessages"].forEach((message) async {
             lastIdMessage = message["idMessage"];
-            print(lastIdMessage);
+            if ((await SQLHelper.getOneDiscussion(message["emetteur"]))
+                .isEmpty) {
+              SQLHelper.insert("discussion", {
+                'uid': message["emetteur"],
+                'nom': message["emetteurName"],
+                'date': message["dateEnvoi"],
+              });
+            }
+            SQLHelper.updateDiscussionDate(
+                message["emetteur"], message["dateEnvoi"]);
             SQLHelper.insert("message", {
               'emetteur': message["emetteur"],
               'recepteur': message["recepteur"],
@@ -159,7 +168,9 @@ class _ReceptionPageState extends State<ReceptionPage> {
       }
     }
 
-    _discussions = updatedDiscussions;
+    setState(() {
+      _discussions = updatedDiscussions;
+    });
   }
 
   @override

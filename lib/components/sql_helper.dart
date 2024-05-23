@@ -86,7 +86,7 @@ class SQLHelper {
       where:
           "(emetteur = ? AND recepteur = ?) OR (emetteur = ? AND recepteur = ?)",
       whereArgs: [uid, uid2, uid2, uid],
-      orderBy: "dateEnvoi DESC",
+      orderBy: "id DESC",
       limit: 1,
     );
 
