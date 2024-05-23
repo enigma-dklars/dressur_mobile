@@ -388,87 +388,99 @@ class _ReceptionPageState extends State<ReceptionPage>
                 ),
               ),
               DressurDivider(),
-              ListView.builder(
-                shrinkWrap: true,
-                physics: NeverScrollableScrollPhysics(),
-                itemCount: _discussions.length,
-                itemBuilder: (context, index) {
-                  final discussion = _discussions[index];
-                  final lastMessage = discussion['lastMessage'];
-                  final unreadCount = discussion['unreadCount'];
-
-                  return GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        uidAutreUser = discussion['uid'];
-                        userChatInfo = [
-                          discussion['uid'],
-                          discussion['nom'],
-                          discussion['nom']
-                        ];
-                      });
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => ChatPage(),
+              _discussions.isEmpty
+                  ? Center(
+                      child: Padding(
+                        padding: EdgeInsets.fromLTRB(5, 50, 5, 5),
+                        child: Text(
+                          (langUserPhone == "fr")
+                              ? "Aucune discussion trouvée."
+                              : "No discussions found.",
+                          style: const TextStyle(fontSize: 16),
                         ),
-                      );
-                    },
-                    child: Card(
-                      margin: const EdgeInsets.symmetric(
-                          horizontal: 10, vertical: 5),
-                      child: ListTile(
-                        leading: CircleAvatar(
-                          child: Icon(
-                            Icons.person,
-                            color: Colors.white,
-                          ),
-                          backgroundColor: primaryColor,
-                        ),
-                        title: Row(
-                          children: [
-                            Text(
-                              discussion['nom'],
-                              style: GoogleFonts.poppins(
-                                color: primaryColor,
-                                fontSize: 18,
-                                fontWeight: FontWeight.w400,
-                              ),
-                            ),
-                            if (unreadCount > 0)
-                              Container(
-                                padding: const EdgeInsets.all(4),
-                                margin: const EdgeInsets.only(left: 5),
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: Colors.red,
-                                ),
-                                child: Text(
-                                  '$unreadCount',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                          ],
-                        ),
-                        subtitle: Text(
-                          lastMessage['message'],
-                          style: GoogleFonts.poppins(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w300,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        trailing: Icon(Icons.chevron_right),
                       ),
+                    )
+                  : ListView.builder(
+                      shrinkWrap: true,
+                      physics: NeverScrollableScrollPhysics(),
+                      itemCount: _discussions.length,
+                      itemBuilder: (context, index) {
+                        final discussion = _discussions[index];
+                        final lastMessage = discussion['lastMessage'];
+                        final unreadCount = discussion['unreadCount'];
+
+                        return GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              uidAutreUser = discussion['uid'];
+                              userChatInfo = [
+                                discussion['uid'],
+                                discussion['nom'],
+                                discussion['nom']
+                              ];
+                            });
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => ChatPage(),
+                              ),
+                            );
+                          },
+                          child: Card(
+                            margin: const EdgeInsets.symmetric(
+                                horizontal: 10, vertical: 5),
+                            child: ListTile(
+                              leading: CircleAvatar(
+                                child: Icon(
+                                  Icons.person,
+                                  color: Colors.white,
+                                ),
+                                backgroundColor: primaryColor,
+                              ),
+                              title: Row(
+                                children: [
+                                  Text(
+                                    discussion['nom'],
+                                    style: GoogleFonts.poppins(
+                                      color: primaryColor,
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w400,
+                                    ),
+                                  ),
+                                  if (unreadCount > 0)
+                                    Container(
+                                      padding: const EdgeInsets.all(4),
+                                      margin: const EdgeInsets.only(left: 5),
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: Colors.red,
+                                      ),
+                                      child: Text(
+                                        '$unreadCount',
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                ],
+                              ),
+                              subtitle: Text(
+                                lastMessage['message'],
+                                style: GoogleFonts.poppins(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w300,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              trailing: Icon(Icons.chevron_right),
+                            ),
+                          ),
+                        );
+                      },
                     ),
-                  );
-                },
-              ),
             ],
           ),
         ),

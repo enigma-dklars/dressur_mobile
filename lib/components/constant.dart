@@ -13,7 +13,7 @@ import 'package:http/http.dart' as http;
 
 const versionApp = '1.0.0';
 const oldDatabaseName = 'neuf_dressur.db';
-const nowDataBaseName = 'dix_dressur.db';
+const nowDataBaseName = 'onze_dressur.db';
 bool modeReconnaissanceContactArrierePlan = false;
 // const generalApiDomaine = 'http://dressur.rf.gd/public';
 const generalRouteForApi = '$generalApiDomaine/api';
