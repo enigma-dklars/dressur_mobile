@@ -13,7 +13,7 @@ class PresentationPage extends StatefulWidget {
 class _PresentationPageState extends State<PresentationPage> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
-  int _totalPages = 5; // Nombre total de pages
+  int _totalPages = 8; // Nombre total de pages
 
   Future<bool> _onWillPop() async {
     return false;
@@ -24,6 +24,7 @@ class _PresentationPageState extends State<PresentationPage> {
     return WillPopScope(
       onWillPop: _onWillPop,
       child: Scaffold(
+        backgroundColor: Colors.black,
         body: Column(
           children: [
             Expanded(
@@ -66,6 +67,9 @@ class _PresentationPageState extends State<PresentationPage> {
       'presentation_3_fr.png',
       'presentation_4_fr.png',
       'presentation_5_fr.png',
+      'presentation_6_fr.png',
+      'presentation_7_fr.png',
+      'presentation_8_fr.png',
     ];
     List<String> imagesEn = [
       'presentation_1_en.png',
@@ -73,6 +77,9 @@ class _PresentationPageState extends State<PresentationPage> {
       'presentation_3_en.png',
       'presentation_4_en.png',
       'presentation_5_en.png',
+      'presentation_6_en.png',
+      'presentation_7_en.png',
+      'presentation_8_en.png',
     ];
 
     return Padding(
