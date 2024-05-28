@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show ByteData, Uint8List, rootBundle;
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:dressur/components/sql_helper.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -42,13 +43,7 @@ const databaseSqlCode = """
     tableName TEXT,
     id INTEGER,
     uid TEXT,
-    contactTel TEXT,
-    titreBonus TEXT,
-    value TEXT,
-    label TEXT,
-    prix TEXT,
-    jours TEXT,
-    youHaveConnexion TEXT
+    contactTel TEXT
   )
 """;
 
@@ -89,37 +84,16 @@ var instagram;
 var facebook;
 var youtube;
 
-void youHaveConnexion() async {
-  SQLHelper.delete('youHaveConnexion');
-  SQLHelper.insert({
-    'tableName': "youHaveConnexion",
-    'youHaveConnexion': "oui",
-  });
-  // try {
-  //   final result = await InternetAddress.lookup("google.com");
-  //   if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
-  //     // oui
-  //     SQLHelper.delete('youHaveConnexion');
-  //     SQLHelper.insert({
-  //       'tableName': "youHaveConnexion",
-  //       'youHaveConnexion': "oui",
-  //     });
-  //   } else {
-  //     // non
-  //     SQLHelper.delete('youHaveConnexion');
-  //     SQLHelper.insert({
-  //       'tableName': "youHaveConnexion",
-  //       'youHaveConnexion': "non",
-  //     });
-  //   }
-  // } on SocketException catch (_) {
-  //   // non
-  //   SQLHelper.delete('youHaveConnexion');
-  //   SQLHelper.insert({
-  //     'tableName': "youHaveConnexion",
-  //     'youHaveConnexion': "non",
-  //   });
-  // }
+Future<bool> isConnectedToInternet() async {
+  try {
+    final result = await InternetAddress.lookup('google.com');
+    if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
+      return true;
+    }
+  } catch (e) {
+    return false;
+  }
+  return false;
 }
 
 Future<void> insertNumTelUserIntoDataBase(numberTel) async {
@@ -1047,8 +1021,15 @@ Future<void> sharePromotion(BuildContext context, String imageLink,
         text: messageShare, subject: 'Partager Promotion!');
   } else {
     // Gérer les erreurs de téléchargement
-    ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erreur de téléchargement de l\'image')));
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: Colors.red,
+        behavior: SnackBarBehavior.floating,
+        content: Text(
+          'Erreur de téléchargement de l\'image',
+          style: GoogleFonts.poppins(
+            color: Colors.white,
+          ),
+        )));
   }
 }
 

@@ -240,12 +240,12 @@ class _SettingPageState extends State<SettingPage> {
                     if (contactsEnregistrer.isNotEmpty) {
                       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                         behavior: SnackBarBehavior.floating,
+                        duration: const Duration(minutes: 1),
                         content: Text(
                           (langUserPhone == "fr")
                               ? "Dressur vas parcourir vos contacts un a un et supprimer les contacts DS.\n\nPatientez tous le long du processus.\n\nCe processus peut durée plusieurs minutes."
                               : "Dressur will go through your contacts one by one and delete DS contacts.\n\nWait all the way through the process.\n\nThis process may take several minutes.",
                         ),
-                        duration: const Duration(minutes: 1),
                       ));
                       List<Contact> contacts =
                           await FlutterContacts.getContacts(

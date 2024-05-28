@@ -23,15 +23,11 @@ class AdministrationPage extends StatefulWidget {
 
 class _AdministrationPageState extends State<AdministrationPage> {
   bool _desactive = false;
+  bool _desactive2 = false;
 
   void importAllContacts() async {
-    dynamic youHaveNetWork = "";
-    youHaveConnexion();
-    youHaveNetWork = await SQLHelper.getYouHaveConnexion();
-    while (youHaveNetWork.length == 0) {
-      youHaveNetWork = await SQLHelper.getYouHaveConnexion();
-    }
-    if (youHaveNetWork[0]['youHaveConnexion'] == "oui") {
+    bool isConnected = await isConnectedToInternet();
+    if (isConnected) {
       setState(() {
         _desactive = true;
       });
@@ -80,8 +76,14 @@ class _AdministrationPageState extends State<AdministrationPage> {
             setState(() {
               _desactive = false;
               ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                backgroundColor: Colors.green,
                 behavior: SnackBarBehavior.floating,
-                content: Text('${countContacts} Contact(s) Enregistré(s)'),
+                content: Text(
+                  '${countContacts} Contact(s) Enregistré(s)',
+                  style: GoogleFonts.poppins(
+                    color: Colors.white,
+                  ),
+                ),
               ));
             });
           }
@@ -109,6 +111,55 @@ class _AdministrationPageState extends State<AdministrationPage> {
       }
       setState(() {
         _desactive = false;
+      });
+    }
+  }
+
+  Future<void> sauvegardeBDD() async {
+    setState(() {
+      _desactive2 = true;
+    });
+    try {
+      final url = Uri.parse('$generalRouteForApi/export/database');
+      final response = await http.get(url);
+
+      if (response.statusCode == 200) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          backgroundColor: Colors.green,
+          behavior: SnackBarBehavior.floating,
+          content: Text(
+            "Sauvegarde Terminer",
+            style: GoogleFonts.poppins(
+              color: Colors.white,
+            ),
+          ),
+        ));
+
+        setState(() {
+          _desactive2 = false;
+        });
+      } else {
+        setState(() {
+          _desactive2 = false;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          backgroundColor: Colors.red,
+          behavior: SnackBarBehavior.floating,
+          content: Text(
+            "Erreur de sauvegarde",
+            style: GoogleFonts.poppins(
+              color: Colors.white,
+            ),
+          ),
+        ));
+      }
+    } catch (e) {
+      setState(() {
+        _desactive2 = false;
+      });
+    } finally {
+      setState(() {
+        _desactive2 = false;
       });
     }
   }
@@ -163,7 +214,8 @@ class _AdministrationPageState extends State<AdministrationPage> {
                   onPressed: () async {
                     final Uri _url =
                         Uri.parse("$generalApiDomaine/admin/interface");
-                    if (!await launchUrl(_url, mode: LaunchMode.inAppWebView)) {
+                    if (!await launchUrl(_url,
+                        mode: LaunchMode.externalApplication)) {
                       throw 'Could not launch $_url';
                     }
                   },
@@ -173,7 +225,29 @@ class _AdministrationPageState extends State<AdministrationPage> {
               GestureDetector(
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.red,
+                    backgroundColor: _desactive2 ? Colors.blue : Colors.red,
+                    shape: const StadiumBorder(),
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 13,
+                    ),
+                  ),
+                  child: Text(
+                    _desactive2 ? "Patientez" : "Sauvegarde de la BDD",
+                    style: GoogleFonts.poppins(
+                      color: Colors.white,
+                      fontSize: 15,
+                    ),
+                  ),
+                  onPressed: () {
+                    _desactive2 ? null : sauvegardeBDD();
+                  },
+                ),
+              ),
+              const SizedBox(height: 5),
+              GestureDetector(
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: _desactive ? Colors.blue : Colors.red,
                     shape: const StadiumBorder(),
                     padding: const EdgeInsets.symmetric(
                       vertical: 13,

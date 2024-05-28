@@ -6,7 +6,6 @@ import 'package:dressur/components/delayed_animation.dart';
 import 'package:dressur/components/constant.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
-import 'package:dressur/components/sql_helper.dart';
 import 'package:flutter/services.dart';
 import 'package:dressur/components/noti.dart';
 import 'package:dressur/5_autre/support_assistance.dart';
@@ -24,13 +23,8 @@ class _AddFriendPageState extends State<AddFriendPage> {
   var codePromoController = TextEditingController();
 
   void addPromo(String codePromo) async {
-    dynamic youHaveNetWork = "";
-    youHaveConnexion();
-    youHaveNetWork = await SQLHelper.getYouHaveConnexion();
-    while (youHaveNetWork.length == 0) {
-      youHaveNetWork = await SQLHelper.getYouHaveConnexion();
-    }
-    if (youHaveNetWork[0]['youHaveConnexion'] == "oui") {
+    bool isConnected = await isConnectedToInternet();
+    if (isConnected) {
       setState(() {
         _loading = true;
       });
@@ -59,8 +53,15 @@ class _AddFriendPageState extends State<AddFriendPage> {
             _loading = false;
             initUserInformations(data['user']);
             Navigator.of(context).pop();
-            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-              content: Text('Code Promo Accepter'),
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              backgroundColor: Colors.green,
+              behavior: SnackBarBehavior.floating,
+              content: Text(
+                'Code Promo Accepter',
+                style: GoogleFonts.poppins(
+                  color: Colors.white,
+                ),
+              ),
             ));
           });
         }
@@ -221,13 +222,8 @@ class _AddFriendPageState extends State<AddFriendPage> {
   }
 
   void addParrain(String codeBonus) async {
-    dynamic youHaveNetWork = "";
-    youHaveConnexion();
-    youHaveNetWork = await SQLHelper.getYouHaveConnexion();
-    while (youHaveNetWork.length == 0) {
-      youHaveNetWork = await SQLHelper.getYouHaveConnexion();
-    }
-    if (youHaveNetWork[0]['youHaveConnexion'] == "oui") {
+    bool isConnected = await isConnectedToInternet();
+    if (isConnected) {
       setState(() {
         _loading = true;
       });
@@ -294,13 +290,9 @@ class _AddFriendPageState extends State<AddFriendPage> {
             : 'Update in progress…',
       ),
     ));
-    dynamic youHaveNetWork = "";
-    youHaveConnexion();
-    youHaveNetWork = await SQLHelper.getYouHaveConnexion();
-    while (youHaveNetWork.length == 0) {
-      youHaveNetWork = await SQLHelper.getYouHaveConnexion();
-    }
-    if (youHaveNetWork[0]['youHaveConnexion'] == "oui") {
+
+    bool isConnected = await isConnectedToInternet();
+    if (isConnected) {
       setState(() {
         _loading = true;
       });
@@ -333,11 +325,15 @@ class _AddFriendPageState extends State<AddFriendPage> {
       });
     }
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      backgroundColor: Colors.green,
       behavior: SnackBarBehavior.floating,
       content: Text(
         (langUserPhone == "fr")
             ? 'Actualisation terminer.'
             : 'Refresh complete.',
+        style: GoogleFonts.poppins(
+          color: Colors.white,
+        ),
       ),
     ));
   }

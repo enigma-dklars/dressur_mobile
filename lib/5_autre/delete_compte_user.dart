@@ -96,13 +96,8 @@ class _DeletecompteFormState extends State<DeletecompteForm> {
 
   //HTTP REQUEST REGISTER
   void deletecompteUser(String motif) async {
-    dynamic youHaveNetWork = "";
-    youHaveConnexion();
-    youHaveNetWork = await SQLHelper.getYouHaveConnexion();
-    while (youHaveNetWork.length == 0) {
-      youHaveNetWork = await SQLHelper.getYouHaveConnexion();
-    }
-    if (youHaveNetWork[0]['youHaveConnexion'] == "oui") {
+    bool isConnected = await isConnectedToInternet();
+    if (isConnected) {
       setState(() {
         _desactive = true;
       });
@@ -212,8 +207,8 @@ class _DeletecompteFormState extends State<DeletecompteForm> {
                 child: Text(
                   _desactive
                       ? (langUserPhone == "fr")
-                            ? "Patientez..."
-                            : "Wait..."
+                          ? "Patientez..."
+                          : "Wait..."
                       : (langUserPhone == "fr")
                           ? "SUPPRIMER"
                           : "DELETE",

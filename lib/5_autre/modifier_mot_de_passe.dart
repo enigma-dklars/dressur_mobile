@@ -7,7 +7,6 @@ import 'package:dressur/components/delayed_animation.dart';
 import 'package:dressur/components/constant.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
-import 'package:dressur/components/sql_helper.dart';
 import 'package:dressur/components/noti.dart';
 
 class ModifierMdpPage extends StatelessWidget {
@@ -111,13 +110,8 @@ class _RegisterFormState extends State<RegisterForm> {
     String password,
     String passwordVerif,
   ) async {
-    dynamic youHaveNetWork = "";
-    youHaveConnexion();
-    youHaveNetWork = await SQLHelper.getYouHaveConnexion();
-    while (youHaveNetWork.length == 0) {
-      youHaveNetWork = await SQLHelper.getYouHaveConnexion();
-    }
-    if (youHaveNetWork[0]['youHaveConnexion'] == "oui") {
+    bool isConnected = await isConnectedToInternet();
+    if (isConnected) {
       setState(() {
         _desactive = true;
       });
@@ -150,10 +144,16 @@ class _RegisterFormState extends State<RegisterForm> {
             passwordController.text = "";
             passwordVerifController.text = "";
             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      behavior: SnackBarBehavior.floating,
-              content: Text((langUserPhone == "fr")
-                  ? 'Mot de passe modifié avec succès.'
-                  : 'Password changed successfully.'),
+              backgroundColor: Colors.green,
+              behavior: SnackBarBehavior.floating,
+              content: Text(
+                (langUserPhone == "fr")
+                    ? 'Mot de passe modifié avec succès.'
+                    : 'Password changed successfully.',
+                style: GoogleFonts.poppins(
+                  color: Colors.white,
+                ),
+              ),
             ));
           });
         }
@@ -186,13 +186,8 @@ class _RegisterFormState extends State<RegisterForm> {
 
   //HTTP REQUEST send MAIL CODE
   void sendMail() async {
-    dynamic youHaveNetWork = "";
-    youHaveConnexion();
-    youHaveNetWork = await SQLHelper.getYouHaveConnexion();
-    while (youHaveNetWork.length == 0) {
-      youHaveNetWork = await SQLHelper.getYouHaveConnexion();
-    }
-    if (youHaveNetWork[0]['youHaveConnexion'] == "oui") {
+    bool isConnected = await isConnectedToInternet();
+    if (isConnected) {
       setState(() {
         _desactive = true;
       });
@@ -352,8 +347,8 @@ class _RegisterFormState extends State<RegisterForm> {
                 child: Text(
                   _desactive
                       ? (langUserPhone == "fr")
-                            ? "Patientez..."
-                            : "Wait..."
+                          ? "Patientez..."
+                          : "Wait..."
                       : (langUserPhone == "fr")
                           ? "MODIFIER"
                           : "EDIT",
@@ -390,8 +385,8 @@ class _RegisterFormState extends State<RegisterForm> {
                 child: Text(
                   _desactivePasseForgetButton
                       ? (langUserPhone == "fr")
-                            ? "Patientez..."
-                            : "Wait..."
+                          ? "Patientez..."
+                          : "Wait..."
                       : (langUserPhone == "fr")
                           ? "Mot de passe oublié ?"
                           : "Forgot your password ?",

@@ -38,12 +38,7 @@ class _AutreProfilPageState extends State<AutreProfilPage> {
     setState(() {
       _loading = true;
     });
-    dynamic youHaveNetWork = "";
-    youHaveConnexion();
-    youHaveNetWork = await SQLHelper.getYouHaveConnexion();
-    while (youHaveNetWork.length == 0) {
-      youHaveNetWork = await SQLHelper.getYouHaveConnexion();
-    }
+
     var request = http.MultipartRequest(
         'POST', Uri.parse('$generalRouteForApi/getUserInfo'));
     request.fields.addAll(
@@ -139,8 +134,9 @@ class _AutreProfilPageState extends State<AutreProfilPage> {
       } else {
         insertContact(tel, pseudo);
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          behavior: SnackBarBehavior.floating,
           backgroundColor: Colors.green,
+          behavior: SnackBarBehavior.floating,
+          duration: const Duration(seconds: 5),
           padding: const EdgeInsets.fromLTRB(5, 20, 5, 20),
           content: Text(
             (langUserPhone == "fr")
@@ -153,7 +149,6 @@ class _AutreProfilPageState extends State<AutreProfilPage> {
             ),
             textAlign: TextAlign.center,
           ),
-          duration: const Duration(milliseconds: 5000),
         ));
       }
     }
