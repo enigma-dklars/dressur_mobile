@@ -6,7 +6,6 @@ import 'package:dressur/components/delayed_animation.dart';
 import 'package:dressur/components/constant.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
-import 'package:dressur/components/sql_helper.dart';
 import 'package:dressur/components/noti.dart';
 
 class SuggestionsPage extends StatelessWidget {
@@ -89,13 +88,8 @@ class _SuggestionsFormState extends State<SuggestionsForm> {
 
   //HTTP REQUEST REGISTER
   void addSuggestion(String suggestion) async {
-    dynamic youHaveNetWork = "";
-    youHaveConnexion();
-    youHaveNetWork = await SQLHelper.getYouHaveConnexion();
-    while (youHaveNetWork.length == 0) {
-      youHaveNetWork = await SQLHelper.getYouHaveConnexion();
-    }
-    if (youHaveNetWork[0]['youHaveConnexion'] == "oui") {
+    bool isConnected = await isConnectedToInternet();
+    if (isConnected) {
       setState(() {
         _desactive = true;
       });
@@ -209,8 +203,8 @@ class _SuggestionsFormState extends State<SuggestionsForm> {
                 child: Text(
                   _desactive
                       ? (langUserPhone == "fr")
-                            ? "Patientez..."
-                            : "Wait..."
+                          ? "Patientez..."
+                          : "Wait..."
                       : (langUserPhone == "fr")
                           ? "SUGGÉRER"
                           : "SUGGEST",

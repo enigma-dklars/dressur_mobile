@@ -7,7 +7,6 @@ import 'package:dressur/components/delayed_animation.dart';
 import 'package:dressur/components/constant.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
-import 'package:dressur/components/sql_helper.dart';
 import 'package:select_form_field/select_form_field.dart';
 import 'package:dressur/components/noti.dart';
 
@@ -183,13 +182,8 @@ class _RegisterFormState extends State<RegisterForm> {
   int jours = 0;
 
   void listeFormuleBoost() async {
-    dynamic youHaveNetWork = "";
-    youHaveConnexion();
-    youHaveNetWork = await SQLHelper.getYouHaveConnexion();
-    while (youHaveNetWork.length == 0) {
-      youHaveNetWork = await SQLHelper.getYouHaveConnexion();
-    }
-    if (youHaveNetWork[0]['youHaveConnexion'] == "oui") {
+    bool isConnected = await isConnectedToInternet();
+    if (isConnected) {
       setState(() {
         _desactive = true;
       });
@@ -230,13 +224,8 @@ class _RegisterFormState extends State<RegisterForm> {
 
   void newBoost() async {
     if (telIsVerified == true) {
-      dynamic youHaveNetWork = "";
-      youHaveConnexion();
-      youHaveNetWork = await SQLHelper.getYouHaveConnexion();
-      while (youHaveNetWork.length == 0) {
-        youHaveNetWork = await SQLHelper.getYouHaveConnexion();
-      }
-      if (youHaveNetWork[0]['youHaveConnexion'] == "oui") {
+      bool isConnected = await isConnectedToInternet();
+      if (isConnected) {
         setState(() {
           _desactive = true;
         });
@@ -428,13 +417,8 @@ class _RegisterForm2State extends State<RegisterForm2> {
   int jours = 0;
 
   void listeFormuleBoost() async {
-    dynamic youHaveNetWork = "";
-    youHaveConnexion();
-    youHaveNetWork = await SQLHelper.getYouHaveConnexion();
-    while (youHaveNetWork.length == 0) {
-      youHaveNetWork = await SQLHelper.getYouHaveConnexion();
-    }
-    if (youHaveNetWork[0]['youHaveConnexion'] == "oui") {
+    bool isConnected = await isConnectedToInternet();
+    if (isConnected) {
       setState(() {
         _desactive2 = true;
       });
@@ -500,13 +484,8 @@ class _RegisterForm2State extends State<RegisterForm2> {
 
   void newBoostPayant() async {
     if (telIsVerified == true) {
-      dynamic youHaveNetWork = "";
-      youHaveConnexion();
-      youHaveNetWork = await SQLHelper.getYouHaveConnexion();
-      while (youHaveNetWork.length == 0) {
-        youHaveNetWork = await SQLHelper.getYouHaveConnexion();
-      }
-      if (youHaveNetWork[0]['youHaveConnexion'] == "oui") {
+      bool isConnected = await isConnectedToInternet();
+      if (isConnected) {
         setState(() {
           _desactive2 = true;
         });
@@ -572,13 +551,8 @@ class _RegisterForm2State extends State<RegisterForm2> {
 
   void checkTransaction(idTransaction) async {
     if (telIsVerified == true) {
-      dynamic youHaveNetWork = "";
-      youHaveConnexion();
-      youHaveNetWork = await SQLHelper.getYouHaveConnexion();
-      while (youHaveNetWork.length == 0) {
-        youHaveNetWork = await SQLHelper.getYouHaveConnexion();
-      }
-      if (youHaveNetWork[0]['youHaveConnexion'] == "oui") {
+      bool isConnected = await isConnectedToInternet();
+      if (isConnected) {
         setState(() {
           _desactive2 = true;
         });

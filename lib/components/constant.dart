@@ -12,8 +12,8 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:http/http.dart' as http;
 
 const versionApp = '1.0.0';
-const oldDatabaseName = 'un_dressur.db';
-const nowDataBaseName = 'deux_dressur.db';
+const oldDatabaseName = 'neuf_dressur.db';
+const nowDataBaseName = 'onze_dressur.db';
 bool modeReconnaissanceContactArrierePlan = false;
 // const generalApiDomaine = 'http://dressur.rf.gd/public';
 const generalRouteForApi = '$generalApiDomaine/api';
@@ -37,22 +37,37 @@ const dressurUrlPlaystore =
 
 const primaryColor = Color(0xFF2a4b9a);
 const secondaryColor = Colors.indigoAccent;
-const databaseSqlCode = """
-  CREATE TABLE userInfos(
-    idDS INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-    tableName TEXT,
-    id INTEGER,
-    uid TEXT,
-    contactTel TEXT,
-    titreBonus TEXT,
-    value TEXT,
-    label TEXT,
-    prix TEXT,
-    jours TEXT,
-    youHaveConnexion TEXT
-  )
-""";
+const String createUserInfosTable = """
+    CREATE TABLE userInfos(
+      idDS INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+      tableName TEXT,
+      id INTEGER,
+      uid TEXT,
+      contactTel TEXT
+    );
+  """;
 
+const String createDiscussionTable = """
+    CREATE TABLE discussion(
+      id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+      uid TEXT,
+      nom TEXT,
+      date INTEGER
+    );
+  """;
+
+const String createMessageTable = """
+    CREATE TABLE message(
+      id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+      emetteur TEXT,
+      recepteur TEXT,
+      message TEXT,
+      dateEnvoi TEXT,
+      vue TEXT
+    );
+  """;
+
+List<dynamic> userChatInfo = [];
 List<dynamic> contactsUserBeforeDS = [];
 List<dynamic> contactsEnregistrer = [];
 String? langUserPhone = "en";
@@ -90,41 +105,20 @@ var instagram;
 var facebook;
 var youtube;
 
-void youHaveConnexion() async {
-  SQLHelper.delete('youHaveConnexion');
-  SQLHelper.insert({
-    'tableName': "youHaveConnexion",
-    'youHaveConnexion': "oui",
-  });
-  // try {
-  //   final result = await InternetAddress.lookup("google.com");
-  //   if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
-  //     // oui
-  //     SQLHelper.delete('youHaveConnexion');
-  //     SQLHelper.insert({
-  //       'tableName': "youHaveConnexion",
-  //       'youHaveConnexion': "oui",
-  //     });
-  //   } else {
-  //     // non
-  //     SQLHelper.delete('youHaveConnexion');
-  //     SQLHelper.insert({
-  //       'tableName': "youHaveConnexion",
-  //       'youHaveConnexion': "non",
-  //     });
-  //   }
-  // } on SocketException catch (_) {
-  //   // non
-  //   SQLHelper.delete('youHaveConnexion');
-  //   SQLHelper.insert({
-  //     'tableName': "youHaveConnexion",
-  //     'youHaveConnexion': "non",
-  //   });
-  // }
+Future<bool> isConnectedToInternet() async {
+  try {
+    final result = await InternetAddress.lookup('google.com');
+    if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
+      return true;
+    }
+  } catch (e) {
+    return false;
+  }
+  return false;
 }
 
 Future<void> insertNumTelUserIntoDataBase(numberTel) async {
-  SQLHelper.insert({
+  SQLHelper.insert("userInfos", {
     'tableName': "numsTelUser",
     'contactTel': numberTel,
   });
@@ -160,7 +154,7 @@ Future<void> initUserInformations(userInfos) async {
 
   SQLHelper.viderLaBaseDeDonneeLocal();
 
-  SQLHelper.insert({
+  SQLHelper.insert("userInfos", {
     'tableName': "user",
     'id': 0,
     'uid': userInfos["uid"],

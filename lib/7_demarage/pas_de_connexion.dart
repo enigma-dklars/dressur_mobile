@@ -1,6 +1,6 @@
+import 'dart:async';
 import 'dart:io';
 
-import 'package:dressur/main.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -30,8 +30,18 @@ class PageDepart extends StatefulWidget {
 }
 
 class _PageDepartState extends State<PageDepart> {
-
-NotificationAppLaunchDetails? notificationAppLaunchDetails;
+  NotificationAppLaunchDetails? notificationAppLaunchDetails;
+  void initState() {
+    super.initState();
+    Timer.periodic(const Duration(seconds: 1), (timer) async {
+      bool isConnected = await isConnectedToInternet();
+      if (isConnected) {
+        timer.cancel();
+        Navigator.of(context).push(MaterialPageRoute(
+            builder: (context) => WelcomePage(notificationAppLaunchDetails)));
+      }
+    });
+  }
 
   Future<bool> _onWillPop() async {
     return (await showDialog(
@@ -141,7 +151,8 @@ NotificationAppLaunchDetails? notificationAppLaunchDetails;
                         ),
                         onPressed: () {
                           Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) => WelcomePage(notificationAppLaunchDetails)));
+                              builder: (context) =>
+                                  WelcomePage(notificationAppLaunchDetails)));
                         },
                       ),
                     )),
