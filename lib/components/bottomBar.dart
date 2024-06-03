@@ -39,7 +39,7 @@ class _BottomBarState extends State<BottomBar> {
 
     // Exécute la fonction toutes les 5 heures
     Timer.periodic(const Duration(hours: 5), (timer) {
-      showNotification("Cc $nom du nouveau ?",
+      showNotification("Cc $name_complete du nouveau ?",
           "Consultez votre compte dès maintenant pour découvrir les dernières promotions, actualités et préférences disponibles sur Dressur.");
     });
 

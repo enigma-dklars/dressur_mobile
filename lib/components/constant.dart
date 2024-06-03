@@ -89,6 +89,7 @@ var textChargementEvolution = "Chargement ...";
 var addUserOnAutreProfilPage = "oui";
 var uidAutreUser;
 var uidUser;
+var name_complete;
 var pseudo;
 var nom;
 var mail;
@@ -126,6 +127,7 @@ Future<void> insertNumTelUserIntoDataBase(numberTel) async {
 
 Future<void> initUserInformations(userInfos) async {
   uidUser = userInfos["uid"];
+  name_complete = userInfos["name_complete"];
   pseudo = userInfos["pseudo"];
   nom = userInfos["nom"];
   mail = userInfos["mail"];
