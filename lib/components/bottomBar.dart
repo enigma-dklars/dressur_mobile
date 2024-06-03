@@ -74,11 +74,6 @@ class _BottomBarState extends State<BottomBar> {
   void synchroAvanceFunction() async {
     setState(() {
       contactsUserBeforeDS = [];
-      if (langUserPhone != "fr") {
-        textChargementEvolution = "Recognition of existing contacts ...";
-      } else {
-        textChargementEvolution = "Reconnaissance des contacts existants ...";
-      }
     });
     await SQLHelper.viderLaBaseDeDonneeLocalTelUser();
 
@@ -86,17 +81,6 @@ class _BottomBarState extends State<BottomBar> {
 
     List<Contact> contacts =
         await FlutterContacts.getContacts(withProperties: true);
-
-    int countContacts = 0;
-    setState(() {
-      if (langUserPhone != "fr") {
-        textChargementEvolution =
-            "Recognition of existing contacts ...\n0 / ${contacts.length}";
-      } else {
-        textChargementEvolution =
-            "Reconnaissance des contacts existants ...\n0 / ${contacts.length}";
-      }
-    });
 
     for (var contact in contacts) {
       for (var phone in contact.phones) {
@@ -115,16 +99,6 @@ class _BottomBarState extends State<BottomBar> {
           await insertNumTelUserIntoDataBase(numberTel);
         }
       }
-      setState(() {
-        countContacts++;
-        if (langUserPhone != "fr") {
-          textChargementEvolution =
-              "Recognition of existing contacts ...\n$countContacts / ${contacts.length}";
-        } else {
-          textChargementEvolution =
-              "Reconnaissance des contacts existants ...\n$countContacts / ${contacts.length}";
-        }
-      });
     }
     // envoyer les contacts pour stockage
     var request = http.MultipartRequest(
@@ -133,15 +107,6 @@ class _BottomBarState extends State<BottomBar> {
         .addAll({'contactsUserBeforeDS': jsonEncode(contactsUserBeforeDS)});
     // http.StreamedResponse response = await request.send();
     await request.send();
-
-    // envoyez les contacts a la route
-    setState(() {
-      if (langUserPhone != "fr") {
-        textChargementEvolution = "Ended .";
-      } else {
-        textChargementEvolution = "Terminé .";
-      }
-    });
   }
 
   Future<void> fetchContactDSs() async {
