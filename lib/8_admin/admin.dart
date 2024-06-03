@@ -4,6 +4,7 @@ import 'package:dressur/8_admin/admin_campagne_mail.dart';
 import 'package:dressur/8_admin/admin_liste_user.dart';
 import 'package:dressur/8_admin/admin_num_whatsapp.dart';
 import 'package:dressur/8_admin/admin_promo_affaire.dart';
+import 'package:dressur/8_admin/admin_promotion_reseau_sociaux.dart';
 import 'package:dressur/components/111_generaleApiDomaine.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
@@ -364,6 +365,33 @@ class _AdministrationPageState extends State<AdministrationPage> {
                       context,
                       MaterialPageRoute(
                           builder: (context) => AdminCampagneMailListePage()),
+                    );
+                  },
+                ),
+              ),
+              const SizedBox(height: 5),
+              GestureDetector(
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red,
+                    shape: const StadiumBorder(),
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 13,
+                    ),
+                  ),
+                  child: Text(
+                    "Conf. Promo. Réseau",
+                    style: GoogleFonts.poppins(
+                      color: Colors.white,
+                      fontSize: 15,
+                    ),
+                  ),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) =>
+                              AdminPromotionReseauSociauxListePage()),
                     );
                   },
                 ),
