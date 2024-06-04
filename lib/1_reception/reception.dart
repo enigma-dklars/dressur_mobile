@@ -71,19 +71,17 @@ class _ReceptionPageState extends State<ReceptionPage>
   void initState() {
     super.initState();
     _loadDiscussions();
+    Timer(Duration(seconds: 1), () {
+      _loadDiscussions();
+      Timer.periodic(const Duration(seconds: 1), (timer) {
+        _loadDiscussions();
+      });
+    });
     _controller = AnimationController(
       duration: const Duration(seconds: 1),
       vsync: this,
     );
     getMessageEnAttente(false);
-    // Démarrez le Timer après un délai de 1 seconde pour éviter les problèmes potentiels avec la construction du widget initial
-    Timer(Duration(seconds: 1), () {
-      _loadDiscussions();
-      // Appelez _loadDiscussions toutes les 5 secondes
-      Timer.periodic(const Duration(seconds: 1), (timer) {
-        _loadDiscussions();
-      });
-    });
   }
 
   @override
@@ -199,18 +197,14 @@ class _ReceptionPageState extends State<ReceptionPage>
   Future<void> _loadDiscussions() async {
     final List<Map<String, dynamic>> discussions =
         await SQLHelper.getAllDiscussions();
-
     List<Map<String, dynamic>> updatedDiscussions = [];
-
     for (var discussion in discussions) {
       final String uid = discussion['uid'];
       final List<Map<String, dynamic>> messages =
           await SQLHelper.getLastMessageAndUnreadCount(uid, uidUser);
-
       if (messages.isNotEmpty) {
         final Map<String, dynamic> lastMessage = messages.first;
         final int unreadCount = messages.length - 1;
-
         // Ajouter le dernier message et le nombre de messages non lus à la discussion
         updatedDiscussions.add({
           ...discussion,
