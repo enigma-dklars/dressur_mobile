@@ -46,7 +46,6 @@ const String createUserInfosTable = """
       contactTel TEXT
     );
   """;
-
 const String createDiscussionTable = """
     CREATE TABLE discussion(
       id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
@@ -55,7 +54,6 @@ const String createDiscussionTable = """
       date INTEGER
     );
   """;
-
 const String createMessageTable = """
     CREATE TABLE message(
       id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
@@ -87,6 +85,7 @@ var modeMotDePasseOublier = false;
 var mailConnexion = "";
 var textChargementEvolution = "Chargement ...";
 var addUserOnAutreProfilPage = "oui";
+var lesPublicites;
 var uidAutreUser;
 var uidUser;
 var name_complete;
@@ -149,6 +148,7 @@ Future<void> initUserInformations(userInfos) async {
   admin = userInfos["admin"];
   permissionAdd = userInfos["permissionAdd"];
   messageErreurPermissionAdd = userInfos["messageErreurPermissionAdd"];
+  lesPublicites = userInfos["lesPublicites"];
   preferencePaysText = preferencePaysToText(userInfos["preferencePays"]);
   preferenceCentreInteretLoisirText = preferenceCentreInteretLoisirToText(
       userInfos["preferenceCentreInteretLoisir"]);

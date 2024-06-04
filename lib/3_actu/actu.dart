@@ -71,6 +71,7 @@ class _ActuPageState extends State<ActuPage> {
   @override
   void initState() {
     super.initState();
+    _futureAdvertisements = fetchAdvertisements();
     _scrollController.addListener(_scrollListener);
     // Démarre le timer lors de l'initialisation du widget
     _startTimer();
@@ -103,9 +104,10 @@ class _ActuPageState extends State<ActuPage> {
   }
 
   void _startTimer() {
-    // Crée un nouveau timer qui exécute la fonction everySecond toutes les secondes
     _timer = Timer.periodic(Duration(seconds: 1), (timer) {
-      everySecond();
+      setState(() {
+        nombreContactDispo = nombreContactDispo;
+      });
     });
   }
 
@@ -113,13 +115,6 @@ class _ActuPageState extends State<ActuPage> {
     // Arrête et annule le timer
     _timer?.cancel();
     _timer = null;
-  }
-
-  void everySecond() {
-    // Code à exécuter toutes les secondes
-    setState(() {
-      nombreContactDispo = nombreContactDispo;
-    });
   }
 
   void actualise(affMessage) async {
@@ -154,9 +149,8 @@ class _ActuPageState extends State<ActuPage> {
       if (data["error"] == false) {
         setState(() {
           initUserInformations(data['user']);
-          havePublicites = data['user']["havePublicites"];
-          _futureAdvertisements =
-              fetchAdvertisements(data['user']["lesPublicites"]);
+          lesPublicites = data['user']["lesPublicites"];
+          _futureAdvertisements = fetchAdvertisements();
           _loading = false;
         });
       } else {
@@ -187,10 +181,10 @@ class _ActuPageState extends State<ActuPage> {
     }
   }
 
-  Future<List<Advertisement>> fetchAdvertisements(lesPublicites) async {
+  Future<List<Advertisement>> fetchAdvertisements() async {
     if (lesPublicites.toString().isNotEmpty) {
+      havePublicites = true;
       final jsonData = jsonDecode(lesPublicites) as List<dynamic>;
-
       final advertisements = jsonData.map((data) {
         return Advertisement(
           uidUser: data['uidUser'],
@@ -204,9 +198,11 @@ class _ActuPageState extends State<ActuPage> {
           nombreImpression: data['nombreImpression'],
         );
       }).toList();
-
+      // Mélanger l'ordre des éléments
+      advertisements.shuffle();
       return advertisements;
     } else {
+      havePublicites = false;
       return []; // Retourne une liste vide si aucune annonce n'est disponible
     }
   }
@@ -418,7 +414,7 @@ class _ActuPageState extends State<ActuPage> {
   Widget build(BuildContext context) {
     if (_firstLoad) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        actualise(false);
+        // actualise(false);
       });
       setState(() {
         _firstLoad = false;
@@ -775,8 +771,7 @@ class _ActuPageState extends State<ActuPage> {
                           if (snapshot.connectionState ==
                               ConnectionState.waiting) {
                             return const Center(
-                              child:
-                                  CircularProgressIndicator(), // Affichez un indicateur de chargement pendant que les données sont chargées
+                              child: CircularProgressIndicator(),
                             );
                           } else if (snapshot.hasError) {
                             return Center(
@@ -798,133 +793,144 @@ class _ActuPageState extends State<ActuPage> {
                                 return Container(
                                   margin: const EdgeInsets.only(
                                       left: 7, top: 0, right: 7, bottom: 0),
-                                  child: GestureDetector(
-                                    onTap: () {
-                                      setPromotionToWatch(advertisement);
-                                      // Ouvrir la page de détails au clic sur l'image ou la description
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              AdvertisementDetailPage(
-                                            advertisement: advertisement,
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                    child: Column(
-                                      children: [
-                                        const SizedBox(height: 1),
-                                        Card(
-                                          child: Column(
-                                            children: [
-                                              ClipRRect(
-                                                borderRadius:
-                                                    BorderRadius.circular(3),
-                                                child: FadeInImage.assetNetwork(
-                                                  placeholder:
-                                                      'images/placeholder.png',
-                                                  image: advertisement.image,
-                                                  fit: BoxFit.cover,
-                                                  imageErrorBuilder: (context,
-                                                      error, stackTrace) {
-                                                    return Image.asset(
-                                                        'images/error_image.png');
-                                                  },
-                                                ),
-                                              ),
-                                              const SizedBox(height: 10),
-                                              Padding(
-                                                  padding:
-                                                      const EdgeInsets.fromLTRB(
-                                                          10, 0, 10, 10),
-                                                  child: Column(
-                                                    children: [
-                                                      Text(
-                                                        advertisement
-                                                            .description,
-                                                        maxLines: 5,
-                                                        overflow: TextOverflow
-                                                            .ellipsis,
-                                                        style: const TextStyle(
-                                                          fontWeight:
-                                                              FontWeight.w400,
-                                                          fontSize: 16,
+                                  child: Column(
+                                    children: [
+                                      const SizedBox(height: 1),
+                                      Card(
+                                        child: Column(
+                                          children: [
+                                            GestureDetector(
+                                              onTap: () {
+                                                setPromotionToWatch(
+                                                    advertisement);
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        AdvertisementDetailPage(
+                                                      advertisement:
+                                                          advertisement,
+                                                    ),
+                                                  ),
+                                                );
+                                              },
+                                              child: Column(
+                                                children: [
+                                                  ClipRRect(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            3),
+                                                    child: FadeInImage
+                                                        .assetNetwork(
+                                                      placeholder:
+                                                          'images/placeholder.png',
+                                                      image:
+                                                          advertisement.image,
+                                                      fit: BoxFit.cover,
+                                                      imageErrorBuilder:
+                                                          (context, error,
+                                                              stackTrace) {
+                                                        return Image.asset(
+                                                            'images/error_image.png');
+                                                      },
+                                                    ),
+                                                  ),
+                                                  const SizedBox(height: 10),
+                                                  Padding(
+                                                    padding: const EdgeInsets
+                                                        .fromLTRB(
+                                                        10, 0, 10, 10),
+                                                    child: Column(
+                                                      children: [
+                                                        Text(
+                                                          advertisement
+                                                              .description,
+                                                          maxLines: 5,
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
+                                                          style:
+                                                              const TextStyle(
+                                                            fontWeight:
+                                                                FontWeight.w400,
+                                                            fontSize: 16,
+                                                          ),
                                                         ),
-                                                      ),
-                                                      const SizedBox(height: 5),
-                                                      Row(
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .spaceBetween,
-                                                        children: [
-                                                          Row(
-                                                            children: [
-                                                              const Icon(Icons
-                                                                  .visibility),
-                                                              const SizedBox(
-                                                                  width: 4),
-                                                              Text(advertisement
-                                                                  .nombreImpression
-                                                                  .toString()),
-                                                              const SizedBox(
-                                                                  width: 16),
-                                                              const Icon(Icons
-                                                                  .touch_app),
-                                                              const SizedBox(
-                                                                  width: 4),
-                                                              Text(advertisement
-                                                                  .nombreDeVues
-                                                                  .toString()),
-                                                            ],
-                                                          ),
-                                                          Row(
-                                                            children: [
-                                                              GestureDetector(
-                                                                child: Row(
-                                                                  children: [
-                                                                    Icon(Icons
-                                                                        .share),
-                                                                    const SizedBox(
-                                                                        width:
-                                                                            5),
-                                                                    Text(
-                                                                      (langUserPhone ==
-                                                                              "fr")
-                                                                          ? "Partager"
-                                                                          : "Share",
-                                                                      style: GoogleFonts
-                                                                          .poppins(
-                                                                        fontSize:
-                                                                            15,
-                                                                      ),
-                                                                    ),
-                                                                  ],
-                                                                ),
-                                                                onTap: (() {
-                                                                  sharePromotion(
-                                                                      context,
-                                                                      advertisement
-                                                                          .image,
-                                                                      advertisement
-                                                                          .imageName,
-                                                                      advertisement
-                                                                          .description);
-                                                                }),
-                                                              ),
-                                                            ],
-                                                          ),
-                                                        ],
-                                                      )
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                            // les icons
+                                            const SizedBox(height: 5),
+                                            Padding(
+                                              padding:
+                                                  const EdgeInsets.fromLTRB(
+                                                      10, 0, 10, 10),
+                                              child: Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  Row(
+                                                    children: [
+                                                      const Icon(
+                                                          Icons.visibility),
+                                                      const SizedBox(width: 4),
+                                                      Text(advertisement
+                                                          .nombreImpression
+                                                          .toString()),
+                                                      const SizedBox(width: 16),
+                                                      const Icon(
+                                                          Icons.touch_app),
+                                                      const SizedBox(width: 4),
+                                                      Text(advertisement
+                                                          .nombreDeVues
+                                                          .toString()),
                                                     ],
-                                                  ))
-                                            ],
-                                          ),
+                                                  ),
+                                                  Row(
+                                                    children: [
+                                                      GestureDetector(
+                                                        child: Row(
+                                                          children: [
+                                                            Icon(Icons.share),
+                                                            const SizedBox(
+                                                                width: 5),
+                                                            Text(
+                                                              (langUserPhone ==
+                                                                      "fr")
+                                                                  ? "Partager"
+                                                                  : "Share",
+                                                              style: GoogleFonts
+                                                                  .poppins(
+                                                                fontSize: 15,
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                        onTap: (() {
+                                                          sharePromotion(
+                                                              context,
+                                                              advertisement
+                                                                  .image,
+                                                              advertisement
+                                                                  .imageName,
+                                                              advertisement
+                                                                  .description);
+                                                        }),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ],
                                         ),
-                                        const SizedBox(height: 1),
-                                        DressurDivider(),
-                                      ],
-                                    ),
+                                      ),
+                                      const SizedBox(height: 1),
+                                      DressurDivider(),
+                                    ],
                                   ),
                                 );
                               },
