@@ -780,7 +780,7 @@ class _ActuPageState extends State<ActuPage> {
                           } else if (!snapshot.hasData ||
                               snapshot.data!.isEmpty) {
                             return const Center(
-                              child: Text('Aucune annonce trouvée'),
+                              child: null,
                             );
                           } else {
                             return ListView.builder(
