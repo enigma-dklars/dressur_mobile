@@ -845,7 +845,7 @@ class _ActuPageState extends State<ActuPage> {
                                                         Text(
                                                           advertisement
                                                               .description,
-                                                          maxLines: 5,
+                                                          maxLines: 3,
                                                           overflow: TextOverflow
                                                               .ellipsis,
                                                           style:
