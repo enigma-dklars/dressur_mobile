@@ -1,19 +1,16 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'dart:io';
+import 'package:dressur/4_preference/choix_centre_interet_loisir.dart';
+import 'package:dressur/components/padding_and_divider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:whatsperson/4_preference/choix_pays_preference.dart';
-import 'package:whatsperson/6_notification/liste_notification.dart';
-import 'package:whatsperson/components/advertisements.dart';
-import 'package:whatsperson/components/constant.dart';
-import 'package:http/http.dart' as http;
-import 'package:whatsperson/components/sociaux.dart';
-import 'dart:convert' as convert;
-import 'package:whatsperson/components/sql_helper.dart';
-import 'package:whatsperson/components/noti.dart';
-import 'package:whatsperson/5_autre/support_assistance.dart';
+import 'package:dressur/4_preference/choix_pays.dart';
+import 'package:dressur/1_reception/liste_notification.dart';
+import 'package:dressur/components/constant.dart';
+import 'package:dressur/components/sociaux.dart';
+import 'package:dressur/5_autre/support_assistance.dart';
 import 'dart:async';
 
 class PreferencePage extends StatefulWidget {
@@ -25,7 +22,6 @@ class PreferencePage extends StatefulWidget {
 
 class _PreferencePageState extends State<PreferencePage> {
   var data;
-  bool _loading = false;
   Timer? _timer;
 
   @override
@@ -53,54 +49,6 @@ class _PreferencePageState extends State<PreferencePage> {
     setState(() {
       preferencePaysText = preferencePaysText;
     });
-  }
-
-  void updateUserPreferenceNom(String valNom) async {
-    dynamic youHaveNetWork = "";
-    youHaveConnexion();
-    youHaveNetWork = await SQLHelper.getYouHaveConnexion();
-    while (youHaveNetWork.length == 0) {
-      youHaveNetWork = await SQLHelper.getYouHaveConnexion();
-    }
-    if (youHaveNetWork[0]['youHaveConnexion'] == "oui") {
-      var request = http.MultipartRequest(
-          'POST', Uri.parse('$generalRouteForApi/updateUserPreferenceNom'));
-      request.fields.addAll({
-        'uid': uidUser,
-        'langUserPhone': langUserPhone.toString(),
-        'valNom': valNom
-      });
-
-      http.StreamedResponse response = await request.send();
-
-      if (response.statusCode == 200) {
-        var data1 = await response.stream.bytesToString();
-        data = convert.jsonDecode(data1);
-        if (data["error"] == true) {
-          dangerNoti(data["titre"], data["message"], context);
-        }
-      } else {
-        if (langUserPhone != "fr") {
-          dangerNoti("Mistake!",
-              "We encountered a problem, contact the administrators.", context);
-        } else {
-          dangerNoti(
-              "Erreur!",
-              "Nous avons rencontré un problème, contacter les administrateurs.",
-              context);
-        }
-      }
-    } else {
-      if (langUserPhone != "fr") {
-        dangerNoti(
-            "Mistake!", "You are not connected to the internet.", context);
-      } else {
-        dangerNoti("Erreur!", "Vous n'ètes pas connecté a internet.", context);
-      }
-      setState(() {
-        _loading = false;
-      });
-    }
   }
 
   Future<bool> _onWillPop() async {
@@ -157,11 +105,17 @@ class _PreferencePageState extends State<PreferencePage> {
           backgroundColor: primaryColor,
           title: Text(
             (langUserPhone == "fr") ? "Préférences" : "Preferences",
-            style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+            style: GoogleFonts.poppins(
+              color: Colors.white,
+              fontWeight: FontWeight.w400,
+            ),
           ),
           actions: [
             IconButton(
-              icon: const Icon(Icons.notifications),
+              icon: const Icon(
+                Icons.notifications,
+                color: Colors.white,
+              ),
               onPressed: () {
                 Navigator.push(
                   context,
@@ -223,137 +177,53 @@ class _PreferencePageState extends State<PreferencePage> {
                   margin: const EdgeInsets.only(
                       left: 10, top: 5, right: 10, bottom: 5),
                   child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(5),
-                      gradient: const LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [
-                          primaryColor,
-                          secondaryColor,
-                          Colors.white,
-                        ],
-                      ),
-                    ),
-                    padding: const EdgeInsets.fromLTRB(15, 10, 15, 10),
+                    padding: const EdgeInsets.fromLTRB(10, 5, 10, 2),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         Text(
-                          (langUserPhone == "fr")
-                              ? "Souhaitez-vous que votre nom et prénom(s) soit visible des autres utilisateurs ?"
-                              : "Would you like your first and last name(s) to be visible to other users?",
+                          (langUserPhone == "fr") ? "Pays" : "Country",
                           style: GoogleFonts.poppins(
-                            fontSize: 16,
-                            color: Colors.white,
-                            fontWeight: FontWeight.w600,
+                            fontWeight: FontWeight.w400,
+                            color: primaryColor,
+                            fontSize: 22,
+                          ),
+                          textAlign: TextAlign.left,
+                        ),
+                        const SizedBox(height: 3),
+                        Text(
+                          (langUserPhone == "fr")
+                              ? "NB : Sélectionnez parmi les pays disponibles. Ces pays sélectionnés seront ceux à partir desquels vous recevrez des propositions de contacts et d'actualités, ainsi que vers lesquels seront orientées vos promotions commerciales et vos boosts contacts."
+                              : "NB : Select from the available countries. These selected countries will be those from which you will receive contact and news proposals, as well as towards which your commercial promotions and contact boosts will be directed.",
+                          style: GoogleFonts.poppins(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w500,
                           ),
                           textAlign: TextAlign.left,
                         ),
                         const SizedBox(height: 5),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              (langUserPhone == "fr") ? 'Non' : 'No',
-                              style: GoogleFonts.poppins(
-                                fontSize: 20,
-                                fontWeight: FontWeight.w800,
-                                color: Colors.black,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                            _loading
-                                ? const Icon(
-                                    Icons.pause,
-                                    size: 48.0,
-                                    color: primaryColor,
-                                  )
-                                : Switch(
-                                    activeColor: Colors.red,
-                                    activeTrackColor: primaryColor,
-                                    inactiveThumbColor: Colors.black,
-                                    inactiveTrackColor: primaryColor,
-                                    value: affUserName,
-                                    onChanged: (bool? newValue) {
-                                      setState(() {
-                                        _loading = false;
-                                        // affUserName = newValue!;
-                                        if (newValue == true) {
-                                          affUserName = true;
-                                          updateUserPreferenceNom("true");
-                                        } else {
-                                          affUserName = false;
-                                          updateUserPreferenceNom("false");
-                                        }
-                                      });
-                                    }),
-                            Text(
-                              (langUserPhone == "fr") ? 'Oui' : 'Yes',
-                              style: GoogleFonts.poppins(
-                                fontSize: 20,
-                                fontWeight: FontWeight.w800,
-                                color: Colors.red,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                const Padding(
-                  padding:
-                      EdgeInsets.only(left: 50, top: 5, right: 50, bottom: 5),
-                  child: Divider(
-                    height: 1,
-                    thickness: 1,
-                    color: Colors.grey,
-                  ),
-                ),
-                Card(
-                  margin: const EdgeInsets.only(
-                      left: 10, top: 5, right: 10, bottom: 5),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(5),
-                      gradient: const LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [
-                          primaryColor,
-                          secondaryColor,
-                          Colors.white,
-                        ],
-                      ),
-                    ),
-                    padding: const EdgeInsets.fromLTRB(15, 10, 15, 10),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
                         Text(
                           (langUserPhone == "fr")
-                              ? "Préférence Pays :"
-                              : "Country Preference:",
+                              ? "Vous avez choisi le(s) pays suivant :"
+                              : "You have chosen the following country(ies) :",
                           style: GoogleFonts.poppins(
-                            fontSize: 16,
-                            color: Colors.white,
-                            fontWeight: FontWeight.w600,
+                            fontWeight: FontWeight.w500,
+                            color: primaryColor,
+                            fontSize: 14,
                           ),
                           textAlign: TextAlign.left,
                         ),
-                        const SizedBox(height: 10),
+                        const SizedBox(height: 5),
                         Text(
                           preferencePaysText.toString(),
                           style: GoogleFonts.poppins(
-                            fontSize: 10,
-                            color: Colors.white,
-                            fontWeight: FontWeight.w600,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w400,
                           ),
                           textAlign: TextAlign.left,
+                          maxLines: 3,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                        const SizedBox(height: 10),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
@@ -374,44 +244,113 @@ class _PreferencePageState extends State<PreferencePage> {
                                         builder: (context) => ChoixDesPays()),
                                   );
                                 },
-                                child: Text((langUserPhone == "fr")
-                                    ? 'Modifier'
-                                    : 'Edit'),
+                                child: Text(
+                                  (langUserPhone == "fr") ? 'Modifier' : 'Edit',
+                                  style: GoogleFonts.poppins(
+                                    color: Colors.white,
+                                  ),
+                                ),
                               ),
                             )
                           ],
                         ),
+                        const SizedBox(height: 3),
                       ],
                     ),
                   ),
                 ),
-                const Padding(
-                  padding:
-                      EdgeInsets.only(left: 50, top: 5, right: 50, bottom: 5),
-                  child: Divider(
-                    height: 1,
-                    thickness: 1,
-                    color: Colors.grey,
+                DressurDivider(),
+                Card(
+                  margin: const EdgeInsets.only(
+                      left: 10, top: 5, right: 10, bottom: 5),
+                  child: Container(
+                    padding: const EdgeInsets.fromLTRB(10, 5, 10, 2),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Text(
+                          (langUserPhone == "fr")
+                              ? "Centres d'intérêt, Loisirs, etc."
+                              : "Center of interest, Leisure, etc.",
+                          style: GoogleFonts.poppins(
+                            fontWeight: FontWeight.w400,
+                            color: primaryColor,
+                            fontSize: 22,
+                          ),
+                          textAlign: TextAlign.left,
+                        ),
+                        const SizedBox(height: 3),
+                        Text(
+                          (langUserPhone == "fr")
+                              ? "NB : Choisissez parmi les options disponibles. Les centres d'intérêt que vous sélectionnerez seront utilisés pour vous proposer des services, des opportunités, des recommandations personnalisées, etc."
+                              : "NB: Choose from the available options. The interests you select will be used to offer you services, opportunities, personalized recommendations, etc.",
+                          style: GoogleFonts.poppins(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w500,
+                          ),
+                          textAlign: TextAlign.left,
+                        ),
+                        const SizedBox(height: 5),
+                        Text(
+                          (langUserPhone == "fr")
+                              ? "Vos choix sont les suivants :"
+                              : "Your choices are :",
+                          style: GoogleFonts.poppins(
+                            fontWeight: FontWeight.w500,
+                            color: primaryColor,
+                            fontSize: 14,
+                          ),
+                          textAlign: TextAlign.left,
+                        ),
+                        const SizedBox(height: 5),
+                        Text(
+                          preferenceCentreInteretLoisirText.toString(),
+                          style: GoogleFonts.poppins(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w400,
+                          ),
+                          textAlign: TextAlign.left,
+                          maxLines: 3,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            SizedBox(
+                              width: MediaQuery.of(context).size.width * 0.35,
+                              child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: primaryColor,
+                                  shape: const StadiumBorder(),
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 10,
+                                  ),
+                                ),
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            ChoixDesCentreInteretLoisir()),
+                                  );
+                                },
+                                child: Text(
+                                  (langUserPhone == "fr") ? 'Modifier' : 'Edit',
+                                  style: GoogleFonts.poppins(
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                            )
+                          ],
+                        ),
+                        const SizedBox(height: 3),
+                      ],
+                    ),
                   ),
                 ),
+                DressurDivider(),
                 const SizedBox(height: 5),
-                if (havePublicites == true)
-                  Column(
-                    children: [
-                      AdvertisementListPage(),
-                      const SizedBox(height: 5),
-                      const Padding(
-                        padding: EdgeInsets.only(
-                            left: 50, top: 5, right: 50, bottom: 5),
-                        child: Divider(
-                          height: 1,
-                          thickness: 1,
-                          color: Colors.grey,
-                        ),
-                      ),
-                      const SizedBox(height: 5),
-                    ],
-                  ),
                 SociauxPage(),
                 const SizedBox(height: 5),
               ],

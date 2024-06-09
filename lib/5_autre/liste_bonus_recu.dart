@@ -1,8 +1,6 @@
-// ignore_for_file: use_build_context_synchronously
-
+import 'package:dressur/components/constant.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:whatsperson/components/constant.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
 
@@ -27,12 +25,17 @@ class _ListeBonusPageState extends State<ListeBonusPage> {
   bool _loading = false;
   List<ListeBonus> _listeBonus = [];
 
+  @override
+  void initState() {
+    super.initState();
+    fetchListeBonus();
+  }
+
   Future<void> fetchListeBonus() async {
     setState(() {
       _loading = true;
     });
-    final url =
-        Uri.parse('$generalRouteForApi/listBonus/$uidUser/$langUserPhone');
+    final url = buildApiUrl();
 
     final response = await http.get(url);
 
@@ -72,97 +75,131 @@ class _ListeBonusPageState extends State<ListeBonusPage> {
     }
   }
 
-  @override
-  void initState() {
-    super.initState();
-    fetchListeBonus(); // Loading the diary when the app starts
+  Uri buildApiUrl() {
+    return Uri.parse('$generalRouteForApi/listBonus/$uidUser/$langUserPhone');
   }
 
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        elevation: 0,
-        backgroundColor: primaryColor,
-        title: Text(
-          (langUserPhone == "fr")
-              ? "Liste des Bonus Reçu"
-              : "List of Bonuses Received",
-          style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+  buildAppBar() {
+    return AppBar(
+      elevation: 0,
+      backgroundColor: primaryColor,
+      title: Text(
+        (langUserPhone == "fr")
+            ? "Liste des Bonus Reçu"
+            : "List of Bonuses Received",
+        style: GoogleFonts.poppins(
+          color: Colors.white,
+          fontWeight: FontWeight.w400,
         ),
       ),
-      body: _loading
-          ? const Center(
-              child: CircularProgressIndicator(),
-            )
-          : ListView.builder(
-              itemCount: _listeBonus.length,
-              itemBuilder: (BuildContext context, int index) {
-                final listeBonus = _listeBonus[index];
+      leading: IconButton(
+        onPressed: () {
+          Navigator.pop(context);
+        },
+        icon: const Icon(
+          Icons.arrow_back,
+          size: 30,
+          color: Colors.white,
+        ),
+      ),
+    );
+  }
 
-                return Card(
-                  margin: const EdgeInsets.only(
-                      left: 10, top: 10, right: 10, bottom: 0),
-                  child: Container(
-                    width: MediaQuery.of(context).size.width * 0.95,
-                    decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [
-                          secondaryColor,
-                          primaryColor,
-                        ],
+  Widget buildLoadingIndicator() {
+    return const Center(
+      child: CircularProgressIndicator(),
+    );
+  }
+
+  Widget buildEmptyListMessage() {
+    return Center(
+      child: Text(
+        (langUserPhone == "fr") ? "Aucun Bonus Reçu." : "No Bonus Received.",
+        style: const TextStyle(fontSize: 16),
+      ),
+    );
+  }
+
+  Widget buildListItem(ListeBonus listeBonus) {
+    return Card(
+      margin: const EdgeInsets.only(left: 10, top: 10, right: 10, bottom: 0),
+      child: Container(
+        width: MediaQuery.of(context).size.width * 0.95,
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              secondaryColor,
+              primaryColor,
+            ],
+          ),
+          borderRadius: BorderRadius.circular(5),
+        ),
+        padding: const EdgeInsets.fromLTRB(15, 10, 15, 10),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  children: [
+                    Text(
+                      listeBonus.titre,
+                      style: GoogleFonts.poppins(
+                        fontSize: 14,
+                        color: Colors.white,
+                        fontWeight: FontWeight.w800,
                       ),
-                      borderRadius: BorderRadius.circular(5),
+                      textAlign: TextAlign.end,
                     ),
-                    padding: const EdgeInsets.fromLTRB(15, 10, 15, 10),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Column(
-                              children: [
-                                Text(
-                                  listeBonus.titre,
-                                  style: GoogleFonts.poppins(
-                                    fontSize: 14,
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w800,
-                                  ),
-                                  textAlign: TextAlign.end,
-                                ),
-                              ],
-                            ),
-                            Column(
-                              children: [
-                                Text(
-                                  listeBonus.montant,
-                                  style: GoogleFonts.poppins(
-                                    fontSize: 14,
-                                    color: Colors.white,
-                                  ),
-                                  textAlign: TextAlign.end,
-                                ),
-                              ],
-                            )
-                          ],
-                        ),
-                        const SizedBox(height: 5),
-                        Text(
-                          listeBonus.date,
-                          style: const TextStyle(
-                            fontSize: 12,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ],
+                  ],
+                ),
+                Column(
+                  children: [
+                    Text(
+                      listeBonus.montant,
+                      style: GoogleFonts.poppins(
+                        fontSize: 14,
+                        color: Colors.white,
+                      ),
+                      textAlign: TextAlign.end,
                     ),
-                  ),
-                );
-              },
+                  ],
+                )
+              ],
             ),
+            const SizedBox(height: 5),
+            Text(
+              listeBonus.date,
+              style: const TextStyle(
+                fontSize: 12,
+                color: Colors.white,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: buildAppBar(),
+      body: _loading
+          ? buildLoadingIndicator()
+          : _listeBonus.isEmpty
+              ? buildEmptyListMessage()
+              : ListView.separated(
+                  itemCount: _listeBonus.length,
+                  separatorBuilder: (context, index) =>
+                      const SizedBox(height: 1),
+                  itemBuilder: (BuildContext context, int index) {
+                    return buildListItem(_listeBonus[index]);
+                  },
+                ),
     );
   }
 }

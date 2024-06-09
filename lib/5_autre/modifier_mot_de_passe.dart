@@ -2,13 +2,12 @@
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:whatsperson/7_login/connexion.dart';
-import 'package:whatsperson/components/delayed_animation.dart';
-import 'package:whatsperson/components/constant.dart';
+import 'package:dressur/6_login_register/connexion.dart';
+import 'package:dressur/components/delayed_animation.dart';
+import 'package:dressur/components/constant.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
-import 'package:whatsperson/components/sql_helper.dart';
-import 'package:whatsperson/components/noti.dart';
+import 'package:dressur/components/noti.dart';
 
 class ModifierMdpPage extends StatelessWidget {
   @override
@@ -24,11 +23,15 @@ class ModifierMdpPage extends StatelessWidget {
           icon: const Icon(
             Icons.arrow_back,
             size: 30,
+            color: Colors.white,
           ),
         ),
         title: Text(
           (langUserPhone == "fr") ? "Modifier Mot de Passe" : "Change Password",
-          style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+          style: GoogleFonts.poppins(
+            color: Colors.white,
+            fontWeight: FontWeight.w400,
+          ),
         ),
       ),
       body: SingleChildScrollView(
@@ -107,13 +110,8 @@ class _RegisterFormState extends State<RegisterForm> {
     String password,
     String passwordVerif,
   ) async {
-    dynamic youHaveNetWork = "";
-    youHaveConnexion();
-    youHaveNetWork = await SQLHelper.getYouHaveConnexion();
-    while (youHaveNetWork.length == 0) {
-      youHaveNetWork = await SQLHelper.getYouHaveConnexion();
-    }
-    if (youHaveNetWork[0]['youHaveConnexion'] == "oui") {
+    bool isConnected = await isConnectedToInternet();
+    if (isConnected) {
       setState(() {
         _desactive = true;
       });
@@ -146,9 +144,16 @@ class _RegisterFormState extends State<RegisterForm> {
             passwordController.text = "";
             passwordVerifController.text = "";
             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-              content: Text((langUserPhone == "fr")
-                  ? 'Mot de passe modifier'
-                  : 'Change password'),
+              backgroundColor: Colors.green,
+              behavior: SnackBarBehavior.floating,
+              content: Text(
+                (langUserPhone == "fr")
+                    ? 'Mot de passe modifié avec succès.'
+                    : 'Password changed successfully.',
+                style: GoogleFonts.poppins(
+                  color: Colors.white,
+                ),
+              ),
             ));
           });
         }
@@ -181,13 +186,8 @@ class _RegisterFormState extends State<RegisterForm> {
 
   //HTTP REQUEST send MAIL CODE
   void sendMail() async {
-    dynamic youHaveNetWork = "";
-    youHaveConnexion();
-    youHaveNetWork = await SQLHelper.getYouHaveConnexion();
-    while (youHaveNetWork.length == 0) {
-      youHaveNetWork = await SQLHelper.getYouHaveConnexion();
-    }
-    if (youHaveNetWork[0]['youHaveConnexion'] == "oui") {
+    bool isConnected = await isConnectedToInternet();
+    if (isConnected) {
       setState(() {
         _desactive = true;
       });
@@ -254,7 +254,6 @@ class _RegisterFormState extends State<RegisterForm> {
               controller: ancienPasswordController,
               obscureText: _obscureText,
               decoration: InputDecoration(
-                labelStyle: TextStyle(color: Colors.grey[400]),
                 border: const OutlineInputBorder(),
                 labelText: (langUserPhone == "fr")
                     ? 'Ancien mot de passe'
@@ -283,7 +282,6 @@ class _RegisterFormState extends State<RegisterForm> {
               controller: passwordController,
               obscureText: _obscureText_1,
               decoration: InputDecoration(
-                labelStyle: TextStyle(color: Colors.grey[400]),
                 border: const OutlineInputBorder(),
                 labelText: (langUserPhone == "fr")
                     ? 'Nouveau mot de passe'
@@ -312,7 +310,6 @@ class _RegisterFormState extends State<RegisterForm> {
               controller: passwordVerifController,
               obscureText: _obscureText_2,
               decoration: InputDecoration(
-                labelStyle: TextStyle(color: Colors.grey[400]),
                 border: const OutlineInputBorder(),
                 labelText: (langUserPhone == "fr")
                     ? 'Confirmer le nouveau mot de passe'
@@ -347,9 +344,19 @@ class _RegisterFormState extends State<RegisterForm> {
                     vertical: 13,
                   ),
                 ),
-                child: _desactive
-                    ? const Text("Wait...")
-                    : Text((langUserPhone == "fr") ? "MODIFIER" : "EDIT"),
+                child: Text(
+                  _desactive
+                      ? (langUserPhone == "fr")
+                          ? "Patientez..."
+                          : "Wait..."
+                      : (langUserPhone == "fr")
+                          ? "MODIFIER"
+                          : "EDIT",
+                  style: GoogleFonts.poppins(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
                 onPressed: () {
                   _desactive
                       ? null
@@ -375,11 +382,19 @@ class _RegisterFormState extends State<RegisterForm> {
                     vertical: 13,
                   ),
                 ),
-                child: _desactivePasseForgetButton
-                    ? const Text("Wait...")
-                    : Text((langUserPhone == "fr")
-                        ? "Mot de passe oublié ?"
-                        : "Forgot your password ?"),
+                child: Text(
+                  _desactivePasseForgetButton
+                      ? (langUserPhone == "fr")
+                          ? "Patientez..."
+                          : "Wait..."
+                      : (langUserPhone == "fr")
+                          ? "Mot de passe oublié ?"
+                          : "Forgot your password ?",
+                  style: GoogleFonts.poppins(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
                 onPressed: () {
                   _desactivePasseForgetButton ? null : sendMail();
                 },

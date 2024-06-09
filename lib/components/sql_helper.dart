@@ -1,10 +1,12 @@
-import 'package:whatsperson/components/constant.dart';
+import 'package:dressur/components/constant.dart';
 import 'package:flutter/foundation.dart';
 import 'package:sqflite/sqflite.dart' as sql;
 
 class SQLHelper {
   static Future<void> createTables(sql.Database database) async {
-    await database.execute(databaseSqlCode);
+    await database.execute(createUserInfosTable);
+    await database.execute(createDiscussionTable);
+    await database.execute(createMessageTable);
   }
 
   static Future<sql.Database> dbOLD() async {
@@ -27,11 +29,94 @@ class SQLHelper {
     );
   }
 
-  static Future<int> insert(var data) async {
+  static Future<int> insert(var tableName, var data) async {
     final db = await SQLHelper.db();
-    final result = await db.insert("userInfos", data,
+    final result = await db.insert(tableName, data,
         conflictAlgorithm: sql.ConflictAlgorithm.replace);
     return result;
+  }
+
+  static Future<List<Map<String, dynamic>>> getOneDiscussion(var uid) async {
+    final db = await SQLHelper.db();
+    return db.query(
+      "discussion",
+      where: "uid = ?",
+      whereArgs: [uid],
+      orderBy: "id",
+      limit: 1,
+    );
+  }
+
+  static Future<List<Map<String, dynamic>>> getAllMessages(
+      String uid, String uid2) async {
+    final db = await SQLHelper.db();
+    return db.query(
+      "message",
+      where:
+          "(emetteur = ? AND recepteur = ?) OR (emetteur = ? AND recepteur = ?)",
+      whereArgs: [uid, uid2, uid2, uid],
+      orderBy: "id DESC",
+    );
+  }
+
+  static Future<List<Map<String, dynamic>>> getAllDiscussions() async {
+    final db = await SQLHelper.db();
+    return db.query("discussion", orderBy: "date DESC");
+  }
+
+  static Future<int> updateDiscussionDate(var uid, int newDate) async {
+    final db = await SQLHelper.db();
+    final data = {'date': newDate};
+    return db.update(
+      'discussion',
+      data,
+      where: 'uid = ?',
+      whereArgs: [uid],
+      conflictAlgorithm: sql.ConflictAlgorithm.replace,
+    );
+  }
+
+  static Future<List<Map<String, dynamic>>> getLastMessageAndUnreadCount(
+      String uid, String uid2) async {
+    final db = await SQLHelper.db();
+
+    // Récupérer le dernier message de la discussion
+    final lastMessageQuery = await db.query(
+      "message",
+      where:
+          "(emetteur = ? AND recepteur = ?) OR (emetteur = ? AND recepteur = ?)",
+      whereArgs: [uid, uid2, uid2, uid],
+      orderBy: "id DESC",
+      limit: 1,
+    );
+
+    if (lastMessageQuery.isEmpty) {
+      return []; // Aucun message trouvé
+    }
+
+    final lastMessage = lastMessageQuery.first;
+
+    // Récupérer le nombre de messages non lus
+    final unreadMessagesQuery = await db.query(
+      "message",
+      where:
+          "((emetteur = ? AND recepteur = ?) OR (emetteur = ? AND recepteur = ?)) AND vue = ?",
+      whereArgs: [uid, uid2, uid2, uid, "non"],
+    );
+
+    return [lastMessage, ...unreadMessagesQuery];
+  }
+
+  static Future<void> markAllMessagesAsRead(
+      String uidUser, String uidOtherUser) async {
+    final db = await SQLHelper.db();
+    await db.update(
+      'message',
+      {'vue': 'oui'},
+      where:
+          "(emetteur = ? AND recepteur = ?) OR (emetteur = ? AND recepteur = ?)",
+      whereArgs: [uidUser, uidOtherUser, uidOtherUser, uidUser],
+    );
   }
 
   static Future<void> delete(String tableName) async {
@@ -58,7 +143,7 @@ class SQLHelper {
     try {
       await db.delete("userInfos",
           where: "tableName != ?", whereArgs: ["numsTelUser"]);
-      // await db.delete("userInfos", where: "idWP >= ?", whereArgs: [0]);
+      // await db.delete("userInfos", where: "idDS >= ?", whereArgs: [0]);
     } catch (err) {
       debugPrint("Something went wrong when deleting an item: $err");
     }
@@ -69,7 +154,7 @@ class SQLHelper {
     try {
       await db.delete("userInfos",
           where: "tableName == ?", whereArgs: ["numsTelUser"]);
-      // await db.delete("userInfos", where: "idWP >= ?", whereArgs: [0]);
+      // await db.delete("userInfos", where: "idDS >= ?", whereArgs: [0]);
     } catch (err) {
       debugPrint("Something went wrong when deleting an item: $err");
     }
@@ -128,10 +213,10 @@ class SQLHelper {
         where: "tableName = ?", whereArgs: ["youHaveConnexion"], orderBy: "id");
   }
 
-  static Future<void> removeInLocalDataBase(idWP) async {
+  static Future<void> removeInLocalDataBase(idDS) async {
     final db = await SQLHelper.db();
     try {
-      await db.delete("userInfos", where: "idWP = ?", whereArgs: [idWP]);
+      await db.delete("userInfos", where: "idDS = ?", whereArgs: [idDS]);
     } catch (err) {
       debugPrint("Something went wrong when deleting an item: $err");
     }

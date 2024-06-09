@@ -4,13 +4,13 @@ import 'package:art_sweetalert/art_sweetalert.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:whatsperson/7_login/connexion.dart';
-import 'package:whatsperson/components/delayed_animation.dart';
-import 'package:whatsperson/components/constant.dart';
+import 'package:dressur/6_login_register/connexion.dart';
+import 'package:dressur/components/delayed_animation.dart';
+import 'package:dressur/components/constant.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
-import 'package:whatsperson/components/sql_helper.dart';
-import 'package:whatsperson/components/noti.dart';
+import 'package:dressur/components/sql_helper.dart';
+import 'package:dressur/components/noti.dart';
 
 class DeletecomptePage extends StatelessWidget {
   @override
@@ -26,13 +26,17 @@ class DeletecomptePage extends StatelessWidget {
           icon: const Icon(
             Icons.arrow_back,
             size: 30,
+            color: Colors.white,
           ),
         ),
         title: Text(
           (langUserPhone == "fr")
               ? "Suppression de compte"
               : "Account deletion",
-          style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+          style: GoogleFonts.poppins(
+            color: Colors.white,
+            fontWeight: FontWeight.w400,
+          ),
         ),
       ),
       body: SingleChildScrollView(
@@ -59,8 +63,8 @@ class DeletecomptePage extends StatelessWidget {
                       ),
                       child: Text(
                         (langUserPhone == "fr")
-                            ? "WhatsPerson s'éfforce de garantir la sécurité et l'intégrité de ses services. Nous nous appuyons sur des principes de sécurité et de confidentialité solides."
-                            : "WhatsPerson strives to ensure the security and integrity of its services. We rely on strong security and privacy principles.",
+                            ? "Dressur s'éfforce de garantir la sécurité et l'intégrité de ses services. Nous nous appuyons sur des principes de sécurité et de confidentialité solides."
+                            : "Dressur strives to ensure the security and integrity of its services. We rely on strong security and privacy principles.",
                         style: GoogleFonts.poppins(
                           fontSize: 16,
                         ),
@@ -92,20 +96,14 @@ class _DeletecompteFormState extends State<DeletecompteForm> {
 
   //HTTP REQUEST REGISTER
   void deletecompteUser(String motif) async {
-    dynamic youHaveNetWork = "";
-    youHaveConnexion();
-    youHaveNetWork = await SQLHelper.getYouHaveConnexion();
-    while (youHaveNetWork.length == 0) {
-      youHaveNetWork = await SQLHelper.getYouHaveConnexion();
-    }
-    if (youHaveNetWork[0]['youHaveConnexion'] == "oui") {
+    bool isConnected = await isConnectedToInternet();
+    if (isConnected) {
       setState(() {
         _desactive = true;
-        // UserClass.getItem('userInfos', 0);
       });
 
       var request = http.MultipartRequest(
-          'POST', Uri.parse('$generalRouteForApi/deleteCompteWP'));
+          'POST', Uri.parse('$generalRouteForApi/deleteCompteDS'));
       request.fields.addAll({
         'uid': uidUser,
         'langUserPhone': langUserPhone.toString(),
@@ -206,9 +204,19 @@ class _DeletecompteFormState extends State<DeletecompteForm> {
                   ),
                   minimumSize: const Size.fromHeight(50),
                 ),
-                child: _desactive
-                    ? const Text("Wait...")
-                    : Text((langUserPhone == "fr") ? "SUPPRIMER" : "DELETE"),
+                child: Text(
+                  _desactive
+                      ? (langUserPhone == "fr")
+                          ? "Patientez..."
+                          : "Wait..."
+                      : (langUserPhone == "fr")
+                          ? "SUPPRIMER"
+                          : "DELETE",
+                  style: GoogleFonts.poppins(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
                 onPressed: () async {
                   if (_desactive) {
                   } else {

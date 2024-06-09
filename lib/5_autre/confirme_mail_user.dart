@@ -2,14 +2,13 @@
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:whatsperson/5_autre/support_assistance.dart';
-import 'package:whatsperson/components/bottomBar.dart';
-import 'package:whatsperson/components/delayed_animation.dart';
-import 'package:whatsperson/components/constant.dart';
+import 'package:dressur/5_autre/support_assistance.dart';
+import 'package:dressur/components/bottomBar.dart';
+import 'package:dressur/components/delayed_animation.dart';
+import 'package:dressur/components/constant.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
-import 'package:whatsperson/components/sql_helper.dart';
-import 'package:whatsperson/components/noti.dart';
+import 'package:dressur/components/noti.dart';
 
 class CodeMailConfirmePage extends StatelessWidget {
   @override
@@ -24,6 +23,7 @@ class CodeMailConfirmePage extends StatelessWidget {
           },
           icon: const Icon(
             Icons.arrow_back,
+            color: Colors.white,
             size: 30,
           ),
         ),
@@ -31,7 +31,10 @@ class CodeMailConfirmePage extends StatelessWidget {
           (langUserPhone == "fr")
               ? "Confirmation du Mail"
               : "Email Confirmation",
-          style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+          style: GoogleFonts.poppins(
+            fontWeight: FontWeight.w600,
+            color: Colors.white,
+          ),
         ),
         actions: [
           PopupMenuButton<int>(
@@ -51,7 +54,7 @@ class CodeMailConfirmePage extends StatelessWidget {
                 child: Row(
                   children: [
                     Text(
-                      (langUserPhone == "fr") ? "Actualiser" : "Help",
+                      (langUserPhone == "fr") ? "Aide" : "Help",
                     ),
                   ],
                 ),
@@ -102,13 +105,8 @@ class _ConfirmeFormeState extends State<ConfirmeForme> {
   var data;
   final _codeMailVerifyController = TextEditingController();
   void sendMail() async {
-    dynamic youHaveNetWork = "";
-    youHaveConnexion();
-    youHaveNetWork = await SQLHelper.getYouHaveConnexion();
-    while (youHaveNetWork.length == 0) {
-      youHaveNetWork = await SQLHelper.getYouHaveConnexion();
-    }
-    if (youHaveNetWork[0]['youHaveConnexion'] == "oui") {
+    bool isConnected = await isConnectedToInternet();
+    if (isConnected) {
       setState(() {
         _desactive = true;
       });
@@ -172,13 +170,8 @@ class _ConfirmeFormeState extends State<ConfirmeForme> {
   }
 
   void codeVerif(String codeForVerifMail) async {
-    dynamic youHaveNetWork = "";
-    youHaveConnexion();
-    youHaveNetWork = await SQLHelper.getYouHaveConnexion();
-    while (youHaveNetWork.length == 0) {
-      youHaveNetWork = await SQLHelper.getYouHaveConnexion();
-    }
-    if (youHaveNetWork[0]['youHaveConnexion'] == "oui") {
+    bool isConnected = await isConnectedToInternet();
+    if (isConnected) {
       setState(() {
         _desactive = true;
       });
@@ -254,7 +247,7 @@ class _ConfirmeFormeState extends State<ConfirmeForme> {
             delay: 0, // 500,
             child: SizedBox(
               height: MediaQuery.of(context).size.height * 0.20,
-              child: Image.asset("images/wp_img_6.png"),
+              child: Image.asset("images/ds_img_6.png"),
             ),
           ),
           const SizedBox(height: 20),
@@ -269,11 +262,18 @@ class _ConfirmeFormeState extends State<ConfirmeForme> {
                   // vertical: 13,
                 ),
               ),
-              child: _desactive
-                  ? const Text("Wait...")
-                  : Text((langUserPhone == "fr")
-                      ? "Renvoyer le code"
-                      : "Return the code"),
+              child: Text(
+                  _desactive
+                      ? (langUserPhone == "fr")
+                          ? "Patientez..."
+                          : "Wait..."
+                      : (langUserPhone == "fr")
+                          ? "Renvoyer le code"
+                          : "Return the code",
+                  style: GoogleFonts.poppins(
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white,
+                  )),
               onPressed: () {
                 _desactive ? null : sendMail();
               },
@@ -284,8 +284,8 @@ class _ConfirmeFormeState extends State<ConfirmeForme> {
             delay: 0, // 1000,
             child: Text(
               (langUserPhone == "fr")
-                  ? "Vous n'avez pas reçu le code par mail ? Cliquez sur le bouton bleu ci-dessus pour recevoir un nouveau code de confirmation de votre adresse mail ($mail). Contactez simplement l'Assistance WhatsPerson après 2H d'attente..."
-                  : "Didn't receive the code by email? Click on the blue button above to receive a new confirmation code from your email address ($mail). Simply contact WhatsPerson Assistance after 2 hours of waiting...",
+                  ? "Vous n'avez pas reçu le code par mail ? Cliquez sur le bouton bleu ci-dessus pour recevoir un nouveau code de confirmation de votre adresse mail ($mail). Contactez simplement l'Assistance Dressur après 2H d'attente..."
+                  : "Didn't receive the code by email? Click on the blue button above to receive a new confirmation code from your email address ($mail). Simply contact Dressur Assistance after 2 hours of waiting...",
               style: GoogleFonts.poppins(
                 fontSize: 16,
               ),
@@ -307,12 +307,14 @@ class _ConfirmeFormeState extends State<ConfirmeForme> {
               textAlign: TextAlign.center,
             ),
           ),
+          const SizedBox(height: 20),
           DelayedAnimation(
             delay: 0, // 2000,
             child: TextField(
               controller: _codeMailVerifyController,
               decoration: InputDecoration(
                 labelStyle: TextStyle(color: secondaryColor),
+                border: const OutlineInputBorder(),
                 labelText: (langUserPhone == "fr")
                     ? 'Code verification mail'
                     : 'Mail verification code',
@@ -332,9 +334,18 @@ class _ConfirmeFormeState extends State<ConfirmeForme> {
                     vertical: 13,
                   ),
                 ),
-                child: _desactive
-                    ? const Text("Wait...")
-                    : Text((langUserPhone == "fr") ? "CONFIRMER" : "CONFIRM"),
+                child: Text(
+                    _desactive
+                        ? (langUserPhone == "fr")
+                            ? "Patientez..."
+                            : "Wait..."
+                        : (langUserPhone == "fr")
+                            ? "CONFIRMER"
+                            : "CONFIRM",
+                    style: GoogleFonts.poppins(
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                    )),
                 onPressed: () {
                   _desactive ? null : codeVerif(_codeMailVerifyController.text);
                 },

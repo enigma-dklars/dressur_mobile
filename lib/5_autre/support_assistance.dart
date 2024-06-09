@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:whatsperson/components/delayed_animation.dart';
-import 'package:whatsperson/components/constant.dart';
+import 'package:dressur/components/delayed_animation.dart';
+import 'package:dressur/components/constant.dart';
 
 class SupportPage extends StatelessWidget {
   @override
@@ -18,11 +18,15 @@ class SupportPage extends StatelessWidget {
           icon: const Icon(
             Icons.arrow_back,
             size: 30,
+            color: Colors.white,
           ),
         ),
         title: Text(
           (langUserPhone == "fr") ? "Support" : "Support",
-          style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+          style: GoogleFonts.poppins(
+            fontWeight: FontWeight.w400,
+            color: Colors.white,
+          ),
         ),
       ),
       body: SingleChildScrollView(
@@ -41,9 +45,7 @@ class SupportPage extends StatelessWidget {
                           ? "Support & Assistance Technique"
                           : "Support & Technical Assistance",
                       style: GoogleFonts.poppins(
-                          color: primaryColor,
-                          fontSize: 22,
-                          fontWeight: FontWeight.w600),
+                          fontSize: 22, fontWeight: FontWeight.w600),
                       textAlign: TextAlign.center,
                     ),
                   ),
@@ -52,7 +54,7 @@ class SupportPage extends StatelessWidget {
                     delay: 0, // 500,
                     child: SizedBox(
                       height: 200,
-                      child: Image.asset("images/wp_img_10.png"),
+                      child: Image.asset("images/ds_img_10.png"),
                     ),
                   ),
                   const SizedBox(height: 30),
@@ -64,8 +66,8 @@ class SupportPage extends StatelessWidget {
                         padding: const EdgeInsets.all(5.0),
                         child: Text(
                           (langUserPhone == "fr")
-                              ? "Nous simplifions votre quête de visibilité sur vos différents réseaux sociaux et surtout sur vos statuts WhatsApp. Grâce à WhatsPerson, faite la promotion de vos produits et services qui seront visibles par des milliers d'utilisateurs en seulement 24H.\n\nAvez-vous des questions ?"
-                              : "We simplify your quest for visibility on your various social networks and especially on your WhatsApp statuses. Thanks to WhatsPerson, promote your products and services which will be visible to thousands of users in just 24 hours.\n\nHave you questions ?",
+                              ? "Nous simplifions votre quête de visibilité sur vos différents réseaux sociaux et surtout sur vos statuts WhatsApp. Grâce à Dressur, faite la promotion de vos produits et services qui seront visibles par des milliers d'utilisateurs en seulement 24H.\n\nAvez-vous des questions ?"
+                              : "We simplify your quest for visibility on your various social networks and especially on your WhatsApp statuses. Thanks to Dressur, promote your products and services which will be visible to thousands of users in just 24 hours.\n\nHave you questions ?",
                           style: GoogleFonts.poppins(
                             fontSize: 16,
                           ),
@@ -88,9 +90,13 @@ class SupportPage extends StatelessWidget {
                         (langUserPhone == "fr")
                             ? "Contactez nous sur WhatsApp"
                             : "Contact us on WhatsApp",
+                        style: GoogleFonts.poppins(
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                        ),
                       ),
                       onPressed: () async {
-                        final Uri _url = Uri.parse(whatsappWPURL);
+                        final Uri _url = Uri.parse(whatsappDSURL);
                         if (!await launchUrl(_url,
                             mode: LaunchMode.externalApplication)) {
                           throw 'Could not launch $_url';

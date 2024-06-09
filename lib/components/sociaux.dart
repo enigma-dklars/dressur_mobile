@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:whatsperson/components/constant.dart';
-import 'package:whatsperson/components/profile_menu_reseau_blanc.dart';
+import 'package:dressur/components/constant.dart';
+import 'package:dressur/components/profile_menu_reseau_blanc.dart';
 
 class SociauxPage extends StatefulWidget {
   @override
@@ -47,12 +47,12 @@ class _SociauxPageState extends State<SociauxPage> {
           const SizedBox(height: 10),
           Text(
             (langUserPhone == "fr")
-                ? "Vous serez donc informé de toutes les opportunités, astuces, bourses de formations, promotions, etc. que vous ne devez pas manquer. Vos réactions aux postes sont également les bienvenus. Merci. 🙏🙏🙏"
-                : "You will therefore be informed of all the opportunities, tips, training grants, promotions, etc. that you should not miss. Your reactions to the posts are also welcome. THANKS. 🙏🙏🙏",
+                ? "Sur les pages ci-dessous, seront dissimulés des codes promos dans les postes, abonnez-vous pour ne rien manquer. Vous serez également informé de toutes les opportunités, astuces, bourses de formations, promotions, etc. que vous ne devez pas manquer. Vos réactions aux postes sont aussi les bienvenus. Merci. 🙏🙏🙏"
+                : "On the pages below, promotional codes will be hidden in the posts, subscribe so you don't miss anything. You will also be informed of all opportunities, tips, training scholarships, promotions, etc. that you must not miss. Your reactions to the posts are also welcome. THANKS. 🙏🙏🙏",
             style: GoogleFonts.poppins(
               color: Colors.white,
-              fontSize: 12,
-              fontWeight: FontWeight.w400,
+              fontSize: 10,
+              fontWeight: FontWeight.w500,
             ),
             textAlign: TextAlign.justify,
           ),
@@ -60,54 +60,107 @@ class _SociauxPageState extends State<SociauxPage> {
           Column(
             children: [
               ProfileMenuReseauBlanc(
-                text: "Facebook WP",
+                text: "Facebook Dressur",
                 press: () async {
-                  final Uri url3 = Uri.parse(facebookWP);
+                  final Uri url3 = Uri.parse(facebookDS);
                   if (!await launchUrl(url3,
                       mode: LaunchMode.externalApplication)) {
                     throw 'Could not launch $url3';
                   }
                 },
               ),
-              ProfileMenuReseauBlanc(
-                text: "Facebook BLT",
-                press: () async {
-                  final Uri url2 = Uri.parse(facebookBLT);
-                  if (!await launchUrl(url2,
-                      mode: LaunchMode.externalApplication)) {
-                    throw 'Could not launch $url2';
-                  }
-                },
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width * 0.44,
+                    child: ProfileMenuReseauBlanc(
+                      text: "TikTok BLT",
+                      press: () async {
+                        final Uri url2 = Uri.parse(tiktokBLT);
+                        if (!await launchUrl(url2,
+                            mode: LaunchMode.externalApplication)) {
+                          throw 'Could not launch $url2';
+                        }
+                      },
+                    ),
+                  ),
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width * 0.44,
+                    child: ProfileMenuReseauBlanc(
+                      text: "TikTok ELTCS",
+                      press: () async {
+                        final Uri url2 = Uri.parse(tiktokELTCS);
+                        if (!await launchUrl(url2,
+                            mode: LaunchMode.externalApplication)) {
+                          throw 'Could not launch $url2';
+                        }
+                      },
+                    ),
+                  ),
+                ],
               ),
-              ProfileMenuReseauBlanc(
-                text: "Tiktok BLT",
-                press: () async {
-                  final Uri url1 = Uri.parse(tiktokBLT);
-                  if (!await launchUrl(url1,
-                      mode: LaunchMode.externalApplication)) {
-                    throw 'Could not launch $url1';
-                  }
-                },
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width * 0.44,
+                    child: ProfileMenuReseauBlanc(
+                      text: "Facebook BLT",
+                      press: () async {
+                        final Uri url2 = Uri.parse(facebookBLT);
+                        if (!await launchUrl(url2,
+                            mode: LaunchMode.externalApplication)) {
+                          throw 'Could not launch $url2';
+                        }
+                      },
+                    ),
+                  ),
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width * 0.44,
+                    child: ProfileMenuReseauBlanc(
+                      text: "Facebook ELTCS",
+                      press: () async {
+                        final Uri url2 = Uri.parse(facebookELTCS);
+                        if (!await launchUrl(url2,
+                            mode: LaunchMode.externalApplication)) {
+                          throw 'Could not launch $url2';
+                        }
+                      },
+                    ),
+                  ),
+                ],
               ),
-              ProfileMenuReseauBlanc(
-                text: "Instagram BLT",
-                press: () async {
-                  final Uri url0 = Uri.parse(instagramBLT);
-                  if (!await launchUrl(url0,
-                      mode: LaunchMode.externalApplication)) {
-                    throw 'Could not launch $url0';
-                  }
-                },
-              ),
-              ProfileMenuReseauBlanc(
-                text: "Youtube BLT",
-                press: () async {
-                  final Uri url = Uri.parse(youtubeBLT);
-                  if (!await launchUrl(url,
-                      mode: LaunchMode.externalApplication)) {
-                    throw 'Could not launch $url';
-                  }
-                },
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width * 0.44,
+                    child: ProfileMenuReseauBlanc(
+                      text: "Instagram BLT",
+                      press: () async {
+                        final Uri url2 = Uri.parse(instagramBLT);
+                        if (!await launchUrl(url2,
+                            mode: LaunchMode.externalApplication)) {
+                          throw 'Could not launch $url2';
+                        }
+                      },
+                    ),
+                  ),
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width * 0.44,
+                    child: ProfileMenuReseauBlanc(
+                      text: "Instagram ELTCS",
+                      press: () async {
+                        final Uri url2 = Uri.parse(instagramELTCS);
+                        if (!await launchUrl(url2,
+                            mode: LaunchMode.externalApplication)) {
+                          throw 'Could not launch $url2';
+                        }
+                      },
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
