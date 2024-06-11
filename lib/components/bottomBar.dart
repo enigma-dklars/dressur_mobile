@@ -39,13 +39,14 @@ class _BottomBarState extends State<BottomBar> {
 
     // Exécute la fonction toutes les 5 heures
     Timer.periodic(const Duration(hours: 5), (timer) {
-      showNotification("Cc $nom du nouveau ?",
+      showNotification("Cc $name_complete du nouveau ?",
           "Consultez votre compte dès maintenant pour découvrir les dernières promotions, actualités et préférences disponibles sur Dressur.");
     });
 
     // Exécute la fonction toutes les 2 heures
     Timer.periodic(const Duration(hours: 2), (timer) {
       fetchContactDSs();
+      // getMessageEnAttente(false);
     });
 
     // si le user est un admin, il sera notifier des traitement en attente de validation
@@ -73,11 +74,6 @@ class _BottomBarState extends State<BottomBar> {
   void synchroAvanceFunction() async {
     setState(() {
       contactsUserBeforeDS = [];
-      if (langUserPhone != "fr") {
-        textChargementEvolution = "Recognition of existing contacts ...";
-      } else {
-        textChargementEvolution = "Reconnaissance des contacts existants ...";
-      }
     });
     await SQLHelper.viderLaBaseDeDonneeLocalTelUser();
 
@@ -85,17 +81,6 @@ class _BottomBarState extends State<BottomBar> {
 
     List<Contact> contacts =
         await FlutterContacts.getContacts(withProperties: true);
-
-    int countContacts = 0;
-    setState(() {
-      if (langUserPhone != "fr") {
-        textChargementEvolution =
-            "Recognition of existing contacts ...\n0 / ${contacts.length}";
-      } else {
-        textChargementEvolution =
-            "Reconnaissance des contacts existants ...\n0 / ${contacts.length}";
-      }
-    });
 
     for (var contact in contacts) {
       for (var phone in contact.phones) {
@@ -114,16 +99,6 @@ class _BottomBarState extends State<BottomBar> {
           await insertNumTelUserIntoDataBase(numberTel);
         }
       }
-      setState(() {
-        countContacts++;
-        if (langUserPhone != "fr") {
-          textChargementEvolution =
-              "Recognition of existing contacts ...\n$countContacts / ${contacts.length}";
-        } else {
-          textChargementEvolution =
-              "Reconnaissance des contacts existants ...\n$countContacts / ${contacts.length}";
-        }
-      });
     }
     // envoyer les contacts pour stockage
     var request = http.MultipartRequest(
@@ -132,15 +107,6 @@ class _BottomBarState extends State<BottomBar> {
         .addAll({'contactsUserBeforeDS': jsonEncode(contactsUserBeforeDS)});
     // http.StreamedResponse response = await request.send();
     await request.send();
-
-    // envoyez les contacts a la route
-    setState(() {
-      if (langUserPhone != "fr") {
-        textChargementEvolution = "Ended .";
-      } else {
-        textChargementEvolution = "Terminé .";
-      }
-    });
   }
 
   Future<void> fetchContactDSs() async {

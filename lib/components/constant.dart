@@ -12,8 +12,8 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:http/http.dart' as http;
 
 const versionApp = '1.0.0';
-const oldDatabaseName = 'un_dressur.db';
-const nowDataBaseName = 'deux_dressur.db';
+const oldDatabaseName = 'neuf_dressur.db';
+const nowDataBaseName = 'onze_dressur.db';
 bool modeReconnaissanceContactArrierePlan = false;
 // const generalApiDomaine = 'http://dressur.rf.gd/public';
 const generalRouteForApi = '$generalApiDomaine/api';
@@ -37,16 +37,35 @@ const dressurUrlPlaystore =
 
 const primaryColor = Color(0xFF2a4b9a);
 const secondaryColor = Colors.indigoAccent;
-const databaseSqlCode = """
-  CREATE TABLE userInfos(
-    idDS INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-    tableName TEXT,
-    id INTEGER,
-    uid TEXT,
-    contactTel TEXT
-  )
-""";
+const String createUserInfosTable = """
+    CREATE TABLE userInfos(
+      idDS INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+      tableName TEXT,
+      id INTEGER,
+      uid TEXT,
+      contactTel TEXT
+    );
+  """;
+const String createDiscussionTable = """
+    CREATE TABLE discussion(
+      id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+      uid TEXT,
+      nom TEXT,
+      date INTEGER
+    );
+  """;
+const String createMessageTable = """
+    CREATE TABLE message(
+      id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+      emetteur TEXT,
+      recepteur TEXT,
+      message TEXT,
+      dateEnvoi TEXT,
+      vue TEXT
+    );
+  """;
 
+List<dynamic> userChatInfo = [];
 List<dynamic> contactsUserBeforeDS = [];
 List<dynamic> contactsEnregistrer = [];
 String? langUserPhone = "en";
@@ -66,8 +85,10 @@ var modeMotDePasseOublier = false;
 var mailConnexion = "";
 var textChargementEvolution = "Chargement ...";
 var addUserOnAutreProfilPage = "oui";
+var lesPublicites;
 var uidAutreUser;
 var uidUser;
+var name_complete;
 var pseudo;
 var nom;
 var mail;
@@ -97,7 +118,7 @@ Future<bool> isConnectedToInternet() async {
 }
 
 Future<void> insertNumTelUserIntoDataBase(numberTel) async {
-  SQLHelper.insert({
+  SQLHelper.insert("userInfos", {
     'tableName': "numsTelUser",
     'contactTel': numberTel,
   });
@@ -105,6 +126,7 @@ Future<void> insertNumTelUserIntoDataBase(numberTel) async {
 
 Future<void> initUserInformations(userInfos) async {
   uidUser = userInfos["uid"];
+  name_complete = userInfos["name_complete"];
   pseudo = userInfos["pseudo"];
   nom = userInfos["nom"];
   mail = userInfos["mail"];
@@ -126,6 +148,7 @@ Future<void> initUserInformations(userInfos) async {
   admin = userInfos["admin"];
   permissionAdd = userInfos["permissionAdd"];
   messageErreurPermissionAdd = userInfos["messageErreurPermissionAdd"];
+  lesPublicites = userInfos["lesPublicites"];
   preferencePaysText = preferencePaysToText(userInfos["preferencePays"]);
   preferenceCentreInteretLoisirText = preferenceCentreInteretLoisirToText(
       userInfos["preferenceCentreInteretLoisir"]);
@@ -133,7 +156,7 @@ Future<void> initUserInformations(userInfos) async {
 
   SQLHelper.viderLaBaseDeDonneeLocal();
 
-  SQLHelper.insert({
+  SQLHelper.insert("userInfos", {
     'tableName': "user",
     'id': 0,
     'uid': userInfos["uid"],

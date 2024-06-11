@@ -74,26 +74,6 @@ class _ReceptionPageState extends State<ReceptionPage> {
             ),
           ),
           actions: [
-            IconButton(
-              icon: const Icon(Icons.notifications),
-              color: Colors.white,
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => ListeNotification(),
-                  ),
-                );
-              },
-            ),
-            const Padding(
-              padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
-              child: VerticalDivider(
-                width: 0,
-                color: Colors.white,
-                thickness: 1,
-              ),
-            ),
             PopupMenuButton<dynamic>(
               itemBuilder: (context) => [
                 PopupMenuItem(
