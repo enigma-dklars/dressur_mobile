@@ -2,7 +2,6 @@
 
 import 'dart:convert';
 import 'package:dressur/components/noti.dart';
-import 'package:dressur/components/profile_menu_reseau.dart';
 import 'package:dressur/components/sql_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -22,6 +21,8 @@ class _AutreProfilPageState extends State<AutreProfilPage> {
   bool _loading = false;
   bool _firstLoad = true;
   var autre_name_complete;
+  var autre_avatar;
+  var autre_banniere;
   var autre_pseudo;
   var autre_nom;
   var autre_mail;
@@ -55,6 +56,8 @@ class _AutreProfilPageState extends State<AutreProfilPage> {
         setState(() {
           var userAutreInfos = data['user'];
           autre_name_complete = userAutreInfos["name_complete"];
+          autre_avatar = userAutreInfos["avatar"];
+          autre_banniere = userAutreInfos["banniere"];
           autre_pseudo = userAutreInfos["pseudo"];
           autre_nom = userAutreInfos["nom"];
           autre_mail = userAutreInfos["mail"];
@@ -184,186 +187,238 @@ class _AutreProfilPageState extends State<AutreProfilPage> {
       });
     }
     return Scaffold(
-      appBar: AppBar(
-        elevation: 0,
-        backgroundColor: primaryColor,
-        title: Text(
-          (langUserPhone == "fr")
-              ? "Informations Utilisateur"
-              : "User Information",
-          style: GoogleFonts.poppins(
-            color: Colors.white,
-            fontWeight: FontWeight.w400,
+      body: Column(
+        children: [
+          SizedBox(
+            height: 44,
+            child: Container(
+              color: primaryColor,
+            ),
           ),
-        ),
-        leading: IconButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          icon: const Icon(
-            Icons.arrow_back,
-            size: 30,
-            color: Colors.white,
-          ),
-        ),
-      ),
-      body: _firstLoad
-          ? const Center(
-              child: CircularProgressIndicator(),
-            )
-          : _loading
-              ? const Center(
-                  child: CircularProgressIndicator(),
-                )
-              : SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      Stack(
-                        alignment: Alignment.center,
-                        clipBehavior: Clip.none,
-                        children: [
-                          Image.asset(
-                            "images/banniere_dressur.jpg",
-                          ),
-                          Positioned(
-                            bottom: -50,
-                            child: CircleAvatar(
-                              backgroundImage: AssetImage("images/blt.png"),
-                              backgroundColor: Colors.white,
-                              radius: 50,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 60),
-                      if (autre_nom != null) ...[
-                        Text(
-                          autre_nom,
-                          style: GoogleFonts.poppins(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        const SizedBox(height: 1),
-                      ],
-                      if (autre_pseudo != null) ...[
-                        Text(
-                          "@$autre_pseudo",
-                          style: GoogleFonts.poppins(fontSize: 14),
-                        ),
-                        const SizedBox(height: 6),
-                      ],
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          GestureDetector(
-                            onTap: () {
-                              launchPhoneCall(autre_tel);
-                            },
-                            child: Container(
-                              padding: EdgeInsets.fromLTRB(5, 5, 5, 5),
-                              decoration: BoxDecoration(
-                                color: primaryColor,
-                                shape: BoxShape.circle,
-                              ),
-                              child: Icon(
-                                Icons.phone,
-                                size: 20,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: espaceEntreLesOptionsContact),
-                          GestureDetector(
-                            onTap: () {
-                              launchSMS(autre_tel);
-                            },
-                            child: Container(
-                              padding: EdgeInsets.fromLTRB(5, 5, 5, 5),
-                              decoration: BoxDecoration(
-                                color: primaryColor,
-                                shape: BoxShape.circle,
-                              ),
-                              child: Icon(
-                                Icons.message,
-                                size: 20,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: espaceEntreLesOptionsContact),
-                          GestureDetector(
-                            onTap: () {
-                              launchEmail(autre_mail);
-                            },
-                            child: Container(
-                              padding: EdgeInsets.fromLTRB(5, 5, 5, 5),
-                              decoration: BoxDecoration(
-                                color: primaryColor,
-                                shape: BoxShape.circle,
-                              ),
-                              child: Icon(
-                                Icons.mail,
-                                size: 20,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: espaceEntreLesOptionsContact),
-                          GestureDetector(
-                            onTap: () {
-                              launchWhatsApp(autre_tel);
-                            },
-                            child: Container(
-                              padding: EdgeInsets.fromLTRB(5, 5, 5, 5),
-                              decoration: BoxDecoration(
-                                color: primaryColor,
-                                shape: BoxShape.circle,
-                              ),
-                              child: Image.asset(
-                                'images/logo_whatsapp.png',
-                                width: 20,
-                                height: 20,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: espaceEntreLesOptionsContact),
-                        ],
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(10.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            if (autre_mail != null)
-                              buildInfoCard("E-Mail", autre_mail),
-                            if (autre_tel != null)
-                              buildInfoCard(
-                                  (langUserPhone == "fr")
-                                      ? "Numéro de Téléphone"
-                                      : "Phone number",
-                                  autre_tel),
-                            if (autre_tiktok != null)
-                              buildSocialMediaCard("TikTok", autre_tiktok),
-                            if (autre_youtube != null)
-                              buildSocialMediaCard("Youtube", autre_youtube),
-                            if (autre_facebook != null)
-                              buildSocialMediaCard("Facebook", autre_facebook),
-                            if (autre_instagram != null)
-                              buildSocialMediaCard(
-                                  "Instagram", autre_instagram),
-                            if (autre_apropos != null)
-                              buildInfoCard(
-                                  (langUserPhone == "fr")
-                                      ? "À propos"
-                                      : "About",
-                                  autre_apropos),
-                          ],
-                        ),
-                      ),
-                    ],
+          Expanded(
+            child: CustomScrollView(
+              slivers: <Widget>[
+                SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (BuildContext context, int index) {
+                      return _firstLoad
+                          ? const Center(
+                              child: CircularProgressIndicator(),
+                            )
+                          : _loading
+                              ? const Center(
+                                  child: CircularProgressIndicator(),
+                                )
+                              : SingleChildScrollView(
+                                  child: Column(
+                                    children: [
+                                      Stack(
+                                        alignment: Alignment.center,
+                                        clipBehavior: Clip.none,
+                                        children: [
+                                          Image.asset(
+                                            "images/$autre_banniere",
+                                          ),
+                                          Positioned(
+                                            bottom: -60,
+                                            child: CircleAvatar(
+                                              backgroundImage: AssetImage(
+                                                  "images/$autre_avatar"),
+                                              backgroundColor: Colors.white,
+                                              radius: 60,
+                                              child: Container(
+                                                decoration: BoxDecoration(
+                                                  shape: BoxShape.circle,
+                                                  border: Border.all(
+                                                    color: primaryColor,
+                                                    width: 2.5,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                          Positioned(
+                                            top: 10,
+                                            left: 10,
+                                            child: GestureDetector(
+                                              onTap: () {
+                                                Navigator.of(context).pop();
+                                              },
+                                              child: Container(
+                                                padding: EdgeInsets.fromLTRB(
+                                                    5, 5, 5, 5),
+                                                decoration: BoxDecoration(
+                                                  color: primaryColor,
+                                                  shape: BoxShape.circle,
+                                                ),
+                                                child: Icon(
+                                                  Icons.arrow_back,
+                                                  size: 25,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 70),
+                                      if (autre_nom != null) ...[
+                                        Text(
+                                          autre_nom,
+                                          style: GoogleFonts.poppins(
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 1),
+                                      ],
+                                      if (autre_pseudo != null) ...[
+                                        Text(
+                                          "@$autre_pseudo",
+                                          style:
+                                              GoogleFonts.poppins(fontSize: 14),
+                                        ),
+                                        const SizedBox(height: 6),
+                                      ],
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          GestureDetector(
+                                            onTap: () {
+                                              launchPhoneCall(autre_tel);
+                                            },
+                                            child: Container(
+                                              padding: EdgeInsets.fromLTRB(
+                                                  5, 5, 5, 5),
+                                              decoration: BoxDecoration(
+                                                color: primaryColor,
+                                                shape: BoxShape.circle,
+                                              ),
+                                              child: Icon(
+                                                Icons.phone,
+                                                size: 20,
+                                                color: Colors.white,
+                                              ),
+                                            ),
+                                          ),
+                                          const SizedBox(
+                                              width:
+                                                  espaceEntreLesOptionsContact),
+                                          GestureDetector(
+                                            onTap: () {
+                                              launchSMS(autre_tel);
+                                            },
+                                            child: Container(
+                                              padding: EdgeInsets.fromLTRB(
+                                                  5, 5, 5, 5),
+                                              decoration: BoxDecoration(
+                                                color: primaryColor,
+                                                shape: BoxShape.circle,
+                                              ),
+                                              child: Icon(
+                                                Icons.message,
+                                                size: 20,
+                                                color: Colors.white,
+                                              ),
+                                            ),
+                                          ),
+                                          const SizedBox(
+                                              width:
+                                                  espaceEntreLesOptionsContact),
+                                          GestureDetector(
+                                            onTap: () {
+                                              launchEmail(autre_mail);
+                                            },
+                                            child: Container(
+                                              padding: EdgeInsets.fromLTRB(
+                                                  5, 5, 5, 5),
+                                              decoration: BoxDecoration(
+                                                color: primaryColor,
+                                                shape: BoxShape.circle,
+                                              ),
+                                              child: Icon(
+                                                Icons.mail,
+                                                size: 20,
+                                                color: Colors.white,
+                                              ),
+                                            ),
+                                          ),
+                                          const SizedBox(
+                                              width:
+                                                  espaceEntreLesOptionsContact),
+                                          GestureDetector(
+                                            onTap: () {
+                                              launchWhatsApp(autre_tel);
+                                            },
+                                            child: Container(
+                                              padding: EdgeInsets.fromLTRB(
+                                                  5, 5, 5, 5),
+                                              decoration: BoxDecoration(
+                                                color: primaryColor,
+                                                shape: BoxShape.circle,
+                                              ),
+                                              child: Image.asset(
+                                                'images/logo_whatsapp.png',
+                                                width: 20,
+                                                height: 20,
+                                              ),
+                                            ),
+                                          ),
+                                          const SizedBox(
+                                              width:
+                                                  espaceEntreLesOptionsContact),
+                                        ],
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.all(10.0),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            if (autre_mail != null)
+                                              buildInfoCard(
+                                                  "E-Mail", autre_mail),
+                                            if (autre_tel != null)
+                                              buildInfoCard(
+                                                  (langUserPhone == "fr")
+                                                      ? "Numéro de Téléphone"
+                                                      : "Phone number",
+                                                  autre_tel),
+                                            if (autre_tiktok != null)
+                                              buildSocialMediaCard(
+                                                  "TikTok", autre_tiktok),
+                                            if (autre_youtube != null)
+                                              buildSocialMediaCard(
+                                                  "Youtube", autre_youtube),
+                                            if (autre_facebook != null)
+                                              buildSocialMediaCard(
+                                                  "Facebook", autre_facebook),
+                                            if (autre_instagram != null)
+                                              buildSocialMediaCard(
+                                                  "Instagram", autre_instagram),
+                                            if (autre_apropos != null)
+                                              buildInfoCard(
+                                                  (langUserPhone == "fr")
+                                                      ? "À propos"
+                                                      : "About",
+                                                  autre_apropos),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                    },
+                    childCount:
+                        1, // Utilisez 1 pour un seul élément dans la liste
                   ),
                 ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -414,7 +469,7 @@ class _AutreProfilPageState extends State<AutreProfilPage> {
   Icon getSocialMediaIcon(String platform) {
     switch (platform) {
       case "TikTok":
-        return Icon(Icons.music_note, color: Colors.black);
+        return Icon(Icons.music_note);
       case "Youtube":
         return Icon(Icons.video_library, color: Colors.red);
       case "Facebook":
