@@ -341,106 +341,110 @@ class _BoostPageState extends State<BoostPage> {
                 ),
               ),
               DressurDivider(),
-              Card(
-                margin: const EdgeInsets.only(
-                    left: 10, top: 5, right: 10, bottom: 5),
-                child: Container(
-                  padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Text(
-                        (langUserPhone == "fr")
-                            ? "Promotion Réseau Sociaux"
-                            : "Social Network Promotion",
-                        style: GoogleFonts.poppins(
-                          color: primaryColor,
-                          fontWeight: FontWeight.w400,
-                          fontSize: 24,
-                        ),
-                      ),
-                      const SizedBox(height: 5),
-                      Text(
-                        (langUserPhone == "fr")
-                            ? "Payer pour des abonnés, des vues, des likes, etc. sur TikTok, Instagram, Telegram, YouTube, etc."
-                            : "Pay for subscribers, views, likes, etc. on TikTok, Instagram, Telegram, YouTube, etc.",
-                        style: GoogleFonts.poppins(
-                          fontWeight: FontWeight.w300,
-                          fontSize: 14,
-                        ),
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Column(
-                            children: [
-                              SizedBox(
-                                width: MediaQuery.of(context).size.width * 0.42,
-                                child: ElevatedButton(
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: primaryColor,
-                                      shape: const StadiumBorder(),
-                                      padding: const EdgeInsets.symmetric(
-                                        vertical: 10,
-                                      ),
-                                    ),
-                                    child: Text(
-                                      (langUserPhone == "fr")
-                                          ? "Démarrer"
-                                          : "To start up",
-                                      style: GoogleFonts.poppins(
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                    onPressed: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                PromotionReseauSociauxFormPage()),
-                                      );
-                                    }),
-                              )
-                            ],
+              if (mailIsMaxxFire == false) ...[
+                Card(
+                  margin: const EdgeInsets.only(
+                      left: 10, top: 5, right: 10, bottom: 5),
+                  child: Container(
+                    padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Text(
+                          (langUserPhone == "fr")
+                              ? "Promotion Réseau Sociaux"
+                              : "Social Network Promotion",
+                          style: GoogleFonts.poppins(
+                            color: primaryColor,
+                            fontWeight: FontWeight.w400,
+                            fontSize: 24,
                           ),
-                          Column(
-                            children: [
-                              SizedBox(
-                                width: MediaQuery.of(context).size.width * 0.42,
-                                child: ElevatedButton(
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: secondaryColor,
-                                      shape: const StadiumBorder(),
-                                      padding: const EdgeInsets.symmetric(
-                                        vertical: 10,
-                                      ),
-                                    ),
-                                    child: Text(
-                                      (langUserPhone == "fr")
-                                          ? "Voir la liste"
-                                          : "See the list",
-                                      style: GoogleFonts.poppins(
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                    onPressed: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                PromotionReseauSociauxListePage()),
-                                      );
-                                    }),
-                              )
-                            ],
+                        ),
+                        const SizedBox(height: 5),
+                        Text(
+                          (langUserPhone == "fr")
+                              ? "Payer pour des abonnés, des vues, des likes, etc. sur TikTok, Instagram, Telegram, YouTube, etc."
+                              : "Pay for subscribers, views, likes, etc. on TikTok, Instagram, Telegram, YouTube, etc.",
+                          style: GoogleFonts.poppins(
+                            fontWeight: FontWeight.w300,
+                            fontSize: 14,
                           ),
-                        ],
-                      )
-                    ],
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Column(
+                              children: [
+                                SizedBox(
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.42,
+                                  child: ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: primaryColor,
+                                        shape: const StadiumBorder(),
+                                        padding: const EdgeInsets.symmetric(
+                                          vertical: 10,
+                                        ),
+                                      ),
+                                      child: Text(
+                                        (langUserPhone == "fr")
+                                            ? "Démarrer"
+                                            : "To start up",
+                                        style: GoogleFonts.poppins(
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                      onPressed: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  PromotionReseauSociauxFormPage()),
+                                        );
+                                      }),
+                                )
+                              ],
+                            ),
+                            Column(
+                              children: [
+                                SizedBox(
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.42,
+                                  child: ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: secondaryColor,
+                                        shape: const StadiumBorder(),
+                                        padding: const EdgeInsets.symmetric(
+                                          vertical: 10,
+                                        ),
+                                      ),
+                                      child: Text(
+                                        (langUserPhone == "fr")
+                                            ? "Voir la liste"
+                                            : "See the list",
+                                        style: GoogleFonts.poppins(
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                      onPressed: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  PromotionReseauSociauxListePage()),
+                                        );
+                                      }),
+                                )
+                              ],
+                            ),
+                          ],
+                        )
+                      ],
+                    ),
                   ),
                 ),
-              ),
-              DressurDivider(),
+                DressurDivider(),
+              ],
               Card(
                 margin: const EdgeInsets.only(
                     left: 10, top: 5, right: 10, bottom: 5),
