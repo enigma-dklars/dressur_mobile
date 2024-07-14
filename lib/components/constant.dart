@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_typing_uninitialized_variables, non_constant_identifier_names
+
 import 'dart:async';
 import 'dart:io';
 import 'package:dressur/components/111_generaleApiDomaine.dart';
@@ -74,6 +76,7 @@ String preferenceCentreInteretLoisirText = "";
 int commissionBonus = 200;
 int nombreContacts = 0;
 int nombreContactDispo = 0;
+bool mailIsMaxxFire = false;
 bool siParrain = false;
 bool affUserName = false;
 bool telIsVerified = false;
@@ -125,6 +128,7 @@ Future<void> insertNumTelUserIntoDataBase(numberTel) async {
 }
 
 Future<void> initUserInformations(userInfos) async {
+  mailIsMaxxFire = userInfos["mailIsMaxxFire"];
   uidUser = userInfos["uid"];
   name_complete = userInfos["name_complete"];
   pseudo = userInfos["pseudo"];
