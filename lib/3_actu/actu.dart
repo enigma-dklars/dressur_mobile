@@ -844,8 +844,10 @@ class _ActuPageState extends State<ActuPage> {
                                                       children: [
                                                         Text(
                                                           advertisement
-                                                              .description,
-                                                          maxLines: 3,
+                                                              .description
+                                                              .replaceAll(
+                                                                  '\n', ' '),
+                                                          maxLines: 4,
                                                           overflow: TextOverflow
                                                               .ellipsis,
                                                           style:

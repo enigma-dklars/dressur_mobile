@@ -308,8 +308,8 @@ class _RegisterFormState extends State<RegisterForm> {
     setState(() {
       idFormulBoost = val;
       _message = (langUserPhone == "fr")
-          ? "Cette formule vous offre un boost de $jours jour(s) pour $prix FCFA."
-          : "This formula offers you a boost of $jours day(s) for $prix FCFA.";
+          ? "Cette formule vous offre un boost de $jours jour(s) pour $prix Bonus."
+          : "This formula offers you a boost of $jours day(s) for $prix Bonus.";
     });
   }
 

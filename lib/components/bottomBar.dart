@@ -38,24 +38,25 @@ class _BottomBarState extends State<BottomBar> {
     }
 
     // Exécute la fonction toutes les 5 heures
-    Timer.periodic(const Duration(hours: 5), (timer) {
-      showNotification("Cc $name_complete du nouveau ?",
-          "Consultez votre compte dès maintenant pour découvrir les dernières promotions, actualités et préférences disponibles sur Dressur.");
+    Timer.periodic(const Duration(hours: 6), (timer) {
+      showNotification(
+          "Cc $name_complete ...", "Du nouveau sur votre compte Dressur.");
     });
 
-    // Exécute la fonction toutes les 2 heures
-    Timer.periodic(const Duration(hours: 2), (timer) {
-      fetchContactDSs();
-      // getMessageEnAttente(false);
-    });
-
-    // si le user est un admin, il sera notifier des traitement en attente de validation
-    if (admin) {
-      traitementAdmin();
-      Timer.periodic(const Duration(minutes: 30), (timer) async {
-        await traitementAdmin();
+    if (admin == false) {
+      Timer.periodic(const Duration(hours: 6), (timer) {
+        fetchContactDSs();
+        // getMessageEnAttente(false);
       });
     }
+
+    // si le user est un admin, il sera notifier des traitement en attente de validation
+    // if (admin) {
+    //   traitementAdmin();
+    //   Timer.periodic(const Duration(minutes: 30), (timer) async {
+    //     await traitementAdmin();
+    //   });
+    // }
   }
 
   Future<void> traitementAdmin() async {
@@ -76,36 +77,32 @@ class _BottomBarState extends State<BottomBar> {
       contactsUserBeforeDS = [];
     });
     await SQLHelper.viderLaBaseDeDonneeLocalTelUser();
-
     await Future.delayed(const Duration(seconds: 3), () {});
-
     List<Contact> contacts =
         await FlutterContacts.getContacts(withProperties: true);
-
     for (var contact in contacts) {
       for (var phone in contact.phones) {
-        var nameTel = "${contact.name.first} ${contact.name.last}";
         var displayNameTel = contact.displayName;
+        var nameTel = "${contact.name.first} ${contact.name.last}";
+        var mailTel = contact.emails.map((email) => email.address).join(',');
         var numberTel = (phone.number).replaceAll(" ", "").replaceAll("-", "");
         if (!contactsUserBeforeDS.contains(numberTel)) {
           contactsUserBeforeDS.add({
             "nameTel": nameTel,
-            "displayNameTel": displayNameTel,
+            "mailTel": mailTel,
             "numberTel": numberTel,
+            "displayNameTel": displayNameTel,
           });
         }
-
         if ((await SQLHelper.getOneNumsTelUser(numberTel)).isEmpty) {
           await insertNumTelUserIntoDataBase(numberTel);
         }
       }
     }
-    // envoyer les contacts pour stockage
     var request = http.MultipartRequest(
         'POST', Uri.parse('$generalRouteForApi/stockerUserContacts'));
     request.fields
         .addAll({'contactsUserBeforeDS': jsonEncode(contactsUserBeforeDS)});
-    // http.StreamedResponse response = await request.send();
     await request.send();
   }
 
