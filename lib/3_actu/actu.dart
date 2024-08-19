@@ -3,6 +3,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dressur/1_reception/liste_contact.dart';
 import 'package:dressur/2_promo/new_boost_contact.dart';
 import 'package:dressur/5_autre/cart_visite.dart';
@@ -879,19 +880,18 @@ class _ActuPageState extends State<ActuPage> {
                                                     borderRadius:
                                                         BorderRadius.circular(
                                                             3),
-                                                    child: FadeInImage
-                                                        .assetNetwork(
-                                                      placeholder:
-                                                          'images/placeholder.png',
-                                                      image:
+                                                    child: CachedNetworkImage(
+                                                      imageUrl:
                                                           advertisement.image,
+                                                      placeholder: (context,
+                                                              url) =>
+                                                          Image.asset(
+                                                              'images/placeholder.png'),
+                                                      errorWidget: (context,
+                                                              url, error) =>
+                                                          Image.asset(
+                                                              'images/error_image.png'),
                                                       fit: BoxFit.cover,
-                                                      imageErrorBuilder:
-                                                          (context, error,
-                                                              stackTrace) {
-                                                        return Image.asset(
-                                                            'images/error_image.png');
-                                                      },
                                                     ),
                                                   ),
                                                   const SizedBox(height: 10),
