@@ -87,6 +87,7 @@ var modeMotDePasseOublier = false;
 var mailConnexion = "";
 var textChargementEvolution = "Chargement ...";
 var addUserOnAutreProfilPage = "oui";
+var myDressurVersion = '1.0.1';
 var lesPublicites;
 var uidAutreUser;
 var uidUser;
@@ -127,6 +128,7 @@ Future<void> insertNumTelUserIntoDataBase(numberTel) async {
 }
 
 Future<void> initUserInformations(userInfos) async {
+  myDressurVersion = userInfos["myDressurVersion"];
   mailIsMaxxFire = userInfos["mailIsMaxxFire"];
   uidUser = userInfos["uid"];
   name_complete = userInfos["name_complete"];

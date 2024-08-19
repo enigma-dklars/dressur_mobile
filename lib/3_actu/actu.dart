@@ -626,6 +626,72 @@ class _ActuPageState extends State<ActuPage> {
                             },
                           )
                         : const SizedBox(height: 0),
+                    if (int.parse(versionApp.toString().replaceAll(".", "")) <
+                        int.parse(
+                            myDressurVersion.toString().replaceAll(".", "")))
+                      Card(
+                        margin: const EdgeInsets.only(
+                            left: 10, top: 5, right: 10, bottom: 5),
+                        child: Container(
+                          padding: const EdgeInsets.fromLTRB(10, 3, 10, 6),
+                          child: Column(
+                            children: [
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    (langUserPhone == "fr")
+                                        ? "Nouvelle Version Disponible"
+                                        : "New Version Available",
+                                    style: GoogleFonts.poppins(
+                                      fontWeight: FontWeight.w500,
+                                      color: Colors.red,
+                                      fontSize: 24,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Text(
+                                (langUserPhone == "fr")
+                                    ? "Pour votre sécurité et une meilleure performance de nos services, veuillez faire la mise à jour."
+                                    : "For your security and better performance of our services, please update.",
+                                style: GoogleFonts.poppins(
+                                  fontWeight: FontWeight.w300,
+                                  fontSize: 14,
+                                ),
+                              ),
+                              const SizedBox(height: 5),
+                              ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.red,
+                                  shape: const StadiumBorder(),
+                                  minimumSize: const Size.fromHeight(40),
+                                ),
+                                child: Text(
+                                  (langUserPhone == "fr")
+                                      ? "Télécharger"
+                                      : "Download",
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                onPressed: () async {
+                                  final Uri _url =
+                                      Uri.parse(dressurUrlPlaystore);
+                                  if (!await launchUrl(_url,
+                                      mode: LaunchMode.externalApplication)) {
+                                    throw 'Could not launch $_url';
+                                  }
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+
                     if (nombreContactDispo > 0)
                       Card(
                         margin: const EdgeInsets.only(

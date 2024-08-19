@@ -60,7 +60,9 @@ class _PageDepartState extends State<PageDepart> {
       var data = convert.jsonDecode(data1);
       if (data["error"] == false) {
         if (data["importantUpdate"] == true) {
-          if (data["versionApp"] != versionApp) {
+          myDressurVersion = data["versionApp"];
+          if (int.parse(versionApp.toString().replaceAll(".", "")) <
+              int.parse(myDressurVersion.toString().replaceAll(".", ""))) {
             return Navigator.of(context).push(MaterialPageRoute(
                 builder: (context) => const ImportantUpdate()));
           }
