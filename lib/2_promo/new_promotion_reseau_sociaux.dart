@@ -49,6 +49,43 @@ class _PromotionReseauSociauxFormPageState
         child: Column(
           children: [
             const SizedBox(height: 5),
+            Card(
+              margin:
+                  const EdgeInsets.only(left: 10, top: 5, right: 10, bottom: 5),
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(5),
+                  gradient: const LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Colors.red,
+                      Color.fromARGB(255, 85, 3, 3),
+                    ],
+                  ),
+                ),
+                padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    const SizedBox(height: 10),
+                    Text(
+                      (langUserPhone == "fr")
+                          ? "NB: Vos préférences sur Dressur ne s'appliquent pas aux Promotions Réseau Sociaux. Les comptes qui interagiront avec votre promotion seront sélectionnés par le réseau social, sans que Dressur puisse intervenir."
+                          : "NB: Your preferences on Dressur do not apply to Social Network Promotions. The accounts that will interact with your promotion will be selected by the social network, without Dressur being able to intervene.",
+                      style: GoogleFonts.poppins(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 10,
+                        color: Colors.white,
+                      ),
+                      textAlign: TextAlign.justify,
+                    ),
+                    const SizedBox(height: 15),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 5),
             Container(
               margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
               child: Column(
