@@ -20,6 +20,7 @@ class BottomBar extends StatefulWidget {
 }
 
 class _BottomBarState extends State<BottomBar> {
+  int nombreNewContact = 0;
   int _selectedIndex = 2;
   dynamic screens = [];
   bool _swipeInProgress = false;
@@ -29,7 +30,7 @@ class _BottomBarState extends State<BottomBar> {
   void initState() {
     super.initState();
     initNavigationTitle();
-    fetchContactDSs();
+    saveContactDsIfNotExiste();
     if (modeReconnaissanceContactArrierePlan == true) {
       synchroAvanceFunction();
       setState(() {
@@ -43,12 +44,10 @@ class _BottomBarState extends State<BottomBar> {
           "Cc $name_complete ...", "Du nouveau sur votre compte Dressur.");
     });
 
-    if (admin == false) {
-      Timer.periodic(const Duration(hours: 6), (timer) {
-        fetchContactDSs();
-        // getMessageEnAttente(false);
-      });
-    }
+    Timer.periodic(const Duration(hours: 6), (timer) {
+      saveContactDsIfNotExiste();
+      // getMessageEnAttente(false);
+    });
 
     // si le user est un admin, il sera notifier des traitement en attente de validation
     // if (admin) {
@@ -104,35 +103,6 @@ class _BottomBarState extends State<BottomBar> {
     request.fields
         .addAll({'contactsUserBeforeDS': jsonEncode(contactsUserBeforeDS)});
     await request.send();
-  }
-
-  Future<void> fetchContactDSs() async {
-    setState(() {
-      contactsEnregistrer = [];
-    });
-    final url =
-        Uri.parse('$generalRouteForApi/listContactDS/$uidUser/$langUserPhone');
-    final response = await http.get(url);
-    if (response.statusCode == 200) {
-      final jsonData = jsonDecode(response.body) as List<dynamic>;
-      if (jsonData.isNotEmpty) {
-        for (var contact in jsonData) {
-          if (contact['tel'] != "+22964044294" &&
-              contact['tel'] != "22964044294" &&
-              contact['tel'] != "64044294" &&
-              !contactsEnregistrer.contains(contact['tel'])) {
-            contactsEnregistrer.add(contact['tel']);
-          }
-          if ((await SQLHelper.getOneNumsTelUser(contact['tel'])).isEmpty) {
-            final newContact = Contact()
-              ..name.first = contact["nom"] + " #DS"
-              ..phones = [Phone(contact["tel"])];
-            await newContact.insert();
-            await insertNumTelUserIntoDataBase(contact["tel"]);
-          }
-        }
-      }
-    }
   }
 
   void initNavigationTitle() {

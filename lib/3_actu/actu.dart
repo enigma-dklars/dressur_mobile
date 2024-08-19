@@ -524,7 +524,8 @@ class _ActuPageState extends State<ActuPage> {
                     const SizedBox(height: 5),
                     if (nombreContactDispo <= 0 ||
                         telIsVerified == false ||
-                        mailIsVerified == false)
+                        mailIsVerified == false ||
+                        nom != nom.toString().replaceAll(' ', ''))
                       Container(
                         padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
                         child: Text(

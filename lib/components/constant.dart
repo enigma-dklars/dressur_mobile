@@ -1,8 +1,10 @@
 // ignore_for_file: prefer_typing_uninitialized_variables, non_constant_identifier_names, prefer_const_constructors
 
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 import 'package:dressur/components/111_generaleApiDomaine.dart';
+import 'package:dressur/components/noti_sys.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show ByteData, Uint8List, rootBundle;
 import 'package:flutter_contacts/flutter_contacts.dart';
@@ -1199,4 +1201,45 @@ void showConfNumeroWhatsapp(context) async {
       ),
     ),
   );
+}
+
+Future<void> saveContactDsIfNotExiste() async {
+  int nombreNewContact = 0;
+  nombreNewContact = 0;
+  contactsEnregistrer = [];
+  final url =
+      Uri.parse('$generalRouteForApi/listContactDS/$uidUser/$langUserPhone');
+  final response = await http.get(url);
+  if (response.statusCode == 200) {
+    final jsonData = jsonDecode(response.body) as List<dynamic>;
+    if (jsonData.isNotEmpty) {
+      for (var contact in jsonData) {
+        if (contact['tel'] != "+22964044294" &&
+            contact['tel'] != "22964044294" &&
+            contact['tel'] != "64044294" &&
+            !contactsEnregistrer.contains(contact['tel'])) {
+          contactsEnregistrer.add(contact['tel']);
+        }
+        if ((await SQLHelper.getOneNumsTelUser(contact['tel'])).isEmpty) {
+          final newContact = Contact()
+            ..name.first = contact["nom"] + " #DS"
+            ..phones = [Phone(contact["tel"])];
+          await newContact.insert();
+          await insertNumTelUserIntoDataBase(contact["tel"]);
+          nombreNewContact++;
+        }
+      }
+      if (nombreNewContact == 1) {
+        showNotification(
+          "ADD Conatcts Dressur",
+          "$nombreNewContact nouveau contact enregistré par Dressur.",
+        );
+      } else if (nombreNewContact > 1) {
+        showNotification(
+          "ADD Conatcts Dressur",
+          "$nombreNewContact nouveaux contacts enregistrés par Dressur.",
+        );
+      }
+    }
+  }
 }
