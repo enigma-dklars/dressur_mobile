@@ -28,7 +28,7 @@ const tiktokELTCS = "https://www.tiktok.com/@eliticscore1";
 const instagramBLT = "https://www.instagram.com/bluelife.tech";
 const instagramELTCS = "https://www.instagram.com/eliticscore";
 const youtubeBLT = "https://www.youtube.com/@bluelife-tech";
-const whatsappDSURL = "https://wa.me/22964044294";
+const whatsappDSURL = "whatsapp://send?phone=22964044294";
 const dressurConditionUtilisation =
     "https://www.bluelife.tech/realisations/dressur/condition";
 const dressurPolitiqueConfidentialite =
@@ -1186,7 +1186,7 @@ void showConfNumeroWhatsapp(context) async {
                     ),
                     onPressed: () async {
                       final Uri _url = Uri.parse(
-                          "$whatsappDSURL?text=WhatsApp Confirmation");
+                          "$whatsappDSURL&text=WhatsApp Confirmation");
                       if (!await launchUrl(_url,
                           mode: LaunchMode.externalApplication)) {
                         throw 'Could not launch $_url';
