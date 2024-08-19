@@ -1,8 +1,10 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'dart:convert';
+import 'dart:convert' as convert;
 import 'dart:io';
 import 'dart:async';
+import 'package:dressur/components/delayed_animation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
@@ -11,6 +13,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:image/image.dart' as img;
 import 'package:dressur/components/constant.dart';
 import 'package:dressur/components/noti.dart';
+import 'package:select_form_field/select_form_field.dart';
 
 class PromotionFormPage extends StatefulWidget {
   @override
@@ -18,6 +21,7 @@ class PromotionFormPage extends StatefulWidget {
 }
 
 class _PromotionFormPageState extends State<PromotionFormPage> {
+  bool load = false;
   File? _imageFile;
   TextEditingController _textEditingController = TextEditingController();
   bool _isSending = false;
@@ -218,6 +222,52 @@ class _PromotionFormPageState extends State<PromotionFormPage> {
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 15),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  (langUserPhone == "fr") ? 'Gratuit' : 'Free',
+                  style: GoogleFonts.poppins(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w800,
+                    color: Colors.green,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(width: 10),
+                Switch(
+                  trackOutlineColor:
+                      MaterialStateColor.resolveWith((states) => primaryColor),
+                  activeColor: Colors.red,
+                  activeTrackColor: primaryColor,
+                  inactiveThumbColor: Colors.green,
+                  inactiveTrackColor: primaryColor,
+                  value: load,
+                  onChanged: (bool? newValue) {
+                    setState(() {
+                      if (newValue == true) {
+                        load = true;
+                      } else {
+                        load = false;
+                      }
+                    });
+                  },
+                ),
+                const SizedBox(width: 10),
+                Text(
+                  (langUserPhone == "fr") ? 'Payant' : 'Paid',
+                  style: GoogleFonts.poppins(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w800,
+                    color: Colors.red,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+            const SizedBox(height: 5),
+            load ? FormulePayante() : FormuleGratuite(),
+            const SizedBox(height: 10),
             ElevatedButton(
               onPressed: _isSending ? null : _selectImage,
               style: ElevatedButton.styleFrom(
@@ -277,6 +327,256 @@ class _PromotionFormPageState extends State<PromotionFormPage> {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class FormulePayante extends StatefulWidget {
+  @override
+  State<FormulePayante> createState() => _FormulePayanteState();
+}
+
+class _FormulePayanteState extends State<FormulePayante> {
+  bool _desactive2 = false;
+  var _message = "";
+  dynamic data;
+  dynamic idFormulBoost = 1;
+  dynamic valueMethodePaiement = "mtn";
+  String? boostId;
+  final telController = TextEditingController(text: tel);
+
+  List<Map<String, dynamic>> listeDesFormules = [];
+  int value = 0;
+  var label = "";
+  int prix = 0;
+  int jours = 0;
+
+  void listeFormuleBoost() async {
+    bool isConnected = await isConnectedToInternet();
+    if (isConnected) {
+      setState(() {
+        _desactive2 = true;
+      });
+
+      var request = http.MultipartRequest(
+          'POST', Uri.parse('$generalRouteForApi/listeFormuleBoost'));
+      request.fields.addAll({});
+
+      http.StreamedResponse response = await request.send();
+
+      if (response.statusCode == 200) {
+        var data1 = await response.stream.bytesToString();
+        var data = convert.jsonDecode(data1);
+        if (data["error"] == false) {
+          setState(() {
+            _desactive2 = false;
+            listeDesFormules = (data["listeFormulBoost"] as List<dynamic>)
+                .map((item) => item as Map<String, dynamic>)
+                .toList();
+            _message = (langUserPhone == "fr")
+                ? "Veuillez choisir une formule."
+                : "Please choose a plan.";
+          });
+        }
+      }
+    } else {
+      if (langUserPhone != "fr") {
+        dangerNoti(
+            "Mistake!", "You are not connected to the internet.", context);
+      } else {
+        dangerNoti("Erreur!", "Vous n'ètes pas connecté a internet.", context);
+      }
+      setState(() {
+        _desactive2 = false;
+      });
+    }
+  }
+
+  onChangeFormulBoost(val) async {
+    for (var service in listeDesFormules) {
+      if ("$val" == "${service['value']}") {
+        setState(() {
+          value = service['value'];
+          label = service['label'];
+          prix = service['prix'];
+          jours = service['jours'];
+        });
+      }
+    }
+    setState(() {
+      idFormulBoost = val;
+      _message = (langUserPhone == "fr")
+          ? "Cette formule vous offre une promotion affaire de $jours jour(s) pour $prix FCFA."
+          : "This formula offers you a business promotion of $jours day(s) for $prix FCFA.";
+    });
+  }
+
+  onChangeMethodePaiement(val) async {
+    setState(() {
+      valueMethodePaiement = val;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState(); // Loading the diary when the app starts
+    listeFormuleBoost();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      child: Column(
+        children: [
+          DelayedAnimation(
+            delay: 0, // 1500,
+            child: SelectFormField(
+              decoration: const InputDecoration(
+                labelText: 'Formules de Promotion Affaire Payant',
+                border: OutlineInputBorder(),
+              ),
+              type: SelectFormFieldType.dropdown,
+              initialValue: '0',
+              labelText: 'Formules de Promotion Affaire Payant',
+              items: listeDesFormules,
+              onChanged: (val) => onChangeFormulBoost(val),
+              onSaved: (val) => print(val),
+            ),
+          ),
+          const SizedBox(height: 10),
+          DelayedAnimation(
+            delay: 0, // 1000,
+            child: Text(
+              _message,
+              style: GoogleFonts.poppins(
+                fontSize: 16,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class FormuleGratuite extends StatefulWidget {
+  @override
+  State<FormuleGratuite> createState() => _FormuleGratuiteState();
+}
+
+class _FormuleGratuiteState extends State<FormuleGratuite> {
+  bool _desactive = false;
+  var _message = "";
+  dynamic data;
+  dynamic idFormulBoost = 1;
+  String? boostId;
+
+  List<Map<String, dynamic>> listeDesFormules = [];
+  int value = 0;
+  var label = "";
+  int prix = 0;
+  int jours = 0;
+
+  void listeFormuleBoost() async {
+    bool isConnected = await isConnectedToInternet();
+    if (isConnected) {
+      setState(() {
+        _desactive = true;
+      });
+
+      var request = http.MultipartRequest(
+          'POST', Uri.parse('$generalRouteForApi/listeFormuleBoost'));
+      request.fields.addAll({});
+
+      http.StreamedResponse response = await request.send();
+
+      if (response.statusCode == 200) {
+        var data1 = await response.stream.bytesToString();
+        var data = convert.jsonDecode(data1);
+        if (data["error"] == false) {
+          setState(() {
+            _desactive = false;
+            listeDesFormules = (data["listeFormulBoost"] as List<dynamic>)
+                .map((item) => item as Map<String, dynamic>)
+                .toList();
+            _message = (langUserPhone == "fr")
+                ? "Veuillez choisir une formule."
+                : "Please choose a plan.";
+          });
+        }
+      }
+    } else {
+      if (langUserPhone != "fr") {
+        dangerNoti(
+            "Mistake!", "You are not connected to the internet.", context);
+      } else {
+        dangerNoti("Erreur!", "Vous n'ètes pas connecté a internet.", context);
+      }
+      setState(() {
+        _desactive = false;
+      });
+    }
+  }
+
+  onChangeFormulBoost(val) async {
+    for (var service in listeDesFormules) {
+      if ("$val" == "${service['value']}") {
+        setState(() {
+          value = service['value'];
+          label = service['label'];
+          prix = service['prix'];
+          jours = service['jours'];
+        });
+      }
+    }
+    setState(() {
+      idFormulBoost = val;
+      _message = (langUserPhone == "fr")
+          ? "Cette formule vous offre une promotion affaire de $jours jour(s) pour $prix Bonus."
+          : "This formula offers you a business promotion of $jours day(s) for $prix Bonus.";
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    listeFormuleBoost(); // Loading the diary when the app starts
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      child: Column(
+        children: [
+          DelayedAnimation(
+            delay: 0, // 1500,
+            child: SelectFormField(
+              decoration: const InputDecoration(
+                labelText: 'Formules de Promotion Affaire',
+                border: OutlineInputBorder(),
+              ),
+              type: SelectFormFieldType.dropdown,
+              initialValue: '0',
+              labelText: 'Formules de Promotion Affaire',
+              items: listeDesFormules,
+              onChanged: (val) => onChangeFormulBoost(val),
+              onSaved: (val) => print(val),
+            ),
+          ),
+          const SizedBox(height: 20),
+          DelayedAnimation(
+            delay: 0, // 1000,
+            child: Text(
+              _message,
+              style: GoogleFonts.poppins(
+                fontSize: 16,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ],
       ),
     );
   }

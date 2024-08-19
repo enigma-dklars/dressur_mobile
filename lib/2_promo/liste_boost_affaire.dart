@@ -607,8 +607,8 @@ class _PaymentGratuitPageState extends State<PaymentGratuitPage> {
     setState(() {
       idFormulBoost = val;
       _message = (langUserPhone == "fr")
-          ? "Cette formule vous offre un boost de $jours jour(s) pour $prix Bonus."
-          : "This formula offers you a boost of $jours day(s) for $prix Bonus.";
+          ? "Cette formule vous offre une promotion affaire de $jours jour(s) pour $prix Bonus."
+          : "This formula offers you a business promotion of $jours day(s) for $prix Bonus.";
     });
   }
 
@@ -649,12 +649,12 @@ class _PaymentGratuitPageState extends State<PaymentGratuitPage> {
               delay: 0, // 1500,
               child: SelectFormField(
                 decoration: const InputDecoration(
-                  labelText: 'Formules de Boost Payant',
+                  labelText: 'Formules de Promotion Affaire Payant',
                   border: OutlineInputBorder(),
                 ),
                 type: SelectFormFieldType.dropdown,
                 initialValue: '0',
-                labelText: 'Formules de Boost',
+                labelText: 'Formules de Promotion Affaire',
                 items: listeDesFormules,
                 onChanged: (val) => onChangeFormulBoost(val),
                 onSaved: (val) => print(val),
@@ -794,8 +794,8 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
     setState(() {
       idFormulBoost = val;
       _message = (langUserPhone == "fr")
-          ? "Cette formule vous offre un boost de $jours jour(s) pour $prix FCFA."
-          : "This formula offers you a boost of $jours day(s) for $prix FCFA.";
+          ? "Cette formule vous offre une promotion affaire de $jours jour(s) pour $prix FCFA."
+          : "This formula offers you a business promotion of $jours day(s) for $prix FCFA.";
     });
   }
 
@@ -905,7 +905,7 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
               delay: 0, // 1500,
               child: SelectFormField(
                 decoration: const InputDecoration(
-                  labelText: 'Formules de Boost Payant',
+                  labelText: 'Formules de Promotion Affaire Payant',
                   border: OutlineInputBorder(),
                 ),
                 type: SelectFormFieldType.dropdown,
@@ -932,7 +932,7 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
               delay: 0, // 1500,
               child: SelectFormField(
                 decoration: const InputDecoration(
-                  labelText: 'Formules de Boost Payant',
+                  labelText: 'Formules de Promotion Affaire Payant',
                   border: OutlineInputBorder(),
                 ),
                 type: SelectFormFieldType.dropdown,
