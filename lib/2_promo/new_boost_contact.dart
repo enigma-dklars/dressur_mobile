@@ -170,6 +170,7 @@ class RegisterForm extends StatefulWidget {
 
 class _RegisterFormState extends State<RegisterForm> {
   bool _desactive = false;
+  bool loading_formule_gratuit = false;
   var _message = "";
   dynamic data;
   dynamic idFormulBoost = 1;
@@ -186,6 +187,7 @@ class _RegisterFormState extends State<RegisterForm> {
     if (isConnected) {
       setState(() {
         _desactive = true;
+        loading_formule_gratuit = true;
       });
 
       var request = http.MultipartRequest(
@@ -200,6 +202,7 @@ class _RegisterFormState extends State<RegisterForm> {
         if (data["error"] == false) {
           setState(() {
             _desactive = false;
+            loading_formule_gratuit = false;
             listeDesFormules = (data["listeFormulBoost"] as List<dynamic>)
                 .map((item) => item as Map<String, dynamic>)
                 .toList();
@@ -218,6 +221,7 @@ class _RegisterFormState extends State<RegisterForm> {
       }
       setState(() {
         _desactive = false;
+        loading_formule_gratuit = false;
       });
     }
   }
@@ -324,21 +328,25 @@ class _RegisterFormState extends State<RegisterForm> {
     return Container(
       child: Column(
         children: [
-          DelayedAnimation(
-            delay: 0, // 1500,
-            child: SelectFormField(
-              decoration: const InputDecoration(
-                labelText: 'Formules de Boost',
-                border: OutlineInputBorder(),
-              ),
-              type: SelectFormFieldType.dropdown,
-              initialValue: '0',
-              labelText: 'Formules de Boost',
-              items: listeDesFormules,
-              onChanged: (val) => onChangeFormulBoost(val),
-              onSaved: (val) => print(val),
-            ),
-          ),
+          loading_formule_gratuit
+              ? const Center(
+                  child: CircularProgressIndicator(),
+                )
+              : DelayedAnimation(
+                  delay: 0, // 1500,
+                  child: SelectFormField(
+                    decoration: const InputDecoration(
+                      labelText: 'Formules de Boost',
+                      border: OutlineInputBorder(),
+                    ),
+                    type: SelectFormFieldType.dropdown,
+                    initialValue: '0',
+                    labelText: 'Formules de Boost',
+                    items: listeDesFormules,
+                    onChanged: (val) => onChangeFormulBoost(val),
+                    onSaved: (val) => print(val),
+                  ),
+                ),
           const SizedBox(height: 20),
           DelayedAnimation(
             delay: 0, // 1000,
@@ -400,6 +408,7 @@ class RegisterForm2 extends StatefulWidget {
 
 class _RegisterForm2State extends State<RegisterForm2> {
   bool _desactive2 = false;
+  bool loading_formule_payant = false;
   var _message = "";
   dynamic data;
   dynamic idFormulBoost = 1;
@@ -418,6 +427,7 @@ class _RegisterForm2State extends State<RegisterForm2> {
     if (isConnected) {
       setState(() {
         _desactive2 = true;
+        loading_formule_payant = true;
       });
 
       var request = http.MultipartRequest(
@@ -432,6 +442,7 @@ class _RegisterForm2State extends State<RegisterForm2> {
         if (data["error"] == false) {
           setState(() {
             _desactive2 = false;
+            loading_formule_payant = false;
             listeDesFormules = (data["listeFormulBoost"] as List<dynamic>)
                 .map((item) => item as Map<String, dynamic>)
                 .toList();
@@ -450,6 +461,7 @@ class _RegisterForm2State extends State<RegisterForm2> {
       }
       setState(() {
         _desactive2 = false;
+        loading_formule_payant = false;
       });
     }
   }
@@ -630,21 +642,25 @@ class _RegisterForm2State extends State<RegisterForm2> {
     return Container(
       child: Column(
         children: [
-          DelayedAnimation(
-            delay: 0, // 1500,
-            child: SelectFormField(
-              decoration: const InputDecoration(
-                labelText: 'Formules de Boost Payant',
-                border: OutlineInputBorder(),
-              ),
-              type: SelectFormFieldType.dropdown,
-              initialValue: '0',
-              labelText: 'Formules de Boost Payant',
-              items: listeDesFormules,
-              onChanged: (val) => onChangeFormulBoost(val),
-              onSaved: (val) => print(val),
-            ),
-          ),
+          loading_formule_payant
+              ? const Center(
+                  child: CircularProgressIndicator(),
+                )
+              : DelayedAnimation(
+                  delay: 0, // 1500,
+                  child: SelectFormField(
+                    decoration: const InputDecoration(
+                      labelText: 'Formules de Boost Payant',
+                      border: OutlineInputBorder(),
+                    ),
+                    type: SelectFormFieldType.dropdown,
+                    initialValue: '0',
+                    labelText: 'Formules de Boost Payant',
+                    items: listeDesFormules,
+                    onChanged: (val) => onChangeFormulBoost(val),
+                    onSaved: (val) => print(val),
+                  ),
+                ),
           const SizedBox(height: 10),
           DelayedAnimation(
             delay: 0, // 1000,

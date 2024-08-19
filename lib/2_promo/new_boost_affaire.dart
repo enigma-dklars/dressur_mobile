@@ -1,4 +1,4 @@
-// ignore_for_file: use_build_context_synchronously
+// ignore_for_file: use_build_context_synchronously, non_constant_identifier_names
 
 import 'dart:convert';
 import 'dart:convert' as convert;
@@ -338,7 +338,7 @@ class FormulePayante extends StatefulWidget {
 }
 
 class _FormulePayanteState extends State<FormulePayante> {
-  bool _desactive2 = false;
+  bool loading_formule_payant = false;
   var _message = "";
   dynamic data;
   dynamic idFormulBoost = 1;
@@ -356,7 +356,7 @@ class _FormulePayanteState extends State<FormulePayante> {
     bool isConnected = await isConnectedToInternet();
     if (isConnected) {
       setState(() {
-        _desactive2 = true;
+        loading_formule_payant = true;
       });
 
       var request = http.MultipartRequest(
@@ -370,7 +370,7 @@ class _FormulePayanteState extends State<FormulePayante> {
         var data = convert.jsonDecode(data1);
         if (data["error"] == false) {
           setState(() {
-            _desactive2 = false;
+            loading_formule_payant = false;
             listeDesFormules = (data["listeFormulBoost"] as List<dynamic>)
                 .map((item) => item as Map<String, dynamic>)
                 .toList();
@@ -388,7 +388,7 @@ class _FormulePayanteState extends State<FormulePayante> {
         dangerNoti("Erreur!", "Vous n'ètes pas connecté a internet.", context);
       }
       setState(() {
-        _desactive2 = false;
+        loading_formule_payant = false;
       });
     }
   }
@@ -429,21 +429,25 @@ class _FormulePayanteState extends State<FormulePayante> {
     return Container(
       child: Column(
         children: [
-          DelayedAnimation(
-            delay: 0, // 1500,
-            child: SelectFormField(
-              decoration: const InputDecoration(
-                labelText: 'Formules de Promotion Affaire Payant',
-                border: OutlineInputBorder(),
-              ),
-              type: SelectFormFieldType.dropdown,
-              initialValue: '0',
-              labelText: 'Formules de Promotion Affaire Payant',
-              items: listeDesFormules,
-              onChanged: (val) => onChangeFormulBoost(val),
-              onSaved: (val) => print(val),
-            ),
-          ),
+          loading_formule_payant
+              ? const Center(
+                  child: CircularProgressIndicator(),
+                )
+              : DelayedAnimation(
+                  delay: 0, // 1500,
+                  child: SelectFormField(
+                    decoration: const InputDecoration(
+                      labelText: 'Formules de Promotion Affaire Payant',
+                      border: OutlineInputBorder(),
+                    ),
+                    type: SelectFormFieldType.dropdown,
+                    initialValue: '0',
+                    labelText: 'Formules de Promotion Affaire Payant',
+                    items: listeDesFormules,
+                    onChanged: (val) => onChangeFormulBoost(val),
+                    onSaved: (val) => print(val),
+                  ),
+                ),
           const SizedBox(height: 10),
           DelayedAnimation(
             delay: 0, // 1000,
@@ -467,7 +471,7 @@ class FormuleGratuite extends StatefulWidget {
 }
 
 class _FormuleGratuiteState extends State<FormuleGratuite> {
-  bool _desactive = false;
+  bool loading_formule_gratuit = false;
   var _message = "";
   dynamic data;
   dynamic idFormulBoost = 1;
@@ -483,7 +487,7 @@ class _FormuleGratuiteState extends State<FormuleGratuite> {
     bool isConnected = await isConnectedToInternet();
     if (isConnected) {
       setState(() {
-        _desactive = true;
+        loading_formule_gratuit = true;
       });
 
       var request = http.MultipartRequest(
@@ -497,7 +501,7 @@ class _FormuleGratuiteState extends State<FormuleGratuite> {
         var data = convert.jsonDecode(data1);
         if (data["error"] == false) {
           setState(() {
-            _desactive = false;
+            loading_formule_gratuit = false;
             listeDesFormules = (data["listeFormulBoost"] as List<dynamic>)
                 .map((item) => item as Map<String, dynamic>)
                 .toList();
@@ -515,7 +519,7 @@ class _FormuleGratuiteState extends State<FormuleGratuite> {
         dangerNoti("Erreur!", "Vous n'ètes pas connecté a internet.", context);
       }
       setState(() {
-        _desactive = false;
+        loading_formule_gratuit = false;
       });
     }
   }
@@ -550,21 +554,25 @@ class _FormuleGratuiteState extends State<FormuleGratuite> {
     return Container(
       child: Column(
         children: [
-          DelayedAnimation(
-            delay: 0, // 1500,
-            child: SelectFormField(
-              decoration: const InputDecoration(
-                labelText: 'Formules de Promotion Affaire',
-                border: OutlineInputBorder(),
-              ),
-              type: SelectFormFieldType.dropdown,
-              initialValue: '0',
-              labelText: 'Formules de Promotion Affaire',
-              items: listeDesFormules,
-              onChanged: (val) => onChangeFormulBoost(val),
-              onSaved: (val) => print(val),
-            ),
-          ),
+          loading_formule_gratuit
+              ? const Center(
+                  child: CircularProgressIndicator(),
+                )
+              : DelayedAnimation(
+                  delay: 0, // 1500,
+                  child: SelectFormField(
+                    decoration: const InputDecoration(
+                      labelText: 'Formules de Promotion Affaire',
+                      border: OutlineInputBorder(),
+                    ),
+                    type: SelectFormFieldType.dropdown,
+                    initialValue: '0',
+                    labelText: 'Formules de Promotion Affaire',
+                    items: listeDesFormules,
+                    onChanged: (val) => onChangeFormulBoost(val),
+                    onSaved: (val) => print(val),
+                  ),
+                ),
           const SizedBox(height: 20),
           DelayedAnimation(
             delay: 0, // 1000,

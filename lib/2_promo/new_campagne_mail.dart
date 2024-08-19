@@ -121,6 +121,7 @@ class RegisterForm2 extends StatefulWidget {
 class _RegisterForm2State extends State<RegisterForm2> {
   var nombreAdresseMailForm = 0;
   bool _desactive2 = false;
+  bool loading_formule_campagne_mail = false;
   dynamic data;
   String? boostId;
   dynamic idFormuleCampagneMail = 1;
@@ -159,6 +160,7 @@ class _RegisterForm2State extends State<RegisterForm2> {
     if (isConnected) {
       setState(() {
         _desactive2 = true;
+        loading_formule_campagne_mail = true;
       });
 
       var request = http.MultipartRequest(
@@ -173,6 +175,7 @@ class _RegisterForm2State extends State<RegisterForm2> {
         if (data["error"] == false) {
           setState(() {
             _desactive2 = false;
+            loading_formule_campagne_mail = false;
             listeDesFormules =
                 (data["listeFormuleCampagneMail"] as List<dynamic>)
                     .map((item) => item as Map<String, dynamic>)
@@ -192,6 +195,7 @@ class _RegisterForm2State extends State<RegisterForm2> {
       }
       setState(() {
         _desactive2 = false;
+        loading_formule_campagne_mail = false;
       });
     }
   }
@@ -328,21 +332,25 @@ class _RegisterForm2State extends State<RegisterForm2> {
     return Container(
       child: Column(
         children: [
-          DelayedAnimation(
-            delay: 0, // 1500,
-            child: SelectFormField(
-              decoration: const InputDecoration(
-                labelText: 'Formules de Campagne Mail Payante',
-                border: OutlineInputBorder(),
-              ),
-              type: SelectFormFieldType.dropdown,
-              initialValue: '0',
-              labelText: 'Formules de Campagne Mail Payante',
-              items: listeDesFormules,
-              onChanged: (val) => onChangeFormulBoost(val),
-              onSaved: (val) => print(val),
-            ),
-          ),
+          loading_formule_campagne_mail
+              ? const Center(
+                  child: CircularProgressIndicator(),
+                )
+              : DelayedAnimation(
+                  delay: 0, // 1500,
+                  child: SelectFormField(
+                    decoration: const InputDecoration(
+                      labelText: 'Formules de Campagne Mail Payante',
+                      border: OutlineInputBorder(),
+                    ),
+                    type: SelectFormFieldType.dropdown,
+                    initialValue: '0',
+                    labelText: 'Formules de Campagne Mail Payante',
+                    items: listeDesFormules,
+                    onChanged: (val) => onChangeFormulBoost(val),
+                    onSaved: (val) => print(val),
+                  ),
+                ),
           const SizedBox(height: 10),
           DelayedAnimation(
             delay: 0, // 1000,

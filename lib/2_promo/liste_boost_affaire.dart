@@ -1,3 +1,5 @@
+// ignore_for_file: non_constant_identifier_names
+
 import 'dart:convert';
 import 'dart:convert' as convert;
 import 'package:dressur/components/delayed_animation.dart';
@@ -480,6 +482,7 @@ class PaymentGratuitPage extends StatefulWidget {
 
 class _PaymentGratuitPageState extends State<PaymentGratuitPage> {
   bool _desactive = false;
+  bool loading_formule_gratuit = false;
   var _message = "";
   dynamic data;
   dynamic idFormulBoost = 1;
@@ -496,6 +499,7 @@ class _PaymentGratuitPageState extends State<PaymentGratuitPage> {
     if (isConnected) {
       setState(() {
         _desactive = true;
+        loading_formule_gratuit = true;
       });
 
       var request = http.MultipartRequest(
@@ -510,6 +514,7 @@ class _PaymentGratuitPageState extends State<PaymentGratuitPage> {
         if (data["error"] == false) {
           setState(() {
             _desactive = false;
+            loading_formule_gratuit = false;
             listeDesFormules = (data["listeFormulBoost"] as List<dynamic>)
                 .map((item) => item as Map<String, dynamic>)
                 .toList();
@@ -528,6 +533,7 @@ class _PaymentGratuitPageState extends State<PaymentGratuitPage> {
       }
       setState(() {
         _desactive = false;
+        loading_formule_gratuit = false;
       });
     }
   }
@@ -645,7 +651,11 @@ class _PaymentGratuitPageState extends State<PaymentGratuitPage> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            DelayedAnimation(
+            loading_formule_gratuit
+              ? const Center(
+                  child: CircularProgressIndicator(),
+                )
+              : DelayedAnimation(
               delay: 0, // 1500,
               child: SelectFormField(
                 decoration: const InputDecoration(
@@ -726,6 +736,7 @@ class PaymentPayantPage extends StatefulWidget {
 
 class _PaymentPayantPageState extends State<PaymentPayantPage> {
   bool _desactive2 = false;
+  bool loading_formule_payant = false;
   var _message = "";
   dynamic data;
   dynamic idFormulBoost = 1;
@@ -744,6 +755,7 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
     if (isConnected) {
       setState(() {
         _desactive2 = true;
+        loading_formule_payant = true;
       });
 
       var request = http.MultipartRequest(
@@ -758,6 +770,7 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
         if (data["error"] == false) {
           setState(() {
             _desactive2 = false;
+            loading_formule_payant = false;
             listeDesFormules = (data["listeFormulBoost"] as List<dynamic>)
                 .map((item) => item as Map<String, dynamic>)
                 .toList();
@@ -776,6 +789,7 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
       }
       setState(() {
         _desactive2 = false;
+        loading_formule_payant = false;
       });
     }
   }
@@ -901,7 +915,11 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            DelayedAnimation(
+            loading_formule_payant
+              ? const Center(
+                  child: CircularProgressIndicator(),
+                )
+              : DelayedAnimation(
               delay: 0, // 1500,
               child: SelectFormField(
                 decoration: const InputDecoration(
