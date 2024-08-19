@@ -384,11 +384,6 @@ class _RegisterFormState extends State<RegisterForm> {
                   onPressed: () {
                     if (!telIsVerified) {
                       showConfNumeroWhatsapp(context);
-                    } else if (!mailIsVerified) {
-                      warningNoti(
-                          "Configuration du compte",
-                          "Veuillez d'abord confirmer votre adresse mail...",
-                          context);
                     } else {
                       _desactive ? null : newBoost();
                     }
