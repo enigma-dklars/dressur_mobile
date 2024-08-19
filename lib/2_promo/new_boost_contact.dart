@@ -375,14 +375,11 @@ class _RegisterFormState extends State<RegisterForm> {
                   ),
                   onPressed: () {
                     if (!telIsVerified) {
-                      warningNoti(
-                          "Configuration du compte",
-                          "Patientez encore svp. Votre numéro WhatsApp n'a pas encore été confirmé par un administrateur. Il le sera dans les plus brefs délais.",
-                          context);
+                      showConfNumeroWhatsapp(context);
                     } else if (!mailIsVerified) {
                       warningNoti(
                           "Configuration du compte",
-                          "Veuillez d'abord confirmer votre adresse mail...\n\nVous trouverez sur notre chaine YouTube des vidéos qui peuvent vous aider...",
+                          "Veuillez d'abord confirmer votre adresse mail...",
                           context);
                     } else {
                       _desactive ? null : newBoost();
@@ -714,15 +711,7 @@ class _RegisterForm2State extends State<RegisterForm2> {
                 ),
                 onPressed: () {
                   if (!telIsVerified) {
-                    warningNoti(
-                        "Configuration du compte",
-                        "Patientez encore svp. Votre numéro WhatsApp n'a pas encore été confirmé par un administrateur. Il le sera dans les plus brefs délais.",
-                        context);
-                  } else if (!mailIsVerified) {
-                    warningNoti(
-                        "Configuration du compte",
-                        "Veuillez d'abord confirmer votre adresse mail...\n\nVous trouverez sur notre chaine YouTube des vidéos qui peuvent vous aider...",
-                        context);
+                    showConfNumeroWhatsapp(context);
                   } else {
                     _desactive2 ? null : newBoostPayant();
                   }

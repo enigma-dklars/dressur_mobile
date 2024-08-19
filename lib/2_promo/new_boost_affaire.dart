@@ -71,6 +71,11 @@ class _PromotionFormPageState extends State<PromotionFormPage> {
   }
 
   Future<void> _sendData() async {
+    if (!telIsVerified) {
+      showConfNumeroWhatsapp(context);
+      return;
+    }
+
     if (_textEditingController.text.isEmpty || _imageFile == null) {
       dangerNoti(
           "Attention !!!",

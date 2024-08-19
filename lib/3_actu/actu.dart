@@ -3,8 +3,10 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'package:dressur/1_reception/liste_contact.dart';
 import 'package:dressur/2_promo/new_boost_contact.dart';
 import 'package:dressur/5_autre/cart_visite.dart';
+import 'package:dressur/5_autre/profil_user.dart';
 import 'package:dressur/components/padding_and_divider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -14,7 +16,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:dressur/5_autre/confirme_mail_user.dart';
 import 'package:dressur/1_reception/liste_notification.dart';
 import 'package:dressur/components/constant.dart';
-import 'package:dressur/components/noti.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
 import 'package:flutter_contacts/flutter_contacts.dart';
@@ -22,7 +23,6 @@ import 'package:dressur/components/sociaux.dart';
 import 'package:dressur/components/sql_helper.dart';
 import 'package:dressur/5_autre/support_assistance.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'liste_contact_add_disponible.dart';
 
 class Advertisement {
   final String uidUser;
@@ -392,24 +392,6 @@ class _ActuPageState extends State<ActuPage> {
     );
   }
 
-  void _showConfNumeroWhatsapp(context) async {
-    showModalBottomSheet(
-      context: context,
-      elevation: 5,
-      isScrollControlled: true,
-      builder: (_) => Container(
-        padding: EdgeInsets.only(
-          top: 0,
-          left: 0,
-          right: 0,
-          // this will prevent the soft keyboard from covering the text fields
-          bottom: MediaQuery.of(context).viewInsets.bottom + 0,
-        ),
-        child: ConfNumeroWhatsapp(),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     if (_firstLoad) {
@@ -546,7 +528,9 @@ class _ActuPageState extends State<ActuPage> {
                       Container(
                         padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
                         child: Text(
-                          (langUserPhone == "fr") ? "À faire :" : "To do :",
+                          (langUserPhone == "fr")
+                              ? "Vous devez :"
+                              : "You must :",
                           style: GoogleFonts.poppins(
                             fontWeight: FontWeight.w300,
                             fontSize: 20,
@@ -569,7 +553,7 @@ class _ActuPageState extends State<ActuPage> {
                               style: GoogleFonts.poppins(),
                             ),
                             onTap: () {
-                              _showConfNumeroWhatsapp(context);
+                              showConfNumeroWhatsapp(context);
                             },
                           )
                         : const SizedBox(height: 0),
@@ -594,6 +578,30 @@ class _ActuPageState extends State<ActuPage> {
                                 MaterialPageRoute(
                                     builder: (context) =>
                                         CodeMailConfirmePage()),
+                              );
+                            },
+                          )
+                        : const SizedBox(height: 0),
+                    (nom != nom.toString().replaceAll(' ', ''))
+                        ? ListTile(
+                            dense: true,
+                            contentPadding: EdgeInsets.symmetric(
+                                vertical: 0, horizontal: 10),
+                            leading: Icon(
+                              Icons.fiber_manual_record,
+                              color: Colors.red,
+                            ),
+                            title: Text(
+                              (langUserPhone == "fr")
+                                  ? "Compléter le Profil"
+                                  : "Complete the Profile",
+                              style: GoogleFonts.poppins(),
+                            ),
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => ProfilPage()),
                               );
                             },
                           )
@@ -697,23 +705,7 @@ class _ActuPageState extends State<ActuPage> {
                                             ),
                                             onPressed: () {
                                               if (!telIsVerified) {
-                                                warningNoti(
-                                                    (langUserPhone == "fr")
-                                                        ? "Configurer votre compte"
-                                                        : "Configure your account",
-                                                    (langUserPhone == "fr")
-                                                        ? "Patientez encore svp. Votre numéro WhatsApp n'a pas encore été confirmé par un administrateur. Il le sera dans les plus brefs délais."
-                                                        : "Please wait again. Your WhatsApp number has not yet been confirmed by an administrator. It will be as soon as possible.",
-                                                    context);
-                                              } else if (!mailIsVerified) {
-                                                warningNoti(
-                                                    (langUserPhone == "fr")
-                                                        ? "Configurer votre compte"
-                                                        : "Configure your account",
-                                                    (langUserPhone == "fr")
-                                                        ? "Veuillez d'abord confirmer votre adresse mail...\n\nVous trouverez sur notre chaine YouTube des vidéos qui peuvent vous aider..."
-                                                        : "Please confirm your email address first...\n\nYou will find videos on our YouTube channel that can help you...",
-                                                    context);
+                                                showConfNumeroWhatsapp(context);
                                               } else {
                                                 _loading
                                                     ? ''
@@ -740,8 +732,8 @@ class _ActuPageState extends State<ActuPage> {
                                             ),
                                             child: Text(
                                               (langUserPhone == "fr")
-                                                  ? "Voir la liste"
-                                                  : "See the list",
+                                                  ? "Mes Contacts"
+                                                  : "My Contacts",
                                               style: GoogleFonts.poppins(
                                                 color: Colors.white,
                                               ),
@@ -751,7 +743,7 @@ class _ActuPageState extends State<ActuPage> {
                                                 context,
                                                 MaterialPageRoute(
                                                     builder: (context) =>
-                                                        ListeContactAAddPage()),
+                                                        ContactPage()),
                                               );
                                             }),
                                       )
@@ -1195,110 +1187,6 @@ class _PasDeContactAddState extends State<PasDeContactAdd> {
                       }),
                 ],
               ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class ConfNumeroWhatsapp extends StatefulWidget {
-  ConfNumeroWhatsapp({Key? key}) : super(key: key);
-
-  @override
-  State<ConfNumeroWhatsapp> createState() => _ConfNumeroWhatsappState();
-}
-
-class _ConfNumeroWhatsappState extends State<ConfNumeroWhatsapp> {
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.end,
-      children: [
-        Container(
-          padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(5),
-            gradient: const LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                Color.fromARGB(255, 1, 156, 81),
-                Color.fromARGB(255, 1, 156, 81),
-                Colors.green,
-              ],
-            ),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                (langUserPhone == "fr")
-                    ? "Confirmation du numéro WhatsApp"
-                    : "WhatsApp Number Confirmation",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 25,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 10),
-              Text(
-                (langUserPhone == "fr")
-                    ? "Assurez-vous de nous envoyer <<WhatsApp Confirmation>> avec le numéro WhatsApp utiliser pour créer votre compte Dressur."
-                    : "Make sure to send us <<WhatsApp Confirmation>> with the WhatsApp number you use to create your Dressur account.",
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 17,
-                ),
-              ),
-              const SizedBox(height: 10),
-              Text(
-                (langUserPhone == "fr")
-                    ? "Cliquez juste sur Demander ci-dessous pour demander la confirmation de votre numéro WhatsApp."
-                    : "Just click Request below to request confirmation of your WhatsApp number.",
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 17,
-                ),
-              ),
-              const SizedBox(height: 10),
-              Text(
-                (langUserPhone == "fr")
-                    ? "Les demandes sont traitées le plus tôt possible, ne vous inquiétez pas."
-                    : "Requests are processed as soon as possible, don't worry.",
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 17,
-                ),
-              ),
-              const SizedBox(height: 10),
-              ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    shape: const StadiumBorder(),
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 13,
-                      horizontal: 40,
-                    ),
-                  ),
-                  child: Text(
-                    (langUserPhone == "fr") ? "Demander" : "Ask",
-                    style: GoogleFonts.poppins(
-                      fontWeight: FontWeight.w600,
-                      color: Color.fromARGB(255, 1, 156, 81),
-                    ),
-                  ),
-                  onPressed: () async {
-                    final Uri _url =
-                        Uri.parse("$whatsappDSURL?text=WhatsApp Confirmation");
-                    if (!await launchUrl(_url,
-                        mode: LaunchMode.externalApplication)) {
-                      throw 'Could not launch $_url';
-                    }
-                  }),
             ],
           ),
         ),

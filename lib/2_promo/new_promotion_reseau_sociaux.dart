@@ -592,15 +592,7 @@ class _RegisterForm3State extends State<RegisterForm3> {
                 ),
                 onPressed: () {
                   if (!telIsVerified) {
-                    warningNoti(
-                        "Configuration du compte",
-                        "Patientez encore svp. Votre numéro WhatsApp n'a pas encore été confirmé par un administrateur. Il le sera dans les plus brefs délais.",
-                        context);
-                  } else if (!mailIsVerified) {
-                    warningNoti(
-                        "Configuration du compte",
-                        "Veuillez d'abord confirmer votre adresse mail...\n\nVous trouverez sur notre chaine YouTube des vidéos qui peuvent vous aider...",
-                        context);
+                    showConfNumeroWhatsapp(context);
                   } else {
                     _desactive3 ? null : newPromoReseau();
                   }

@@ -696,14 +696,11 @@ class _PaymentGratuitPageState extends State<PaymentGratuitPage> {
                     ),
                     onPressed: () {
                       if (!telIsVerified) {
-                        warningNoti(
-                            "Configuration du compte",
-                            "Patientez encore svp. Votre numéro WhatsApp n'a pas encore été confirmé par un administrateur. Il le sera dans les plus brefs délais.",
-                            context);
+                        showConfNumeroWhatsapp(context);
                       } else if (!mailIsVerified) {
                         warningNoti(
                             "Configuration du compte",
-                            "Veuillez d'abord confirmer votre adresse mail...\n\nVous trouverez sur notre chaine YouTube des vidéos qui peuvent vous aider...",
+                            "Veuillez d'abord confirmer votre adresse mail...",
                             context);
                       } else {
                         _desactive ? null : newPromo();
@@ -984,14 +981,11 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
                   ),
                   onPressed: () {
                     if (!telIsVerified) {
-                      warningNoti(
-                          "Configuration du compte",
-                          "Patientez encore svp. Votre numéro WhatsApp n'a pas encore été confirmé par un administrateur. Il le sera dans les plus brefs délais.",
-                          context);
+                      showConfNumeroWhatsapp(context);
                     } else if (!mailIsVerified) {
                       warningNoti(
                           "Configuration du compte",
-                          "Veuillez d'abord confirmer votre adresse mail...\n\nVous trouverez sur notre chaine YouTube des vidéos qui peuvent vous aider...",
+                          "Veuillez d'abord confirmer votre adresse mail...",
                           context);
                     } else {
                       _desactive2 ? null : newPromoPayant();
