@@ -567,16 +567,20 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
           var data1 = await response.stream.bytesToString();
           var data = convert.jsonDecode(data1);
           if (data["error"] == false) {
-            // var idTransaction = data["idTransaction"];
             setState(() {
               _desactive2 = false;
+            });
+            if (data["direct"] == true) {
               dangerNoti(
                   (langUserPhone == "fr") ? "Attention !!!" : "Attention !!!",
                   (langUserPhone == "fr")
                       ? "Après confirmation du paiement, veuillez consulter la liste de vos campagnes mails."
                       : "After confirmation of payment, please consult the list of your email campaigns.",
                   context);
-            });
+            } else {
+              launchPaiement(data["url"]);
+            }
+            // var idTransaction = data["idTransaction"];
           } else {
             dangerNoti(data["titre"], data["message"], context);
             setState(() {

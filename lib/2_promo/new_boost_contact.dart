@@ -510,16 +510,20 @@ class _RegisterForm2State extends State<RegisterForm2> {
           var data1 = await response.stream.bytesToString();
           var data = convert.jsonDecode(data1);
           if (data["error"] == false) {
-            // var idTransaction = data["idTransaction"];
             setState(() {
               _desactive2 = false;
+            });
+            if (data["direct"] == true) {
               dangerNoti(
                   (langUserPhone == "fr") ? "Attention !!!" : "Attention !!!",
                   (langUserPhone == "fr")
                       ? "Après confirmation du paiement, veuillez consulter la liste de vos boosts."
                       : "After payment confirmation, please view the list of your boosts.",
                   context);
-            });
+            } else {
+              launchPaiement(data["url"]);
+            }
+            // var idTransaction = data["idTransaction"];
           } else {
             dangerNoti(data["titre"], data["message"], context);
             setState(() {

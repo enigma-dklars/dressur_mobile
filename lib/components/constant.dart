@@ -1001,6 +1001,13 @@ void launchWhatsApp(String phoneNumber) async {
   }
 }
 
+void launchPaiement(String urlPaiement) async {
+  final Uri _url = Uri.parse(urlPaiement);
+  if (!await launchUrl(_url, mode: LaunchMode.externalApplication)) {
+    throw 'Could not launch $_url';
+  }
+}
+
 Future<void> shareMessageWithImage(BuildContext context, String codeBonus,
     String commissionBonus, String langUserPhone) async {
   var messageShare = (langUserPhone == "fr")

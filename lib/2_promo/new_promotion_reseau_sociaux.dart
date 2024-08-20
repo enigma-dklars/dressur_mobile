@@ -1,4 +1,4 @@
-// ignore_for_file: unnecessary_null_comparison, non_constant_identifier_names, prefer_final_fields, unused_field
+// ignore_for_file: unnecessary_null_comparison, non_constant_identifier_names, prefer_final_fields, unused_field, use_build_context_synchronously
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
@@ -272,13 +272,17 @@ class _RegisterForm3State extends State<RegisterForm3> {
           if (data["error"] == false) {
             setState(() {
               _desactive3 = false;
+            });
+            if (data["direct"] == true) {
               dangerNoti(
                   (langUserPhone == "fr") ? "Attention !!!" : "Attention !!!",
                   (langUserPhone == "fr")
                       ? "Après confirmation du paiement, veuillez consulter la liste de vos promotions réseaux sociaux."
                       : "After payment confirmation, please view the list of your social media promotions.",
                   context);
-            });
+            } else {
+              launchPaiement(data["url"]);
+            }
           } else {
             dangerNoti(data["titre"], data["message"], context);
             setState(() {
