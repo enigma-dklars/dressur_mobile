@@ -1077,8 +1077,16 @@ class AdvertisementDetailPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Image.network(
-              advertisement.image,
+            ClipRRect(
+              borderRadius: BorderRadius.circular(3),
+              child: CachedNetworkImage(
+                imageUrl: advertisement.image,
+                placeholder: (context, url) =>
+                    Image.asset('images/placeholder.png'),
+                errorWidget: (context, url, error) =>
+                    Image.asset('images/error_image.png'),
+                fit: BoxFit.cover,
+              ),
             ),
             const SizedBox(height: 5),
             Container(

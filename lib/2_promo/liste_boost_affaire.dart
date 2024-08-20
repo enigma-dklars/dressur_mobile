@@ -2,6 +2,7 @@
 
 import 'dart:convert';
 import 'dart:convert' as convert;
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dressur/components/delayed_animation.dart';
 import 'package:dressur/components/noti.dart';
 import 'package:flutter/material.dart';
@@ -387,11 +388,21 @@ class PromotionDetailPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Image.network(promotion.image),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(3),
+              child: CachedNetworkImage(
+                imageUrl: promotion.image,
+                placeholder: (context, url) =>
+                    Image.asset('images/placeholder.png'),
+                errorWidget: (context, url, error) =>
+                    Image.asset('images/error_image.png'),
+                fit: BoxFit.cover,
+              ),
+            ),
             if (promotion.peutPayer)
               Column(
                 children: [
-                  const SizedBox(height: 5),
+                  const SizedBox(height: 10),
                   const Divider(height: 1, thickness: 1, color: Colors.grey),
                   const SizedBox(height: 5),
                   Text(
@@ -433,10 +444,11 @@ class PromotionDetailPage extends StatelessWidget {
                       ),
                     ],
                   ),
+                  const SizedBox(height: 5),
                   const Divider(height: 1, thickness: 1, color: Colors.grey),
                 ],
               ),
-            const SizedBox(height: 16.0),
+            const SizedBox(height: 10),
             Text(
               (langUserPhone == "fr")
                   ? 'Formule de promotion : ${promotion.formulePromotion}'
@@ -652,24 +664,24 @@ class _PaymentGratuitPageState extends State<PaymentGratuitPage> {
         child: Column(
           children: [
             loading_formule_gratuit
-              ? const Center(
-                  child: CircularProgressIndicator(),
-                )
-              : DelayedAnimation(
-              delay: 0, // 1500,
-              child: SelectFormField(
-                decoration: const InputDecoration(
-                  labelText: 'Formules de Promotion Affaire Payant',
-                  border: OutlineInputBorder(),
-                ),
-                type: SelectFormFieldType.dropdown,
-                initialValue: '0',
-                labelText: 'Formules de Promotion Affaire',
-                items: listeDesFormules,
-                onChanged: (val) => onChangeFormulBoost(val),
-                onSaved: (val) => print(val),
-              ),
-            ),
+                ? const Center(
+                    child: CircularProgressIndicator(),
+                  )
+                : DelayedAnimation(
+                    delay: 0, // 1500,
+                    child: SelectFormField(
+                      decoration: const InputDecoration(
+                        labelText: 'Formules de Promotion Affaire Payant',
+                        border: OutlineInputBorder(),
+                      ),
+                      type: SelectFormFieldType.dropdown,
+                      initialValue: '0',
+                      labelText: 'Formules de Promotion Affaire',
+                      items: listeDesFormules,
+                      onChanged: (val) => onChangeFormulBoost(val),
+                      onSaved: (val) => print(val),
+                    ),
+                  ),
             const SizedBox(height: 20),
             DelayedAnimation(
               delay: 0, // 1000,
@@ -916,24 +928,24 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
         child: Column(
           children: [
             loading_formule_payant
-              ? const Center(
-                  child: CircularProgressIndicator(),
-                )
-              : DelayedAnimation(
-              delay: 0, // 1500,
-              child: SelectFormField(
-                decoration: const InputDecoration(
-                  labelText: 'Formules de Promotion Affaire Payant',
-                  border: OutlineInputBorder(),
-                ),
-                type: SelectFormFieldType.dropdown,
-                initialValue: '0',
-                labelText: 'Formules de Promotion Payante',
-                items: listeDesFormules,
-                onChanged: (val) => onChangeFormulBoost(val),
-                onSaved: (val) => print(val),
-              ),
-            ),
+                ? const Center(
+                    child: CircularProgressIndicator(),
+                  )
+                : DelayedAnimation(
+                    delay: 0, // 1500,
+                    child: SelectFormField(
+                      decoration: const InputDecoration(
+                        labelText: 'Formules de Promotion Affaire Payant',
+                        border: OutlineInputBorder(),
+                      ),
+                      type: SelectFormFieldType.dropdown,
+                      initialValue: '0',
+                      labelText: 'Formules de Promotion Payante',
+                      items: listeDesFormules,
+                      onChanged: (val) => onChangeFormulBoost(val),
+                      onSaved: (val) => print(val),
+                    ),
+                  ),
             const SizedBox(height: 20),
             DelayedAnimation(
               delay: 0, // 1000,
