@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'dart:convert' as convert;
 import 'package:dressur/components/delayed_animation.dart';
 import 'package:dressur/components/noti.dart';
+import 'package:dressur/components/noti_sys.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -579,6 +580,14 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
                   context);
             } else {
               launchPaiement(data["url"]);
+              Navigator.pop(context);
+              showNotification(
+                  (langUserPhone == "fr")
+                      ? "Paiement en cours !"
+                      : "Payment in progress !",
+                  (langUserPhone == "fr")
+                      ? "Après confirmation du paiement, veuillez consulter la liste de vos campagnes mails."
+                      : "After confirmation of payment, please consult the list of your email campaigns.");
             }
             // var idTransaction = data["idTransaction"];
           } else {

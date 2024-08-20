@@ -1,6 +1,7 @@
 // ignore_for_file: unnecessary_null_comparison, non_constant_identifier_names, prefer_final_fields, unused_field, use_build_context_synchronously
 import 'dart:ui';
 
+import 'package:dressur/components/noti_sys.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -282,6 +283,14 @@ class _RegisterForm3State extends State<RegisterForm3> {
                   context);
             } else {
               launchPaiement(data["url"]);
+              Navigator.pop(context);
+              showNotification(
+                  (langUserPhone == "fr")
+                      ? "Paiement en cours !"
+                      : "Payment in progress !",
+                  (langUserPhone == "fr")
+                      ? "Après confirmation du paiement, veuillez consulter la liste de vos promotions réseaux sociaux."
+                      : "After payment confirmation, please view the list of your social media promotions.");
             }
           } else {
             dangerNoti(data["titre"], data["message"], context);
