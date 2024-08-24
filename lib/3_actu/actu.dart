@@ -526,7 +526,8 @@ class _ActuPageState extends State<ActuPage> {
                     if (nombreContactDispo <= 0 ||
                         telIsVerified == false ||
                         mailIsVerified == false ||
-                        nom != nom.toString().replaceAll(' ', ''))
+                        nom.toString().replaceAll(' ', '').isEmpty ||
+                        nom == null)
                       Container(
                         padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
                         child: Text(
@@ -584,7 +585,7 @@ class _ActuPageState extends State<ActuPage> {
                             },
                           )
                         : const SizedBox(height: 0),
-                    (nom != nom.toString().replaceAll(' ', ''))
+                    (nom.toString().replaceAll(' ', '').isEmpty || nom == null)
                         ? ListTile(
                             dense: true,
                             contentPadding: EdgeInsets.symmetric(
