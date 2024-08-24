@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:convert' as convert;
 import 'package:dressur/1_reception/reception.dart';
 import 'package:dressur/components/noti_sys.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
@@ -19,7 +21,7 @@ class BottomBar extends StatefulWidget {
   State<BottomBar> createState() => _BottomBarState();
 }
 
-class _BottomBarState extends State<BottomBar> {
+class _BottomBarState extends State<BottomBar> with WidgetsBindingObserver {
   int nombreNewContact = 0;
   int _selectedIndex = 2;
   dynamic screens = [];
@@ -31,6 +33,7 @@ class _BottomBarState extends State<BottomBar> {
     super.initState();
     initNavigationTitle();
     saveContactDsIfNotExiste();
+    WidgetsBinding.instance.addObserver(this);
     if (modeReconnaissanceContactArrierePlan == true) {
       synchroAvanceFunction();
       setState(() {
@@ -56,6 +59,24 @@ class _BottomBarState extends State<BottomBar> {
     //     await traitementAdmin();
     //   });
     // }
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    if (state == AppLifecycleState.resumed) {
+      // showNotificationTimeOutAfter("Cc $name_complete ...", "Dressur est revenue au premier plan.", 10000);
+      saveContactDsIfNotExiste();
+      actualise(true);
+    } else if (state == AppLifecycleState.paused) {
+      // showNotificationTimeOutAfter("Cc $name_complete ...", "Dressur est passée à l'arrière-plan.", 10000);
+    }
   }
 
   Future<void> traitementAdmin() async {
@@ -103,6 +124,57 @@ class _BottomBarState extends State<BottomBar> {
     request.fields
         .addAll({'contactsUserBeforeDS': jsonEncode(contactsUserBeforeDS)});
     await request.send();
+  }
+
+  void actualise(affMessage) async {
+    if (affMessage == true) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: Colors.red,
+        behavior: SnackBarBehavior.floating,
+        content: Text(
+          (langUserPhone == "fr")
+              ? 'Actualisation en cours…'
+              : 'Update in progress…',
+          style: GoogleFonts.poppins(
+            color: Colors.white,
+          ),
+        ),
+      ));
+    }
+
+    var request = http.MultipartRequest(
+        'POST', Uri.parse('$generalRouteForApi/getUserInfo'));
+    request.fields
+        .addAll({'uid': uidUser, 'langUserPhone': langUserPhone.toString()});
+
+    http.StreamedResponse response = await request.send();
+
+    if (response.statusCode == 200) {
+      var data1 = await response.stream.bytesToString();
+      var data = convert.jsonDecode(data1);
+      if (data["error"] == false) {
+        setState(() {
+          initUserInformations(data['user']);
+          lesPublicites = data['user']["lesPublicites"];
+        });
+      }
+    }
+    if (affMessage == true) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: Colors.green,
+          behavior: SnackBarBehavior.floating,
+          content: Text(
+            (langUserPhone == "fr")
+                ? 'Actualisation terminée.'
+                : 'Refresh complete.',
+            style: GoogleFonts.poppins(
+              color: Colors.white,
+            ),
+          ),
+        ),
+      );
+    }
   }
 
   void initNavigationTitle() {
