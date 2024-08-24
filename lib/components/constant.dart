@@ -15,7 +15,7 @@ import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:http/http.dart' as http;
 
-const versionApp = '1.0.1';
+const versionApp = '1.0.2';
 const oldDatabaseName = 'neuf_dressur.db';
 const nowDataBaseName = 'onze_dressur.db';
 bool modeReconnaissanceContactArrierePlan = false;
@@ -89,7 +89,7 @@ var modeMotDePasseOublier = false;
 var mailConnexion = "";
 var textChargementEvolution = "Chargement ...";
 var addUserOnAutreProfilPage = "oui";
-var myDressurVersion = '1.0.1';
+var myDressurVersion = '1.0.2';
 var lesPublicites;
 var uidAutreUser;
 var uidUser;
@@ -296,7 +296,7 @@ List<Map<String, dynamic>> listeMethodePaiement = [
   },
 ];
 
-// map de tous les pays du monde 
+// map de tous les pays du monde
 Map<String, String> countryCodes = {
   '93': 'Afghanistan',
   '355': 'Albanie',
