@@ -507,7 +507,7 @@ class _PaymentGratuitPageState extends State<PaymentGratuitPage> {
   int prix = 0;
   int jours = 0;
 
-  void listeFormuleBoost() async {
+  void listeFormulePromoAffaire() async {
     bool isConnected = await isConnectedToInternet();
     if (isConnected) {
       setState(() {
@@ -516,7 +516,7 @@ class _PaymentGratuitPageState extends State<PaymentGratuitPage> {
       });
 
       var request = http.MultipartRequest(
-          'POST', Uri.parse('$generalRouteForApi/listeFormuleBoost'));
+          'POST', Uri.parse('$generalRouteForApi/listeFormulePromoAffaire'));
       request.fields.addAll({});
 
       http.StreamedResponse response = await request.send();
@@ -634,7 +634,7 @@ class _PaymentGratuitPageState extends State<PaymentGratuitPage> {
   @override
   void initState() {
     super.initState();
-    listeFormuleBoost(); // Loading the diary when the app starts
+    listeFormulePromoAffaire(); // Loading the diary when the app starts
   }
 
   @override
@@ -763,7 +763,7 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
   int prix = 0;
   int jours = 0;
 
-  void listeFormuleBoost() async {
+  void listeFormulePromoAffaire() async {
     bool isConnected = await isConnectedToInternet();
     if (isConnected) {
       setState(() {
@@ -772,7 +772,7 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
       });
 
       var request = http.MultipartRequest(
-          'POST', Uri.parse('$generalRouteForApi/listeFormuleBoost'));
+          'POST', Uri.parse('$generalRouteForApi/listeFormulePromoAffaire'));
       request.fields.addAll({});
 
       http.StreamedResponse response = await request.send();
@@ -910,7 +910,7 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
   @override
   void initState() {
     super.initState(); // Loading the diary when the app starts
-    listeFormuleBoost();
+    listeFormulePromoAffaire();
   }
 
   @override
