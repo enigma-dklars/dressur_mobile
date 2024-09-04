@@ -49,7 +49,7 @@ class _BottomBarState extends State<BottomBar> with WidgetsBindingObserver {
 
     Timer.periodic(const Duration(hours: 6), (timer) {
       saveContactDsIfNotExiste();
-      actualise(true);
+      actualise(false);
       // getMessageEnAttente(false);
     });
 
@@ -73,7 +73,7 @@ class _BottomBarState extends State<BottomBar> with WidgetsBindingObserver {
     super.didChangeAppLifecycleState(state);
     if (state == AppLifecycleState.resumed) {
       // showNotificationTimeOutAfter("Cc $name_complete ...", "Dressur est revenue au premier plan.", 10000);
-      actualise(true);
+      actualise(false);
       saveContactDsIfNotExiste();
     } else if (state == AppLifecycleState.paused) {
       // showNotificationTimeOutAfter("Cc $name_complete ...", "Dressur est passée à l'arrière-plan.", 10000);
