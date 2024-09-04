@@ -523,7 +523,7 @@ class _ActuPageState extends State<ActuPage> {
                   controller: _scrollController,
                   children: [
                     const SizedBox(height: 5),
-                    if (nombreContactDispo <= 0 ||
+                    if ((nombreContactDispo <= 0 && boostEnCours == false) ||
                         telIsVerified == false ||
                         mailIsVerified == false ||
                         nom.toString().replaceAll(' ', '').isEmpty ||
@@ -609,7 +609,7 @@ class _ActuPageState extends State<ActuPage> {
                             },
                           )
                         : const SizedBox(height: 0),
-                    (nombreContactDispo <= 0)
+                    (nombreContactDispo <= 0 && boostEnCours == false)
                         ? ListTile(
                             dense: true,
                             contentPadding: EdgeInsets.symmetric(
@@ -824,7 +824,12 @@ class _ActuPageState extends State<ActuPage> {
                           ),
                         ),
                       ),
-                    DressurDivider(),
+                    if ((nombreContactDispo <= 0 && boostEnCours == false) ||
+                        telIsVerified == false ||
+                        mailIsVerified == false ||
+                        nom.toString().replaceAll(' ', '').isEmpty ||
+                        nom == null)
+                      DressurDivider(),
                     if (havePublicites == true)
                       FutureBuilder<List<Advertisement>>(
                         future: _futureAdvertisements,

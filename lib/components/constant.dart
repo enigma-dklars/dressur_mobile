@@ -85,6 +85,7 @@ bool mailIsVerified = false;
 bool ihaveConnexion = false;
 bool admin = false;
 bool permissionAdd = false;
+bool boostEnCours = false;
 var modeMotDePasseOublier = false;
 var mailConnexion = "";
 var textChargementEvolution = "Chargement ...";
@@ -168,6 +169,7 @@ Future<void> initUserInformations(userInfos) async {
   totalVues = userInfos["totalVues"];
   totalImpressionsText = userInfos["totalImpressionsText"];
   totalVuesText = userInfos["totalVuesText"];
+  boostEnCours = userInfos["boostEnCours"];
 
   SQLHelper.viderLaBaseDeDonneeLocal();
 
