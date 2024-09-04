@@ -109,6 +109,10 @@ var tiktok;
 var instagram;
 var facebook;
 var youtube;
+var totalImpressions;
+var totalVues;
+var totalImpressionsText;
+var totalVuesText;
 
 Future<bool> isConnectedToInternet() async {
   try {
@@ -160,6 +164,10 @@ Future<void> initUserInformations(userInfos) async {
   preferenceCentreInteretLoisirText = preferenceCentreInteretLoisirToText(
       userInfos["preferenceCentreInteretLoisir"]);
   nombreContactDispo = userInfos["nombreContactDispo"];
+  totalImpressions = userInfos["totalImpressions"];
+  totalVues = userInfos["totalVues"];
+  totalImpressionsText = userInfos["totalImpressionsText"];
+  totalVuesText = userInfos["totalVuesText"];
 
   SQLHelper.viderLaBaseDeDonneeLocal();
 
