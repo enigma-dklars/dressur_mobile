@@ -13,7 +13,7 @@
 
 # 
     flutter build apk
-    flutter build appbundle
+    flutter clean; flutter build appbundle
 
 # symbols.zip
     C:\Users\dklar\codes\dressur_mobile\build\app\intermediates\merged_native_libs\release\out\lib
