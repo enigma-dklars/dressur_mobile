@@ -973,6 +973,21 @@ List<Map<String, dynamic>> centreInteretLoisir = [
   // { 'value': "21", 'labelFr': "aaa", 'labelEn': "aaa", 'descpFr': "aaa", 'descpEn': "aaa", },
 ];
 
+List<Map<String, dynamic>> listeTypePromoAffaire = [
+  {
+    'value': 'produit_service',
+    'label': 'Produits et Services',
+  },
+  {
+    'value': 'dmd_emploi',
+    'label': "Demandes d'emploi",
+  },
+  {
+    'value': 'offre_emploi',
+    'label': "Offres d'emploi",
+  },
+];
+
 String getCurrentYear() {
   // Obtenez la date actuelle
   DateTime now = DateTime.now();

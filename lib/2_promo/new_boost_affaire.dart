@@ -5,6 +5,7 @@ import 'dart:convert' as convert;
 import 'dart:io';
 import 'dart:async';
 import 'package:dressur/components/delayed_animation.dart';
+import 'package:dressur/components/padding_and_divider.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
@@ -21,6 +22,118 @@ class PromotionFormPage extends StatefulWidget {
 }
 
 class _PromotionFormPageState extends State<PromotionFormPage> {
+  dynamic type_promo_affaire = "produit_service";
+  onChangeTypePromoAffaire(val) async {
+    setState(() {
+      type_promo_affaire = val;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          (langUserPhone == "fr")
+              ? 'Nouvelle Promotion Affaire'
+              : 'New Business Promotion',
+          style: GoogleFonts.poppins(
+            fontWeight: FontWeight.w400,
+            color: Colors.white,
+          ),
+        ),
+        leading: IconButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          icon: const Icon(
+            Icons.arrow_back,
+            size: 30,
+            color: Colors.white,
+          ),
+        ),
+        backgroundColor: primaryColor,
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.only(left: 10, top: 5, right: 10, bottom: 5),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const SizedBox(height: 5),
+            Card(
+              margin:
+                  const EdgeInsets.only(left: 0, top: 0, right: 0, bottom: 5),
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(5),
+                  gradient: const LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Colors.red,
+                      Color.fromARGB(255, 85, 3, 3),
+                    ],
+                  ),
+                ),
+                padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    const SizedBox(height: 10),
+                    Text(
+                      (langUserPhone == "fr")
+                          ? "NB : Après avoir rempli et valider votre promotion, elle sera analysée par les administrateurs de Dressur. Si votre promotion est acceptée, elle sera visible par des milliers d'utilisateurs correspondants à vos préférences pays. Si la promotion est rejetée, vous aurez la possibilité de la modifier."
+                          : "NB : After completing and validating your promotion, it will be analyzed by Dressur administrators. If your promotion is accepted, it will be visible to thousands of users corresponding to your country preferences. If the promotion is rejected, you will have the opportunity to modify it.",
+                      style: GoogleFonts.poppins(
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                        fontSize: 10,
+                      ),
+                      textAlign: TextAlign.justify,
+                    ),
+                    const SizedBox(height: 15),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 10),
+            DelayedAnimation(
+              delay: 0, // 1500,
+              child: SelectFormField(
+                decoration: const InputDecoration(
+                  labelText: 'Type Promotion Affaire',
+                  border: OutlineInputBorder(),
+                ),
+                type: SelectFormFieldType.dropdown,
+                initialValue: 'produit_service',
+                labelText: 'Type Promotion Affaire',
+                items: listeTypePromoAffaire,
+                onChanged: (val) => onChangeTypePromoAffaire(val),
+                onSaved: (val) => print(val),
+              ),
+            ),
+            const SizedBox(height: 5),
+            DressurDivider(),
+            const SizedBox(height: 5),
+            if (type_promo_affaire == "produit_service") ...[
+              ProduitsServices()
+            ],
+            if (type_promo_affaire == "dmd_emploi") ...[DemandesEmploi()],
+            if (type_promo_affaire == "offre_emploi") ...[OffresEmploi()],
+            const SizedBox(height: 15),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class ProduitsServices extends StatefulWidget {
+  @override
+  State<ProduitsServices> createState() => _ProduitsServicesState();
+}
+
+class _ProduitsServicesState extends State<ProduitsServices> {
   bool load = false;
   File? _imageFile;
   TextEditingController _textEditingController = TextEditingController();
@@ -146,187 +259,183 @@ class _PromotionFormPageState extends State<PromotionFormPage> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    // listeFormulePromoAffaire(); // Loading the diary when the app starts
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          (langUserPhone == "fr")
-              ? 'Nouvelle Promotion Affaire'
-              : 'New Business Promotion',
-          style: GoogleFonts.poppins(
-            fontWeight: FontWeight.w400,
-            color: Colors.white,
-          ),
-        ),
-        leading: IconButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          icon: const Icon(
-            Icons.arrow_back,
-            size: 30,
-            color: Colors.white,
-          ),
-        ),
-        backgroundColor: primaryColor,
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.only(left: 10, top: 5, right: 10, bottom: 5),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            const SizedBox(height: 5),
-            Card(
-              margin:
-                  const EdgeInsets.only(left: 0, top: 0, right: 0, bottom: 5),
-              child: Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(5),
-                  gradient: const LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      Colors.red,
-                      Color.fromARGB(255, 85, 3, 3),
-                    ],
-                  ),
+    return Container(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                (langUserPhone == "fr") ? 'Gratuit' : 'Free',
+                style: GoogleFonts.poppins(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w800,
+                  color: Colors.green,
                 ),
-                padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    const SizedBox(height: 10),
-                    Text(
-                      (langUserPhone == "fr")
-                          ? "NB: Après avoir rempli et envoyer votre promotion, elle sera analyser par les administrateurs de Dressur.\nSi votre promotion est acceptée, vous passerez au paiement et ainsi votre promotion sera visible par des milliers d'utilisateurs correspondants à vos préférences pays."
-                          : "NB: After completing and sending your promotion, it will be analyzed by the Dressur administrators.\nIf your promotion is accepted, you will proceed to payment and your promotion will thus be visible to thousands of users corresponding to your country preferences.",
-                      style: GoogleFonts.poppins(
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
-                        fontSize: 10,
-                      ),
-                      textAlign: TextAlign.justify,
-                    ),
-                    const SizedBox(height: 15),
-                  ],
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(width: 10),
+              Switch(
+                trackOutlineColor:
+                    MaterialStateColor.resolveWith((states) => primaryColor),
+                activeColor: Colors.red,
+                activeTrackColor: primaryColor,
+                inactiveThumbColor: Colors.green,
+                inactiveTrackColor: primaryColor,
+                value: load,
+                onChanged: (bool? newValue) {
+                  setState(() {
+                    if (newValue == true) {
+                      load = true;
+                    } else {
+                      load = false;
+                    }
+                  });
+                },
+              ),
+              const SizedBox(width: 10),
+              Text(
+                (langUserPhone == "fr") ? 'Payant' : 'Paid',
+                style: GoogleFonts.poppins(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w800,
+                  color: Colors.red,
                 ),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+          const SizedBox(height: 5),
+          load ? FormulePayante() : FormuleGratuite(),
+          const SizedBox(height: 10),
+          ElevatedButton(
+            onPressed: _isSending ? null : _selectImage,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: primaryColor,
+              shape: const StadiumBorder(),
+              padding: const EdgeInsets.symmetric(
+                vertical: 13,
               ),
             ),
-            const SizedBox(height: 15),
-            Text(
-              (langUserPhone == "fr") ? "Nouvelle Promotion" : "New Promotion",
+            child: Text(
+              (langUserPhone == "fr")
+                  ? 'Sélectionner une image'
+                  : 'Select an image',
               style: GoogleFonts.poppins(
-                fontSize: 25,
+                color: Colors.white,
                 fontWeight: FontWeight.w600,
               ),
-              textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 15),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  (langUserPhone == "fr") ? 'Gratuit' : 'Free',
-                  style: GoogleFonts.poppins(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w800,
-                    color: Colors.green,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(width: 10),
-                Switch(
-                  trackOutlineColor:
-                      MaterialStateColor.resolveWith((states) => primaryColor),
-                  activeColor: Colors.red,
-                  activeTrackColor: primaryColor,
-                  inactiveThumbColor: Colors.green,
-                  inactiveTrackColor: primaryColor,
-                  value: load,
-                  onChanged: (bool? newValue) {
-                    setState(() {
-                      if (newValue == true) {
-                        load = true;
-                      } else {
-                        load = false;
-                      }
-                    });
-                  },
-                ),
-                const SizedBox(width: 10),
-                Text(
-                  (langUserPhone == "fr") ? 'Payant' : 'Paid',
-                  style: GoogleFonts.poppins(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w800,
-                    color: Colors.red,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ],
-            ),
-            const SizedBox(height: 5),
-            load ? FormulePayante() : FormuleGratuite(),
-            const SizedBox(height: 10),
-            ElevatedButton(
-              onPressed: _isSending ? null : _selectImage,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: primaryColor,
-                shape: const StadiumBorder(),
-                padding: const EdgeInsets.symmetric(
-                  vertical: 13,
-                ),
-              ),
-              child: Text(
-                (langUserPhone == "fr")
-                    ? 'Sélectionner une image'
-                    : 'Select an image',
-                style: GoogleFonts.poppins(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w600,
-                ),
+          ),
+          if (_imageFile != null)
+            Container(
+              margin: const EdgeInsets.only(top: 16.0),
+              child: Image.file(
+                _imageFile!,
+                fit: BoxFit.contain,
               ),
             ),
-            if (_imageFile != null)
-              Container(
-                margin: const EdgeInsets.only(top: 16.0),
-                child: Image.file(
-                  _imageFile!,
-                  fit: BoxFit.contain,
-                ),
-              ),
-            const SizedBox(height: 16.0),
-            TextField(
-              controller: _textEditingController,
-              maxLines: null,
-              decoration: InputDecoration(
-                labelText: (langUserPhone == "fr")
-                    ? 'Description de la promotion'
-                    : 'Description of the promotion',
-                border: const OutlineInputBorder(),
+          const SizedBox(height: 16.0),
+          TextField(
+            controller: _textEditingController,
+            maxLines: null,
+            decoration: InputDecoration(
+              labelText: (langUserPhone == "fr")
+                  ? 'Description de la promotion'
+                  : 'Description of the promotion',
+              border: const OutlineInputBorder(),
+            ),
+          ),
+          const SizedBox(height: 16.0),
+          ElevatedButton(
+            onPressed: _isSending ? null : _sendData,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: primaryColor,
+              shape: const StadiumBorder(),
+              padding: const EdgeInsets.symmetric(
+                vertical: 13,
               ),
             ),
-            const SizedBox(height: 16.0),
-            ElevatedButton(
-              onPressed: _isSending ? null : _sendData,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: primaryColor,
-                shape: const StadiumBorder(),
-                padding: const EdgeInsets.symmetric(
-                  vertical: 13,
-                ),
-              ),
-              child: _isSending
-                  ? const Text('Wait ...')
-                  : Text(
-                      (langUserPhone == "fr") ? 'Envoyer' : 'Send',
-                      style: GoogleFonts.poppins(
-                        color: Colors.white,
-                      ),
+            child: _isSending
+                ? const Text('Wait ...')
+                : Text(
+                    (langUserPhone == "fr") ? 'Envoyer' : 'Send',
+                    style: GoogleFonts.poppins(
+                      color: Colors.white,
                     ),
+                  ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class DemandesEmploi extends StatefulWidget {
+  @override
+  State<DemandesEmploi> createState() => _DemandesEmploiState();
+}
+
+class _DemandesEmploiState extends State<DemandesEmploi> {
+  @override
+  void initState() {
+    super.initState();
+    // listeFormulePromoAffaire(); // Loading the diary when the app starts
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      child: Column(
+        children: [
+          Text(
+            "dmd_emploi",
+            style: GoogleFonts.poppins(
+              fontWeight: FontWeight.w600,
+              fontSize: 18,
             ),
-          ],
-        ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class OffresEmploi extends StatefulWidget {
+  @override
+  State<OffresEmploi> createState() => _OffresEmploiState();
+}
+
+class _OffresEmploiState extends State<OffresEmploi> {
+  @override
+  void initState() {
+    super.initState();
+    // listeFormulePromoAffaire(); // Loading the diary when the app starts
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      child: Column(
+        children: [
+          Text(
+            "offre_emploi",
+            style: GoogleFonts.poppins(
+              fontWeight: FontWeight.w600,
+              fontSize: 18,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
       ),
     );
   }
