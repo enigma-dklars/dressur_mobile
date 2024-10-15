@@ -88,7 +88,7 @@ class _RegisterFormState extends State<RegisterForm> {
           'POST', Uri.parse('$generalRouteForApi/inscriptionDS'));
       request.fields.addAll({
         'langUserPhone': langUserPhone.toString(),
-        'pseudo': pseudo,
+        // 'pseudo': pseudo,
         'tel': tel,
         'mail': mail,
         'password': password,
@@ -203,34 +203,34 @@ class _RegisterFormState extends State<RegisterForm> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
-                            'Pseudo',
-                            style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 18.0,
-                                fontWeight: FontWeight.w500),
-                          ),
-                          const SizedBox(height: 5),
-                          Container(
-                            decoration: BoxDecoration(
-                                border: Border.all(
-                                    width: 1.0, color: Colors.black38),
-                                borderRadius: BorderRadius.circular(10)),
-                            child: TextFormField(
-                              style: const TextStyle(
-                                color: Colors.black,
-                                fontSize: 20,
-                              ),
-                              controller: pseudoController,
-                              decoration: const InputDecoration(
-                                  border: InputBorder.none,
-                                  prefixIcon: Icon(
-                                    Icons.person_outline,
-                                    color: primaryColor,
-                                  )),
-                            ),
-                          ),
-                          const SizedBox(height: 15),
+                          // const Text(
+                          //   'Pseudo',
+                          //   style: TextStyle(
+                          //       color: Colors.black,
+                          //       fontSize: 18.0,
+                          //       fontWeight: FontWeight.w500),
+                          // ),
+                          // const SizedBox(height: 5),
+                          // Container(
+                          //   decoration: BoxDecoration(
+                          //       border: Border.all(
+                          //           width: 1.0, color: Colors.black38),
+                          //       borderRadius: BorderRadius.circular(10)),
+                          //   child: TextFormField(
+                          //     style: const TextStyle(
+                          //       color: Colors.black,
+                          //       fontSize: 20,
+                          //     ),
+                          //     controller: pseudoController,
+                          //     decoration: const InputDecoration(
+                          //         border: InputBorder.none,
+                          //         prefixIcon: Icon(
+                          //           Icons.person_outline,
+                          //           color: primaryColor,
+                          //         )),
+                          //   ),
+                          // ),
+                          // const SizedBox(height: 15),
                           Text(
                             (langUserPhone == "fr")
                                 ? 'Numéro Whatsapp'

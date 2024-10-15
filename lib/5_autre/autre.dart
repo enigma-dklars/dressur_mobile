@@ -105,19 +105,32 @@ class _SettingPageState extends State<SettingPage> {
           child: Column(
             children: [
               const SizedBox(height: 5),
-              admin
-                  ? ProfileMenu(
-                      text: "Administration",
-                      Myicon: const Icon(Icons.stop),
-                      press: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => AdministrationPage()),
-                        );
-                      },
-                    )
-                  : const SizedBox(height: 0),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Expanded(
+                      child: StatCard(
+                        icon: Icons.visibility,
+                        number: totalImpressions,
+                        numberText: totalImpressionsText,
+                        label: (langUserPhone == "fr")
+                            ? "Impressions"
+                            : "Impressions",
+                      ),
+                    ),
+                    Expanded(
+                      child: StatCard(
+                        icon: Icons.touch_app,
+                        number: totalVues,
+                        numberText: totalVuesText,
+                        label: (langUserPhone == "fr") ? "Vues" : "Views",
+                      ),
+                    ),
+                  ],
+                ),
+              ),
               ProfileMenu(
                 text: (langUserPhone == "fr")
                     ? "Support, Assistance Technique"
@@ -337,8 +350,91 @@ class _SettingPageState extends State<SettingPage> {
                 },
               ),
               const SizedBox(height: 5),
+              admin
+                  ? ProfileMenu(
+                      text: "Administration",
+                      Myicon: const Icon(Icons.stop),
+                      press: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => AdministrationPage()),
+                        );
+                      },
+                    )
+                  : const SizedBox(height: 0),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class StatCard extends StatelessWidget {
+  final IconData icon;
+  final int number;
+  final String numberText;
+  final String label;
+
+  const StatCard({
+    required this.icon,
+    required this.number,
+    required this.numberText,
+    required this.label,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16.0),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(0, 5, 0, 10),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              icon,
+              size: 30,
+              color: (number != 0) ? Colors.green : primaryColor,
+            ),
+            // const SizedBox(height: 8),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  numberText,
+                  style: GoogleFonts.poppins(
+                    fontWeight: FontWeight.w400,
+                    fontSize: 24,
+                  ),
+                ),
+                const SizedBox(width: 5),
+                if (number != 0) ...[
+                  const Icon(
+                    Icons.arrow_upward,
+                    color: Colors.green,
+                    size: 20,
+                  ),
+                ] else ...[
+                  const Icon(
+                    Icons.arrow_drop_down,
+                    color: Colors.red,
+                    size: 20,
+                  ),
+                ]
+              ],
+            ),
+            // const SizedBox(height: 8),
+            Text(
+              label,
+              style: GoogleFonts.poppins(
+                fontWeight: FontWeight.w400,
+              ),
+            ),
+          ],
         ),
       ),
     );

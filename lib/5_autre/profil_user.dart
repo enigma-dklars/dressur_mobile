@@ -1,5 +1,6 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'package:dressur/5_autre/autre_profil.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:dressur/components/delayed_animation.dart';
@@ -32,6 +33,31 @@ class ProfilPage extends StatelessWidget {
             color: Colors.white,
           ),
         ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 10.0),
+            child: Row(
+              children: [
+                GestureDetector(
+                  onTap: () {
+                    uidAutreUser = uidUser;
+                    addUserOnAutreProfilPage = "non";
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => AutreProfilPage(),
+                      ),
+                    );
+                  },
+                  child: const Icon(
+                    Icons.info,
+                    size: 30.0,
+                    color: Colors.white,
+                  ),
+                )
+              ],
+            ),
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         child: Column(

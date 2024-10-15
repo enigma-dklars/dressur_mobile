@@ -1,8 +1,11 @@
-// ignore_for_file: use_build_context_synchronously
+// ignore_for_file: use_build_context_synchronously, non_constant_identifier_names
 
 import 'dart:convert';
+import 'dart:convert' as convert;
 import 'dart:io';
 import 'dart:async';
+import 'package:dressur/components/delayed_animation.dart';
+import 'package:dressur/components/padding_and_divider.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
@@ -11,6 +14,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:image/image.dart' as img;
 import 'package:dressur/components/constant.dart';
 import 'package:dressur/components/noti.dart';
+import 'package:select_form_field/select_form_field.dart';
 
 class PromotionFormPage extends StatefulWidget {
   @override
@@ -18,6 +22,119 @@ class PromotionFormPage extends StatefulWidget {
 }
 
 class _PromotionFormPageState extends State<PromotionFormPage> {
+  dynamic type_promo_affaire = "produit_service";
+  onChangeTypePromoAffaire(val) async {
+    setState(() {
+      type_promo_affaire = val;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          (langUserPhone == "fr")
+              ? 'Nouvelle Promotion Affaire'
+              : 'New Business Promotion',
+          style: GoogleFonts.poppins(
+            fontWeight: FontWeight.w400,
+            color: Colors.white,
+          ),
+        ),
+        leading: IconButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          icon: const Icon(
+            Icons.arrow_back,
+            size: 30,
+            color: Colors.white,
+          ),
+        ),
+        backgroundColor: primaryColor,
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.only(left: 10, top: 5, right: 10, bottom: 5),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const SizedBox(height: 5),
+            Card(
+              margin:
+                  const EdgeInsets.only(left: 0, top: 0, right: 0, bottom: 5),
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(5),
+                  gradient: const LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Colors.red,
+                      Color.fromARGB(255, 85, 3, 3),
+                    ],
+                  ),
+                ),
+                padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    const SizedBox(height: 10),
+                    Text(
+                      (langUserPhone == "fr")
+                          ? "NB : Après avoir rempli et valider votre promotion, elle sera analysée par les administrateurs de Dressur. Si votre promotion est acceptée, elle sera visible par des milliers d'utilisateurs correspondants à vos préférences pays. Si la promotion est rejetée, vous aurez la possibilité de la modifier."
+                          : "NB : After completing and validating your promotion, it will be analyzed by Dressur administrators. If your promotion is accepted, it will be visible to thousands of users corresponding to your country preferences. If the promotion is rejected, you will have the opportunity to modify it.",
+                      style: GoogleFonts.poppins(
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                        fontSize: 10,
+                      ),
+                      textAlign: TextAlign.justify,
+                    ),
+                    const SizedBox(height: 15),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 10),
+            DelayedAnimation(
+              delay: 0, // 1500,
+              child: SelectFormField(
+                decoration: const InputDecoration(
+                  labelText: 'Type Promotion Affaire',
+                  border: OutlineInputBorder(),
+                ),
+                type: SelectFormFieldType.dropdown,
+                initialValue: 'produit_service',
+                labelText: 'Type Promotion Affaire',
+                items: listeTypePromoAffaire,
+                onChanged: (val) => onChangeTypePromoAffaire(val),
+                onSaved: (val) => print(val),
+              ),
+            ),
+            const SizedBox(height: 5),
+            DressurDivider(),
+            const SizedBox(height: 5),
+            if (type_promo_affaire == "produit_service") ...[
+              ProduitsServices()
+            ],
+            if (type_promo_affaire == "dmd_emploi") ...[DemandesEmploi()],
+            if (type_promo_affaire == "offre_emploi") ...[OffresEmploi()],
+            const SizedBox(height: 15),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class ProduitsServices extends StatefulWidget {
+  @override
+  State<ProduitsServices> createState() => _ProduitsServicesState();
+}
+
+class _ProduitsServicesState extends State<ProduitsServices> {
+  bool load = false;
   File? _imageFile;
   TextEditingController _textEditingController = TextEditingController();
   bool _isSending = false;
@@ -71,6 +188,11 @@ class _PromotionFormPageState extends State<PromotionFormPage> {
   }
 
   Future<void> _sendData() async {
+    if (!telIsVerified) {
+      showConfNumeroWhatsapp(context);
+      return;
+    }
+
     if (_textEditingController.text.isEmpty || _imageFile == null) {
       dangerNoti(
           "Attention !!!",
@@ -137,141 +259,441 @@ class _PromotionFormPageState extends State<PromotionFormPage> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    // listeFormulePromoAffaire(); // Loading the diary when the app starts
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          (langUserPhone == "fr")
-              ? 'Nouvelle Promotion Affaire'
-              : 'New Business Promotion',
-          style: GoogleFonts.poppins(
-            fontWeight: FontWeight.w400,
-            color: Colors.white,
-          ),
-        ),
-        leading: IconButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          icon: const Icon(
-            Icons.arrow_back,
-            size: 30,
-            color: Colors.white,
-          ),
-        ),
-        backgroundColor: primaryColor,
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.only(left: 10, top: 5, right: 10, bottom: 5),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            const SizedBox(height: 5),
-            Card(
-              margin:
-                  const EdgeInsets.only(left: 0, top: 0, right: 0, bottom: 5),
-              child: Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(5),
-                  gradient: const LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      Colors.red,
-                      Color.fromARGB(255, 85, 3, 3),
-                    ],
-                  ),
+    return Container(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                (langUserPhone == "fr") ? 'Gratuit' : 'Free',
+                style: GoogleFonts.poppins(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w800,
+                  color: Colors.green,
                 ),
-                padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    const SizedBox(height: 10),
-                    Text(
-                      (langUserPhone == "fr")
-                          ? "NB: Après avoir rempli et envoyer votre promotion, elle sera analyser par les administrateurs de Dressur.\nSi votre promotion est acceptée, vous passerez au paiement et ainsi votre promotion sera visible par des milliers d'utilisateurs correspondants à vos préférences pays."
-                          : "NB: After completing and sending your promotion, it will be analyzed by the Dressur administrators.\nIf your promotion is accepted, you will proceed to payment and your promotion will thus be visible to thousands of users corresponding to your country preferences.",
-                      style: GoogleFonts.poppins(
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
-                        fontSize: 10,
-                      ),
-                      textAlign: TextAlign.justify,
-                    ),
-                    const SizedBox(height: 15),
-                  ],
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(width: 10),
+              Switch(
+                trackOutlineColor:
+                    MaterialStateColor.resolveWith((states) => primaryColor),
+                activeColor: Colors.red,
+                activeTrackColor: primaryColor,
+                inactiveThumbColor: Colors.green,
+                inactiveTrackColor: primaryColor,
+                value: load,
+                onChanged: (bool? newValue) {
+                  setState(() {
+                    if (newValue == true) {
+                      load = true;
+                    } else {
+                      load = false;
+                    }
+                  });
+                },
+              ),
+              const SizedBox(width: 10),
+              Text(
+                (langUserPhone == "fr") ? 'Payant' : 'Paid',
+                style: GoogleFonts.poppins(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w800,
+                  color: Colors.red,
                 ),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+          const SizedBox(height: 5),
+          load ? FormulePayante() : FormuleGratuite(),
+          const SizedBox(height: 10),
+          ElevatedButton(
+            onPressed: _isSending ? null : _selectImage,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: primaryColor,
+              shape: const StadiumBorder(),
+              padding: const EdgeInsets.symmetric(
+                vertical: 13,
               ),
             ),
-            const SizedBox(height: 15),
-            Text(
-              (langUserPhone == "fr") ? "Nouvelle Promotion" : "New Promotion",
+            child: Text(
+              (langUserPhone == "fr")
+                  ? 'Sélectionner une image'
+                  : 'Select an image',
               style: GoogleFonts.poppins(
-                fontSize: 25,
+                color: Colors.white,
                 fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+          if (_imageFile != null)
+            Container(
+              margin: const EdgeInsets.only(top: 16.0),
+              child: Image.file(
+                _imageFile!,
+                fit: BoxFit.contain,
+              ),
+            ),
+          const SizedBox(height: 16.0),
+          TextField(
+            controller: _textEditingController,
+            maxLines: null,
+            decoration: InputDecoration(
+              labelText: (langUserPhone == "fr")
+                  ? 'Description de la promotion'
+                  : 'Description of the promotion',
+              border: const OutlineInputBorder(),
+            ),
+          ),
+          const SizedBox(height: 16.0),
+          ElevatedButton(
+            onPressed: _isSending ? null : _sendData,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: primaryColor,
+              shape: const StadiumBorder(),
+              padding: const EdgeInsets.symmetric(
+                vertical: 13,
+              ),
+            ),
+            child: _isSending
+                ? const Text('Wait ...')
+                : Text(
+                    (langUserPhone == "fr") ? 'Envoyer' : 'Send',
+                    style: GoogleFonts.poppins(
+                      color: Colors.white,
+                    ),
+                  ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class DemandesEmploi extends StatefulWidget {
+  @override
+  State<DemandesEmploi> createState() => _DemandesEmploiState();
+}
+
+class _DemandesEmploiState extends State<DemandesEmploi> {
+  @override
+  void initState() {
+    super.initState();
+    // listeFormulePromoAffaire(); // Loading the diary when the app starts
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      child: Column(
+        children: [
+          Text(
+            "dmd_emploi",
+            style: GoogleFonts.poppins(
+              fontWeight: FontWeight.w600,
+              fontSize: 18,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class OffresEmploi extends StatefulWidget {
+  @override
+  State<OffresEmploi> createState() => _OffresEmploiState();
+}
+
+class _OffresEmploiState extends State<OffresEmploi> {
+  @override
+  void initState() {
+    super.initState();
+    // listeFormulePromoAffaire(); // Loading the diary when the app starts
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      child: Column(
+        children: [
+          Text(
+            "offre_emploi",
+            style: GoogleFonts.poppins(
+              fontWeight: FontWeight.w600,
+              fontSize: 18,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class FormulePayante extends StatefulWidget {
+  @override
+  State<FormulePayante> createState() => _FormulePayanteState();
+}
+
+class _FormulePayanteState extends State<FormulePayante> {
+  bool loading_formule_payant = false;
+  var _message = "";
+  dynamic data;
+  dynamic idFormulBoost = 1;
+  dynamic valueMethodePaiement = "mtn";
+  String? boostId;
+  final telController = TextEditingController(text: tel);
+
+  List<Map<String, dynamic>> listeDesFormules = [];
+  int value = 0;
+  var label = "";
+  int prix = 0;
+  int jours = 0;
+
+  void listeFormulePromoAffaire() async {
+    bool isConnected = await isConnectedToInternet();
+    if (isConnected) {
+      setState(() {
+        loading_formule_payant = true;
+      });
+
+      var request = http.MultipartRequest(
+          'POST', Uri.parse('$generalRouteForApi/listeFormulePromoAffaire'));
+      request.fields.addAll({});
+
+      http.StreamedResponse response = await request.send();
+
+      if (response.statusCode == 200) {
+        var data1 = await response.stream.bytesToString();
+        var data = convert.jsonDecode(data1);
+        if (data["error"] == false) {
+          setState(() {
+            loading_formule_payant = false;
+            listeDesFormules = (data["listeFormulBoost"] as List<dynamic>)
+                .map((item) => item as Map<String, dynamic>)
+                .toList();
+            _message = (langUserPhone == "fr")
+                ? "Veuillez choisir une formule."
+                : "Please choose a plan.";
+          });
+        }
+      }
+    } else {
+      if (langUserPhone != "fr") {
+        dangerNoti(
+            "Mistake!", "You are not connected to the internet.", context);
+      } else {
+        dangerNoti("Erreur!", "Vous n'ètes pas connecté a internet.", context);
+      }
+      setState(() {
+        loading_formule_payant = false;
+      });
+    }
+  }
+
+  onChangeFormulBoost(val) async {
+    for (var service in listeDesFormules) {
+      if ("$val" == "${service['value']}") {
+        setState(() {
+          value = service['value'];
+          label = service['label'];
+          prix = service['prix'];
+          jours = service['jours'];
+        });
+      }
+    }
+    setState(() {
+      idFormulBoost = val;
+      _message = (langUserPhone == "fr")
+          ? "Cette formule vous offre une promotion affaire de $jours jour(s) pour $prix FCFA."
+          : "This formula offers you a business promotion of $jours day(s) for $prix FCFA.";
+    });
+  }
+
+  onChangeMethodePaiement(val) async {
+    setState(() {
+      valueMethodePaiement = val;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState(); // Loading the diary when the app starts
+    listeFormulePromoAffaire();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      child: Column(
+        children: [
+          loading_formule_payant
+              ? const Center(
+                  child: CircularProgressIndicator(),
+                )
+              : DelayedAnimation(
+                  delay: 0, // 1500,
+                  child: SelectFormField(
+                    decoration: const InputDecoration(
+                      labelText: 'Formules de Promotion Affaire Payant',
+                      border: OutlineInputBorder(),
+                    ),
+                    type: SelectFormFieldType.dropdown,
+                    initialValue: '0',
+                    labelText: 'Formules de Promotion Affaire Payant',
+                    items: listeDesFormules,
+                    onChanged: (val) => onChangeFormulBoost(val),
+                    onSaved: (val) => print(val),
+                  ),
+                ),
+          const SizedBox(height: 10),
+          DelayedAnimation(
+            delay: 0, // 1000,
+            child: Text(
+              _message,
+              style: GoogleFonts.poppins(
+                fontSize: 16,
               ),
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 15),
-            ElevatedButton(
-              onPressed: _isSending ? null : _selectImage,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: primaryColor,
-                shape: const StadiumBorder(),
-                padding: const EdgeInsets.symmetric(
-                  vertical: 13,
-                ),
-              ),
-              child: Text(
-                (langUserPhone == "fr")
-                    ? 'Sélectionner une image'
-                    : 'Select an image',
-                style: GoogleFonts.poppins(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-            if (_imageFile != null)
-              Container(
-                margin: const EdgeInsets.only(top: 16.0),
-                child: Image.file(
-                  _imageFile!,
-                  fit: BoxFit.contain,
-                ),
-              ),
-            const SizedBox(height: 16.0),
-            TextField(
-              controller: _textEditingController,
-              maxLines: null,
-              decoration: InputDecoration(
-                labelText: (langUserPhone == "fr")
-                    ? 'Description de la promotion'
-                    : 'Description of the promotion',
-                border: const OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 16.0),
-            ElevatedButton(
-              onPressed: _isSending ? null : _sendData,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: primaryColor,
-                shape: const StadiumBorder(),
-                padding: const EdgeInsets.symmetric(
-                  vertical: 13,
-                ),
-              ),
-              child: _isSending
-                  ? const Text('Wait ...')
-                  : Text(
-                      (langUserPhone == "fr") ? 'Envoyer' : 'Send',
-                      style: GoogleFonts.poppins(
-                        color: Colors.white,
-                      ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class FormuleGratuite extends StatefulWidget {
+  @override
+  State<FormuleGratuite> createState() => _FormuleGratuiteState();
+}
+
+class _FormuleGratuiteState extends State<FormuleGratuite> {
+  bool loading_formule_gratuit = false;
+  var _message = "";
+  dynamic data;
+  dynamic idFormulBoost = 1;
+  String? boostId;
+
+  List<Map<String, dynamic>> listeDesFormules = [];
+  int value = 0;
+  var label = "";
+  int prix = 0;
+  int jours = 0;
+
+  void listeFormulePromoAffaire() async {
+    bool isConnected = await isConnectedToInternet();
+    if (isConnected) {
+      setState(() {
+        loading_formule_gratuit = true;
+      });
+
+      var request = http.MultipartRequest(
+          'POST', Uri.parse('$generalRouteForApi/listeFormulePromoAffaire'));
+      request.fields.addAll({});
+
+      http.StreamedResponse response = await request.send();
+
+      if (response.statusCode == 200) {
+        var data1 = await response.stream.bytesToString();
+        var data = convert.jsonDecode(data1);
+        if (data["error"] == false) {
+          setState(() {
+            loading_formule_gratuit = false;
+            listeDesFormules = (data["listeFormulBoost"] as List<dynamic>)
+                .map((item) => item as Map<String, dynamic>)
+                .toList();
+            _message = (langUserPhone == "fr")
+                ? "Veuillez choisir une formule."
+                : "Please choose a plan.";
+          });
+        }
+      }
+    } else {
+      if (langUserPhone != "fr") {
+        dangerNoti(
+            "Mistake!", "You are not connected to the internet.", context);
+      } else {
+        dangerNoti("Erreur!", "Vous n'ètes pas connecté a internet.", context);
+      }
+      setState(() {
+        loading_formule_gratuit = false;
+      });
+    }
+  }
+
+  onChangeFormulBoost(val) async {
+    for (var service in listeDesFormules) {
+      if ("$val" == "${service['value']}") {
+        setState(() {
+          value = service['value'];
+          label = service['label'];
+          prix = service['prix'];
+          jours = service['jours'];
+        });
+      }
+    }
+    setState(() {
+      idFormulBoost = val;
+      _message = (langUserPhone == "fr")
+          ? "Cette formule vous offre une promotion affaire de $jours jour(s) pour $prix Bonus."
+          : "This formula offers you a business promotion of $jours day(s) for $prix Bonus.";
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    listeFormulePromoAffaire(); // Loading the diary when the app starts
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      child: Column(
+        children: [
+          loading_formule_gratuit
+              ? const Center(
+                  child: CircularProgressIndicator(),
+                )
+              : DelayedAnimation(
+                  delay: 0, // 1500,
+                  child: SelectFormField(
+                    decoration: const InputDecoration(
+                      labelText: 'Formules de Promotion Affaire',
+                      border: OutlineInputBorder(),
                     ),
+                    type: SelectFormFieldType.dropdown,
+                    initialValue: '0',
+                    labelText: 'Formules de Promotion Affaire',
+                    items: listeDesFormules,
+                    onChanged: (val) => onChangeFormulBoost(val),
+                    onSaved: (val) => print(val),
+                  ),
+                ),
+          const SizedBox(height: 20),
+          DelayedAnimation(
+            delay: 0, // 1000,
+            child: Text(
+              _message,
+              style: GoogleFonts.poppins(
+                fontSize: 16,
+              ),
+              textAlign: TextAlign.center,
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

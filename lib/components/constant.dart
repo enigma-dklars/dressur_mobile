@@ -1,8 +1,10 @@
-// ignore_for_file: prefer_typing_uninitialized_variables, non_constant_identifier_names
+// ignore_for_file: prefer_typing_uninitialized_variables, non_constant_identifier_names, prefer_const_constructors
 
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 import 'package:dressur/components/111_generaleApiDomaine.dart';
+import 'package:dressur/components/noti_sys.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show ByteData, Uint8List, rootBundle;
 import 'package:flutter_contacts/flutter_contacts.dart';
@@ -13,11 +15,10 @@ import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:http/http.dart' as http;
 
-const versionApp = '1.0.0';
+const versionApp = '1.0.3';
 const oldDatabaseName = 'neuf_dressur.db';
 const nowDataBaseName = 'onze_dressur.db';
 bool modeReconnaissanceContactArrierePlan = false;
-// const generalApiDomaine = 'http://dressur.rf.gd/public';
 const generalRouteForApi = '$generalApiDomaine/api';
 const generalRouteForPromotionImage = '$generalApiDomaine/promotion/';
 
@@ -29,7 +30,7 @@ const tiktokELTCS = "https://www.tiktok.com/@eliticscore1";
 const instagramBLT = "https://www.instagram.com/bluelife.tech";
 const instagramELTCS = "https://www.instagram.com/eliticscore";
 const youtubeBLT = "https://www.youtube.com/@bluelife-tech";
-const whatsappDSURL = "https://wa.me/22964044294";
+const whatsappDSURL = "whatsapp://send?phone=22964044294";
 const dressurConditionUtilisation =
     "https://www.bluelife.tech/realisations/dressur/condition";
 const dressurPolitiqueConfidentialite =
@@ -84,10 +85,12 @@ bool mailIsVerified = false;
 bool ihaveConnexion = false;
 bool admin = false;
 bool permissionAdd = false;
+bool boostEnCours = false;
 var modeMotDePasseOublier = false;
 var mailConnexion = "";
 var textChargementEvolution = "Chargement ...";
 var addUserOnAutreProfilPage = "oui";
+var myDressurVersion = '1.0.3';
 var lesPublicites;
 var uidAutreUser;
 var uidUser;
@@ -107,6 +110,10 @@ var tiktok;
 var instagram;
 var facebook;
 var youtube;
+var totalImpressions;
+var totalVues;
+var totalImpressionsText;
+var totalVuesText;
 
 Future<bool> isConnectedToInternet() async {
   try {
@@ -128,6 +135,7 @@ Future<void> insertNumTelUserIntoDataBase(numberTel) async {
 }
 
 Future<void> initUserInformations(userInfos) async {
+  myDressurVersion = userInfos["myDressurVersion"];
   mailIsMaxxFire = userInfos["mailIsMaxxFire"];
   uidUser = userInfos["uid"];
   name_complete = userInfos["name_complete"];
@@ -157,6 +165,11 @@ Future<void> initUserInformations(userInfos) async {
   preferenceCentreInteretLoisirText = preferenceCentreInteretLoisirToText(
       userInfos["preferenceCentreInteretLoisir"]);
   nombreContactDispo = userInfos["nombreContactDispo"];
+  totalImpressions = userInfos["totalImpressions"];
+  totalVues = userInfos["totalVues"];
+  totalImpressionsText = userInfos["totalImpressionsText"];
+  totalVuesText = userInfos["totalVuesText"];
+  boostEnCours = userInfos["boostEnCours"];
 
   SQLHelper.viderLaBaseDeDonneeLocal();
 
@@ -960,6 +973,21 @@ List<Map<String, dynamic>> centreInteretLoisir = [
   // { 'value': "21", 'labelFr': "aaa", 'labelEn': "aaa", 'descpFr': "aaa", 'descpEn': "aaa", },
 ];
 
+List<Map<String, dynamic>> listeTypePromoAffaire = [
+  {
+    'value': 'produit_service',
+    'label': 'Produits et Services',
+  },
+  {
+    'value': 'dmd_emploi',
+    'label': "Demandes d'emploi",
+  },
+  {
+    'value': 'offre_emploi',
+    'label': "Offres d'emploi",
+  },
+];
+
 String getCurrentYear() {
   // Obtenez la date actuelle
   DateTime now = DateTime.now();
@@ -998,11 +1026,18 @@ void launchWhatsApp(String phoneNumber) async {
   }
 }
 
+void launchPaiement(String urlPaiement) async {
+  final Uri _url = Uri.parse(urlPaiement);
+  if (!await launchUrl(_url, mode: LaunchMode.externalApplication)) {
+    throw 'Could not launch $_url';
+  }
+}
+
 Future<void> shareMessageWithImage(BuildContext context, String codeBonus,
     String commissionBonus, String langUserPhone) async {
   var messageShare = (langUserPhone == "fr")
-      ? "Utilise Dressur, une application simple, sûr et fiable pour avoir de la visibilité sur tes différents réseaux sociaux et surtout sur tes statuts WhatsApp.\nGrâce à Dressur, fait la promotion de tes produits et services qui seront visibles par des milliers d'utilisateurs en seulement 24H.\nElle te permet d'avoir plus facilement des contacts WhatsApp selon les pays de ton choix. De plus, ses contacts sont automatiquement enregistrés dans ton téléphone et ton contact dans les leurs, etc.\n\nA télécharger gratuitement sur Play Store : https://play.google.com/store/apps/details?id=com.dressur.ds\n\nVoici mon code parrainage : $codeBonus\n\nIl te donnera $commissionBonus Points Bonus pour tester les services de l'application."
-      : "Use Dressur, a simple, safe and reliable application to have visibility on your various social networks and especially on your WhatsApp statuses.\nThanks to Dressur, promote your products and services which will be visible to thousands of users in just 24 hours.\nIt makes it easier for you to have WhatsApp contacts according to the countries of your choice. In addition, its contacts are automatically saved in your phone and your contact in theirs, etc.\n\nA download for free on Play Store: https://play.google.com/store/apps/details?id=com.dressur.ds\n\nHere is my referral code: $codeBonus\n\nIt will give you $commissionBonus Points Bonus to test the services of the app.";
+      ? "Utilise Dressur, une application simple, sûr et fiable pour avoir de la visibilité sur tes différents réseaux sociaux et surtout sur tes statuts WhatsApp.\nGrâce à Dressur, fait la promotion de tes produits et services qui seront visibles par des milliers d'utilisateurs en seulement 24H.\nElle te permet d'avoir plus facilement des contacts WhatsApp selon les pays de ton choix. De plus, ses contacts sont automatiquement enregistrés dans ton téléphone et ton contact dans les leurs, etc.\n\nA téléchargé gratuitement sur Play Store : https://play.google.com/store/apps/details?id=com.dressur.ds\n\nOu la version web si tu n'as pas d'Android : https://dressur.site/inscription\n\nVoici mon code parrainage : $codeBonus\n\nIl te donnera $commissionBonus Points Bonus pour tester les services de l'application."
+      : "Use Dressur, a simple, safe and reliable application to have visibility on your different social networks and especially on your WhatsApp statuses.\nThanks to Dressur, promote your products and services that will be visible to thousands of users in just 24 hours.\nIt allows you to more easily have WhatsApp contacts according to the countries of your choice. In addition, its contacts are automatically saved in your phone and your contact in theirs, etc.\n\nDownloaded for free on Play Store: https://play.google.com/store/apps/details?id=com.dressur.ds\n\nOr the web version if you don't have an Android: https://dressur.site/inscription\n\nHere is my referral code: $codeBonus\n\nIt will give you $commissionBonus Bonus Points to test the application's services.";
 
   // Load the image from assets
   final ByteData bytes = await rootBundle.load('images/flyers_dressur_fr.jpg');
@@ -1079,5 +1114,164 @@ Future<String> expandShortUrl(String shortUrl) async {
   } else {
     // throw Exception('Failed to expand short URL: ${response.body}');
     return shortUrl;
+  }
+}
+
+void showConfNumeroWhatsapp(context) async {
+  showModalBottomSheet(
+    context: context,
+    elevation: 5,
+    isScrollControlled: true,
+    builder: (_) => Container(
+      padding: EdgeInsets.only(
+        top: 0,
+        left: 0,
+        right: 0,
+        // this will prevent the soft keyboard from covering the text fields
+        bottom: MediaQuery.of(context).viewInsets.bottom + 0,
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          Container(
+            padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(5),
+              gradient: const LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Color.fromARGB(255, 1, 156, 81),
+                  Color.fromARGB(255, 1, 156, 81),
+                  Colors.green,
+                ],
+              ),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  (langUserPhone == "fr")
+                      ? "Confirmation du numéro WhatsApp"
+                      : "WhatsApp Number Confirmation",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 25,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  (langUserPhone == "fr")
+                      ? "Assurez-vous de nous envoyer <<WhatsApp Confirmation>> avec le numéro WhatsApp utiliser pour créer votre compte Dressur."
+                      : "Make sure to send us <<WhatsApp Confirmation>> with the WhatsApp number you use to create your Dressur account.",
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 17,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  (langUserPhone == "fr")
+                      ? "Cliquez juste sur Demander ci-dessous pour demander la confirmation de votre numéro WhatsApp."
+                      : "Just click Request below to request confirmation of your WhatsApp number.",
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 17,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  (langUserPhone == "fr")
+                      ? "Les demandes sont traitées le plus tôt possible, ne vous inquiétez pas."
+                      : "Requests are processed as soon as possible, don't worry.",
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 17,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  (langUserPhone == "fr")
+                      ? "Les demandes sont traitées le plus tôt possible, ne vous inquiétez pas."
+                      : "Requests are processed as soon as possible, don't worry.",
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 17,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      shape: const StadiumBorder(),
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 13,
+                        horizontal: 40,
+                      ),
+                    ),
+                    child: Text(
+                      (langUserPhone == "fr") ? "Demander" : "Ask",
+                      style: GoogleFonts.poppins(
+                        fontWeight: FontWeight.w600,
+                        color: Color.fromARGB(255, 1, 156, 81),
+                      ),
+                    ),
+                    onPressed: () async {
+                      final Uri _url = Uri.parse(
+                          "$whatsappDSURL&text=WhatsApp Confirmation");
+                      if (!await launchUrl(_url,
+                          mode: LaunchMode.externalApplication)) {
+                        throw 'Could not launch $_url';
+                      }
+                    }),
+              ],
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
+Future<void> saveContactDsIfNotExiste() async {
+  int nombreNewContact = 0;
+  nombreNewContact = 0;
+  contactsEnregistrer = [];
+  final url =
+      Uri.parse('$generalRouteForApi/listContactDS/$uidUser/$langUserPhone');
+  final response = await http.get(url);
+  if (response.statusCode == 200) {
+    final jsonData = jsonDecode(response.body) as List<dynamic>;
+    if (jsonData.isNotEmpty) {
+      for (var contact in jsonData) {
+        if (contact['tel'] != "+22964044294" &&
+            contact['tel'] != "22964044294" &&
+            contact['tel'] != "64044294" &&
+            !contactsEnregistrer.contains(contact['tel'])) {
+          contactsEnregistrer.add(contact['tel']);
+        }
+        if ((await SQLHelper.getOneNumsTelUser(contact['tel'])).isEmpty) {
+          final newContact = Contact()
+            ..name.first = contact["nom"] + " #DS"
+            ..phones = [Phone(contact["tel"])];
+          await newContact.insert();
+          await insertNumTelUserIntoDataBase(contact["tel"]);
+          nombreNewContact++;
+        }
+      }
+      if (nombreNewContact == 1) {
+        showNotification(
+          "ADD Conatcts Dressur",
+          "$nombreNewContact nouveau contact enregistré par Dressur.",
+        );
+      } else if (nombreNewContact > 1) {
+        showNotification(
+          "ADD Conatcts Dressur",
+          "$nombreNewContact nouveaux contacts enregistrés par Dressur.",
+        );
+      }
+    }
   }
 }
