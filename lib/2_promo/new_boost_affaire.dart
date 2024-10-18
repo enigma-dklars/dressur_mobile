@@ -2,6 +2,7 @@
 
 import 'dart:convert';
 import 'dart:convert' as convert;
+import 'package:http/http.dart' as http;
 import 'dart:io';
 import 'dart:async';
 import 'package:dressur/components/delayed_animation.dart';
@@ -9,7 +10,6 @@ import 'package:dressur/components/padding_and_divider.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 import 'package:image/image.dart' as img;
 import 'package:dressur/components/constant.dart';
@@ -385,6 +385,8 @@ class DemandesEmploi extends StatefulWidget {
 }
 
 class _DemandesEmploiState extends State<DemandesEmploi> {
+  bool _desactive = false;
+  var data;
   final titre_demande_poste_rechercher_controller = TextEditingController();
   final description_profil_demandeur_controller = TextEditingController();
   final competence_qualification_controller = TextEditingController();
@@ -396,6 +398,100 @@ class _DemandesEmploiState extends State<DemandesEmploi> {
   final langues_parle_controller = TextEditingController();
   final lien_portfolio_controller = TextEditingController();
   final coordonne_demandeur_controller = TextEditingController();
+
+void add_dmd_emploi(
+      String titre_demande_poste_rechercher,
+      String description_profil_demandeur,
+      String competence_qualification,
+      String niveau_experience,
+      String secteur_activite_rechercher,
+      String type_contrat_rechercher,
+      String localisation_souhaite,
+      String salaire_souhaite,
+      String langues_parle,
+      String lien_portfolio,
+      String coordonne_demandeur) async {
+    bool isConnected = await isConnectedToInternet();
+    if (isConnected) {
+      setState(() {
+        _desactive = true;
+      });
+
+      var request = http.MultipartRequest(
+          'POST', Uri.parse('$generalRouteForApi/newDmdEmploi'));
+      request.fields.addAll({
+        'uid': uidUser,
+        'langUserPhone': langUserPhone.toString(),
+        'titre_demande_poste_rechercher': titre_demande_poste_rechercher,
+        'description_profil_demandeur': description_profil_demandeur,
+        'competence_qualification': competence_qualification,
+        'niveau_experience': niveau_experience,
+        'secteur_activite_rechercher': secteur_activite_rechercher,
+        'type_contrat_rechercher': type_contrat_rechercher,
+        'localisation_souhaite': localisation_souhaite,
+        'salaire_souhaite': salaire_souhaite,
+        'langues_parle': langues_parle,
+        'lien_portfolio': lien_portfolio,
+        'coordonne_demandeur': coordonne_demandeur,
+      });
+
+      http.StreamedResponse response = await request.send();
+
+      if (response.statusCode == 200) {
+        var data1 = await response.stream.bytesToString();
+        data = convert.jsonDecode(data1);
+        if (data["error"] == true) {
+          dangerNoti(data["titre"], data["message"], context);
+          setState(() {
+            _desactive = false;
+          });
+        } else {
+          setState(() {
+            _desactive = false;
+            initUserInformations(data['user']);
+            Navigator.pop(context);
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              backgroundColor: Colors.green,
+              behavior: SnackBarBehavior.floating,
+              content: Text(
+                (langUserPhone == "fr")
+                    ? 'Profil mis à jour…'
+                    : 'Profile updated…',
+                style: GoogleFonts.poppins(
+                  color: Colors.white,
+                ),
+              ),
+            ));
+          });
+        }
+      } else {
+        if (langUserPhone != "fr") {
+          dangerNoti("Mistake!",
+              "We encountered a problem, contact the administrators.", context);
+        } else {
+          dangerNoti(
+              "Erreur!",
+              "Nous avons rencontré un problème, contacter les administrateurs.",
+              context);
+        }
+        setState(() {
+          _desactive = false;
+        });
+      }
+    } else {
+      if (langUserPhone != "fr") {
+        dangerNoti(
+            "Mistake!", "You are not connected to the internet.", context);
+      } else {
+        dangerNoti("Erreur!", "Vous n'ètes pas connecté a internet.", context);
+      }
+      setState(() {
+        _desactive = false;
+      });
+    }
+  }
+
+  
 
   @override
   void initState() {
@@ -549,6 +645,52 @@ class _DemandesEmploiState extends State<DemandesEmploi> {
             ),
           ),
           const SizedBox(height: 10),
+          DelayedAnimation(
+            delay: 0, // 4000,
+            child: SizedBox(
+              width: MediaQuery.of(context).size.width * 0.90,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: primaryColor,
+                  shape: const StadiumBorder(),
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 16,
+                  ),
+                ),
+                child: Text(
+                  _desactive
+                      ? (langUserPhone == "fr")
+                          ? "Patientez..."
+                          : "Wait..."
+                      : (langUserPhone == "fr")
+                          ? "ENREGISTRER"
+                          : "SAVED",
+                  style: GoogleFonts.poppins(
+                    fontWeight: FontWeight.w400,
+                    color: Colors.white,
+                  ),
+                ),
+                onPressed: () {
+                  _desactive
+                      ? null
+                      : add_dmd_emploi(
+                          titre_demande_poste_rechercher_controller.text,
+                          description_profil_demandeur_controller.text,
+                          competence_qualification_controller.text,
+                          niveau_experience_controller.text,
+                          secteur_activite_rechercher_controller.text,
+                          type_contrat_rechercher_controller.text,
+                          localisation_souhaite_controller.text,
+                          salaire_souhaite_controller.text,
+                          langues_parle_controller.text,
+                          lien_portfolio_controller.text,
+                          coordonne_demandeur_controller.text,
+                        );
+                },
+              ),
+            ),
+          ),
+        
         ],
       ),
     );
