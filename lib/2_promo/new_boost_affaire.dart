@@ -385,6 +385,18 @@ class DemandesEmploi extends StatefulWidget {
 }
 
 class _DemandesEmploiState extends State<DemandesEmploi> {
+  final titre_demande_poste_rechercher_controller = TextEditingController();
+  final description_profil_demandeur_controller = TextEditingController();
+  final competence_qualification_controller = TextEditingController();
+  final niveau_experience_controller = TextEditingController();
+  final secteur_activite_rechercher_controller = TextEditingController();
+  final type_contrat_rechercher_controller = TextEditingController();
+  final localisation_souhaite_controller = TextEditingController();
+  final salaire_souhaite_controller = TextEditingController();
+  final langues_parle_controller = TextEditingController();
+  final lien_portfolio_controller = TextEditingController();
+  final coordonne_demandeur_controller = TextEditingController();
+
   @override
   void initState() {
     super.initState();
@@ -396,14 +408,147 @@ class _DemandesEmploiState extends State<DemandesEmploi> {
     return Container(
       child: Column(
         children: [
-          Text(
-            "dmd_emploi",
-            style: GoogleFonts.poppins(
-              fontWeight: FontWeight.w600,
-              fontSize: 18,
+          TextField(
+            controller: titre_demande_poste_rechercher_controller,
+            decoration: InputDecoration(
+              labelStyle: TextStyle(color: Colors.grey[400]),
+              labelText: (langUserPhone == "fr")
+                  ? 'Titre de la demande ou poste recherché '
+                  : 'WhatsApp number',
+              border: const OutlineInputBorder(),
             ),
-            textAlign: TextAlign.center,
           ),
+          const SizedBox(height: 10),
+          TextField(
+            controller: description_profil_demandeur_controller,
+            minLines: 1,
+            maxLines: 5,
+            decoration: InputDecoration(
+              labelStyle: TextStyle(color: Colors.grey[400]),
+              labelText: (langUserPhone == "fr")
+                  ? 'Description du profil du demandeur'
+                  : 'WhatsApp number',
+              border: const OutlineInputBorder(),
+            ),
+          ),
+          const SizedBox(height: 10),
+          TextField(
+            controller: competence_qualification_controller,
+            minLines: 1,
+            maxLines: 3,
+            decoration: InputDecoration(
+              labelStyle: TextStyle(color: Colors.grey[400]),
+              labelText: (langUserPhone == "fr")
+                  ? 'Compétences et qualification (listes)'
+                  : 'WhatsApp number',
+              border: const OutlineInputBorder(),
+            ),
+          ),
+          const SizedBox(height: 10),
+          TextField(
+            controller: niveau_experience_controller,
+            minLines: 1,
+            maxLines: 2,
+            decoration: InputDecoration(
+              labelStyle: TextStyle(color: Colors.grey[400]),
+              labelText: (langUserPhone == "fr")
+                  ? "Niveau d'experience (Nombres d'année d'expérience)"
+                  : 'WhatsApp number',
+              border: const OutlineInputBorder(),
+            ),
+          ),
+          const SizedBox(height: 10),
+          TextField(
+            controller: secteur_activite_rechercher_controller,
+            minLines: 1,
+            maxLines: 2,
+            decoration: InputDecoration(
+              labelStyle: TextStyle(color: Colors.grey[400]),
+              labelText: (langUserPhone == "fr")
+                  ? "Secteur d'activté rechercher"
+                  : 'WhatsApp number',
+              border: const OutlineInputBorder(),
+            ),
+          ),
+          const SizedBox(height: 10),
+          TextField(
+            controller: type_contrat_rechercher_controller,
+            minLines: 1,
+            maxLines: 3,
+            decoration: InputDecoration(
+              labelStyle: TextStyle(color: Colors.grey[400]),
+              labelText: (langUserPhone == "fr")
+                  ? "Type de contrat rechercher"
+                  : 'WhatsApp number',
+              border: const OutlineInputBorder(),
+            ),
+          ),
+          const SizedBox(height: 10),
+          TextField(
+            controller: localisation_souhaite_controller,
+            minLines: 1,
+            maxLines: 3,
+            decoration: InputDecoration(
+              labelStyle: TextStyle(color: Colors.grey[400]),
+              labelText: (langUserPhone == "fr")
+                  ? "Localisation souhaité"
+                  : 'WhatsApp number',
+              border: const OutlineInputBorder(),
+            ),
+          ),
+          const SizedBox(height: 10),
+          TextField(
+            controller: salaire_souhaite_controller,
+            minLines: 1,
+            maxLines: 1,
+            decoration: InputDecoration(
+              labelStyle: TextStyle(color: Colors.grey[400]),
+              labelText: (langUserPhone == "fr")
+                  ? "Salaire souhaité"
+                  : 'WhatsApp number',
+              border: const OutlineInputBorder(),
+            ),
+          ),
+          const SizedBox(height: 10),
+          TextField(
+            controller: langues_parle_controller,
+            minLines: 1,
+            maxLines: 3,
+            decoration: InputDecoration(
+              labelStyle: TextStyle(color: Colors.grey[400]),
+              labelText: (langUserPhone == "fr")
+                  ? "Langues parlées"
+                  : 'WhatsApp number',
+              border: const OutlineInputBorder(),
+            ),
+          ),
+          const SizedBox(height: 10),
+          TextField(
+            controller: lien_portfolio_controller,
+            minLines: 1,
+            maxLines: 1,
+            decoration: InputDecoration(
+              labelStyle: TextStyle(color: Colors.grey[400]),
+              labelText: (langUserPhone == "fr")
+                  ? "Lien vers votre portfolio ou cv"
+                  : 'WhatsApp number',
+              border: const OutlineInputBorder(),
+            ),
+          ),
+          const SizedBox(height: 10),
+          TextField(
+            controller: coordonne_demandeur_controller,
+            minLines: 1,
+            maxLines: 2,
+            decoration: InputDecoration(
+              labelStyle: TextStyle(color: Colors.grey[400]),
+              labelText: (langUserPhone == "fr")
+                  ? "Coordonnées du demandeur"
+                  : 'WhatsApp number',
+              border: const OutlineInputBorder(),
+            ),
+          ),
+          const SizedBox(height: 10),
         ],
       ),
     );
@@ -416,6 +561,20 @@ class OffresEmploi extends StatefulWidget {
 }
 
 class _OffresEmploiState extends State<OffresEmploi> {
+  final titre_poste_controller = TextEditingController();
+  final description_poste_controller = TextEditingController();
+  final competences_requises_controller = TextEditingController();
+  final type_contrat_controller = TextEditingController();
+  final lieu_travail_controller = TextEditingController();
+  final salaire_controller = TextEditingController();
+  final niveau_experience_controller = TextEditingController();
+  final horaire_travail_controller = TextEditingController();
+  final avantages_controller = TextEditingController();
+  final dure_contrat_not_cdi_controller = TextEditingController();
+  final contact_emploiyeur_controller = TextEditingController();
+  final date_limite_candidature_controller = TextEditingController();
+  final Lien_information_otionel_controller = TextEditingController();
+
   @override
   void initState() {
     super.initState();
@@ -427,14 +586,173 @@ class _OffresEmploiState extends State<OffresEmploi> {
     return Container(
       child: Column(
         children: [
-          Text(
-            "offre_emploi",
-            style: GoogleFonts.poppins(
-              fontWeight: FontWeight.w600,
-              fontSize: 18,
+          TextField(
+            controller: titre_poste_controller,
+            minLines: 1,
+            maxLines: 1,
+            decoration: InputDecoration(
+              labelStyle: TextStyle(color: Colors.grey[400]),
+              labelText: (langUserPhone == "fr")
+                  ? "Titre du poste"
+                  : 'WhatsApp number',
+              border: const OutlineInputBorder(),
             ),
-            textAlign: TextAlign.center,
           ),
+          const SizedBox(height: 10),
+          TextField(
+            controller: description_poste_controller,
+            minLines: 1,
+            maxLines: 5,
+            decoration: InputDecoration(
+              labelStyle: TextStyle(color: Colors.grey[400]),
+              labelText: (langUserPhone == "fr")
+                  ? "Description du poste "
+                  : 'WhatsApp number',
+              border: const OutlineInputBorder(),
+            ),
+          ),
+          const SizedBox(height: 10),
+          TextField(
+            controller: competences_requises_controller,
+            minLines: 1,
+            maxLines: 5,
+            decoration: InputDecoration(
+              labelStyle: TextStyle(color: Colors.grey[400]),
+              labelText: (langUserPhone == "fr")
+                  ? "Compétences requises"
+                  : 'WhatsApp number',
+              border: const OutlineInputBorder(),
+            ),
+          ),
+          const SizedBox(height: 10),
+          TextField(
+            controller: type_contrat_controller,
+            minLines: 1,
+            maxLines: 3,
+            decoration: InputDecoration(
+              labelStyle: TextStyle(color: Colors.grey[400]),
+              labelText: (langUserPhone == "fr")
+                  ? "Type de contrat"
+                  : 'WhatsApp number',
+              border: const OutlineInputBorder(),
+            ),
+          ),
+          const SizedBox(height: 10),
+          TextField(
+            controller: lieu_travail_controller,
+            minLines: 1,
+            maxLines: 2,
+            decoration: InputDecoration(
+              labelStyle: TextStyle(color: Colors.grey[400]),
+              labelText: (langUserPhone == "fr")
+                  ? "Lieu de travail"
+                  : 'WhatsApp number',
+              border: const OutlineInputBorder(),
+            ),
+          ),
+          const SizedBox(height: 10),
+          TextField(
+            controller: salaire_controller,
+            minLines: 1,
+            maxLines: 2,
+            decoration: InputDecoration(
+              labelStyle: TextStyle(color: Colors.grey[400]),
+              labelText:
+                  (langUserPhone == "fr") ? "Salaire" : 'WhatsApp number',
+              border: const OutlineInputBorder(),
+            ),
+          ),
+          const SizedBox(height: 10),
+          TextField(
+            controller: niveau_experience_controller,
+            minLines: 1,
+            maxLines: 2,
+            decoration: InputDecoration(
+              labelStyle: TextStyle(color: Colors.grey[400]),
+              labelText: (langUserPhone == "fr")
+                  ? "Niveau d'expérience"
+                  : 'WhatsApp number',
+              border: const OutlineInputBorder(),
+            ),
+          ),
+          const SizedBox(height: 10),
+          TextField(
+            controller: horaire_travail_controller,
+            minLines: 1,
+            maxLines: 3,
+            decoration: InputDecoration(
+              labelStyle: TextStyle(color: Colors.grey[400]),
+              labelText: (langUserPhone == "fr")
+                  ? "Horaire de travail"
+                  : 'WhatsApp number',
+              border: const OutlineInputBorder(),
+            ),
+          ),
+          const SizedBox(height: 10),
+          TextField(
+            controller: avantages_controller,
+            minLines: 1,
+            maxLines: 4,
+            decoration: InputDecoration(
+              labelStyle: TextStyle(color: Colors.grey[400]),
+              labelText:
+                  (langUserPhone == "fr") ? "Avantages" : 'WhatsApp number',
+              border: const OutlineInputBorder(),
+            ),
+          ),
+          const SizedBox(height: 10),
+          TextField(
+            controller: dure_contrat_not_cdi_controller,
+            minLines: 1,
+            maxLines: 2,
+            decoration: InputDecoration(
+              labelStyle: TextStyle(color: Colors.grey[400]),
+              labelText: (langUserPhone == "fr")
+                  ? "Durée du contrat si ce n'est pas CDI"
+                  : 'WhatsApp number',
+              border: const OutlineInputBorder(),
+            ),
+          ),
+          const SizedBox(height: 10),
+          TextField(
+            controller: contact_emploiyeur_controller,
+            minLines: 1,
+            maxLines: 3,
+            decoration: InputDecoration(
+              labelStyle: TextStyle(color: Colors.grey[400]),
+              labelText: (langUserPhone == "fr")
+                  ? "Contact de l'emploiyeur"
+                  : 'WhatsApp number',
+              border: const OutlineInputBorder(),
+            ),
+          ),
+          const SizedBox(height: 10),
+          TextField(
+            controller: date_limite_candidature_controller,
+            minLines: 1,
+            maxLines: 2,
+            decoration: InputDecoration(
+              labelStyle: TextStyle(color: Colors.grey[400]),
+              labelText: (langUserPhone == "fr")
+                  ? "Date limite de la candidature"
+                  : 'WhatsApp number',
+              border: const OutlineInputBorder(),
+            ),
+          ),
+          const SizedBox(height: 10),
+          TextField(
+            controller: Lien_information_otionel_controller,
+            minLines: 1,
+            maxLines: 2,
+            decoration: InputDecoration(
+              labelStyle: TextStyle(color: Colors.grey[400]),
+              labelText: (langUserPhone == "fr")
+                  ? "Lien vers plus d'information (optionel)"
+                  : 'WhatsApp number',
+              border: const OutlineInputBorder(),
+            ),
+          ),
+          const SizedBox(height: 10),
         ],
       ),
     );
