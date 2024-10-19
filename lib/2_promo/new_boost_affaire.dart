@@ -729,7 +729,7 @@ class _OffresEmploiState extends State<OffresEmploi> {
       });
 
       var request = http.MultipartRequest(
-          'POST', Uri.parse('$generalRouteForApi/updateUserInfo'));
+          'POST', Uri.parse('$generalRouteForApi/newOffreEmploi'));
       request.fields.addAll({
         'uid': uidUser,
         'langUserPhone': langUserPhone.toString(),
