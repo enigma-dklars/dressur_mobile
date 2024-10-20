@@ -761,21 +761,13 @@ class _OffresEmploiState extends State<OffresEmploi> {
         } else {
           setState(() {
             _desactive = false;
-            initUserInformations(data['user']);
-            Navigator.pop(context);
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-              backgroundColor: Colors.green,
-              behavior: SnackBarBehavior.floating,
-              content: Text(
-                (langUserPhone == "fr")
-                    ? 'Profil mis à jour…'
-                    : 'Profile updated…',
-                style: GoogleFonts.poppins(
-                  color: Colors.white,
-                ),
-              ),
-            ));
           });
+          successNoti(
+              "Good",
+              (langUserPhone == "fr")
+                  ? "Votre offre d'emploi a été enregistrée et sera publiée après accord d'un des administrateurs de Dressur."
+                  : "Your job offer has been recorded and will be published after approval from one of the Dressur administrators.",
+              context);
         }
       } else {
         if (langUserPhone != "fr") {
