@@ -138,6 +138,15 @@ class _ProduitsServicesState extends State<ProduitsServices> {
   File? _imageFile;
   TextEditingController _textEditingController = TextEditingController();
   bool _isSending = false;
+  var _message = "";
+  dynamic idFormulBoost = 1;
+  dynamic valueMethodePaiement = "mtn";
+  bool loading_formule_gratuit = false;
+  List<Map<String, dynamic>> listeDesFormules = [];
+  int value = 0;
+  var label = "";
+  int prix = 0;
+  int jours = 0;
 
   bool isImageSquare(File imageFile) {
     final image = img.decodeImage(File(imageFile.path).readAsBytesSync());
@@ -258,10 +267,76 @@ class _ProduitsServicesState extends State<ProduitsServices> {
     }
   }
 
+  void listeFormulePromoAffaire() async {
+    bool isConnected = await isConnectedToInternet();
+    if (isConnected) {
+      setState(() {
+        loading_formule_gratuit = true;
+      });
+
+      var request = http.MultipartRequest(
+          'POST', Uri.parse('$generalRouteForApi/listeFormulePromoAffaire'));
+      request.fields.addAll({});
+
+      http.StreamedResponse response = await request.send();
+
+      if (response.statusCode == 200) {
+        var data1 = await response.stream.bytesToString();
+        var data = convert.jsonDecode(data1);
+        if (data["error"] == false) {
+          setState(() {
+            loading_formule_gratuit = false;
+            listeDesFormules = (data["listeFormulBoost"] as List<dynamic>)
+                .map((item) => item as Map<String, dynamic>)
+                .toList();
+            _message = (langUserPhone == "fr")
+                ? "Veuillez choisir une formule."
+                : "Please choose a plan.";
+          });
+        }
+      }
+    } else {
+      if (langUserPhone != "fr") {
+        dangerNoti(
+            "Mistake!", "You are not connected to the internet.", context);
+      } else {
+        dangerNoti("Erreur!", "Vous n'ètes pas connecté a internet.", context);
+      }
+      setState(() {
+        loading_formule_gratuit = false;
+      });
+    }
+  }
+
+  onChangeFormulBoost(val) async {
+    for (var service in listeDesFormules) {
+      if ("$val" == "${service['value']}") {
+        setState(() {
+          value = service['value'];
+          label = service['label'];
+          prix = service['prix'];
+          jours = service['jours'];
+        });
+      }
+    }
+    setState(() {
+      idFormulBoost = val;
+      if (load == true) {
+        _message = (langUserPhone == "fr")
+            ? "Cette formule vous offre une promotion affaire de $jours jour(s) pour $prix FCFA."
+            : "This formula offers you a business promotion of $jours day(s) for $prix FCFA.";
+      } else {
+        _message = (langUserPhone == "fr")
+            ? "Cette formule vous offre une promotion affaire de $jours jour(s) pour $prix Bonus."
+            : "This formula offers you a business promotion of $jours day(s) for $prix Bonus.";
+      }
+    });
+  }
+
   @override
   void initState() {
     super.initState();
-    // listeFormulePromoAffaire(); // Loading the diary when the app starts
+    listeFormulePromoAffaire();
   }
 
   @override
@@ -314,7 +389,36 @@ class _ProduitsServicesState extends State<ProduitsServices> {
             ],
           ),
           const SizedBox(height: 5),
-          load ? FormulePayante() : FormuleGratuite(),
+          loading_formule_gratuit
+              ? const Center(
+                  child: CircularProgressIndicator(),
+                )
+              : DelayedAnimation(
+                  delay: 0, // 1500,
+                  child: SelectFormField(
+                    decoration: const InputDecoration(
+                      labelText: 'Formules de Promotion Affaire',
+                      border: OutlineInputBorder(),
+                    ),
+                    type: SelectFormFieldType.dropdown,
+                    initialValue: '0',
+                    labelText: 'Formules de Promotion Affaire',
+                    items: listeDesFormules,
+                    onChanged: (val) => onChangeFormulBoost(val),
+                    onSaved: (val) => print(val),
+                  ),
+                ),
+          const SizedBox(height: 20),
+          DelayedAnimation(
+            delay: 0, // 1000,
+            child: Text(
+              _message,
+              style: GoogleFonts.poppins(
+                fontSize: 16,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
           const SizedBox(height: 10),
           ElevatedButton(
             onPressed: _isSending ? null : _selectImage,
@@ -1015,264 +1119,6 @@ class _OffresEmploiState extends State<OffresEmploi> {
                         );
                 },
               ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class FormulePayante extends StatefulWidget {
-  @override
-  State<FormulePayante> createState() => _FormulePayanteState();
-}
-
-class _FormulePayanteState extends State<FormulePayante> {
-  bool loading_formule_payant = false;
-  var _message = "";
-  dynamic data;
-  dynamic idFormulBoost = 1;
-  dynamic valueMethodePaiement = "mtn";
-  String? boostId;
-  final telController = TextEditingController(text: tel);
-
-  List<Map<String, dynamic>> listeDesFormules = [];
-  int value = 0;
-  var label = "";
-  int prix = 0;
-  int jours = 0;
-
-  void listeFormulePromoAffaire() async {
-    bool isConnected = await isConnectedToInternet();
-    if (isConnected) {
-      setState(() {
-        loading_formule_payant = true;
-      });
-
-      var request = http.MultipartRequest(
-          'POST', Uri.parse('$generalRouteForApi/listeFormulePromoAffaire'));
-      request.fields.addAll({});
-
-      http.StreamedResponse response = await request.send();
-
-      if (response.statusCode == 200) {
-        var data1 = await response.stream.bytesToString();
-        var data = convert.jsonDecode(data1);
-        if (data["error"] == false) {
-          setState(() {
-            loading_formule_payant = false;
-            listeDesFormules = (data["listeFormulBoost"] as List<dynamic>)
-                .map((item) => item as Map<String, dynamic>)
-                .toList();
-            _message = (langUserPhone == "fr")
-                ? "Veuillez choisir une formule."
-                : "Please choose a plan.";
-          });
-        }
-      }
-    } else {
-      if (langUserPhone != "fr") {
-        dangerNoti(
-            "Mistake!", "You are not connected to the internet.", context);
-      } else {
-        dangerNoti("Erreur!", "Vous n'ètes pas connecté a internet.", context);
-      }
-      setState(() {
-        loading_formule_payant = false;
-      });
-    }
-  }
-
-  onChangeFormulBoost(val) async {
-    for (var service in listeDesFormules) {
-      if ("$val" == "${service['value']}") {
-        setState(() {
-          value = service['value'];
-          label = service['label'];
-          prix = service['prix'];
-          jours = service['jours'];
-        });
-      }
-    }
-    setState(() {
-      idFormulBoost = val;
-      _message = (langUserPhone == "fr")
-          ? "Cette formule vous offre une promotion affaire de $jours jour(s) pour $prix FCFA."
-          : "This formula offers you a business promotion of $jours day(s) for $prix FCFA.";
-    });
-  }
-
-  onChangeMethodePaiement(val) async {
-    setState(() {
-      valueMethodePaiement = val;
-    });
-  }
-
-  @override
-  void initState() {
-    super.initState(); // Loading the diary when the app starts
-    listeFormulePromoAffaire();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      child: Column(
-        children: [
-          loading_formule_payant
-              ? const Center(
-                  child: CircularProgressIndicator(),
-                )
-              : DelayedAnimation(
-                  delay: 0, // 1500,
-                  child: SelectFormField(
-                    decoration: const InputDecoration(
-                      labelText: 'Formules de Promotion Affaire Payant',
-                      border: OutlineInputBorder(),
-                    ),
-                    type: SelectFormFieldType.dropdown,
-                    initialValue: '0',
-                    labelText: 'Formules de Promotion Affaire Payant',
-                    items: listeDesFormules,
-                    onChanged: (val) => onChangeFormulBoost(val),
-                    onSaved: (val) => print(val),
-                  ),
-                ),
-          const SizedBox(height: 10),
-          DelayedAnimation(
-            delay: 0, // 1000,
-            child: Text(
-              _message,
-              style: GoogleFonts.poppins(
-                fontSize: 16,
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class FormuleGratuite extends StatefulWidget {
-  @override
-  State<FormuleGratuite> createState() => _FormuleGratuiteState();
-}
-
-class _FormuleGratuiteState extends State<FormuleGratuite> {
-  bool loading_formule_gratuit = false;
-  var _message = "";
-  dynamic data;
-  dynamic idFormulBoost = 1;
-  String? boostId;
-
-  List<Map<String, dynamic>> listeDesFormules = [];
-  int value = 0;
-  var label = "";
-  int prix = 0;
-  int jours = 0;
-
-  void listeFormulePromoAffaire() async {
-    bool isConnected = await isConnectedToInternet();
-    if (isConnected) {
-      setState(() {
-        loading_formule_gratuit = true;
-      });
-
-      var request = http.MultipartRequest(
-          'POST', Uri.parse('$generalRouteForApi/listeFormulePromoAffaire'));
-      request.fields.addAll({});
-
-      http.StreamedResponse response = await request.send();
-
-      if (response.statusCode == 200) {
-        var data1 = await response.stream.bytesToString();
-        var data = convert.jsonDecode(data1);
-        if (data["error"] == false) {
-          setState(() {
-            loading_formule_gratuit = false;
-            listeDesFormules = (data["listeFormulBoost"] as List<dynamic>)
-                .map((item) => item as Map<String, dynamic>)
-                .toList();
-            _message = (langUserPhone == "fr")
-                ? "Veuillez choisir une formule."
-                : "Please choose a plan.";
-          });
-        }
-      }
-    } else {
-      if (langUserPhone != "fr") {
-        dangerNoti(
-            "Mistake!", "You are not connected to the internet.", context);
-      } else {
-        dangerNoti("Erreur!", "Vous n'ètes pas connecté a internet.", context);
-      }
-      setState(() {
-        loading_formule_gratuit = false;
-      });
-    }
-  }
-
-  onChangeFormulBoost(val) async {
-    for (var service in listeDesFormules) {
-      if ("$val" == "${service['value']}") {
-        setState(() {
-          value = service['value'];
-          label = service['label'];
-          prix = service['prix'];
-          jours = service['jours'];
-        });
-      }
-    }
-    setState(() {
-      idFormulBoost = val;
-      _message = (langUserPhone == "fr")
-          ? "Cette formule vous offre une promotion affaire de $jours jour(s) pour $prix Bonus."
-          : "This formula offers you a business promotion of $jours day(s) for $prix Bonus.";
-    });
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    listeFormulePromoAffaire(); // Loading the diary when the app starts
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      child: Column(
-        children: [
-          loading_formule_gratuit
-              ? const Center(
-                  child: CircularProgressIndicator(),
-                )
-              : DelayedAnimation(
-                  delay: 0, // 1500,
-                  child: SelectFormField(
-                    decoration: const InputDecoration(
-                      labelText: 'Formules de Promotion Affaire',
-                      border: OutlineInputBorder(),
-                    ),
-                    type: SelectFormFieldType.dropdown,
-                    initialValue: '0',
-                    labelText: 'Formules de Promotion Affaire',
-                    items: listeDesFormules,
-                    onChanged: (val) => onChangeFormulBoost(val),
-                    onSaved: (val) => print(val),
-                  ),
-                ),
-          const SizedBox(height: 20),
-          DelayedAnimation(
-            delay: 0, // 1000,
-            child: Text(
-              _message,
-              style: GoogleFonts.poppins(
-                fontSize: 16,
-              ),
-              textAlign: TextAlign.center,
             ),
           ),
         ],
