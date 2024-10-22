@@ -1,4 +1,4 @@
-// ignore_for_file: use_build_context_synchronously, non_constant_identifier_names
+// ignore_for_file: use_build_context_synchronously, non_constant_identifier_names, prefer_typing_uninitialized_variables
 
 import 'dart:convert';
 import 'dart:convert' as convert;
@@ -856,6 +856,7 @@ class _OffresEmploiState extends State<OffresEmploi> {
 
       if (response.statusCode == 200) {
         var data1 = await response.stream.bytesToString();
+        print(data1);
         data = convert.jsonDecode(data1);
         if (data["error"] == true) {
           dangerNoti(data["titre"], data["message"], context);
