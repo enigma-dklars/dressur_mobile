@@ -849,7 +849,7 @@ class _OffresEmploiState extends State<OffresEmploi> {
         'dure_contrat_not_cdi': dure_contrat_not_cdi,
         'contact_emploiyeur': contact_emploiyeur,
         'date_limite_candidature': date_limite_candidature,
-        'Lien_information_otionel': Lien_information_otionel,
+        'lien_information_otionel': Lien_information_otionel,
       });
 
       http.StreamedResponse response = await request.send();
