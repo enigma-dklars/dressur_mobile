@@ -17,6 +17,7 @@ class AutreProfilPage extends StatefulWidget {
 }
 
 class _AutreProfilPageState extends State<AutreProfilPage> {
+  static const espaceEntreLesOptionsContact = 10.0;
   bool _loading = false;
   bool _firstLoad = true;
   var autre_name_complete;
@@ -196,239 +197,289 @@ class _AutreProfilPageState extends State<AutreProfilPage> {
               color: primaryColor,
             ),
           ),
-        ),
-        leading: IconButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          icon: const Icon(
-            Icons.arrow_back,
-            size: 30,
-            color: Colors.white,
+          Expanded(
+            child: CustomScrollView(
+              slivers: <Widget>[
+                SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (BuildContext context, int index) {
+                      return _firstLoad
+                          ? const Center(
+                              child: CircularProgressIndicator(),
+                            )
+                          : _loading
+                              ? const Center(
+                                  child: CircularProgressIndicator(),
+                                )
+                              : SingleChildScrollView(
+                                  child: Column(
+                                    children: [
+                                      Stack(
+                                        alignment: Alignment.center,
+                                        clipBehavior: Clip.none,
+                                        children: [
+                                          Image.asset(
+                                            "images/$autre_banniere",
+                                          ),
+                                          Positioned(
+                                            bottom: -60,
+                                            child: CircleAvatar(
+                                              backgroundImage: AssetImage(
+                                                  "images/$autre_avatar"),
+                                              backgroundColor: Colors.white,
+                                              radius: 60,
+                                              child: Container(
+                                                decoration: BoxDecoration(
+                                                  shape: BoxShape.circle,
+                                                  border: Border.all(
+                                                    color: primaryColor,
+                                                    width: 2.5,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                          Positioned(
+                                            top: 10,
+                                            left: 10,
+                                            child: GestureDetector(
+                                              onTap: () {
+                                                Navigator.of(context).pop();
+                                              },
+                                              child: Container(
+                                                padding: EdgeInsets.fromLTRB(
+                                                    5, 5, 5, 5),
+                                                decoration: BoxDecoration(
+                                                  color: primaryColor,
+                                                  shape: BoxShape.circle,
+                                                ),
+                                                child: Icon(
+                                                  Icons.arrow_back,
+                                                  size: 25,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 70),
+                                      if (autre_nom != null) ...[
+                                        Text(
+                                          autre_nom,
+                                          style: GoogleFonts.poppins(
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 1),
+                                      ],
+                                      if (autre_pseudo != null) ...[
+                                        Text(
+                                          "@$autre_pseudo",
+                                          style:
+                                              GoogleFonts.poppins(fontSize: 14),
+                                        ),
+                                        const SizedBox(height: 6),
+                                      ],
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          GestureDetector(
+                                            onTap: () {
+                                              launchPhoneCall(autre_tel);
+                                            },
+                                            child: Container(
+                                              padding: EdgeInsets.fromLTRB(
+                                                  5, 5, 5, 5),
+                                              decoration: BoxDecoration(
+                                                color: primaryColor,
+                                                shape: BoxShape.circle,
+                                              ),
+                                              child: Icon(
+                                                Icons.phone,
+                                                size: 20,
+                                                color: Colors.white,
+                                              ),
+                                            ),
+                                          ),
+                                          const SizedBox(
+                                              width:
+                                                  espaceEntreLesOptionsContact),
+                                          GestureDetector(
+                                            onTap: () {
+                                              launchSMS(autre_tel);
+                                            },
+                                            child: Container(
+                                              padding: EdgeInsets.fromLTRB(
+                                                  5, 5, 5, 5),
+                                              decoration: BoxDecoration(
+                                                color: primaryColor,
+                                                shape: BoxShape.circle,
+                                              ),
+                                              child: Icon(
+                                                Icons.message,
+                                                size: 20,
+                                                color: Colors.white,
+                                              ),
+                                            ),
+                                          ),
+                                          const SizedBox(
+                                              width:
+                                                  espaceEntreLesOptionsContact),
+                                          GestureDetector(
+                                            onTap: () {
+                                              launchEmail(autre_mail);
+                                            },
+                                            child: Container(
+                                              padding: EdgeInsets.fromLTRB(
+                                                  5, 5, 5, 5),
+                                              decoration: BoxDecoration(
+                                                color: primaryColor,
+                                                shape: BoxShape.circle,
+                                              ),
+                                              child: Icon(
+                                                Icons.mail,
+                                                size: 20,
+                                                color: Colors.white,
+                                              ),
+                                            ),
+                                          ),
+                                          const SizedBox(
+                                              width:
+                                                  espaceEntreLesOptionsContact),
+                                          GestureDetector(
+                                            onTap: () {
+                                              launchWhatsApp(autre_tel);
+                                            },
+                                            child: Container(
+                                              padding: EdgeInsets.fromLTRB(
+                                                  5, 5, 5, 5),
+                                              decoration: BoxDecoration(
+                                                color: primaryColor,
+                                                shape: BoxShape.circle,
+                                              ),
+                                              child: Image.asset(
+                                                'images/logo_whatsapp.png',
+                                                width: 20,
+                                                height: 20,
+                                              ),
+                                            ),
+                                          ),
+                                          const SizedBox(
+                                              width:
+                                                  espaceEntreLesOptionsContact),
+                                        ],
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.all(10.0),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            if (autre_mail != null)
+                                              buildInfoCard(
+                                                  "E-Mail", autre_mail),
+                                            if (autre_tel != null)
+                                              buildInfoCard(
+                                                  (langUserPhone == "fr")
+                                                      ? "Numéro de Téléphone"
+                                                      : "Phone number",
+                                                  autre_tel),
+                                            if (autre_tiktok != null)
+                                              buildSocialMediaCard(
+                                                  "TikTok", autre_tiktok),
+                                            if (autre_youtube != null)
+                                              buildSocialMediaCard(
+                                                  "Youtube", autre_youtube),
+                                            if (autre_facebook != null)
+                                              buildSocialMediaCard(
+                                                  "Facebook", autre_facebook),
+                                            if (autre_instagram != null)
+                                              buildSocialMediaCard(
+                                                  "Instagram", autre_instagram),
+                                            if (autre_apropos != null)
+                                              buildInfoCard(
+                                                  (langUserPhone == "fr")
+                                                      ? "À propos"
+                                                      : "About",
+                                                  autre_apropos),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                    },
+                    childCount:
+                        1, // Utilisez 1 pour un seul élément dans la liste
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget buildInfoCard(String title, String content) {
+    return SizedBox(
+      width: double.infinity,
+      child: Card(
+        margin: EdgeInsets.only(bottom: 10),
+        child: Padding(
+          padding: const EdgeInsets.all(10.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: GoogleFonts.poppins(fontSize: 12, color: Colors.grey),
+              ),
+              Text(
+                content,
+                style: GoogleFonts.poppins(fontSize: 18),
+              ),
+            ],
           ),
         ),
       ),
-      body: _firstLoad
-          ? const Center(
-              child: CircularProgressIndicator(),
-            )
-          : _loading
-              ? const Center(
-                  child: CircularProgressIndicator(),
-                )
-              : SingleChildScrollView(
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(15, 10, 15, 10),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        if (autre_pseudo != null) ...[
-                          Text(
-                            (langUserPhone == "fr") ? "Pseudo" : "Username",
-                            style: GoogleFonts.poppins(
-                              fontSize: 10,
-                            ),
-                          ),
-                          Text(
-                            autre_pseudo,
-                            style: GoogleFonts.poppins(
-                              fontSize: 20,
-                            ),
-                          ),
-                          const SizedBox(height: 5),
-                          const Divider(
-                            height: 1,
-                            thickness: 1,
-                            color: Colors.grey,
-                          ),
-                          const SizedBox(height: 10),
-                        ],
-                        if (autre_nom != null) ...[
-                          Text(
-                            (langUserPhone == "fr")
-                                ? "Nom et Prénom(s)"
-                                : "Last name and first names",
-                            style: GoogleFonts.poppins(
-                              fontSize: 10,
-                            ),
-                          ),
-                          Text(
-                            autre_nom,
-                            style: GoogleFonts.poppins(
-                              fontSize: 20,
-                            ),
-                          ),
-                          const SizedBox(height: 5),
-                          const Divider(
-                            height: 1,
-                            thickness: 1,
-                            color: Colors.grey,
-                          ),
-                          const SizedBox(height: 10),
-                        ],
-                        if (autre_mail != null) ...[
-                          Text(
-                            (langUserPhone == "fr") ? "E-Mail" : "E-Mail",
-                            style: GoogleFonts.poppins(
-                              fontSize: 10,
-                            ),
-                          ),
-                          Text(
-                            autre_mail,
-                            style: GoogleFonts.poppins(
-                              fontSize: 20,
-                            ),
-                          ),
-                          const SizedBox(height: 5),
-                          const Divider(
-                            height: 1,
-                            thickness: 1,
-                            color: Colors.grey,
-                          ),
-                          const SizedBox(height: 10),
-                        ],
-                        if (autre_tel != null) ...[
-                          Text(
-                            (langUserPhone == "fr")
-                                ? "Numéro de Téléphone"
-                                : "Phone number",
-                            style: GoogleFonts.poppins(
-                              fontSize: 10,
-                            ),
-                          ),
-                          Text(
-                            autre_tel,
-                            style: GoogleFonts.poppins(
-                              fontSize: 20,
-                            ),
-                          ),
-                          const SizedBox(height: 5),
-                          const Divider(
-                            height: 1,
-                            thickness: 1,
-                            color: Colors.grey,
-                          ),
-                          const SizedBox(height: 10),
-                        ],
-                        if (autre_tiktok != null) ...[
-                          const SizedBox(height: 5),
-                          Text(
-                            "TikTok",
-                            style: GoogleFonts.poppins(
-                              fontSize: 10,
-                            ),
-                          ),
-                          ProfileMenuReseau(
-                            text: "Tiktok",
-                            press: () async {
-                              final Uri _url = Uri.parse(autre_tiktok);
-                              if (!await launchUrl(_url,
-                                  mode: LaunchMode.externalApplication)) {
-                                throw 'Could not launch $_url';
-                              }
-                            },
-                          ),
-                          const SizedBox(height: 5),
-                          const Divider(
-                            height: 1,
-                            thickness: 1,
-                            color: Colors.grey,
-                          ),
-                        ],
-                        if (autre_youtube != null) ...[
-                          const SizedBox(height: 5),
-                          Text(
-                            "Youtube",
-                            style: GoogleFonts.poppins(
-                              fontSize: 10,
-                            ),
-                          ),
-                          ProfileMenuReseau(
-                            text: "Youtube",
-                            press: () async {
-                              final Uri _url = Uri.parse(autre_youtube);
-                              if (!await launchUrl(_url,
-                                  mode: LaunchMode.externalApplication)) {
-                                throw 'Could not launch $_url';
-                              }
-                            },
-                          ),
-                          const SizedBox(height: 5),
-                          const Divider(
-                            height: 1,
-                            thickness: 1,
-                            color: Colors.grey,
-                          ),
-                        ],
-                        if (autre_facebook != null) ...[
-                          const SizedBox(height: 5),
-                          Text(
-                            "Facebook",
-                            style: GoogleFonts.poppins(
-                              fontSize: 10,
-                            ),
-                          ),
-                          ProfileMenuReseau(
-                            text: "Facebook",
-                            press: () async {
-                              final Uri _url = Uri.parse(autre_facebook);
-                              if (!await launchUrl(_url,
-                                  mode: LaunchMode.externalApplication)) {
-                                throw 'Could not launch $_url';
-                              }
-                            },
-                          ),
-                          const SizedBox(height: 5),
-                          const Divider(
-                            height: 1,
-                            thickness: 1,
-                            color: Colors.grey,
-                          ),
-                        ],
-                        if (autre_instagram != null) ...[
-                          const SizedBox(height: 5),
-                          Text(
-                            "Instagram",
-                            style: GoogleFonts.poppins(
-                              fontSize: 10,
-                            ),
-                          ),
-                          ProfileMenuReseau(
-                            text: "Instagram",
-                            press: () async {
-                              final Uri _url = Uri.parse(autre_instagram);
-                              if (!await launchUrl(_url,
-                                  mode: LaunchMode.externalApplication)) {
-                                throw 'Could not launch $_url';
-                              }
-                            },
-                          ),
-                          const SizedBox(height: 5),
-                          const Divider(
-                            height: 1,
-                            thickness: 1,
-                            color: Colors.grey,
-                          ),
-                        ],
-                        if (autre_apropos != null) ...[
-                          Text(
-                            (langUserPhone == "fr") ? "À propos" : "About",
-                            style: GoogleFonts.poppins(
-                              fontSize: 10,
-                            ),
-                          ),
-                          Text(
-                            autre_apropos,
-                            style: GoogleFonts.poppins(
-                              fontSize: 20,
-                            ),
-                          ),
-                          const SizedBox(height: 10),
-                        ],
-                      ],
-                    ),
-                  ),
-                ),
     );
+  }
+
+  Widget buildSocialMediaCard(String platform, String url) {
+    return Card(
+      margin: EdgeInsets.only(bottom: 10),
+      child: ListTile(
+        leading: getSocialMediaIcon(platform),
+        title: Text(
+          platform,
+          style: GoogleFonts.poppins(fontSize: 18),
+        ),
+        onTap: () async {
+          final Uri _url = Uri.parse(url);
+          if (!await launchUrl(_url, mode: LaunchMode.externalApplication)) {
+            throw 'Could not launch $_url';
+          }
+        },
+      ),
+    );
+  }
+
+  Icon getSocialMediaIcon(String platform) {
+    switch (platform) {
+      case "TikTok":
+        return Icon(Icons.music_note);
+      case "Youtube":
+        return Icon(Icons.video_library, color: Colors.red);
+      case "Facebook":
+        return Icon(Icons.facebook, color: Colors.blue);
+      case "Instagram":
+        return Icon(Icons.camera_alt, color: Colors.purple);
+      default:
+        return Icon(Icons.link);
+    }
   }
 }
