@@ -1056,7 +1056,7 @@ Future<void> shareMessageWithImage(BuildContext context, String codeBonus,
   file2.writeAsBytesSync(list2);
 
   // Share the image and the message
-  await Share.shareFiles([file.path, file2.path],
+  await Share.shareXFiles([XFile(file.path), XFile(file2.path)],
       text: messageShare, subject: 'Partager Dressur!');
 }
 
@@ -1079,7 +1079,7 @@ Future<void> sharePromotion(BuildContext context, String imageLink,
     await file.writeAsBytes(response.bodyBytes);
 
     // Partager l'image et le message
-    await Share.shareFiles([file.path],
+    await Share.shareXFiles([XFile(file.path)],
         text: messageShare, subject: 'Partager Promotion!');
   } else {
     // Gérer les erreurs de téléchargement
