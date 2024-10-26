@@ -1,0 +1,10 @@
+Mail : dressur.ds@gmail.com
+Pass : DressurDS3@
+SMTP : cbecrafioykvabbl
+
+
+flutter pub cache clean
+flutter channel stable
+flutter pub get
+flutter pub upgrade
+flutter pub upgrade --major-versions
