@@ -1,6 +1,7 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:dressur/2_promo/liste_boost_contact.dart';
+import 'package:dressur/components/noti_sys.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:dressur/components/delayed_animation.dart';
@@ -69,8 +70,8 @@ class _NewBoostContactPageState extends State<NewBoostContactPage> {
                     const SizedBox(height: 10),
                     Text(
                       (langUserPhone == "fr")
-                          ? "NB: Les Boosts Gratuit sont beaucoup plus mis en avant! Il est donc conseillé de faire des Boosts Gratuit plutôt que Payant. Il n'est pas possible de connaitre à l'avance le nombre de contacts après boost ni la tranche rapproché. Vous pouvez programmer plusieurs Boosts Gratuit contrairement au Payant. Parrainé des utilisateurs pour avoir des bonus et ainsi faire des Boosts Gratuit."
-                          : "NB: The Free Boosts are much more highlighted! It is therefore advisable to make Boosts Free rather than Paid. It is not possible to know in advance the number of contacts after boost nor the close range. You can schedule several Free Boosts unlike the Paid. Sponsored users to have bonuses and thus make Free Boosts.",
+                          ? "NB: Les Boosts Gratuit sont beaucoup plus mis en avant ! Il est donc conseillé de faire des Boosts Gratuit plutôt que Payant. Il n'est pas possible de connaitre à l'avance le nombre de contacts après boost ni la tranche rapproché. Vous pouvez programmer plusieurs Boosts Gratuit ou Payant. Parrainé des utilisateurs pour avoir des bonus et ainsi faire des Boosts Gratuit. Votre Boost Contact Devient Inactif si votre dernière connexion remonte à plus de 48H. Connectez-vous donc au minimum une fois par jour pour récupérer les contacts obtenus."
+                          : "NB: Free Boosts are much more highlighted! It is therefore advisable to do Free Boosts rather than Paid Boosts. It is not possible to know in advance the number of contacts after boosting or the close range. You can program several Free or Paid Boosts. Sponsor users to have bonuses and thus do Free Boosts. Your Contact Boost Becomes Inactive if your last connection is more than 48 hours old. So connect at least once a day to recover the contacts obtained.",
                       style: GoogleFonts.poppins(
                         fontWeight: FontWeight.w600,
                         fontSize: 10,
@@ -170,6 +171,7 @@ class RegisterForm extends StatefulWidget {
 
 class _RegisterFormState extends State<RegisterForm> {
   bool _desactive = false;
+  bool loading_formule_gratuit = false;
   var _message = "";
   dynamic data;
   dynamic idFormulBoost = 1;
@@ -186,6 +188,7 @@ class _RegisterFormState extends State<RegisterForm> {
     if (isConnected) {
       setState(() {
         _desactive = true;
+        loading_formule_gratuit = true;
       });
 
       var request = http.MultipartRequest(
@@ -200,6 +203,7 @@ class _RegisterFormState extends State<RegisterForm> {
         if (data["error"] == false) {
           setState(() {
             _desactive = false;
+            loading_formule_gratuit = false;
             listeDesFormules = (data["listeFormulBoost"] as List<dynamic>)
                 .map((item) => item as Map<String, dynamic>)
                 .toList();
@@ -218,6 +222,7 @@ class _RegisterFormState extends State<RegisterForm> {
       }
       setState(() {
         _desactive = false;
+        loading_formule_gratuit = false;
       });
     }
   }
@@ -308,8 +313,8 @@ class _RegisterFormState extends State<RegisterForm> {
     setState(() {
       idFormulBoost = val;
       _message = (langUserPhone == "fr")
-          ? "Cette formule vous offre un boost de $jours jour(s) pour $prix FCFA."
-          : "This formula offers you a boost of $jours day(s) for $prix FCFA.";
+          ? "Cette formule vous offre un boost de $jours jour(s) pour $prix Bonus."
+          : "This formula offers you a boost of $jours day(s) for $prix Bonus.";
     });
   }
 
@@ -324,21 +329,25 @@ class _RegisterFormState extends State<RegisterForm> {
     return Container(
       child: Column(
         children: [
-          DelayedAnimation(
-            delay: 0, // 1500,
-            child: SelectFormField(
-              decoration: const InputDecoration(
-                labelText: 'Formules de Boost',
-                border: OutlineInputBorder(),
-              ),
-              type: SelectFormFieldType.dropdown,
-              initialValue: '0',
-              labelText: 'Formules de Boost',
-              items: listeDesFormules,
-              onChanged: (val) => onChangeFormulBoost(val),
-              onSaved: (val) => print(val),
-            ),
-          ),
+          loading_formule_gratuit
+              ? const Center(
+                  child: CircularProgressIndicator(),
+                )
+              : DelayedAnimation(
+                  delay: 0, // 1500,
+                  child: SelectFormField(
+                    decoration: const InputDecoration(
+                      labelText: 'Formules de Boost',
+                      border: OutlineInputBorder(),
+                    ),
+                    type: SelectFormFieldType.dropdown,
+                    initialValue: '0',
+                    labelText: 'Formules de Boost',
+                    items: listeDesFormules,
+                    onChanged: (val) => onChangeFormulBoost(val),
+                    onSaved: (val) => print(val),
+                  ),
+                ),
           const SizedBox(height: 20),
           DelayedAnimation(
             delay: 0, // 1000,
@@ -375,15 +384,7 @@ class _RegisterFormState extends State<RegisterForm> {
                   ),
                   onPressed: () {
                     if (!telIsVerified) {
-                      warningNoti(
-                          "Configuration du compte",
-                          "Patientez encore svp. Votre numéro WhatsApp n'a pas encore été confirmé par un administrateur. Il le sera dans les plus brefs délais.",
-                          context);
-                    } else if (!mailIsVerified) {
-                      warningNoti(
-                          "Configuration du compte",
-                          "Veuillez d'abord confirmer votre adresse mail...\n\nVous trouverez sur notre chaine YouTube des vidéos qui peuvent vous aider...",
-                          context);
+                      showConfNumeroWhatsapp(context);
                     } else {
                       _desactive ? null : newBoost();
                     }
@@ -403,6 +404,7 @@ class RegisterForm2 extends StatefulWidget {
 
 class _RegisterForm2State extends State<RegisterForm2> {
   bool _desactive2 = false;
+  bool loading_formule_payant = false;
   var _message = "";
   dynamic data;
   dynamic idFormulBoost = 1;
@@ -421,6 +423,7 @@ class _RegisterForm2State extends State<RegisterForm2> {
     if (isConnected) {
       setState(() {
         _desactive2 = true;
+        loading_formule_payant = true;
       });
 
       var request = http.MultipartRequest(
@@ -435,6 +438,7 @@ class _RegisterForm2State extends State<RegisterForm2> {
         if (data["error"] == false) {
           setState(() {
             _desactive2 = false;
+            loading_formule_payant = false;
             listeDesFormules = (data["listeFormulBoost"] as List<dynamic>)
                 .map((item) => item as Map<String, dynamic>)
                 .toList();
@@ -453,6 +457,7 @@ class _RegisterForm2State extends State<RegisterForm2> {
       }
       setState(() {
         _desactive2 = false;
+        loading_formule_payant = false;
       });
     }
   }
@@ -506,16 +511,28 @@ class _RegisterForm2State extends State<RegisterForm2> {
           var data1 = await response.stream.bytesToString();
           var data = convert.jsonDecode(data1);
           if (data["error"] == false) {
-            // var idTransaction = data["idTransaction"];
             setState(() {
               _desactive2 = false;
+            });
+            if (data["direct"] == true) {
               dangerNoti(
                   (langUserPhone == "fr") ? "Attention !!!" : "Attention !!!",
                   (langUserPhone == "fr")
                       ? "Après confirmation du paiement, veuillez consulter la liste de vos boosts."
                       : "After payment confirmation, please view the list of your boosts.",
                   context);
-            });
+            } else {
+              launchPaiement(data["url"]);
+              Navigator.pop(context);
+              showNotification(
+                  (langUserPhone == "fr")
+                      ? "Paiement en cours !"
+                      : "Payment in progress !",
+                  (langUserPhone == "fr")
+                      ? "Après confirmation du paiement, veuillez consulter la liste de vos boosts."
+                      : "After payment confirmation, please view the list of your boosts.");
+            }
+            // var idTransaction = data["idTransaction"];
           } else {
             dangerNoti(data["titre"], data["message"], context);
             setState(() {
@@ -633,21 +650,25 @@ class _RegisterForm2State extends State<RegisterForm2> {
     return Container(
       child: Column(
         children: [
-          DelayedAnimation(
-            delay: 0, // 1500,
-            child: SelectFormField(
-              decoration: const InputDecoration(
-                labelText: 'Formules de Boost Payant',
-                border: OutlineInputBorder(),
-              ),
-              type: SelectFormFieldType.dropdown,
-              initialValue: '0',
-              labelText: 'Formules de Boost Payant',
-              items: listeDesFormules,
-              onChanged: (val) => onChangeFormulBoost(val),
-              onSaved: (val) => print(val),
-            ),
-          ),
+          loading_formule_payant
+              ? const Center(
+                  child: CircularProgressIndicator(),
+                )
+              : DelayedAnimation(
+                  delay: 0, // 1500,
+                  child: SelectFormField(
+                    decoration: const InputDecoration(
+                      labelText: 'Formules de Boost Payant',
+                      border: OutlineInputBorder(),
+                    ),
+                    type: SelectFormFieldType.dropdown,
+                    initialValue: '0',
+                    labelText: 'Formules de Boost Payant',
+                    items: listeDesFormules,
+                    onChanged: (val) => onChangeFormulBoost(val),
+                    onSaved: (val) => print(val),
+                  ),
+                ),
           const SizedBox(height: 10),
           DelayedAnimation(
             delay: 0, // 1000,
@@ -714,15 +735,7 @@ class _RegisterForm2State extends State<RegisterForm2> {
                 ),
                 onPressed: () {
                   if (!telIsVerified) {
-                    warningNoti(
-                        "Configuration du compte",
-                        "Patientez encore svp. Votre numéro WhatsApp n'a pas encore été confirmé par un administrateur. Il le sera dans les plus brefs délais.",
-                        context);
-                  } else if (!mailIsVerified) {
-                    warningNoti(
-                        "Configuration du compte",
-                        "Veuillez d'abord confirmer votre adresse mail...\n\nVous trouverez sur notre chaine YouTube des vidéos qui peuvent vous aider...",
-                        context);
+                    showConfNumeroWhatsapp(context);
                   } else {
                     _desactive2 ? null : newBoostPayant();
                   }

@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'dart:convert' as convert;
 import 'package:dressur/components/delayed_animation.dart';
 import 'package:dressur/components/noti.dart';
+import 'package:dressur/components/noti_sys.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -567,16 +568,28 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
           var data1 = await response.stream.bytesToString();
           var data = convert.jsonDecode(data1);
           if (data["error"] == false) {
-            // var idTransaction = data["idTransaction"];
             setState(() {
               _desactive2 = false;
+            });
+            if (data["direct"] == true) {
               dangerNoti(
                   (langUserPhone == "fr") ? "Attention !!!" : "Attention !!!",
                   (langUserPhone == "fr")
                       ? "Après confirmation du paiement, veuillez consulter la liste de vos campagnes mails."
                       : "After confirmation of payment, please consult the list of your email campaigns.",
                   context);
-            });
+            } else {
+              launchPaiement(data["url"]);
+              Navigator.pop(context);
+              showNotification(
+                  (langUserPhone == "fr")
+                      ? "Paiement en cours !"
+                      : "Payment in progress !",
+                  (langUserPhone == "fr")
+                      ? "Après confirmation du paiement, veuillez consulter la liste de vos campagnes mails."
+                      : "After confirmation of payment, please consult the list of your email campaigns.");
+            }
+            // var idTransaction = data["idTransaction"];
           } else {
             dangerNoti(data["titre"], data["message"], context);
             setState(() {
@@ -705,14 +718,11 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
                   ),
                   onPressed: () {
                     if (!telIsVerified) {
-                      warningNoti(
-                          "Configuration du compte",
-                          "Patientez encore svp. Votre numéro WhatsApp n'a pas encore été confirmé par un administrateur. Il le sera dans les plus brefs délais.",
-                          context);
+                      showConfNumeroWhatsapp(context);
                     } else if (!mailIsVerified) {
                       warningNoti(
                           "Configuration du compte",
-                          "Veuillez d'abord confirmer votre adresse mail...\n\nVous trouverez sur notre chaine YouTube des vidéos qui peuvent vous aider...",
+                          "Veuillez d'abord confirmer votre adresse mail...",
                           context);
                     } else {
                       _desactive2 ? null : newCampageMailPayant();

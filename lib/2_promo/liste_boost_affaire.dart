@@ -1,7 +1,11 @@
+// ignore_for_file: non_constant_identifier_names, use_build_context_synchronously
+
 import 'dart:convert';
 import 'dart:convert' as convert;
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dressur/components/delayed_animation.dart';
 import 'package:dressur/components/noti.dart';
+import 'package:dressur/components/noti_sys.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
@@ -385,11 +389,21 @@ class PromotionDetailPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Image.network(promotion.image),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(3),
+              child: CachedNetworkImage(
+                imageUrl: promotion.image,
+                placeholder: (context, url) =>
+                    Image.asset('images/placeholder.png'),
+                errorWidget: (context, url, error) =>
+                    Image.asset('images/error_image.png'),
+                fit: BoxFit.cover,
+              ),
+            ),
             if (promotion.peutPayer)
               Column(
                 children: [
-                  const SizedBox(height: 5),
+                  const SizedBox(height: 10),
                   const Divider(height: 1, thickness: 1, color: Colors.grey),
                   const SizedBox(height: 5),
                   Text(
@@ -431,10 +445,11 @@ class PromotionDetailPage extends StatelessWidget {
                       ),
                     ],
                   ),
+                  const SizedBox(height: 5),
                   const Divider(height: 1, thickness: 1, color: Colors.grey),
                 ],
               ),
-            const SizedBox(height: 16.0),
+            const SizedBox(height: 10),
             Text(
               (langUserPhone == "fr")
                   ? 'Formule de promotion : ${promotion.formulePromotion}'
@@ -480,6 +495,7 @@ class PaymentGratuitPage extends StatefulWidget {
 
 class _PaymentGratuitPageState extends State<PaymentGratuitPage> {
   bool _desactive = false;
+  bool loading_formule_gratuit = false;
   var _message = "";
   dynamic data;
   dynamic idFormulBoost = 1;
@@ -491,15 +507,16 @@ class _PaymentGratuitPageState extends State<PaymentGratuitPage> {
   int prix = 0;
   int jours = 0;
 
-  void listeFormuleBoost() async {
+  void listeFormulePromoAffaire() async {
     bool isConnected = await isConnectedToInternet();
     if (isConnected) {
       setState(() {
         _desactive = true;
+        loading_formule_gratuit = true;
       });
 
       var request = http.MultipartRequest(
-          'POST', Uri.parse('$generalRouteForApi/listeFormuleBoost'));
+          'POST', Uri.parse('$generalRouteForApi/listeFormulePromoAffaire'));
       request.fields.addAll({});
 
       http.StreamedResponse response = await request.send();
@@ -510,6 +527,7 @@ class _PaymentGratuitPageState extends State<PaymentGratuitPage> {
         if (data["error"] == false) {
           setState(() {
             _desactive = false;
+            loading_formule_gratuit = false;
             listeDesFormules = (data["listeFormulBoost"] as List<dynamic>)
                 .map((item) => item as Map<String, dynamic>)
                 .toList();
@@ -528,6 +546,7 @@ class _PaymentGratuitPageState extends State<PaymentGratuitPage> {
       }
       setState(() {
         _desactive = false;
+        loading_formule_gratuit = false;
       });
     }
   }
@@ -607,15 +626,15 @@ class _PaymentGratuitPageState extends State<PaymentGratuitPage> {
     setState(() {
       idFormulBoost = val;
       _message = (langUserPhone == "fr")
-          ? "Cette formule vous offre un boost de $jours jour(s) pour $prix FCFA."
-          : "This formula offers you a boost of $jours day(s) for $prix FCFA.";
+          ? "Cette formule vous offre une promotion affaire de $jours jour(s) pour $prix Bonus."
+          : "This formula offers you a business promotion of $jours day(s) for $prix Bonus.";
     });
   }
 
   @override
   void initState() {
     super.initState();
-    listeFormuleBoost(); // Loading the diary when the app starts
+    listeFormulePromoAffaire(); // Loading the diary when the app starts
   }
 
   @override
@@ -645,21 +664,25 @@ class _PaymentGratuitPageState extends State<PaymentGratuitPage> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            DelayedAnimation(
-              delay: 0, // 1500,
-              child: SelectFormField(
-                decoration: const InputDecoration(
-                  labelText: 'Formules de Boost Payant',
-                  border: OutlineInputBorder(),
-                ),
-                type: SelectFormFieldType.dropdown,
-                initialValue: '0',
-                labelText: 'Formules de Boost',
-                items: listeDesFormules,
-                onChanged: (val) => onChangeFormulBoost(val),
-                onSaved: (val) => print(val),
-              ),
-            ),
+            loading_formule_gratuit
+                ? const Center(
+                    child: CircularProgressIndicator(),
+                  )
+                : DelayedAnimation(
+                    delay: 0, // 1500,
+                    child: SelectFormField(
+                      decoration: const InputDecoration(
+                        labelText: 'Formules de Promotion Affaire Payant',
+                        border: OutlineInputBorder(),
+                      ),
+                      type: SelectFormFieldType.dropdown,
+                      initialValue: '0',
+                      labelText: 'Formules de Promotion Affaire',
+                      items: listeDesFormules,
+                      onChanged: (val) => onChangeFormulBoost(val),
+                      onSaved: (val) => print(val),
+                    ),
+                  ),
             const SizedBox(height: 20),
             DelayedAnimation(
               delay: 0, // 1000,
@@ -696,14 +719,11 @@ class _PaymentGratuitPageState extends State<PaymentGratuitPage> {
                     ),
                     onPressed: () {
                       if (!telIsVerified) {
-                        warningNoti(
-                            "Configuration du compte",
-                            "Patientez encore svp. Votre numéro WhatsApp n'a pas encore été confirmé par un administrateur. Il le sera dans les plus brefs délais.",
-                            context);
+                        showConfNumeroWhatsapp(context);
                       } else if (!mailIsVerified) {
                         warningNoti(
                             "Configuration du compte",
-                            "Veuillez d'abord confirmer votre adresse mail...\n\nVous trouverez sur notre chaine YouTube des vidéos qui peuvent vous aider...",
+                            "Veuillez d'abord confirmer votre adresse mail...",
                             context);
                       } else {
                         _desactive ? null : newPromo();
@@ -729,6 +749,7 @@ class PaymentPayantPage extends StatefulWidget {
 
 class _PaymentPayantPageState extends State<PaymentPayantPage> {
   bool _desactive2 = false;
+  bool loading_formule_payant = false;
   var _message = "";
   dynamic data;
   dynamic idFormulBoost = 1;
@@ -742,15 +763,16 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
   int prix = 0;
   int jours = 0;
 
-  void listeFormuleBoost() async {
+  void listeFormulePromoAffaire() async {
     bool isConnected = await isConnectedToInternet();
     if (isConnected) {
       setState(() {
         _desactive2 = true;
+        loading_formule_payant = true;
       });
 
       var request = http.MultipartRequest(
-          'POST', Uri.parse('$generalRouteForApi/listeFormuleBoost'));
+          'POST', Uri.parse('$generalRouteForApi/listeFormulePromoAffaire'));
       request.fields.addAll({});
 
       http.StreamedResponse response = await request.send();
@@ -761,6 +783,7 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
         if (data["error"] == false) {
           setState(() {
             _desactive2 = false;
+            loading_formule_payant = false;
             listeDesFormules = (data["listeFormulBoost"] as List<dynamic>)
                 .map((item) => item as Map<String, dynamic>)
                 .toList();
@@ -779,6 +802,7 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
       }
       setState(() {
         _desactive2 = false;
+        loading_formule_payant = false;
       });
     }
   }
@@ -797,8 +821,8 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
     setState(() {
       idFormulBoost = val;
       _message = (langUserPhone == "fr")
-          ? "Cette formule vous offre un boost de $jours jour(s) pour $prix FCFA."
-          : "This formula offers you a boost of $jours day(s) for $prix FCFA.";
+          ? "Cette formule vous offre une promotion affaire de $jours jour(s) pour $prix FCFA."
+          : "This formula offers you a business promotion of $jours day(s) for $prix FCFA.";
     });
   }
 
@@ -833,16 +857,28 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
           var data1 = await response.stream.bytesToString();
           var data = convert.jsonDecode(data1);
           if (data["error"] == false) {
-            // var idTransaction = data["idTransaction"];
             setState(() {
               _desactive2 = false;
+            });
+            if (data["direct"] == true) {
               dangerNoti(
                   (langUserPhone == "fr") ? "Attention !!!" : "Attention !!!",
                   (langUserPhone == "fr")
                       ? "Après confirmation du paiement, veuillez consulter la liste de vos promotions affaires."
                       : "After confirmation of payment, please consult the list of your business promotions.",
                   context);
-            });
+            } else {
+              launchPaiement(data["url"]);
+              Navigator.pop(context);
+              showNotification(
+                  (langUserPhone == "fr")
+                      ? "Paiement en cours !"
+                      : "Payment in progress !",
+                  (langUserPhone == "fr")
+                      ? "Après confirmation du paiement, veuillez consulter la liste de vos promotions affaires."
+                      : "After confirmation of payment, please consult the list of your business promotions.");
+            }
+            // var idTransaction = data["idTransaction"];
           } else {
             dangerNoti(data["titre"], data["message"], context);
             setState(() {
@@ -874,7 +910,7 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
   @override
   void initState() {
     super.initState(); // Loading the diary when the app starts
-    listeFormuleBoost();
+    listeFormulePromoAffaire();
   }
 
   @override
@@ -904,21 +940,25 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            DelayedAnimation(
-              delay: 0, // 1500,
-              child: SelectFormField(
-                decoration: const InputDecoration(
-                  labelText: 'Formules de Boost Payant',
-                  border: OutlineInputBorder(),
-                ),
-                type: SelectFormFieldType.dropdown,
-                initialValue: '0',
-                labelText: 'Formules de Promotion Payante',
-                items: listeDesFormules,
-                onChanged: (val) => onChangeFormulBoost(val),
-                onSaved: (val) => print(val),
-              ),
-            ),
+            loading_formule_payant
+                ? const Center(
+                    child: CircularProgressIndicator(),
+                  )
+                : DelayedAnimation(
+                    delay: 0, // 1500,
+                    child: SelectFormField(
+                      decoration: const InputDecoration(
+                        labelText: 'Formules de Promotion Affaire Payant',
+                        border: OutlineInputBorder(),
+                      ),
+                      type: SelectFormFieldType.dropdown,
+                      initialValue: '0',
+                      labelText: 'Formules de Promotion Payante',
+                      items: listeDesFormules,
+                      onChanged: (val) => onChangeFormulBoost(val),
+                      onSaved: (val) => print(val),
+                    ),
+                  ),
             const SizedBox(height: 20),
             DelayedAnimation(
               delay: 0, // 1000,
@@ -935,7 +975,7 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
               delay: 0, // 1500,
               child: SelectFormField(
                 decoration: const InputDecoration(
-                  labelText: 'Formules de Boost Payant',
+                  labelText: 'Formules de Promotion Affaire Payant',
                   border: OutlineInputBorder(),
                 ),
                 type: SelectFormFieldType.dropdown,
@@ -984,14 +1024,11 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
                   ),
                   onPressed: () {
                     if (!telIsVerified) {
-                      warningNoti(
-                          "Configuration du compte",
-                          "Patientez encore svp. Votre numéro WhatsApp n'a pas encore été confirmé par un administrateur. Il le sera dans les plus brefs délais.",
-                          context);
+                      showConfNumeroWhatsapp(context);
                     } else if (!mailIsVerified) {
                       warningNoti(
                           "Configuration du compte",
-                          "Veuillez d'abord confirmer votre adresse mail...\n\nVous trouverez sur notre chaine YouTube des vidéos qui peuvent vous aider...",
+                          "Veuillez d'abord confirmer votre adresse mail...",
                           context);
                     } else {
                       _desactive2 ? null : newPromoPayant();

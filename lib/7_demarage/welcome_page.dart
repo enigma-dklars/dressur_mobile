@@ -6,7 +6,6 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:dressur/7_demarage/update_app_important.dart';
-import 'package:dressur/7_demarage/pas_de_connexion.dart';
 import 'package:dressur/7_demarage/presentation_ds.dart';
 import 'package:dressur/components/constant.dart';
 import 'package:dressur/components/sql_helper.dart';
@@ -52,26 +51,23 @@ class _PageDepartState extends State<PageDepart> {
     /**
      * verification de la version de l'application
      */
-    try {
-      var request = http.MultipartRequest(
-          'POST', Uri.parse('$generalRouteForApi/getVersionApp'));
-      request.fields.addAll({});
-      http.StreamedResponse response = await request.send();
-      if (response.statusCode == 200) {
-        var data1 = await response.stream.bytesToString();
-        var data = convert.jsonDecode(data1);
-        if (data["error"] == false) {
-          if (data["importantUpdate"] == true) {
-            if (data["versionApp"] != versionApp) {
-              return Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => const ImportantUpdate()));
-            }
+    var request = http.MultipartRequest(
+        'POST', Uri.parse('$generalRouteForApi/getVersionApp'));
+    request.fields.addAll({});
+    http.StreamedResponse response = await request.send();
+    if (response.statusCode == 200) {
+      var data1 = await response.stream.bytesToString();
+      var data = convert.jsonDecode(data1);
+      if (data["error"] == false) {
+        if (data["importantUpdate"] == true) {
+          myDressurVersion = data["versionApp"];
+          if (int.parse(versionApp.toString().replaceAll(".", "")) <
+              int.parse(myDressurVersion.toString().replaceAll(".", ""))) {
+            return Navigator.of(context).push(MaterialPageRoute(
+                builder: (context) => const ImportantUpdate()));
           }
         }
       }
-    } catch (e) {
-      return Navigator.of(context).push(
-          MaterialPageRoute(builder: (context) => const NoConnexionPage()));
     }
 
     try {

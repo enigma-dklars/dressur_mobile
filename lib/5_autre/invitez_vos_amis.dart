@@ -441,18 +441,14 @@ class _AddFriendPageState extends State<AddFriendPage> {
               elevation: 2,
               onSelected: (value) {
                 if (value == 2) {
-                  _showFormBonus(context);
+                  if (!telIsVerified) {
+                    showConfNumeroWhatsapp(context);
+                  } else {
+                    _showFormBonus(context);
+                  }
                 } else if (value == 3) {
                   if (!telIsVerified) {
-                    warningNoti(
-                        "Configuration du compte",
-                        "Patientez encore svp. Votre numéro WhatsApp n'a pas encore été confirmé par un administrateur. Il le sera dans les plus brefs délais.",
-                        context);
-                  } else if (!mailIsVerified) {
-                    warningNoti(
-                        "Configuration du compte",
-                        "Veuillez d'abord confirmer votre adresse mail...\n\nVous trouverez sur notre chaine YouTube des vidéos qui peuvent vous aider...",
-                        context);
+                    showConfNumeroWhatsapp(context);
                   } else {
                     _showFormParrainage(context);
                   }

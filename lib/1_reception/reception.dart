@@ -1,35 +1,22 @@
-// ignore_for_file: sort_child_properties_last, prefer_const_constructors
-
 import 'dart:io';
 import 'dart:async';
-import 'package:dressur/1_reception/chat.dart';
 import 'package:dressur/1_reception/liste_contact.dart';
-import 'package:dressur/1_reception/liste_contact_message.dart';
-import 'package:dressur/components/noti.dart';
 import 'package:dressur/components/padding_and_divider.dart';
+import 'package:dressur/components/pub_smt_2024.dart';
+import 'package:dressur/components/sociaux.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:dressur/5_autre/support_assistance.dart';
 import 'package:dressur/1_reception/liste_notification.dart';
 import 'package:dressur/components/constant.dart';
-import 'package:dressur/components/sql_helper.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert' as convert;
-
-import 'package:intl/intl.dart';
 
 class ReceptionPage extends StatefulWidget {
   @override
   State<ReceptionPage> createState() => _ReceptionPageState();
 }
 
-class _ReceptionPageState extends State<ReceptionPage>
-    with SingleTickerProviderStateMixin {
-  List<Map<String, dynamic>> _discussions = [];
-  bool _desactive = false;
-  late AnimationController _controller;
-
+class _ReceptionPageState extends State<ReceptionPage> {
   Future<bool> _onWillPop() async {
     return (await showDialog(
           context: context,
@@ -67,168 +54,10 @@ class _ReceptionPageState extends State<ReceptionPage>
   }
 
   @override
-  @override
   void initState() {
     super.initState();
-    _loadDiscussions();
-    _controller = AnimationController(
-      duration: const Duration(seconds: 1),
-      vsync: this,
-    );
-    getMessageEnAttente(false);
-    // Démarrez le Timer après un délai de 1 seconde pour éviter les problèmes potentiels avec la construction du widget initial
-    Timer(Duration(seconds: 1), () {
-      _loadDiscussions();
-      // Appelez _loadDiscussions toutes les 5 secondes
-      Timer.periodic(const Duration(seconds: 1), (timer) {
-        _loadDiscussions();
-      });
-    });
   }
 
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  void getMessageEnAttente(affMessage) async {
-    if (affMessage == true) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        backgroundColor: Colors.red,
-        behavior: SnackBarBehavior.floating,
-        content: Text(
-          (langUserPhone == "fr")
-              ? 'Actualisation en cours…'
-              : 'Update in progress…',
-          style: GoogleFonts.poppins(
-            color: Colors.white,
-          ),
-        ),
-      ));
-    }
-    bool isConnected = await isConnectedToInternet();
-    if (isConnected) {
-      setState(() {
-        _desactive = true;
-        _controller.repeat();
-      });
-
-      DateFormat formatter = DateFormat('dd/MM/yyyy HH:mm');
-
-      var request = http.MultipartRequest(
-          'POST', Uri.parse('$generalRouteForApi/getMessageEnAttente'));
-      request.fields.addAll({
-        'uidUser': uidUser.toString(),
-        'langUserPhone': langUserPhone.toString(),
-      });
-
-      http.StreamedResponse response = await request.send();
-
-      if (response.statusCode == 200) {
-        var lastIdMessage = 0;
-        var data1 = await response.stream.bytesToString();
-        var data = convert.jsonDecode(data1);
-        if (data["error"] == false) {
-          data["lesMessages"].forEach((message) async {
-            lastIdMessage = message["idMessage"];
-            if ((await SQLHelper.getOneDiscussion(message["emetteur"]))
-                .isEmpty) {
-              SQLHelper.insert("discussion", {
-                'uid': message["emetteur"],
-                'nom': message["emetteurName"],
-                'date': message["dateEnvoi"],
-              });
-            }
-            SQLHelper.updateDiscussionDate(
-                message["emetteur"], message["dateEnvoi"]);
-            SQLHelper.insert("message", {
-              'emetteur': message["emetteur"],
-              'recepteur': message["recepteur"],
-              'message': message["message"],
-              'dateEnvoi': formatter.format(
-                  DateTime.fromMillisecondsSinceEpoch(message["dateEnvoi"])),
-              'vue': "non",
-            });
-          });
-
-          var request = http.MultipartRequest(
-              'POST',
-              Uri.parse(
-                  '$generalRouteForApi/deleteMessageEnAttente/$lastIdMessage/$uidUser'));
-          request.fields.addAll({});
-          http.StreamedResponse response = await request.send();
-          if (response.statusCode == 200) {}
-
-          setState(() {
-            _desactive = false;
-            _controller.stop();
-          });
-        }
-      }
-    } else {
-      if (langUserPhone != "fr") {
-        dangerNoti(
-            "Mistake!", "You are not connected to the internet.", context);
-      } else {
-        dangerNoti("Erreur!", "Vous n'ètes pas connecté a internet.", context);
-      }
-      setState(() {
-        _desactive = false;
-        _controller.stop();
-      });
-    }
-    if (affMessage == true) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          backgroundColor: Colors.green,
-          behavior: SnackBarBehavior.floating,
-          content: Text(
-            (langUserPhone == "fr")
-                ? 'Actualisation terminée.'
-                : 'Refresh complete.',
-            style: GoogleFonts.poppins(
-              color: Colors.white,
-            ),
-          ),
-        ),
-      );
-    }
-  }
-
-  Future<void> _loadDiscussions() async {
-    final List<Map<String, dynamic>> discussions =
-        await SQLHelper.getAllDiscussions();
-
-    List<Map<String, dynamic>> updatedDiscussions = [];
-
-    for (var discussion in discussions) {
-      final String uid = discussion['uid'];
-      final List<Map<String, dynamic>> messages =
-          await SQLHelper.getLastMessageAndUnreadCount(uid, uidUser);
-
-      if (messages.isNotEmpty) {
-        final Map<String, dynamic> lastMessage = messages.first;
-        final int unreadCount = messages.length - 1;
-
-        // Ajouter le dernier message et le nombre de messages non lus à la discussion
-        updatedDiscussions.add({
-          ...discussion,
-          'lastMessage': lastMessage,
-          'unreadCount': unreadCount,
-        });
-      }
-    }
-
-    // Vérifier si le widget est toujours monté avant d'appeler setState
-    if (mounted) {
-      setState(() {
-        _discussions = updatedDiscussions;
-      });
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: _onWillPop,
@@ -245,29 +74,6 @@ class _ReceptionPageState extends State<ReceptionPage>
             ),
           ),
           actions: [
-            IconButton(
-              icon: _desactive
-                  ? RotationTransition(
-                      turns: Tween(begin: 0.0, end: 1.0).animate(_controller),
-                      child: const Icon(
-                        Icons.refresh,
-                        color: Colors.white,
-                      ),
-                    )
-                  : const Icon(Icons.refresh),
-              color: Colors.white,
-              onPressed: () {
-                _desactive ? null : getMessageEnAttente(true);
-              },
-            ),
-            const Padding(
-              padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
-              child: VerticalDivider(
-                width: 0,
-                color: Colors.white,
-                thickness: 1,
-              ),
-            ),
             PopupMenuButton<dynamic>(
               itemBuilder: (context) => [
                 PopupMenuItem(
@@ -307,6 +113,7 @@ class _ReceptionPageState extends State<ReceptionPage>
           child: Column(
             children: [
               const SizedBox(height: 5),
+              SpecialPub(),
               GestureDetector(
                 onTap: () {
                   Navigator.push(
@@ -317,36 +124,65 @@ class _ReceptionPageState extends State<ReceptionPage>
                   );
                 },
                 child: Card(
-                  margin:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                  child: ListTile(
-                    leading: const CircleAvatar(
-                      child: Icon(
-                        Icons.contacts,
-                        color: Colors.white,
-                      ),
-                      backgroundColor: primaryColor,
+                  margin: const EdgeInsets.only(
+                      left: 10, top: 5, right: 10, bottom: 5),
+                  child: Container(
+                    padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        // Première colonne avec une icône centrée dans un cercle vert
+                        Container(
+                          padding: const EdgeInsets.all(10.0),
+                          margin: const EdgeInsets.all(10.0),
+                          decoration: const BoxDecoration(
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(
+                            Icons.contacts,
+                            color: primaryColor,
+                            size: 20,
+                          ),
+                        ),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                "Contacts",
+                                style: GoogleFonts.poppins(
+                                  color: primaryColor,
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.w400,
+                                ),
+                              ),
+                              const SizedBox(height: 5),
+                              Text(
+                                (langUserPhone == "fr")
+                                    ? "Contacts ajouter et scanner"
+                                    : "Contacts add and scan",
+                                style: GoogleFonts.poppins(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w300,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        Container(
+                          padding: const EdgeInsets.all(5),
+                          margin: const EdgeInsets.all(5),
+                          child: const Icon(
+                            Icons.chevron_right,
+                            size: 24,
+                          ),
+                        ),
+                      ],
                     ),
-                    title: Text(
-                      "Contacts",
-                      style: GoogleFonts.poppins(
-                        color: primaryColor,
-                        fontSize: 22,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    subtitle: Text(
-                      (langUserPhone == "fr")
-                          ? "Contacts ajouter et scanner"
-                          : "Contacts add and scan",
-                      style: GoogleFonts.poppins(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w300,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    trailing: const Icon(Icons.chevron_right),
                   ),
                 ),
               ),
@@ -360,120 +196,43 @@ class _ReceptionPageState extends State<ReceptionPage>
                   );
                 },
                 child: Card(
-                  margin:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                  child: ListTile(
-                    leading: const CircleAvatar(
-                      child: Icon(
-                        Icons.notifications,
-                        color: Colors.white,
-                      ),
-                      backgroundColor: primaryColor,
-                    ),
-                    title: Text(
-                      "Notifications",
-                      style: GoogleFonts.poppins(
-                        color: primaryColor,
-                        fontSize: 22,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    subtitle: Text(
-                      (langUserPhone == "fr")
-                          ? "Cadeaux, Astuces, Recommandations, Informations, Avertissements, "
-                          : "Gifts, Tips, Recommendations, Information, Warnings, ",
-                      style: GoogleFonts.poppins(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w300,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    trailing: const Icon(Icons.chevron_right),
-                  ),
-                ),
-              ),
-              DressurDivider(),
-              _discussions.isEmpty
-                  ? Center(
-                      child: Padding(
-                        padding: EdgeInsets.fromLTRB(5, 50, 5, 5),
-                        child: Text(
-                          (langUserPhone == "fr")
-                              ? "Aucune discussion trouvée."
-                              : "No discussions found.",
-                          style: const TextStyle(fontSize: 16),
+                  margin: const EdgeInsets.only(
+                      left: 10, top: 5, right: 10, bottom: 5),
+                  child: Container(
+                    padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(10.0),
+                          margin: const EdgeInsets.all(10.0),
+                          decoration: const BoxDecoration(
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(
+                            Icons.notifications,
+                            color: primaryColor,
+                            size: 20,
+                          ),
                         ),
-                      ),
-                    )
-                  : ListView.builder(
-                      shrinkWrap: true,
-                      physics: NeverScrollableScrollPhysics(),
-                      itemCount: _discussions.length,
-                      itemBuilder: (context, index) {
-                        final discussion = _discussions[index];
-                        final lastMessage = discussion['lastMessage'];
-                        final unreadCount = discussion['unreadCount'];
-
-                        return GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              uidAutreUser = discussion['uid'];
-                              userChatInfo = [
-                                discussion['uid'],
-                                discussion['nom'],
-                                discussion['nom']
-                              ];
-                            });
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => ChatPage(),
-                              ),
-                            );
-                          },
-                          child: Card(
-                            margin: const EdgeInsets.symmetric(
-                                horizontal: 10, vertical: 5),
-                            child: ListTile(
-                              leading: CircleAvatar(
-                                child: Icon(
-                                  Icons.person,
-                                  color: Colors.white,
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                "Notifications",
+                                style: GoogleFonts.poppins(
+                                  color: primaryColor,
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.w400,
                                 ),
-                                backgroundColor: primaryColor,
                               ),
-                              title: Row(
-                                children: [
-                                  Text(
-                                    discussion['nom'],
-                                    style: GoogleFonts.poppins(
-                                      color: primaryColor,
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w400,
-                                    ),
-                                  ),
-                                  if (unreadCount > 0)
-                                    Container(
-                                      padding: const EdgeInsets.all(4),
-                                      margin: const EdgeInsets.only(left: 5),
-                                      decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        color: Colors.red,
-                                      ),
-                                      child: Text(
-                                        '$unreadCount',
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ),
-                                ],
-                              ),
-                              subtitle: Text(
-                                lastMessage['message'],
+                              const SizedBox(height: 5),
+                              Text(
+                                (langUserPhone == "fr")
+                                    ? "Cadeaux, Astuces, Recommandations, Informations, Avertissements, "
+                                    : "Gifts, Tips, Recommendations, Information, Warnings, ",
                                 style: GoogleFonts.poppins(
                                   fontSize: 13,
                                   fontWeight: FontWeight.w300,
@@ -481,29 +240,27 @@ class _ReceptionPageState extends State<ReceptionPage>
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                               ),
-                              trailing: Icon(Icons.chevron_right),
-                            ),
+                            ],
                           ),
-                        );
-                      },
+                        ),
+                        Container(
+                          padding: const EdgeInsets.all(5),
+                          margin: const EdgeInsets.all(5),
+                          child: const Icon(
+                            Icons.chevron_right,
+                            size: 24,
+                          ),
+                        ),
+                      ],
                     ),
+                  ),
+                ),
+              ),
+              DressurDivider(),
+              const SizedBox(height: 5),
+              SociauxPage(),
+              const SizedBox(height: 5),
             ],
-          ),
-        ),
-        floatingActionButton: FloatingActionButton(
-          backgroundColor: primaryColor,
-          tooltip: (langUserPhone == "fr")
-              ? "Nouvelle discussion"
-              : "New discussion",
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => ContactForMessagePage()),
-            );
-          },
-          child: const Icon(
-            Icons.chat,
-            color: Colors.white,
           ),
         ),
       ),
