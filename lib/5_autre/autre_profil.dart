@@ -177,7 +177,9 @@ class _AutreProfilPageState extends State<AutreProfilPage> {
     super.initState();
   }
 
+  @override
   Widget build(BuildContext context) {
+
     if (_firstLoad) {
       WidgetsBinding.instance.addPostFrameCallback((_) async {
         fetchAutreProfil();

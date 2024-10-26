@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:convert' as convert;
 import 'package:dressur/1_reception/reception.dart';
 import 'package:dressur/components/noti_sys.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
@@ -19,7 +21,8 @@ class BottomBar extends StatefulWidget {
   State<BottomBar> createState() => _BottomBarState();
 }
 
-class _BottomBarState extends State<BottomBar> {
+class _BottomBarState extends State<BottomBar> with WidgetsBindingObserver {
+  int nombreNewContact = 0;
   int _selectedIndex = 2;
   dynamic screens = [];
   bool _swipeInProgress = false;
@@ -29,7 +32,8 @@ class _BottomBarState extends State<BottomBar> {
   void initState() {
     super.initState();
     initNavigationTitle();
-    fetchContactDSs();
+    saveContactDsIfNotExiste();
+    WidgetsBinding.instance.addObserver(this);
     if (modeReconnaissanceContactArrierePlan == true) {
       synchroAvanceFunction();
       setState(() {
@@ -38,23 +42,41 @@ class _BottomBarState extends State<BottomBar> {
     }
 
     // Exécute la fonction toutes les 5 heures
-    Timer.periodic(const Duration(hours: 5), (timer) {
-      showNotification("Cc $name_complete du nouveau ?",
-          "Consultez votre compte dès maintenant pour découvrir les dernières promotions, actualités et préférences disponibles sur Dressur.");
+    Timer.periodic(const Duration(hours: 6), (timer) {
+      showNotification(
+          "Cc $name_complete ...", "Du nouveau sur votre compte Dressur.");
     });
 
-    // Exécute la fonction toutes les 2 heures
-    Timer.periodic(const Duration(hours: 2), (timer) {
-      fetchContactDSs();
+    Timer.periodic(const Duration(hours: 6), (timer) {
+      saveContactDsIfNotExiste();
+      actualise(false);
       // getMessageEnAttente(false);
     });
 
     // si le user est un admin, il sera notifier des traitement en attente de validation
-    if (admin) {
-      traitementAdmin();
-      Timer.periodic(const Duration(minutes: 30), (timer) async {
-        await traitementAdmin();
-      });
+    // if (admin) {
+    //   traitementAdmin();
+    //   Timer.periodic(const Duration(minutes: 30), (timer) async {
+    //     await traitementAdmin();
+    //   });
+    // }
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    if (state == AppLifecycleState.resumed) {
+      // showNotificationTimeOutAfter("Cc $name_complete ...", "Dressur est revenue au premier plan.", 10000);
+      actualise(false);
+      saveContactDsIfNotExiste();
+    } else if (state == AppLifecycleState.paused) {
+      // showNotificationTimeOutAfter("Cc $name_complete ...", "Dressur est passée à l'arrière-plan.", 10000);
     }
   }
 
@@ -76,65 +98,83 @@ class _BottomBarState extends State<BottomBar> {
       contactsUserBeforeDS = [];
     });
     await SQLHelper.viderLaBaseDeDonneeLocalTelUser();
-
     await Future.delayed(const Duration(seconds: 3), () {});
-
     List<Contact> contacts =
         await FlutterContacts.getContacts(withProperties: true);
-
     for (var contact in contacts) {
       for (var phone in contact.phones) {
-        var nameTel = "${contact.name.first} ${contact.name.last}";
         var displayNameTel = contact.displayName;
+        var nameTel = "${contact.name.first} ${contact.name.last}";
+        var mailTel = contact.emails.map((email) => email.address).join(',');
         var numberTel = (phone.number).replaceAll(" ", "").replaceAll("-", "");
         if (!contactsUserBeforeDS.contains(numberTel)) {
           contactsUserBeforeDS.add({
             "nameTel": nameTel,
-            "displayNameTel": displayNameTel,
+            "mailTel": mailTel,
             "numberTel": numberTel,
+            "displayNameTel": displayNameTel,
           });
         }
-
         if ((await SQLHelper.getOneNumsTelUser(numberTel)).isEmpty) {
           await insertNumTelUserIntoDataBase(numberTel);
         }
       }
     }
-    // envoyer les contacts pour stockage
     var request = http.MultipartRequest(
         'POST', Uri.parse('$generalRouteForApi/stockerUserContacts'));
     request.fields
         .addAll({'contactsUserBeforeDS': jsonEncode(contactsUserBeforeDS)});
-    // http.StreamedResponse response = await request.send();
     await request.send();
   }
 
-  Future<void> fetchContactDSs() async {
-    setState(() {
-      contactsEnregistrer = [];
-    });
-    final url =
-        Uri.parse('$generalRouteForApi/listContactDS/$uidUser/$langUserPhone');
-    final response = await http.get(url);
+  void actualise(affMessage) async {
+    if (affMessage == true) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: Colors.red,
+        behavior: SnackBarBehavior.floating,
+        content: Text(
+          (langUserPhone == "fr")
+              ? 'Actualisation en cours…'
+              : 'Update in progress…',
+          style: GoogleFonts.poppins(
+            color: Colors.white,
+          ),
+        ),
+      ));
+    }
+
+    var request = http.MultipartRequest(
+        'POST', Uri.parse('$generalRouteForApi/getUserInfo'));
+    request.fields
+        .addAll({'uid': uidUser, 'langUserPhone': langUserPhone.toString()});
+
+    http.StreamedResponse response = await request.send();
+
     if (response.statusCode == 200) {
-      final jsonData = jsonDecode(response.body) as List<dynamic>;
-      if (jsonData.isNotEmpty) {
-        for (var contact in jsonData) {
-          if (contact['tel'] != "+22964044294" &&
-              contact['tel'] != "22964044294" &&
-              contact['tel'] != "64044294" &&
-              !contactsEnregistrer.contains(contact['tel'])) {
-            contactsEnregistrer.add(contact['tel']);
-          }
-          if ((await SQLHelper.getOneNumsTelUser(contact['tel'])).isEmpty) {
-            final newContact = Contact()
-              ..name.first = contact["nom"] + " #DS"
-              ..phones = [Phone(contact["tel"])];
-            await newContact.insert();
-            await insertNumTelUserIntoDataBase(contact["tel"]);
-          }
-        }
+      var data1 = await response.stream.bytesToString();
+      var data = convert.jsonDecode(data1);
+      if (data["error"] == false) {
+        setState(() {
+          initUserInformations(data['user']);
+          lesPublicites = data['user']["lesPublicites"];
+        });
       }
+    }
+    if (affMessage == true) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: Colors.green,
+          behavior: SnackBarBehavior.floating,
+          content: Text(
+            (langUserPhone == "fr")
+                ? 'Actualisation terminée.'
+                : 'Refresh complete.',
+            style: GoogleFonts.poppins(
+              color: Colors.white,
+            ),
+          ),
+        ),
+      );
     }
   }
 

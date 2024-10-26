@@ -1,6 +1,7 @@
-// ignore_for_file: unnecessary_null_comparison, non_constant_identifier_names, prefer_final_fields, unused_field
+// ignore_for_file: unnecessary_null_comparison, non_constant_identifier_names, prefer_final_fields, unused_field, use_build_context_synchronously
 import 'dart:ui';
 
+import 'package:dressur/components/noti_sys.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -49,6 +50,43 @@ class _PromotionReseauSociauxFormPageState
         child: Column(
           children: [
             const SizedBox(height: 5),
+            Card(
+              margin:
+                  const EdgeInsets.only(left: 10, top: 5, right: 10, bottom: 5),
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(5),
+                  gradient: const LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Colors.red,
+                      Color.fromARGB(255, 85, 3, 3),
+                    ],
+                  ),
+                ),
+                padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    const SizedBox(height: 10),
+                    Text(
+                      (langUserPhone == "fr")
+                          ? "NB: Vos préférences sur Dressur ne s'appliquent pas aux Promotions Réseau Sociaux. Les comptes qui interagiront avec votre promotion seront sélectionnés par le réseau social, sans que Dressur puisse intervenir."
+                          : "NB: Your preferences on Dressur do not apply to Social Network Promotions. The accounts that will interact with your promotion will be selected by the social network, without Dressur being able to intervene.",
+                      style: GoogleFonts.poppins(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 10,
+                        color: Colors.white,
+                      ),
+                      textAlign: TextAlign.justify,
+                    ),
+                    const SizedBox(height: 15),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 5),
             Container(
               margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
               child: Column(
@@ -92,13 +130,13 @@ class _RegisterForm3State extends State<RegisterForm3> {
   bool _loading_liste_formule = false;
   bool _desactive2 = false;
   bool _desactive3 = false;
-  bool _isValidLink = true; // Flag to indicate link validity
+  bool _isValidLink = true;
   dynamic data;
   List<dynamic> listSocialNetworks = [];
   List<Map<String, dynamic>> listServices = [];
   dynamic valueMethodePaiement = "mtn";
   String? titreFormuleFils;
-  dynamic idFormulePromoReseau = 1;
+  dynamic idFormulePromoReseau = 0;
   var _message = "";
 
   String titre = "";
@@ -121,6 +159,7 @@ class _RegisterForm3State extends State<RegisterForm3> {
     for (var service in listServices) {
       if ("$val" == "${service['id']}") {
         setState(() {
+          idFormulePromoReseau = service['id'];
           id = service['id'];
           titre = service['titre'];
           prix = service['prix'];
@@ -140,9 +179,7 @@ class _RegisterForm3State extends State<RegisterForm3> {
   }
 
   void calculerPrixTotal() {
-    setState(() {
-      _message = "";
-    });
+    _message = "";
     if (qte != 0) {
       int qteDemander = int.tryParse(quantityController.text) ?? 0;
       if (qteDemander >= qteMin && qteDemander <= qteMax) {
@@ -150,25 +187,19 @@ class _RegisterForm3State extends State<RegisterForm3> {
         quantityController.text = "$qteDemander";
         priceController.text = "$prixQteDemander";
         if (prixQteDemander < 100) {
-          setState(() {
-            _message = (langUserPhone == "fr")
-                ? "Le prix minimum pour une transaction est de 100 FCFA."
-                : "The minimum price for a transaction is 100 FCFA.";
-          });
+          _message = (langUserPhone == "fr")
+              ? "Le prix minimum pour une transaction est de 100 FCFA."
+              : "The minimum price for a transaction is 100 FCFA.";
         }
       } else {
-        setState(() {
-          _message = (langUserPhone == "fr")
-              ? "La quantité doit être comprise entre $qteMin et $qteMax"
-              : "The quantity must be between $qteMin and $qteMax";
-        });
+        _message = (langUserPhone == "fr")
+            ? "La quantité doit être comprise entre $qteMin et $qteMax"
+            : "The quantity must be between $qteMin and $qteMax";
       }
     } else {
-      setState(() {
-        _message = (langUserPhone == "fr")
-            ? "Veuillez choisir un réseau social puis un service."
-            : "Please choose a social network then a service.";
-      });
+      _message = (langUserPhone == "fr")
+          ? "Veuillez choisir un réseau social puis un service."
+          : "Please choose a social network then a service.";
     }
   }
 
@@ -211,62 +242,80 @@ class _RegisterForm3State extends State<RegisterForm3> {
   }
 
   void newPromoReseau() async {
-    setState(() {
-      _desactive3 = true;
-    });
-
-    bool isConnected = await isConnectedToInternet();
-    if (isConnected) {
-      var request = http.MultipartRequest(
-          'POST', Uri.parse('$generalRouteForApi/newPromoReseau'));
-      request.fields.addAll({
-        'langUserPhone': langUserPhone.toString(),
-        'uid': uidUser,
-        'idFormulePromoReseau': idFormulePromoReseau.toString(),
-        'qteDemander': quantityController.text,
-        'prixQteDemander': priceController.text,
-        'lien': linkController.text,
-        'valueMethodePaiement': valueMethodePaiement,
-        'tel': telController.text,
+    if (_message != "") {
+      dangerNoti((langUserPhone == "fr") ? "Attention !!!" : "Attention !!!",
+          _message, context);
+    } else {
+      setState(() {
+        _desactive3 = true;
       });
 
-      http.StreamedResponse response = await request.send();
+      bool isConnected = await isConnectedToInternet();
+      if (isConnected) {
+        var request = http.MultipartRequest(
+            'POST', Uri.parse('$generalRouteForApi/newPromoReseau'));
+        request.fields.addAll({
+          'langUserPhone': langUserPhone.toString(),
+          'uid': uidUser,
+          'idFormulePromoReseau': idFormulePromoReseau.toString(),
+          'qteDemander': quantityController.text,
+          'prixQteDemander': priceController.text,
+          'lien': linkController.text,
+          'valueMethodePaiement': valueMethodePaiement,
+          'tel': telController.text,
+        });
 
-      if (response.statusCode == 200) {
-        var data1 = await response.stream.bytesToString();
-        var data = convert.jsonDecode(data1);
-        if (data["error"] == false) {
-          setState(() {
-            _desactive3 = false;
-            dangerNoti(
-                (langUserPhone == "fr") ? "Attention !!!" : "Attention !!!",
-                (langUserPhone == "fr")
-                    ? "Après confirmation du paiement, veuillez consulter la liste de vos promotions réseaux sociaux."
-                    : "After payment confirmation, please view the list of your social media promotions.",
-                context);
-          });
+        http.StreamedResponse response = await request.send();
+
+        if (response.statusCode == 200) {
+          var data1 = await response.stream.bytesToString();
+          var data = convert.jsonDecode(data1);
+          if (data["error"] == false) {
+            setState(() {
+              _desactive3 = false;
+            });
+            if (data["direct"] == true) {
+              dangerNoti(
+                  (langUserPhone == "fr") ? "Attention !!!" : "Attention !!!",
+                  (langUserPhone == "fr")
+                      ? "Après confirmation du paiement, veuillez consulter la liste de vos promotions réseaux sociaux."
+                      : "After payment confirmation, please view the list of your social media promotions.",
+                  context);
+            } else {
+              launchPaiement(data["url"]);
+              Navigator.pop(context);
+              showNotification(
+                  (langUserPhone == "fr")
+                      ? "Paiement en cours !"
+                      : "Payment in progress !",
+                  (langUserPhone == "fr")
+                      ? "Après confirmation du paiement, veuillez consulter la liste de vos promotions réseaux sociaux."
+                      : "After payment confirmation, please view the list of your social media promotions.");
+            }
+          } else {
+            dangerNoti(data["titre"], data["message"], context);
+            setState(() {
+              _desactive3 = false;
+            });
+          }
         } else {
-          dangerNoti(data["titre"], data["message"], context);
+          dangerNoti("ERROR", "ERROR", context);
           setState(() {
             _desactive3 = false;
           });
         }
       } else {
-        dangerNoti("ERROR", "ERROR", context);
+        if (langUserPhone != "fr") {
+          dangerNoti(
+              "Mistake!", "You are not connected to the internet.", context);
+        } else {
+          dangerNoti(
+              "Erreur!", "Vous n'ètes pas connecté a internet.", context);
+        }
         setState(() {
           _desactive3 = false;
         });
       }
-    } else {
-      if (langUserPhone != "fr") {
-        dangerNoti(
-            "Mistake!", "You are not connected to the internet.", context);
-      } else {
-        dangerNoti("Erreur!", "Vous n'ètes pas connecté a internet.", context);
-      }
-      setState(() {
-        _desactive3 = false;
-      });
     }
   }
 
@@ -360,20 +409,6 @@ class _RegisterForm3State extends State<RegisterForm3> {
     return Container(
       child: Column(
         children: [
-          if (_message != "")
-            DelayedAnimation(
-              delay: 0, // 1000,
-              child: Text(
-                _message,
-                style: GoogleFonts.poppins(
-                  color: Colors.redAccent,
-                  fontWeight: FontWeight.w600,
-                  fontSize: 16,
-                ),
-                textAlign: TextAlign.center,
-              ),
-            ),
-          if (_message != "") const SizedBox(height: 10),
           _loading_liste_formule
               ? const Center(
                   child: CircularProgressIndicator(),
@@ -424,6 +459,11 @@ class _RegisterForm3State extends State<RegisterForm3> {
                                     ),
                                     onPressed: () {
                                       setState(() {
+                                        idFormulePromoReseau = 0;
+                                        description = (langUserPhone == "fr")
+                                            ? "Veuillez choisir un réseau social puis un service."
+                                            : "Please choose a social network then a service.";
+                                        _message = description;
                                         selectedSocialNetwork =
                                             listSocialNetworks[index]['titre'];
                                         listServices =
@@ -576,20 +616,6 @@ class _RegisterForm3State extends State<RegisterForm3> {
             ),
           ),
           const SizedBox(height: 15),
-          if (_message != "")
-            DelayedAnimation(
-              delay: 0, // 1000,
-              child: Text(
-                _message,
-                style: GoogleFonts.poppins(
-                  color: Colors.redAccent,
-                  fontWeight: FontWeight.w600,
-                  fontSize: 16,
-                ),
-                textAlign: TextAlign.center,
-              ),
-            ),
-          if (_message != "") const SizedBox(height: 10),
           DelayedAnimation(
             delay: 0,
             child: SizedBox(
@@ -616,15 +642,7 @@ class _RegisterForm3State extends State<RegisterForm3> {
                 ),
                 onPressed: () {
                   if (!telIsVerified) {
-                    warningNoti(
-                        "Configuration du compte",
-                        "Patientez encore svp. Votre numéro WhatsApp n'a pas encore été confirmé par un administrateur. Il le sera dans les plus brefs délais.",
-                        context);
-                  } else if (!mailIsVerified) {
-                    warningNoti(
-                        "Configuration du compte",
-                        "Veuillez d'abord confirmer votre adresse mail...\n\nVous trouverez sur notre chaine YouTube des vidéos qui peuvent vous aider...",
-                        context);
+                    showConfNumeroWhatsapp(context);
                   } else {
                     _desactive3 ? null : newPromoReseau();
                   }

@@ -1,7 +1,7 @@
  plugins {
     id "com.android.application"
-    id "dev.flutter.flutter-gradle-plugin"
     id "org.jetbrains.kotlin.android"
+    id "dev.flutter.flutter-gradle-plugin"
     id "com.google.gms.google-services"
     id "com.google.firebase.crashlytics"
 }
@@ -50,8 +50,8 @@ android {
 
     defaultConfig {
         applicationId "com.dressur.ds"
-        minSdkVersion 20
-        targetSdkVersion 33
+        minSdkVersion flutter.minSdkVersion // 20 by google play
+        targetSdkVersion 34
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
     }
