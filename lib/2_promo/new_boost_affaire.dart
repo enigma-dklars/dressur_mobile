@@ -224,7 +224,7 @@ class _ProduitsServicesState extends State<ProduitsServices> {
     request.fields['text'] = _textEditingController.text;
     request.fields['uid'] = uidUser;
     request.fields['langUserPhone'] = langUserPhone.toString();
-    request.fields['mode'] = load ? "yes" : "no";
+    request.fields['mode'] = load ? "payant" : "gratuit";
     request.fields['paymentMethod'] = valueMethodePaiement;
     request.fields['tel'] = telController.text;
 
