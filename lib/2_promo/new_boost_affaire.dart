@@ -217,12 +217,16 @@ class _ProduitsServicesState extends State<ProduitsServices> {
       _isSending = true;
     });
 
-    final url = Uri.parse('$generalRouteForApi/newPromotion');
+    final url = Uri.parse('$generalRouteForApi/addProduitService');
 
     final request = http.MultipartRequest('POST', url);
+    request.fields['idFormulePromoAffaire'] = idFormulBoost;
     request.fields['text'] = _textEditingController.text;
     request.fields['uid'] = uidUser;
     request.fields['langUserPhone'] = langUserPhone.toString();
+    request.fields['mode'] = load ? "yes" : "no";
+    request.fields['paymentMethod'] = valueMethodePaiement;
+    request.fields['tel'] = telController.text;
 
     final tempDir = await getTemporaryDirectory();
     final filePath = '${tempDir.path}/temp_image.jpg';
@@ -254,8 +258,8 @@ class _ProduitsServicesState extends State<ProduitsServices> {
         successNoti(
             "Good",
             (langUserPhone == "fr")
-                ? 'Votre demande de promotion a été enregistrée, vous passerez au paiement si elle est acceptée.'
-                : 'Your promotion request has been registered, you will proceed to payment if it is accepted.',
+                ? 'Good. Votre demande de promotion a été enregistrée. Elle sera diffusée si elle est acceptée par un administrateur. Dans le cas contraire, vous devrez la modifier en tenant compte des remarques.'
+                : 'Good. Your promotion request has been saved. It will be released if it is accepted by an administrator. Otherwise, you will need to modify it taking into account the comments.',
             context);
       }
       setState(() {
