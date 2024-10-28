@@ -147,6 +147,7 @@ class _ProduitsServicesState extends State<ProduitsServices> {
   var label = "";
   int prix = 0;
   int jours = 0;
+  final telController = TextEditingController(text: tel);
 
   bool isImageSquare(File imageFile) {
     final image = img.decodeImage(File(imageFile.path).readAsBytesSync());
@@ -321,15 +322,15 @@ class _ProduitsServicesState extends State<ProduitsServices> {
     }
     setState(() {
       idFormulBoost = val;
-      if (load == true) {
-        _message = (langUserPhone == "fr")
-            ? "Cette formule vous offre une promotion affaire de $jours jour(s) pour $prix FCFA."
-            : "This formula offers you a business promotion of $jours day(s) for $prix FCFA.";
-      } else {
-        _message = (langUserPhone == "fr")
-            ? "Cette formule vous offre une promotion affaire de $jours jour(s) pour $prix Bonus."
-            : "This formula offers you a business promotion of $jours day(s) for $prix Bonus.";
-      }
+      _message = (langUserPhone == "fr")
+          ? "Cette formule vous offre une promotion affaire de $jours jour(s) pour $prix Bonus ou $prix FCFA."
+          : "This formula offers you a business promotion of $jours day(s) for $prix Bonus or $prix FCFA.";
+    });
+  }
+
+  onChangeMethodePaiement(val) async {
+    setState(() {
+      valueMethodePaiement = val;
     });
   }
 
@@ -345,49 +346,6 @@ class _ProduitsServicesState extends State<ProduitsServices> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                (langUserPhone == "fr") ? 'Gratuit' : 'Free',
-                style: GoogleFonts.poppins(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w800,
-                  color: Colors.green,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(width: 10),
-              Switch(
-                trackOutlineColor:
-                    MaterialStateColor.resolveWith((states) => primaryColor),
-                activeColor: Colors.red,
-                activeTrackColor: primaryColor,
-                inactiveThumbColor: Colors.green,
-                inactiveTrackColor: primaryColor,
-                value: load,
-                onChanged: (bool? newValue) {
-                  setState(() {
-                    if (newValue == true) {
-                      load = true;
-                    } else {
-                      load = false;
-                    }
-                  });
-                },
-              ),
-              const SizedBox(width: 10),
-              Text(
-                (langUserPhone == "fr") ? 'Payant' : 'Paid',
-                style: GoogleFonts.poppins(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w800,
-                  color: Colors.red,
-                ),
-                textAlign: TextAlign.center,
-              ),
-            ],
-          ),
           const SizedBox(height: 5),
           loading_formule_gratuit
               ? const Center(
@@ -459,6 +417,79 @@ class _ProduitsServicesState extends State<ProduitsServices> {
             ),
           ),
           const SizedBox(height: 16.0),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                (langUserPhone == "fr") ? 'Gratuit' : 'Free',
+                style: GoogleFonts.poppins(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w800,
+                  color: Colors.green,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(width: 10),
+              Switch(
+                trackOutlineColor:
+                    MaterialStateColor.resolveWith((states) => primaryColor),
+                activeColor: Colors.red,
+                activeTrackColor: primaryColor,
+                inactiveThumbColor: Colors.green,
+                inactiveTrackColor: primaryColor,
+                value: load,
+                onChanged: (bool? newValue) {
+                  setState(() {
+                    if (newValue == true) {
+                      load = true;
+                    } else {
+                      load = false;
+                    }
+                  });
+                },
+              ),
+              const SizedBox(width: 10),
+              Text(
+                (langUserPhone == "fr") ? 'Payant' : 'Paid',
+                style: GoogleFonts.poppins(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w800,
+                  color: Colors.red,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+          const SizedBox(height: 16.0),
+          if (load == true) ...[
+            DelayedAnimation(
+              delay: 0, // 1500,
+              child: SelectFormField(
+                decoration: const InputDecoration(
+                  labelText: 'Formules de Promotion Affaire Payant',
+                  border: OutlineInputBorder(),
+                ),
+                type: SelectFormFieldType.dropdown,
+                initialValue: 'mtn',
+                labelText: 'Methode de paiement mobile',
+                items: listeMethodePaiement,
+                onChanged: (val) => onChangeMethodePaiement(val),
+                onSaved: (val) => print(val),
+              ),
+            ),
+            const SizedBox(height: 20),
+            DelayedAnimation(
+              delay: 0, // 1500,
+              child: TextField(
+                controller: telController,
+                decoration: const InputDecoration(
+                  labelText: 'Indicatif + Numéro du paiement',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+            ),
+            const SizedBox(height: 10),
+          ],
           ElevatedButton(
             onPressed: _isSending ? null : _sendData,
             style: ElevatedButton.styleFrom(
