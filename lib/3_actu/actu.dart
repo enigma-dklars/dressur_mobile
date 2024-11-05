@@ -1065,6 +1065,9 @@ class AdvertisementDetailPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final Map<String, dynamic> infoMap = (advertisement.annotherInfo != "")
+        ? jsonDecode(advertisement.annotherInfo)
+        : {};
     return Scaffold(
       appBar: AppBar(
         backgroundColor: primaryColor,
@@ -1150,11 +1153,55 @@ class AdvertisementDetailPage extends StatelessWidget {
                   ),
                 ],
               ),
-            )
+            ),
+            Container(
+              margin: const EdgeInsets.only(
+                  left: 10, top: 0, right: 10, bottom: 20),
+              child: Column(
+                children: infoMap.entries.map((entry) {
+                  final key = entry.key.replaceAll('_', ' ').capitalize();
+                  final value = entry.value;
+
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 8.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '$key :',
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors
+                                .blue, // Replace with your theme's primary color if needed
+                            fontSize: 16,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          value,
+                          style: const TextStyle(
+                            fontSize: 14,
+                          ),
+                          softWrap: true, // Wraps text within the container
+                        ),
+                        const Divider(),
+                      ],
+                    ),
+                  );
+                }).toList(),
+              ),
+            ),
           ],
         ),
       ),
     );
+  }
+}
+
+extension StringExtension on String {
+  String capitalize() {
+    if (isEmpty) return this;
+    return this[0].toUpperCase() + substring(1).toLowerCase();
   }
 }
 
