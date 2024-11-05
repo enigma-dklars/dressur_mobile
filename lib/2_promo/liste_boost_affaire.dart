@@ -281,21 +281,23 @@ class _PromotionListPageState extends State<PromotionListPage> {
             ],
             const SizedBox(height: 5),
             Row(
-              mainAxisAlignment: promotion.peutPayer ||
+              mainAxisAlignment: (promotion.peutPayer ||
                       ![
-                        "Completed",
-                        "Terminé",
-                        "Accept and in progress",
-                        "Accepter et en cours",
-                        "Waiting for validation",
-                        "En Attente de validation",
-                        "Accept and pending payment",
-                        "Accepter et en attente de paiement"
-                      ].contains(promotion.status)
+                            "Completed",
+                            "Terminé",
+                            "Accept and in progress",
+                            "Accepter et en cours",
+                            "Waiting for validation",
+                            "En Attente de validation",
+                            "Accept and pending payment",
+                            "Accepter et en attente de paiement"
+                          ].contains(promotion.status) &&
+                          promotion.typePromotionAffaire == "produit_service")
                   ? MainAxisAlignment.spaceBetween
                   : MainAxisAlignment.end,
               children: [
-                if (promotion.peutPayer)
+                if (promotion.peutPayer &&
+                    promotion.typePromotionAffaire == "produit_service")
                   ElevatedButton.icon(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.orange,
@@ -322,15 +324,16 @@ class _PromotionListPageState extends State<PromotionListPage> {
                         color: Colors.white, size: 13),
                   ),
                 if (![
-                  "Completed",
-                  "Terminé",
-                  "Accept and in progress",
-                  "Accepter et en cours",
-                  "Waiting for validation",
-                  "En Attente de validation",
-                  "Accept and pending payment",
-                  "Accepter et en attente de paiement"
-                ].contains(promotion.status))
+                      "Completed",
+                      "Terminé",
+                      "Accept and in progress",
+                      "Accepter et en cours",
+                      "Waiting for validation",
+                      "En Attente de validation",
+                      "Accept and pending payment",
+                      "Accepter et en attente de paiement"
+                    ].contains(promotion.status) &&
+                    promotion.typePromotionAffaire == "produit_service")
                   ElevatedButton.icon(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.green,
@@ -341,8 +344,8 @@ class _PromotionListPageState extends State<PromotionListPage> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) =>
-                              ModificationProduitServicesPage(promotion: promotion),
+                          builder: (context) => ModificationProduitServicesPage(
+                              promotion: promotion),
                         ),
                       );
                     },
@@ -468,6 +471,9 @@ class PromotionDetailPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final Map<String, dynamic> infoMap = (promotion.annotherInfo != "")
+        ? jsonDecode(promotion.annotherInfo)
+        : {};
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -578,6 +584,40 @@ class PromotionDetailPage extends StatelessWidget {
             ),
             const SizedBox(height: 16.0),
             Text(promotion.description),
+            const SizedBox(height: 16.0),
+            Column(
+              children: infoMap.entries.map((entry) {
+                final key = entry.key.replaceAll('_', ' ').capitalize();
+                final value = entry.value;
+
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 8.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '$key :',
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors
+                              .blue, // Replace with your theme's primary color if needed
+                          fontSize: 16,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        value,
+                        style: const TextStyle(
+                          fontSize: 14,
+                        ),
+                        softWrap: true, // Wraps text within the container
+                      ),
+                      const Divider(),
+                    ],
+                  ),
+                );
+              }).toList(),
+            ),
           ],
         ),
       ),
