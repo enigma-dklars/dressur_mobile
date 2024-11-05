@@ -2,7 +2,6 @@
 
 import 'dart:convert';
 import 'dart:convert' as convert;
-import 'package:dressur/components/delayed_animation.dart';
 import 'package:dressur/components/noti.dart';
 import 'package:dressur/components/noti_sys.dart';
 import 'package:flutter/material.dart';
@@ -651,98 +650,83 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            DelayedAnimation(
-              delay: 0, // 1500,
-              child: Text(
-                (langUserPhone == "fr")
-                    ? 'Prix : ${campagneMail.prixFormuleCampagneMail} FCFA'
-                    : 'Price: : ${campagneMail.prixFormuleCampagneMail} FCFA',
-                style: GoogleFonts.poppins(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 20,
-                ),
+            Text(
+              (langUserPhone == "fr")
+                  ? 'Prix : ${campagneMail.prixFormuleCampagneMail} FCFA'
+                  : 'Price: : ${campagneMail.prixFormuleCampagneMail} FCFA',
+              style: GoogleFonts.poppins(
+                fontWeight: FontWeight.w600,
+                fontSize: 20,
               ),
             ),
             const SizedBox(height: 20),
-            DelayedAnimation(
-              delay: 0, // 1500,
-              child: SelectFormField(
-                decoration: const InputDecoration(
-                  labelText: 'Formules de Boost Payant',
-                  border: OutlineInputBorder(),
-                ),
-                type: SelectFormFieldType.dropdown,
-                initialValue: 'mtn',
-                labelText: 'Methode de paiement mobile',
-                items: listeMethodePaiement,
-                onChanged: (val) => onChangeMethodePaiement(val),
-                onSaved: (val) => print(val),
+            SelectFormField(
+              decoration: const InputDecoration(
+                labelText: 'Formules de Boost Payant',
+                border: OutlineInputBorder(),
               ),
+              type: SelectFormFieldType.dropdown,
+              initialValue: 'mtn',
+              labelText: 'Methode de paiement mobile',
+              items: listeMethodePaiement,
+              onChanged: (val) => onChangeMethodePaiement(val),
+              onSaved: (val) => print(val),
             ),
             const SizedBox(height: 20),
-            DelayedAnimation(
-              delay: 0, // 1500,
-              child: TextField(
-                controller: telController,
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelStyle: TextStyle(color: Colors.grey[400]),
-                  labelText: 'Indicatif + Numéro du paiement',
-                ),
+            TextField(
+              controller: telController,
+              decoration: InputDecoration(
+                border: OutlineInputBorder(),
+                labelStyle: TextStyle(color: Colors.grey[400]),
+                labelText: 'Indicatif + Numéro du paiement',
               ),
             ),
             const SizedBox(height: 10),
-            DelayedAnimation(
-              delay: 0,
-              child: SizedBox(
-                width: MediaQuery.of(context).size.width * 0.95,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: primaryColor,
-                    shape: const StadiumBorder(),
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 13,
-                    ),
+            SizedBox(
+              width: MediaQuery.of(context).size.width * 0.95,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: primaryColor,
+                  shape: const StadiumBorder(),
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 13,
                   ),
-                  child: Text(
-                    _desactive2
-                        ? (langUserPhone == "fr")
-                            ? "Patientez..."
-                            : "Wait..."
-                        : (langUserPhone == "fr")
-                            ? "Payer"
-                            : "Pay",
-                    style: GoogleFonts.poppins(
-                      color: Colors.white,
-                    ),
-                  ),
-                  onPressed: () {
-                    if (!telIsVerified) {
-                      showConfNumeroWhatsapp(context);
-                    } else if (!mailIsVerified) {
-                      warningNoti(
-                          "Configuration du compte",
-                          "Veuillez d'abord confirmer votre adresse mail...",
-                          context);
-                    } else {
-                      _desactive2 ? null : newCampageMailPayant();
-                    }
-                  },
                 ),
+                child: Text(
+                  _desactive2
+                      ? (langUserPhone == "fr")
+                          ? "Patientez..."
+                          : "Wait..."
+                      : (langUserPhone == "fr")
+                          ? "Payer"
+                          : "Pay",
+                  style: GoogleFonts.poppins(
+                    color: Colors.white,
+                  ),
+                ),
+                onPressed: () {
+                  if (!telIsVerified) {
+                    showConfNumeroWhatsapp(context);
+                  } else if (!mailIsVerified) {
+                    warningNoti(
+                        "Configuration du compte",
+                        "Veuillez d'abord confirmer votre adresse mail...",
+                        context);
+                  } else {
+                    _desactive2 ? null : newCampageMailPayant();
+                  }
+                },
               ),
             ),
             const SizedBox(height: 20),
-            DelayedAnimation(
-              delay: 0, // 1500,
-              child: Text(
-                "Pour payer par Wave ou Carte Bancaire, veuillez contactez l'Assistance Dressur par WhatsApp. Merci...",
-                style: GoogleFonts.poppins(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 12,
-                  color: Colors.red[400],
-                ),
-                textAlign: TextAlign.center,
+            Text(
+              "Pour payer par Wave ou Carte Bancaire, veuillez contactez l'Assistance Dressur par WhatsApp. Merci...",
+              style: GoogleFonts.poppins(
+                fontWeight: FontWeight.w600,
+                fontSize: 12,
+                color: Colors.red[400],
               ),
+              textAlign: TextAlign.center,
             ),
           ],
         ),

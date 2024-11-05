@@ -35,6 +35,8 @@ class Advertisement {
   final String pseudoAnnonceur;
   final String nombreDeVues;
   final String nombreImpression;
+  final String typePromotionAffaire;
+  final String annotherInfo;
 
   Advertisement({
     required this.uidUser,
@@ -46,6 +48,8 @@ class Advertisement {
     required this.pseudoAnnonceur,
     required this.nombreDeVues,
     required this.nombreImpression,
+    required this.typePromotionAffaire,
+    required this.annotherInfo,
   });
 }
 
@@ -151,6 +155,7 @@ class _ActuPageState extends State<ActuPage> {
         setState(() {
           initUserInformations(data['user']);
           lesPublicites = data['user']["lesPublicites"];
+          print(jsonDecode(lesPublicites).length);
           _futureAdvertisements = fetchAdvertisements();
           _loading = false;
         });
@@ -197,6 +202,10 @@ class _ActuPageState extends State<ActuPage> {
           pseudoAnnonceur: data['pseudoAnnonceur'],
           nombreDeVues: data['nombreDeVues'],
           nombreImpression: data['nombreImpression'],
+          typePromotionAffaire: data['typePromotionAffaire'],
+          annotherInfo: data['annotherInfo'] != null
+              ? jsonEncode(data['annotherInfo'])
+              : "",
         );
       }).toList();
       // Mélanger l'ordre des éléments

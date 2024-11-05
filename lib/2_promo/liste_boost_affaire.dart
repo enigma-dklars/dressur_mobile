@@ -25,6 +25,8 @@ class Promotion {
   final String formulePromotion;
   final bool peutPayer;
   final String motif;
+  final String typePromotionAffaire;
+  final String annotherInfo;
 
   Promotion({
     required this.id,
@@ -38,6 +40,8 @@ class Promotion {
     required this.formulePromotion,
     required this.peutPayer,
     required this.motif,
+    required this.typePromotionAffaire,
+    required this.annotherInfo,
   });
 }
 
@@ -74,6 +78,10 @@ class _PromotionListPageState extends State<PromotionListPage> {
             formulePromotion: data['formulePromotion'],
             peutPayer: data['peutPayer'],
             motif: data['motif'],
+            typePromotionAffaire: data['typePromotionAffaire'],
+            annotherInfo: data['annotherInfo'] != null
+                ? jsonEncode(data['annotherInfo'])
+                : "",
           );
         }).toList();
 
@@ -86,7 +94,8 @@ class _PromotionListPageState extends State<PromotionListPage> {
       }
     } catch (e) {
       _showErrorDialog(
-          'An error occurred while fetching promotions. Please try again.');
+          'An error occurred while fetching promotions. Please try again. ::: ' +
+              e.toString());
     } finally {
       setState(() {
         _loading = false;
@@ -120,6 +129,66 @@ class _PromotionListPageState extends State<PromotionListPage> {
     fetchPromotions();
   }
 
+  Widget _buildStatusLabel(String status) {
+    Color backgroundColor;
+    if ([
+      "Completed",
+      "Terminé",
+      "Accept and in progress",
+      "Accepter et en cours"
+    ].contains(status)) {
+      backgroundColor = Colors.green;
+    } else if ([
+      "Waiting for validation",
+      "En Attente de validation",
+      "Accept and pending payment",
+      "Accepter et en attente de paiement"
+    ].contains(status)) {
+      backgroundColor = Colors.orange;
+    } else {
+      backgroundColor = Colors.red;
+    }
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 1),
+      decoration: BoxDecoration(
+        color: backgroundColor,
+        borderRadius: BorderRadius.circular(10.0),
+      ),
+      child: Text(
+        status,
+        style: GoogleFonts.poppins(
+            fontSize: 12, color: Colors.white, fontWeight: FontWeight.bold),
+      ),
+    );
+  }
+
+  Widget _buildTypePromoAffaire(String type) {
+    Color backgroundColor;
+    String typeLabel;
+    if (type == "produit_service") {
+      backgroundColor = Colors.green;
+      typeLabel = "Produit Service";
+    } else if (type == "offre_emploi") {
+      backgroundColor = Colors.orange;
+      typeLabel = "Offre Emploi";
+    } else {
+      backgroundColor = Colors.red;
+      typeLabel = "Demande Emploi";
+    }
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 1),
+      decoration: BoxDecoration(
+        color: backgroundColor,
+        borderRadius: BorderRadius.circular(10.0),
+      ),
+      child: Text(
+        typeLabel,
+        style: GoogleFonts.poppins(
+            fontSize: 12, color: Colors.white, fontWeight: FontWeight.bold),
+      ),
+    );
+  }
+
   Widget _buildPromotionCard(Promotion promotion) {
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
@@ -128,7 +197,16 @@ class _PromotionListPageState extends State<PromotionListPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildStatusLabel(promotion.status),
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  _buildTypePromoAffaire(promotion.typePromotionAffaire),
+                  SizedBox(width: 5),
+                  _buildStatusLabel(promotion.status),
+                ],
+              ),
+            ),
             const SizedBox(height: 5),
             if ([
               "Completed",
@@ -159,7 +237,7 @@ class _PromotionListPageState extends State<PromotionListPage> {
               ),
               const SizedBox(height: 5),
               Text(
-                promotion.description,
+                promotion.description.replaceAll('\n', ' '),
                 style: GoogleFonts.poppins(fontSize: 14),
                 maxLines: 3,
                 overflow: TextOverflow.ellipsis,
@@ -176,20 +254,43 @@ class _PromotionListPageState extends State<PromotionListPage> {
                 ),
               ),
               const SizedBox(height: 5),
-              Text(
-                (langUserPhone == "fr")
-                    ? "Tenez compte du motif de refus pour soumettre une nouvelle demande. Merci..."
-                    : "Take the reason for refusal into account when submitting a new request. THANKS...",
-                style: const TextStyle(
-                  color: Colors.green,
-                  fontWeight: FontWeight.w500,
-                  fontSize: 16,
+              if (promotion.typePromotionAffaire != "produit_service") ...[
+                Text(
+                  (langUserPhone == "fr")
+                      ? "Tenez compte du motif de refus pour soumettre une nouvelle promotion. Merci..."
+                      : "Please consider the reason for refusal to submit a new promotion. Thank you...",
+                  style: const TextStyle(
+                    color: Colors.green,
+                    fontWeight: FontWeight.w500,
+                    fontSize: 16,
+                  ),
                 ),
-              ),
+              ] else ...[
+                Text(
+                  (langUserPhone == "fr")
+                      ? "Tenez compte du motif de refus pour modifier votre promotion. Merci..."
+                      : "Please consider the reason for refusal to modify your promotion. Thank you...",
+                  style: const TextStyle(
+                    color: Colors.green,
+                    fontWeight: FontWeight.w500,
+                    fontSize: 16,
+                  ),
+                ),
+              ]
             ],
             const SizedBox(height: 5),
             Row(
-              mainAxisAlignment: promotion.peutPayer
+              mainAxisAlignment: promotion.peutPayer ||
+                      ![
+                        "Completed",
+                        "Terminé",
+                        "Accept and in progress",
+                        "Accepter et en cours",
+                        "Waiting for validation",
+                        "En Attente de validation",
+                        "Accept and pending payment",
+                        "Accepter et en attente de paiement"
+                      ].contains(promotion.status)
                   ? MainAxisAlignment.spaceBetween
                   : MainAxisAlignment.end,
               children: [
@@ -219,6 +320,40 @@ class _PromotionListPageState extends State<PromotionListPage> {
                     icon: const Icon(Icons.payment,
                         color: Colors.white, size: 13),
                   ),
+                if (![
+                  "Completed",
+                  "Terminé",
+                  "Accept and in progress",
+                  "Accepter et en cours",
+                  "Waiting for validation",
+                  "En Attente de validation",
+                  "Accept and pending payment",
+                  "Accepter et en attente de paiement"
+                ].contains(promotion.status))
+                  ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green,
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 0, horizontal: 15),
+                    ),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              PaymentPayantPage(promotion: promotion),
+                        ),
+                      );
+                    },
+                    label: Text(
+                      (langUserPhone == "fr") ? 'Modifier' : 'Edit',
+                      style: GoogleFonts.poppins(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w400,
+                          fontSize: 13),
+                    ),
+                    icon: const Icon(Icons.edit, color: Colors.white, size: 13),
+                  ),
                 ElevatedButton.icon(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: secondaryColor,
@@ -226,9 +361,7 @@ class _PromotionListPageState extends State<PromotionListPage> {
                         const EdgeInsets.symmetric(vertical: 0, horizontal: 15),
                   ),
                   label: Text(
-                    (langUserPhone == "fr")
-                        ? 'Autres Informations'
-                        : 'Other information',
+                    (langUserPhone == "fr") ? 'Autres ' : 'Other ',
                     style: GoogleFonts.poppins(
                         color: Colors.white,
                         fontWeight: FontWeight.w400,
@@ -249,39 +382,6 @@ class _PromotionListPageState extends State<PromotionListPage> {
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildStatusLabel(String status) {
-    Color backgroundColor;
-    if ([
-      "Completed",
-      "Terminé",
-      "Accept and in progress",
-      "Accepter et en cours"
-    ].contains(status)) {
-      backgroundColor = Colors.green;
-    } else if ([
-      "Waiting for validation",
-      "En Attente de validation",
-      "Accept and pending payment",
-      "Accepter et en attente de paiement"
-    ].contains(status)) {
-      backgroundColor = Colors.orange;
-    } else {
-      backgroundColor = Colors.red;
-    }
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 1),
-      decoration: BoxDecoration(
-        color: backgroundColor,
-        borderRadius: BorderRadius.circular(10.0),
-      ),
-      child: Text(
-        status,
-        style: GoogleFonts.poppins(
-            fontSize: 14, color: Colors.white, fontWeight: FontWeight.bold),
       ),
     );
   }
@@ -668,69 +768,61 @@ class _PaymentGratuitPageState extends State<PaymentGratuitPage> {
                 ? const Center(
                     child: CircularProgressIndicator(),
                   )
-                : DelayedAnimation(
-                    delay: 0, // 1500,
-                    child: SelectFormField(
-                      decoration: const InputDecoration(
-                        labelText: 'Formules de Promotion Affaire Payant',
-                        border: OutlineInputBorder(),
-                      ),
-                      type: SelectFormFieldType.dropdown,
-                      initialValue: '0',
-                      labelText: 'Formules de Promotion Affaire',
-                      items: listeDesFormules,
-                      onChanged: (val) => onChangeFormulBoost(val),
-                      onSaved: (val) => print(val),
+                : SelectFormField(
+                    decoration: const InputDecoration(
+                      labelText: 'Formules de Promotion Affaire Payant',
+                      border: OutlineInputBorder(),
                     ),
+                    type: SelectFormFieldType.dropdown,
+                    initialValue: '0',
+                    labelText: 'Formules de Promotion Affaire',
+                    items: listeDesFormules,
+                    onChanged: (val) => onChangeFormulBoost(val),
+                    onSaved: (val) => print(val),
                   ),
             const SizedBox(height: 20),
-            DelayedAnimation(
-              delay: 0, // 1000,
-              child: Text(
-                _message,
-                style: GoogleFonts.poppins(
-                  fontSize: 16,
-                ),
-                textAlign: TextAlign.center,
+            Text(
+              _message,
+              style: GoogleFonts.poppins(
+                fontSize: 16,
               ),
+              textAlign: TextAlign.center,
             ),
             const SizedBox(height: 20),
-            DelayedAnimation(
-                delay: 0,
-                child: SizedBox(
-                  width: MediaQuery.of(context).size.width * 0.95,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: primaryColor,
-                      shape: const StadiumBorder(),
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 13,
-                      ),
-                    ),
-                    child: Text(
-                      _desactive
-                          ? (langUserPhone == "fr")
-                              ? "Patientez..."
-                              : "Wait..."
-                          : "BOOSTER",
-                      style: GoogleFonts.poppins(
-                        color: Colors.white,
-                      ),
-                    ),
-                    onPressed: () {
-                      if (!telIsVerified) {
-                        showConfNumeroWhatsapp(context);
-                      } else if (!mailIsVerified) {
-                        warningNoti(
-                            "Configuration du compte",
-                            "Veuillez d'abord confirmer votre adresse mail...",
-                            context);
-                      } else {
-                        _desactive ? null : newPromo();
-                      }
-                    },
+            SizedBox(
+              width: MediaQuery.of(context).size.width * 0.95,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: primaryColor,
+                  shape: const StadiumBorder(),
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 13,
                   ),
-                )),
+                ),
+                child: Text(
+                  _desactive
+                      ? (langUserPhone == "fr")
+                          ? "Patientez..."
+                          : "Wait..."
+                      : "BOOSTER",
+                  style: GoogleFonts.poppins(
+                    color: Colors.white,
+                  ),
+                ),
+                onPressed: () {
+                  if (!telIsVerified) {
+                    showConfNumeroWhatsapp(context);
+                  } else if (!mailIsVerified) {
+                    warningNoti(
+                        "Configuration du compte",
+                        "Veuillez d'abord confirmer votre adresse mail...",
+                        context);
+                  } else {
+                    _desactive ? null : newPromo();
+                  }
+                },
+              ),
+            ),
           ],
         ),
       ),

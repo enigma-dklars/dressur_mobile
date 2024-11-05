@@ -5,7 +5,6 @@ import 'package:dressur/components/noti_sys.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:dressur/components/delayed_animation.dart';
 import 'package:dressur/components/constant.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
@@ -124,6 +123,7 @@ class RegisterForm3 extends StatefulWidget {
 }
 
 class _RegisterForm3State extends State<RegisterForm3> {
+  final ScrollController _scrollController = ScrollController();
   String? selectedSocialNetwork = "";
   var nombreAdresseMailForm = 0;
   int? initialService;
@@ -392,16 +392,30 @@ class _RegisterForm3State extends State<RegisterForm3> {
     }
   }
 
-  @override
-  void initState() {
-    super.initState();
-    listeFormPromoReseau();
-  }
-
   onChangeMethodePaiement(val) async {
     setState(() {
       valueMethodePaiement = val;
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    // S'assurer que le ScrollController est attaché après le rendu initial
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        setState(() {
+          listeFormPromoReseau();
+        }); // Rafraîchir pour s'assurer que tout est prêt
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 
   @override
@@ -425,10 +439,13 @@ class _RegisterForm3State extends State<RegisterForm3> {
                   : SizedBox(
                       height: 70,
                       child: Scrollbar(
+                        controller: _scrollController,
                         thumbVisibility: true,
                         thickness: 5,
                         radius: const Radius.circular(5),
                         child: SingleChildScrollView(
+                          controller:
+                              _scrollController, // Attach the ScrollController here
                           padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
                           scrollDirection: Axis.horizontal,
                           child: Padding(
@@ -487,20 +504,17 @@ class _RegisterForm3State extends State<RegisterForm3> {
                       ),
                     ),
           const SizedBox(height: 20),
-          DelayedAnimation(
-            delay: 0, // 1500,
-            child: SelectFormField(
-              decoration: InputDecoration(
-                labelText: 'Services $selectedSocialNetwork',
-                border: const OutlineInputBorder(),
-              ),
-              type: SelectFormFieldType.dropdown,
-              initialValue: "1",
+          SelectFormField(
+            decoration: InputDecoration(
               labelText: 'Services $selectedSocialNetwork',
-              items: listServices,
-              onChanged: (val) => onChangeService(val),
-              onSaved: (val) => print(val),
+              border: const OutlineInputBorder(),
             ),
+            type: SelectFormFieldType.dropdown,
+            initialValue: "1",
+            labelText: 'Services $selectedSocialNetwork',
+            items: listServices,
+            onChanged: (val) => onChangeService(val),
+            onSaved: (val) => print(val),
           ),
           const SizedBox(height: 10),
           Card(
@@ -526,144 +540,123 @@ class _RegisterForm3State extends State<RegisterForm3> {
             children: [
               SizedBox(
                 width: MediaQuery.of(context).size.width * 0.35,
-                child: DelayedAnimation(
-                  delay: 0, // 1500,
-                  child: TextField(
-                    controller: quantityController,
-                    keyboardType: TextInputType.number,
-                    decoration: InputDecoration(
-                      labelText:
-                          (langUserPhone == "fr") ? "Quantité" : "Quantity",
-                      helperText: "Min : $qteMin - Max : $qteMax",
-                      border: const OutlineInputBorder(),
-                    ),
-                    onChanged: (val) => calculerPrixTotal(),
+                child: TextField(
+                  controller: quantityController,
+                  keyboardType: TextInputType.number,
+                  decoration: InputDecoration(
+                    labelText:
+                        (langUserPhone == "fr") ? "Quantité" : "Quantity",
+                    helperText: "Min : $qteMin - Max : $qteMax",
+                    border: const OutlineInputBorder(),
                   ),
+                  onChanged: (val) => calculerPrixTotal(),
                 ),
               ),
               SizedBox(
                 width: MediaQuery.of(context).size.width * 0.55,
-                child: DelayedAnimation(
-                  delay: 0,
-                  child: TextField(
-                    controller: priceController,
-                    maxLines: 3,
-                    minLines: 1,
-                    keyboardType:
-                        const TextInputType.numberWithOptions(decimal: true),
-                    decoration: const InputDecoration(
-                      labelText: "Prix",
-                      helperText: "FCFA",
-                      border: OutlineInputBorder(),
-                      // Définir la couleur du texte lorsque le champ est désactivé
-                      labelStyle: TextStyle(color: primaryColor),
-                    ),
-                    style: const TextStyle(color: primaryColor),
-                    enabled: false,
+                child: TextField(
+                  controller: priceController,
+                  maxLines: 3,
+                  minLines: 1,
+                  keyboardType:
+                      const TextInputType.numberWithOptions(decimal: true),
+                  decoration: const InputDecoration(
+                    labelText: "Prix",
+                    helperText: "FCFA",
+                    border: OutlineInputBorder(),
+                    // Définir la couleur du texte lorsque le champ est désactivé
+                    labelStyle: TextStyle(color: primaryColor),
                   ),
+                  style: const TextStyle(color: primaryColor),
+                  enabled: false,
                 ),
               ),
             ],
           ),
           const SizedBox(height: 10),
-          DelayedAnimation(
-            delay: 0,
-            child: TextField(
-              controller: linkController,
-              decoration: InputDecoration(
-                labelText: (langUserPhone == "fr") ? "Lien" : "Link",
-                border: const OutlineInputBorder(),
-                errorText: _isValidLink
-                    ? null
-                    : "Veuillez saisir un lien valide.", // Set error text if link is invalid
+          TextField(
+            controller: linkController,
+            decoration: InputDecoration(
+              labelText: (langUserPhone == "fr") ? "Lien" : "Link",
+              border: const OutlineInputBorder(),
+              errorText: _isValidLink
+                  ? null
+                  : "Veuillez saisir un lien valide.", // Set error text if link is invalid
+            ),
+            onChanged: (text) {
+              setState(() {
+                // Basic URL validation using a regular expression
+                final RegExp urlRegex = RegExp(r"^(?:(?:https?|ftp)://)?\S+$",
+                    caseSensitive: false);
+                _isValidLink = urlRegex.hasMatch(text);
+              });
+            },
+          ),
+          const SizedBox(height: 15),
+          SelectFormField(
+            decoration: const InputDecoration(
+              labelText: 'Methode de paiement mobile',
+              border: OutlineInputBorder(),
+            ),
+            type: SelectFormFieldType.dropdown,
+            initialValue: 'mtn',
+            labelText: 'Methode de paiement mobile',
+            items: listeMethodePaiement,
+            onChanged: (val) => onChangeMethodePaiement(val),
+            onSaved: (val) => print(val),
+          ),
+          const SizedBox(height: 15),
+          TextField(
+            controller: telController,
+            decoration: InputDecoration(
+              labelStyle: TextStyle(color: Colors.grey[400]),
+              labelText: 'Indicatif + Numéro du paiement',
+              border: const OutlineInputBorder(),
+            ),
+          ),
+          const SizedBox(height: 15),
+          SizedBox(
+            width: MediaQuery.of(context).size.width * 0.95,
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: primaryColor,
+                shape: const StadiumBorder(),
+                padding: const EdgeInsets.symmetric(
+                  vertical: 13,
+                ),
               ),
-              onChanged: (text) {
-                setState(() {
-                  // Basic URL validation using a regular expression
-                  final RegExp urlRegex = RegExp(r"^(?:(?:https?|ftp)://)?\S+$",
-                      caseSensitive: false);
-                  _isValidLink = urlRegex.hasMatch(text);
-                });
+              child: Text(
+                _desactive3
+                    ? (langUserPhone == "fr")
+                        ? "Patientez..."
+                        : "Wait..."
+                    : (langUserPhone == "fr")
+                        ? "Payer et Démarrer"
+                        : "Pay and Get Started",
+                style: GoogleFonts.poppins(
+                  color: Colors.white,
+                ),
+              ),
+              onPressed: () {
+                if (!telIsVerified) {
+                  showConfNumeroWhatsapp(context);
+                } else {
+                  _desactive3 ? null : newPromoReseau();
+                }
               },
             ),
           ),
           const SizedBox(height: 15),
-          DelayedAnimation(
-            delay: 0, // 1500,
-            child: SelectFormField(
-              decoration: const InputDecoration(
-                labelText: 'Methode de paiement mobile',
-                border: OutlineInputBorder(),
-              ),
-              type: SelectFormFieldType.dropdown,
-              initialValue: 'mtn',
-              labelText: 'Methode de paiement mobile',
-              items: listeMethodePaiement,
-              onChanged: (val) => onChangeMethodePaiement(val),
-              onSaved: (val) => print(val),
+          Text(
+            (langUserPhone == "fr")
+                ? "Pour payer par Wave ou Carte Bancaire, veuillez contacter l'Assistance Dressur par WhatsApp. Merci..."
+                : "To pay by Wave or Credit Card, please contact Dressur Support by WhatsApp. THANKS...",
+            style: GoogleFonts.poppins(
+              fontWeight: FontWeight.w600,
+              fontSize: 12,
+              color: Colors.red,
             ),
-          ),
-          const SizedBox(height: 15),
-          DelayedAnimation(
-            delay: 0, // 1500,
-            child: TextField(
-              controller: telController,
-              decoration: InputDecoration(
-                labelStyle: TextStyle(color: Colors.grey[400]),
-                labelText: 'Indicatif + Numéro du paiement',
-                border: const OutlineInputBorder(),
-              ),
-            ),
-          ),
-          const SizedBox(height: 15),
-          DelayedAnimation(
-            delay: 0,
-            child: SizedBox(
-              width: MediaQuery.of(context).size.width * 0.95,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: primaryColor,
-                  shape: const StadiumBorder(),
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 13,
-                  ),
-                ),
-                child: Text(
-                  _desactive3
-                      ? (langUserPhone == "fr")
-                          ? "Patientez..."
-                          : "Wait..."
-                      : (langUserPhone == "fr")
-                          ? "Payer et Démarrer"
-                          : "Pay and Get Started",
-                  style: GoogleFonts.poppins(
-                    color: Colors.white,
-                  ),
-                ),
-                onPressed: () {
-                  if (!telIsVerified) {
-                    showConfNumeroWhatsapp(context);
-                  } else {
-                    _desactive3 ? null : newPromoReseau();
-                  }
-                },
-              ),
-            ),
-          ),
-          const SizedBox(height: 15),
-          DelayedAnimation(
-            delay: 0, // 1500,
-            child: Text(
-              (langUserPhone == "fr")
-                  ? "Pour payer par Wave ou Carte Bancaire, veuillez contacter l'Assistance Dressur par WhatsApp. Merci..."
-                  : "To pay by Wave or Credit Card, please contact Dressur Support by WhatsApp. THANKS...",
-              style: GoogleFonts.poppins(
-                fontWeight: FontWeight.w600,
-                fontSize: 12,
-                color: Colors.red,
-              ),
-              textAlign: TextAlign.center,
-            ),
+            textAlign: TextAlign.center,
           ),
         ],
       ),
