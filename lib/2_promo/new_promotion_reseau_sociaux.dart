@@ -123,6 +123,7 @@ class RegisterForm3 extends StatefulWidget {
 }
 
 class _RegisterForm3State extends State<RegisterForm3> {
+  final ScrollController _scrollController = ScrollController();
   String? selectedSocialNetwork = "";
   var nombreAdresseMailForm = 0;
   int? initialService;
@@ -391,16 +392,30 @@ class _RegisterForm3State extends State<RegisterForm3> {
     }
   }
 
-  @override
-  void initState() {
-    super.initState();
-    listeFormPromoReseau();
-  }
-
   onChangeMethodePaiement(val) async {
     setState(() {
       valueMethodePaiement = val;
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    // S'assurer que le ScrollController est attaché après le rendu initial
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        setState(() {
+          listeFormPromoReseau();
+        }); // Rafraîchir pour s'assurer que tout est prêt
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 
   @override
@@ -424,6 +439,7 @@ class _RegisterForm3State extends State<RegisterForm3> {
                   : SizedBox(
                       height: 70,
                       child: Scrollbar(
+                        controller: _scrollController,
                         thumbVisibility: true,
                         thickness: 5,
                         radius: const Radius.circular(5),
