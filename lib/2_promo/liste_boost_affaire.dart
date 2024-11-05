@@ -25,6 +25,8 @@ class Promotion {
   final String formulePromotion;
   final bool peutPayer;
   final String motif;
+  final String typePromotionAffaire;
+  final String annotherInfo;
 
   Promotion({
     required this.id,
@@ -38,6 +40,8 @@ class Promotion {
     required this.formulePromotion,
     required this.peutPayer,
     required this.motif,
+    required this.typePromotionAffaire,
+    required this.annotherInfo,
   });
 }
 
@@ -74,6 +78,10 @@ class _PromotionListPageState extends State<PromotionListPage> {
             formulePromotion: data['formulePromotion'],
             peutPayer: data['peutPayer'],
             motif: data['motif'],
+            typePromotionAffaire: data['typePromotionAffaire'],
+            annotherInfo: data['annotherInfo'] != null
+                ? jsonEncode(data['annotherInfo'])
+                : "",
           );
         }).toList();
 
@@ -86,7 +94,8 @@ class _PromotionListPageState extends State<PromotionListPage> {
       }
     } catch (e) {
       _showErrorDialog(
-          'An error occurred while fetching promotions. Please try again.');
+          'An error occurred while fetching promotions. Please try again. ::: ' +
+              e.toString());
     } finally {
       setState(() {
         _loading = false;
