@@ -3,7 +3,6 @@
 import 'package:dressur/2_promo/liste_campagne_mail.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:dressur/components/delayed_animation.dart';
 import 'package:dressur/components/constant.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
@@ -336,134 +335,110 @@ class _RegisterForm2State extends State<RegisterForm2> {
               ? const Center(
                   child: CircularProgressIndicator(),
                 )
-              : DelayedAnimation(
-                  delay: 0, // 1500,
-                  child: SelectFormField(
-                    decoration: const InputDecoration(
-                      labelText: 'Formules de Campagne Mail Payante',
-                      border: OutlineInputBorder(),
-                    ),
-                    type: SelectFormFieldType.dropdown,
-                    initialValue: '0',
+              : SelectFormField(
+                  decoration: const InputDecoration(
                     labelText: 'Formules de Campagne Mail Payante',
-                    items: listeDesFormules,
-                    onChanged: (val) => onChangeFormulBoost(val),
-                    onSaved: (val) => print(val),
+                    border: OutlineInputBorder(),
                   ),
+                  type: SelectFormFieldType.dropdown,
+                  initialValue: '0',
+                  labelText: 'Formules de Campagne Mail Payante',
+                  items: listeDesFormules,
+                  onChanged: (val) => onChangeFormulBoost(val),
+                  onSaved: (val) => print(val),
                 ),
           const SizedBox(height: 10),
-          DelayedAnimation(
-            delay: 0, // 1000,
-            child: Text(
-              _message,
-              style: GoogleFonts.poppins(
-                fontSize: 16,
-              ),
-              textAlign: TextAlign.center,
+          Text(
+            _message,
+            style: GoogleFonts.poppins(
+              fontSize: 16,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 10),
+          TextField(
+            controller: titreController,
+            decoration: InputDecoration(
+              labelText: (langUserPhone == "fr") ? "Titre" : "Title",
+              border: const OutlineInputBorder(),
             ),
           ),
           const SizedBox(height: 10),
-          DelayedAnimation(
-            delay: 0, // 1500,
-            child: TextField(
-              controller: titreController,
-              decoration: InputDecoration(
-                labelText: (langUserPhone == "fr") ? "Titre" : "Title",
-                border: const OutlineInputBorder(),
-              ),
+          TextField(
+            controller: sujetController,
+            decoration: InputDecoration(
+              labelText: (langUserPhone == "fr") ? "Sujet" : "Subject",
+              border: const OutlineInputBorder(),
             ),
           ),
           const SizedBox(height: 10),
-          DelayedAnimation(
-            delay: 0, // 1500,
-            child: TextField(
-              controller: sujetController,
-              decoration: InputDecoration(
-                labelText: (langUserPhone == "fr") ? "Sujet" : "Subject",
-                border: const OutlineInputBorder(),
-              ),
+          TextField(
+            readOnly: true,
+            controller: replytoController,
+            decoration: InputDecoration(
+              labelText: (langUserPhone == "fr") ? "Réponde à" : "Reply to",
+              border: const OutlineInputBorder(),
             ),
           ),
           const SizedBox(height: 10),
-          DelayedAnimation(
-            delay: 0, // 1500,
-            child: TextField(
-              readOnly: true,
-              controller: replytoController,
-              decoration: InputDecoration(
-                labelText: (langUserPhone == "fr") ? "Réponde à" : "Reply to",
-                border: const OutlineInputBorder(),
-              ),
+          TextField(
+            maxLines: 3,
+            minLines: 1,
+            controller: sendtoController,
+            decoration: InputDecoration(
+              labelText:
+                  (langUserPhone == "fr") ? "Destinataires" : "Recipients",
+              helperText: (langUserPhone == "fr")
+                  ? "Séparez les adresses par des virgules"
+                  : "Separate addresses with commas",
+              border: const OutlineInputBorder(),
             ),
           ),
           const SizedBox(height: 10),
-          DelayedAnimation(
-            delay: 0, // 1500,
-            child: TextField(
-              maxLines: 3,
-              minLines: 1,
-              controller: sendtoController,
-              decoration: InputDecoration(
-                labelText:
-                    (langUserPhone == "fr") ? "Destinataires" : "Recipients",
-                helperText: (langUserPhone == "fr")
-                    ? "Séparez les adresses par des virgules"
-                    : "Separate addresses with commas",
-                border: const OutlineInputBorder(),
-              ),
+          TextField(
+            maxLines: 50,
+            minLines: 1,
+            controller: contentmailController,
+            decoration: InputDecoration(
+              labelText: (langUserPhone == "fr")
+                  ? "Contenu du mail"
+                  : "Content of the email",
+              border: const OutlineInputBorder(),
             ),
           ),
           const SizedBox(height: 10),
-          DelayedAnimation(
-            delay: 0, // 1500,
-            child: TextField(
-              maxLines: 50,
-              minLines: 1,
-              controller: contentmailController,
-              decoration: InputDecoration(
-                labelText: (langUserPhone == "fr")
-                    ? "Contenu du mail"
-                    : "Content of the email",
-                border: const OutlineInputBorder(),
-              ),
-            ),
-          ),
-          const SizedBox(height: 10),
-          DelayedAnimation(
-            delay: 0,
-            child: SizedBox(
-              width: MediaQuery.of(context).size.width * 0.95,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: primaryColor,
-                  shape: const StadiumBorder(),
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 13,
-                  ),
+          SizedBox(
+            width: MediaQuery.of(context).size.width * 0.95,
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: primaryColor,
+                shape: const StadiumBorder(),
+                padding: const EdgeInsets.symmetric(
+                  vertical: 13,
                 ),
-                child: Text(
-                  _desactive2
-                      ? (langUserPhone == "fr")
-                          ? "Patientez..."
-                          : "Wait..."
-                      : (langUserPhone == "fr")
-                          ? "Envoyer"
-                          : "Send",
-                  style: GoogleFonts.poppins(
-                    color: Colors.white,
-                  ),
-                ),
-                onPressed: () {
-                  if (!mailIsVerified) {
-                    warningNoti(
-                        "Configuration du compte",
-                        "Veuillez d'abord confirmer votre adresse mail...",
-                        context);
-                  } else {
-                    _desactive2 ? null : newCampagneMail();
-                  }
-                },
               ),
+              child: Text(
+                _desactive2
+                    ? (langUserPhone == "fr")
+                        ? "Patientez..."
+                        : "Wait..."
+                    : (langUserPhone == "fr")
+                        ? "Envoyer"
+                        : "Send",
+                style: GoogleFonts.poppins(
+                  color: Colors.white,
+                ),
+              ),
+              onPressed: () {
+                if (!mailIsVerified) {
+                  warningNoti(
+                      "Configuration du compte",
+                      "Veuillez d'abord confirmer votre adresse mail...",
+                      context);
+                } else {
+                  _desactive2 ? null : newCampagneMail();
+                }
+              },
             ),
           ),
           const SizedBox(height: 10),

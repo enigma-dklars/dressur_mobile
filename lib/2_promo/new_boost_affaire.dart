@@ -5,7 +5,6 @@ import 'dart:convert' as convert;
 import 'package:http/http.dart' as http;
 import 'dart:io';
 import 'dart:async';
-import 'package:dressur/components/delayed_animation.dart';
 import 'package:dressur/components/padding_and_divider.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -97,20 +96,17 @@ class _PromotionFormPageState extends State<PromotionFormPage> {
               ),
             ),
             const SizedBox(height: 10),
-            DelayedAnimation(
-              delay: 0, // 1500,
-              child: SelectFormField(
-                decoration: const InputDecoration(
-                  labelText: 'Type Promotion Affaire',
-                  border: OutlineInputBorder(),
-                ),
-                type: SelectFormFieldType.dropdown,
-                initialValue: 'produit_service',
+            SelectFormField(
+              decoration: const InputDecoration(
                 labelText: 'Type Promotion Affaire',
-                items: listeTypePromoAffaire,
-                onChanged: (val) => onChangeTypePromoAffaire(val),
-                onSaved: (val) => print(val),
+                border: OutlineInputBorder(),
               ),
+              type: SelectFormFieldType.dropdown,
+              initialValue: 'produit_service',
+              labelText: 'Type Promotion Affaire',
+              items: listeTypePromoAffaire,
+              onChanged: (val) => onChangeTypePromoAffaire(val),
+              onSaved: (val) => print(val),
             ),
             const SizedBox(height: 5),
             DressurDivider(),
@@ -355,31 +351,25 @@ class _ProduitsServicesState extends State<ProduitsServices> {
               ? const Center(
                   child: CircularProgressIndicator(),
                 )
-              : DelayedAnimation(
-                  delay: 0, // 1500,
-                  child: SelectFormField(
-                    decoration: const InputDecoration(
-                      labelText: 'Formules de Promotion Affaire',
-                      border: OutlineInputBorder(),
-                    ),
-                    type: SelectFormFieldType.dropdown,
-                    initialValue: '0',
+              : SelectFormField(
+                  decoration: const InputDecoration(
                     labelText: 'Formules de Promotion Affaire',
-                    items: listeDesFormules,
-                    onChanged: (val) => onChangeFormulBoost(val),
-                    onSaved: (val) => print(val),
+                    border: OutlineInputBorder(),
                   ),
+                  type: SelectFormFieldType.dropdown,
+                  initialValue: '0',
+                  labelText: 'Formules de Promotion Affaire',
+                  items: listeDesFormules,
+                  onChanged: (val) => onChangeFormulBoost(val),
+                  onSaved: (val) => print(val),
                 ),
           const SizedBox(height: 20),
-          DelayedAnimation(
-            delay: 0, // 1000,
-            child: Text(
-              _message,
-              style: GoogleFonts.poppins(
-                fontSize: 16,
-              ),
-              textAlign: TextAlign.center,
+          Text(
+            _message,
+            style: GoogleFonts.poppins(
+              fontSize: 16,
             ),
+            textAlign: TextAlign.center,
           ),
           const SizedBox(height: 10),
           ElevatedButton(
@@ -466,30 +456,24 @@ class _ProduitsServicesState extends State<ProduitsServices> {
           ),
           const SizedBox(height: 16.0),
           if (load == true) ...[
-            DelayedAnimation(
-              delay: 0, // 1500,
-              child: SelectFormField(
-                decoration: const InputDecoration(
-                  labelText: 'Formules de Promotion Affaire Payant',
-                  border: OutlineInputBorder(),
-                ),
-                type: SelectFormFieldType.dropdown,
-                initialValue: 'mtn',
-                labelText: 'Methode de paiement mobile',
-                items: listeMethodePaiement,
-                onChanged: (val) => onChangeMethodePaiement(val),
-                onSaved: (val) => print(val),
+            SelectFormField(
+              decoration: const InputDecoration(
+                labelText: 'Formules de Promotion Affaire Payant',
+                border: OutlineInputBorder(),
               ),
+              type: SelectFormFieldType.dropdown,
+              initialValue: 'mtn',
+              labelText: 'Methode de paiement mobile',
+              items: listeMethodePaiement,
+              onChanged: (val) => onChangeMethodePaiement(val),
+              onSaved: (val) => print(val),
             ),
             const SizedBox(height: 20),
-            DelayedAnimation(
-              delay: 0, // 1500,
-              child: TextField(
-                controller: telController,
-                decoration: const InputDecoration(
-                  labelText: 'Indicatif + Numéro du paiement',
-                  border: OutlineInputBorder(),
-                ),
+            TextField(
+              controller: telController,
+              decoration: const InputDecoration(
+                labelText: 'Indicatif + Numéro du paiement',
+                border: OutlineInputBorder(),
               ),
             ),
             const SizedBox(height: 10),
@@ -774,49 +758,46 @@ class _DemandesEmploiState extends State<DemandesEmploi> {
             ),
           ),
           const SizedBox(height: 10),
-          DelayedAnimation(
-            delay: 0, // 4000,
-            child: SizedBox(
-              width: MediaQuery.of(context).size.width * 0.90,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: primaryColor,
-                  shape: const StadiumBorder(),
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 16,
-                  ),
+          SizedBox(
+            width: MediaQuery.of(context).size.width * 0.90,
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: primaryColor,
+                shape: const StadiumBorder(),
+                padding: const EdgeInsets.symmetric(
+                  vertical: 16,
                 ),
-                child: Text(
-                  _desactive
-                      ? (langUserPhone == "fr")
-                          ? "Patientez..."
-                          : "Wait..."
-                      : (langUserPhone == "fr")
-                          ? "ENREGISTRER"
-                          : "SAVED",
-                  style: GoogleFonts.poppins(
-                    fontWeight: FontWeight.w400,
-                    color: Colors.white,
-                  ),
-                ),
-                onPressed: () {
-                  _desactive
-                      ? null
-                      : add_dmd_emploi(
-                          titre_demande_poste_rechercher_controller.text,
-                          description_profil_demandeur_controller.text,
-                          competence_qualification_controller.text,
-                          niveau_experience_controller.text,
-                          secteur_activite_rechercher_controller.text,
-                          type_contrat_rechercher_controller.text,
-                          localisation_souhaite_controller.text,
-                          salaire_souhaite_controller.text,
-                          langues_parle_controller.text,
-                          lien_portfolio_controller.text,
-                          coordonne_demandeur_controller.text,
-                        );
-                },
               ),
+              child: Text(
+                _desactive
+                    ? (langUserPhone == "fr")
+                        ? "Patientez..."
+                        : "Wait..."
+                    : (langUserPhone == "fr")
+                        ? "ENREGISTRER"
+                        : "SAVED",
+                style: GoogleFonts.poppins(
+                  fontWeight: FontWeight.w400,
+                  color: Colors.white,
+                ),
+              ),
+              onPressed: () {
+                _desactive
+                    ? null
+                    : add_dmd_emploi(
+                        titre_demande_poste_rechercher_controller.text,
+                        description_profil_demandeur_controller.text,
+                        competence_qualification_controller.text,
+                        niveau_experience_controller.text,
+                        secteur_activite_rechercher_controller.text,
+                        type_contrat_rechercher_controller.text,
+                        localisation_souhaite_controller.text,
+                        salaire_souhaite_controller.text,
+                        langues_parle_controller.text,
+                        lien_portfolio_controller.text,
+                        coordonne_demandeur_controller.text,
+                      );
+              },
             ),
           ),
         ],
@@ -1110,51 +1091,48 @@ class _OffresEmploiState extends State<OffresEmploi> {
             ),
           ),
           const SizedBox(height: 10),
-          DelayedAnimation(
-            delay: 0, // 4000,
-            child: SizedBox(
-              width: MediaQuery.of(context).size.width * 0.90,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: primaryColor,
-                  shape: const StadiumBorder(),
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 16,
-                  ),
+          SizedBox(
+            width: MediaQuery.of(context).size.width * 0.90,
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: primaryColor,
+                shape: const StadiumBorder(),
+                padding: const EdgeInsets.symmetric(
+                  vertical: 16,
                 ),
-                child: Text(
-                  _desactive
-                      ? (langUserPhone == "fr")
-                          ? "Patientez..."
-                          : "Wait..."
-                      : (langUserPhone == "fr")
-                          ? "ENREGISTRER"
-                          : "SAVED",
-                  style: GoogleFonts.poppins(
-                    fontWeight: FontWeight.w400,
-                    color: Colors.white,
-                  ),
-                ),
-                onPressed: () {
-                  _desactive
-                      ? null
-                      : add_offre_emploi(
-                          titre_poste_controller.text,
-                          description_poste_controller.text,
-                          competences_requises_controller.text,
-                          type_contrat_controller.text,
-                          lieu_travail_controller.text,
-                          salaire_controller.text,
-                          niveau_experience_controller.text,
-                          horaire_travail_controller.text,
-                          avantages_controller.text,
-                          dure_contrat_not_cdi_controller.text,
-                          contact_emploiyeur_controller.text,
-                          date_limite_candidature_controller.text,
-                          Lien_information_otionel_controller.text,
-                        );
-                },
               ),
+              child: Text(
+                _desactive
+                    ? (langUserPhone == "fr")
+                        ? "Patientez..."
+                        : "Wait..."
+                    : (langUserPhone == "fr")
+                        ? "ENREGISTRER"
+                        : "SAVED",
+                style: GoogleFonts.poppins(
+                  fontWeight: FontWeight.w400,
+                  color: Colors.white,
+                ),
+              ),
+              onPressed: () {
+                _desactive
+                    ? null
+                    : add_offre_emploi(
+                        titre_poste_controller.text,
+                        description_poste_controller.text,
+                        competences_requises_controller.text,
+                        type_contrat_controller.text,
+                        lieu_travail_controller.text,
+                        salaire_controller.text,
+                        niveau_experience_controller.text,
+                        horaire_travail_controller.text,
+                        avantages_controller.text,
+                        dure_contrat_not_cdi_controller.text,
+                        contact_emploiyeur_controller.text,
+                        date_limite_candidature_controller.text,
+                        Lien_information_otionel_controller.text,
+                      );
+              },
             ),
           ),
         ],

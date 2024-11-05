@@ -668,69 +668,61 @@ class _PaymentGratuitPageState extends State<PaymentGratuitPage> {
                 ? const Center(
                     child: CircularProgressIndicator(),
                   )
-                : DelayedAnimation(
-                    delay: 0, // 1500,
-                    child: SelectFormField(
-                      decoration: const InputDecoration(
-                        labelText: 'Formules de Promotion Affaire Payant',
-                        border: OutlineInputBorder(),
-                      ),
-                      type: SelectFormFieldType.dropdown,
-                      initialValue: '0',
-                      labelText: 'Formules de Promotion Affaire',
-                      items: listeDesFormules,
-                      onChanged: (val) => onChangeFormulBoost(val),
-                      onSaved: (val) => print(val),
+                : SelectFormField(
+                    decoration: const InputDecoration(
+                      labelText: 'Formules de Promotion Affaire Payant',
+                      border: OutlineInputBorder(),
                     ),
+                    type: SelectFormFieldType.dropdown,
+                    initialValue: '0',
+                    labelText: 'Formules de Promotion Affaire',
+                    items: listeDesFormules,
+                    onChanged: (val) => onChangeFormulBoost(val),
+                    onSaved: (val) => print(val),
                   ),
             const SizedBox(height: 20),
-            DelayedAnimation(
-              delay: 0, // 1000,
-              child: Text(
-                _message,
-                style: GoogleFonts.poppins(
-                  fontSize: 16,
-                ),
-                textAlign: TextAlign.center,
+            Text(
+              _message,
+              style: GoogleFonts.poppins(
+                fontSize: 16,
               ),
+              textAlign: TextAlign.center,
             ),
             const SizedBox(height: 20),
-            DelayedAnimation(
-                delay: 0,
-                child: SizedBox(
-                  width: MediaQuery.of(context).size.width * 0.95,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: primaryColor,
-                      shape: const StadiumBorder(),
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 13,
-                      ),
-                    ),
-                    child: Text(
-                      _desactive
-                          ? (langUserPhone == "fr")
-                              ? "Patientez..."
-                              : "Wait..."
-                          : "BOOSTER",
-                      style: GoogleFonts.poppins(
-                        color: Colors.white,
-                      ),
-                    ),
-                    onPressed: () {
-                      if (!telIsVerified) {
-                        showConfNumeroWhatsapp(context);
-                      } else if (!mailIsVerified) {
-                        warningNoti(
-                            "Configuration du compte",
-                            "Veuillez d'abord confirmer votre adresse mail...",
-                            context);
-                      } else {
-                        _desactive ? null : newPromo();
-                      }
-                    },
+            SizedBox(
+              width: MediaQuery.of(context).size.width * 0.95,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: primaryColor,
+                  shape: const StadiumBorder(),
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 13,
                   ),
-                )),
+                ),
+                child: Text(
+                  _desactive
+                      ? (langUserPhone == "fr")
+                          ? "Patientez..."
+                          : "Wait..."
+                      : "BOOSTER",
+                  style: GoogleFonts.poppins(
+                    color: Colors.white,
+                  ),
+                ),
+                onPressed: () {
+                  if (!telIsVerified) {
+                    showConfNumeroWhatsapp(context);
+                  } else if (!mailIsVerified) {
+                    warningNoti(
+                        "Configuration du compte",
+                        "Veuillez d'abord confirmer votre adresse mail...",
+                        context);
+                  } else {
+                    _desactive ? null : newPromo();
+                  }
+                },
+              ),
+            ),
           ],
         ),
       ),

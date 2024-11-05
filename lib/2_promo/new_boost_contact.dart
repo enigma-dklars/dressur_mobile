@@ -4,7 +4,6 @@ import 'package:dressur/2_promo/liste_boost_contact.dart';
 import 'package:dressur/components/noti_sys.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:dressur/components/delayed_animation.dart';
 import 'package:dressur/components/constant.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
@@ -90,17 +89,14 @@ class _NewBoostContactPageState extends State<NewBoostContactPage> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   const SizedBox(height: 20),
-                  DelayedAnimation(
-                    delay: 0, // 1000,
-                    child: Text(
-                      (langUserPhone == "fr")
-                          ? "Après BOOST, votre numéro sera visible dans les pays que vous avez choisie au niveau de vos préférences pendant un certain temps."
-                          : "After BOOST, your number will be visible in the countries you have chosen in your preferences for a certain time.",
-                      style: GoogleFonts.poppins(
-                        fontSize: 16,
-                      ),
-                      textAlign: TextAlign.center,
+                  Text(
+                    (langUserPhone == "fr")
+                        ? "Après BOOST, votre numéro sera visible dans les pays que vous avez choisie au niveau de vos préférences pendant un certain temps."
+                        : "After BOOST, your number will be visible in the countries you have chosen in your preferences for a certain time.",
+                    style: GoogleFonts.poppins(
+                      fontSize: 16,
                     ),
+                    textAlign: TextAlign.center,
                   ),
 
                   const SizedBox(height: 20),
@@ -333,64 +329,56 @@ class _RegisterFormState extends State<RegisterForm> {
               ? const Center(
                   child: CircularProgressIndicator(),
                 )
-              : DelayedAnimation(
-                  delay: 0, // 1500,
-                  child: SelectFormField(
-                    decoration: const InputDecoration(
-                      labelText: 'Formules de Boost',
-                      border: OutlineInputBorder(),
-                    ),
-                    type: SelectFormFieldType.dropdown,
-                    initialValue: '0',
+              : SelectFormField(
+                  decoration: const InputDecoration(
                     labelText: 'Formules de Boost',
-                    items: listeDesFormules,
-                    onChanged: (val) => onChangeFormulBoost(val),
-                    onSaved: (val) => print(val),
+                    border: OutlineInputBorder(),
                   ),
+                  type: SelectFormFieldType.dropdown,
+                  initialValue: '0',
+                  labelText: 'Formules de Boost',
+                  items: listeDesFormules,
+                  onChanged: (val) => onChangeFormulBoost(val),
+                  onSaved: (val) => print(val),
                 ),
           const SizedBox(height: 20),
-          DelayedAnimation(
-            delay: 0, // 1000,
-            child: Text(
-              _message,
-              style: GoogleFonts.poppins(
-                fontSize: 16,
-              ),
-              textAlign: TextAlign.center,
+          Text(
+            _message,
+            style: GoogleFonts.poppins(
+              fontSize: 16,
             ),
+            textAlign: TextAlign.center,
           ),
           const SizedBox(height: 20),
-          DelayedAnimation(
-              delay: 0,
-              child: SizedBox(
-                width: MediaQuery.of(context).size.width * 0.95,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: primaryColor,
-                    shape: const StadiumBorder(),
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 13,
-                    ),
-                  ),
-                  child: Text(
-                    _desactive
-                        ? (langUserPhone == "fr")
-                            ? "Patientez..."
-                            : "Wait..."
-                        : "BOOSTER",
-                    style: GoogleFonts.poppins(
-                      color: Colors.white,
-                    ),
-                  ),
-                  onPressed: () {
-                    if (!telIsVerified) {
-                      showConfNumeroWhatsapp(context);
-                    } else {
-                      _desactive ? null : newBoost();
-                    }
-                  },
+          SizedBox(
+            width: MediaQuery.of(context).size.width * 0.95,
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: primaryColor,
+                shape: const StadiumBorder(),
+                padding: const EdgeInsets.symmetric(
+                  vertical: 13,
                 ),
-              )),
+              ),
+              child: Text(
+                _desactive
+                    ? (langUserPhone == "fr")
+                        ? "Patientez..."
+                        : "Wait..."
+                    : "BOOSTER",
+                style: GoogleFonts.poppins(
+                  color: Colors.white,
+                ),
+              ),
+              onPressed: () {
+                if (!telIsVerified) {
+                  showConfNumeroWhatsapp(context);
+                } else {
+                  _desactive ? null : newBoost();
+                }
+              },
+            ),
+          ),
         ],
       ),
     );
@@ -654,109 +642,91 @@ class _RegisterForm2State extends State<RegisterForm2> {
               ? const Center(
                   child: CircularProgressIndicator(),
                 )
-              : DelayedAnimation(
-                  delay: 0, // 1500,
-                  child: SelectFormField(
-                    decoration: const InputDecoration(
-                      labelText: 'Formules de Boost Payant',
-                      border: OutlineInputBorder(),
-                    ),
-                    type: SelectFormFieldType.dropdown,
-                    initialValue: '0',
+              : SelectFormField(
+                  decoration: const InputDecoration(
                     labelText: 'Formules de Boost Payant',
-                    items: listeDesFormules,
-                    onChanged: (val) => onChangeFormulBoost(val),
-                    onSaved: (val) => print(val),
+                    border: OutlineInputBorder(),
                   ),
+                  type: SelectFormFieldType.dropdown,
+                  initialValue: '0',
+                  labelText: 'Formules de Boost Payant',
+                  items: listeDesFormules,
+                  onChanged: (val) => onChangeFormulBoost(val),
+                  onSaved: (val) => print(val),
                 ),
           const SizedBox(height: 10),
-          DelayedAnimation(
-            delay: 0, // 1000,
-            child: Text(
-              _message,
-              style: GoogleFonts.poppins(
-                fontSize: 16,
-              ),
-              textAlign: TextAlign.center,
+          Text(
+            _message,
+            style: GoogleFonts.poppins(
+              fontSize: 16,
             ),
+            textAlign: TextAlign.center,
           ),
           const SizedBox(height: 10),
-          DelayedAnimation(
-            delay: 0, // 1500,
-            child: SelectFormField(
-              decoration: const InputDecoration(
-                labelText: 'Methode de paiement mobile',
-                border: OutlineInputBorder(),
-              ),
-              type: SelectFormFieldType.dropdown,
-              initialValue: 'mtn',
+          SelectFormField(
+            decoration: const InputDecoration(
               labelText: 'Methode de paiement mobile',
-              items: listeMethodePaiement,
-              onChanged: (val) => onChangeMethodePaiement(val),
-              onSaved: (val) => print(val),
+              border: OutlineInputBorder(),
+            ),
+            type: SelectFormFieldType.dropdown,
+            initialValue: 'mtn',
+            labelText: 'Methode de paiement mobile',
+            items: listeMethodePaiement,
+            onChanged: (val) => onChangeMethodePaiement(val),
+            onSaved: (val) => print(val),
+          ),
+          const SizedBox(height: 10),
+          TextField(
+            controller: telController,
+            decoration: InputDecoration(
+              labelStyle: TextStyle(color: Colors.grey[400]),
+              labelText: 'Indicatif + Numéro du paiement',
+              border: const OutlineInputBorder(),
             ),
           ),
           const SizedBox(height: 10),
-          DelayedAnimation(
-            delay: 0, // 1500,
-            child: TextField(
-              controller: telController,
-              decoration: InputDecoration(
-                labelStyle: TextStyle(color: Colors.grey[400]),
-                labelText: 'Indicatif + Numéro du paiement',
-                border: const OutlineInputBorder(),
-              ),
-            ),
-          ),
-          const SizedBox(height: 10),
-          DelayedAnimation(
-            delay: 0,
-            child: SizedBox(
-              width: MediaQuery.of(context).size.width * 0.95,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: primaryColor,
-                  shape: const StadiumBorder(),
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 13,
-                  ),
+          SizedBox(
+            width: MediaQuery.of(context).size.width * 0.95,
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: primaryColor,
+                shape: const StadiumBorder(),
+                padding: const EdgeInsets.symmetric(
+                  vertical: 13,
                 ),
-                child: Text(
-                  _desactive2
-                      ? (langUserPhone == "fr")
-                          ? "Patientez..."
-                          : "Wait..."
-                      : (langUserPhone == "fr")
-                          ? "Payer et Booster"
-                          : "Pay and Boost",
-                  style: GoogleFonts.poppins(
-                    color: Colors.white,
-                  ),
-                ),
-                onPressed: () {
-                  if (!telIsVerified) {
-                    showConfNumeroWhatsapp(context);
-                  } else {
-                    _desactive2 ? null : newBoostPayant();
-                  }
-                },
               ),
+              child: Text(
+                _desactive2
+                    ? (langUserPhone == "fr")
+                        ? "Patientez..."
+                        : "Wait..."
+                    : (langUserPhone == "fr")
+                        ? "Payer et Booster"
+                        : "Pay and Boost",
+                style: GoogleFonts.poppins(
+                  color: Colors.white,
+                ),
+              ),
+              onPressed: () {
+                if (!telIsVerified) {
+                  showConfNumeroWhatsapp(context);
+                } else {
+                  _desactive2 ? null : newBoostPayant();
+                }
+              },
             ),
           ),
           const SizedBox(height: 10),
-          DelayedAnimation(
-            delay: 0, // 1500,
-            child: Text(
-              (langUserPhone == "fr")
-                  ? "Pour payer par Wave ou Carte Bancaire, veuillez contacter l'Assistance Dressur par WhatsApp. Merci..."
-                  : "To pay by Wave or Credit Card, please contact Dressur Support by WhatsApp. THANKS...",
-              style: GoogleFonts.poppins(
-                fontWeight: FontWeight.w600,
-                fontSize: 12,
-                color: Colors.red[400],
-              ),
-              textAlign: TextAlign.center,
+          Text(
+            (langUserPhone == "fr")
+                ? "Pour payer par Wave ou Carte Bancaire, veuillez contacter l'Assistance Dressur par WhatsApp. Merci..."
+                : "To pay by Wave or Credit Card, please contact Dressur Support by WhatsApp. THANKS...",
+            style: GoogleFonts.poppins(
+              fontWeight: FontWeight.w600,
+              fontSize: 12,
+              color: Colors.red[400],
             ),
+            textAlign: TextAlign.center,
           ),
         ],
       ),
