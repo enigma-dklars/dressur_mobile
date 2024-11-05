@@ -2,6 +2,7 @@
 
 import 'dart:async';
 import 'dart:convert';
+import 'dart:developer';
 import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dressur/1_reception/liste_contact.dart';
@@ -151,6 +152,7 @@ class _ActuPageState extends State<ActuPage> {
         setState(() {
           initUserInformations(data['user']);
           lesPublicites = data['user']["lesPublicites"];
+          print(jsonDecode(lesPublicites).length);
           _futureAdvertisements = fetchAdvertisements();
           _loading = false;
         });
@@ -201,6 +203,7 @@ class _ActuPageState extends State<ActuPage> {
       }).toList();
       // Mélanger l'ordre des éléments
       advertisements.shuffle();
+      inspect(advertisements);
       return advertisements;
     } else {
       havePublicites = false;
