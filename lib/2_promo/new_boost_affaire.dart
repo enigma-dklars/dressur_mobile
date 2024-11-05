@@ -578,6 +578,17 @@ class _DemandesEmploiState extends State<DemandesEmploi> {
                   ? "Votre demande d'emploi a été enregistrée et sera publiée après accord d'un des administrateurs de Dressur."
                   : "Your job application has been registered and will be published after approval by one of Dressur's administrators.",
               context);
+          titre_demande_poste_rechercher_controller.clear();
+          description_profil_demandeur_controller.clear();
+          competence_qualification_controller.clear();
+          niveau_experience_controller.clear();
+          secteur_activite_rechercher_controller.clear();
+          type_contrat_rechercher_controller.clear();
+          localisation_souhaite_controller.clear();
+          salaire_souhaite_controller.clear();
+          langues_parle_controller.clear();
+          lien_portfolio_controller.clear();
+          coordonne_demandeur_controller.clear();
         }
       } else {
         if (langUserPhone != "fr") {
@@ -889,6 +900,19 @@ class _OffresEmploiState extends State<OffresEmploi> {
                   ? "Votre offre d'emploi a été enregistrée et sera publiée après accord d'un des administrateurs de Dressur."
                   : "Your job offer has been recorded and will be published after approval from one of the Dressur administrators.",
               context);
+          titre_poste_controller.clear();
+          description_poste_controller.clear();
+          competences_requises_controller.clear();
+          type_contrat_controller.clear();
+          lieu_travail_controller.clear();
+          salaire_controller.clear();
+          niveau_experience_controller.clear();
+          horaire_travail_controller.clear();
+          avantages_controller.clear();
+          dure_contrat_not_cdi_controller.clear();
+          contact_emploiyeur_controller.clear();
+          date_limite_candidature_controller.clear();
+          Lien_information_otionel_controller.clear();
         }
       } else {
         if (langUserPhone != "fr") {
