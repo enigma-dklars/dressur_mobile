@@ -444,6 +444,8 @@ class _RegisterForm3State extends State<RegisterForm3> {
                         thickness: 5,
                         radius: const Radius.circular(5),
                         child: SingleChildScrollView(
+                          controller:
+                              _scrollController, // Attach the ScrollController here
                           padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
                           scrollDirection: Axis.horizontal,
                           child: Padding(
