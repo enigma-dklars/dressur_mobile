@@ -3,6 +3,7 @@
 import 'dart:convert';
 import 'dart:convert' as convert;
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:dressur/2_promo/modification_produit_services.dart';
 import 'package:dressur/components/delayed_animation.dart';
 import 'package:dressur/components/noti.dart';
 import 'package:dressur/components/noti_sys.dart';
@@ -341,7 +342,7 @@ class _PromotionListPageState extends State<PromotionListPage> {
                         context,
                         MaterialPageRoute(
                           builder: (context) =>
-                              PaymentPayantPage(promotion: promotion),
+                              ModificationProduitServicesPage(promotion: promotion),
                         ),
                       );
                     },
