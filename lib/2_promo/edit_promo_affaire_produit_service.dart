@@ -27,7 +27,6 @@ class _ModificationProduitServicesPageState
   File? _imageFile;
   final TextEditingController _textEditingController = TextEditingController();
   bool _isSending = false;
-  String _message = "";
   dynamic idFormulBoost = 1;
   dynamic valueMethodePaiement = "mtn";
   bool loadingFormuleGratuit = false;
@@ -42,7 +41,6 @@ class _ModificationProduitServicesPageState
   void initState() {
     super.initState();
     _textEditingController.text = widget.promotion.description;
-    listeFormulePromoAffaire();
   }
 
   bool isImageSquare(File imageFile) {
@@ -140,11 +138,6 @@ class _ModificationProduitServicesPageState
       );
 
       request.files.add(multipartFile);
-    } else {
-      // final multipartFile =
-      //     http.MultipartFile('image', null, null, filename: null);
-
-      // request.files.add(multipartFile);
     }
 
     final response = await request.send();
@@ -155,6 +148,12 @@ class _ModificationProduitServicesPageState
       if (data["error"] == true) {
         dangerNoti(data["titre"], data["message"], context);
       } else {
+        Navigator.pop(context);
+        Navigator.pop(context);
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => PromotionListPage()),
+        );
         successNoti(
             "Good",
             (langUserPhone == "fr")
@@ -169,43 +168,6 @@ class _ModificationProduitServicesPageState
       });
     } else {
       dangerNoti("Attention !!!", 'Erreur : ${response.statusCode}', context);
-    }
-  }
-
-  void listeFormulePromoAffaire() async {
-    final isConnected = await isConnectedToInternet();
-    if (!isConnected) {
-      dangerNoti(
-          langUserPhone == "fr" ? "Erreur!" : "Mistake!",
-          langUserPhone == "fr"
-              ? "Vous n'ètes pas connecté a internet."
-              : "You are not connected to the internet.",
-          context);
-      return;
-    }
-
-    setState(() {
-      loadingFormuleGratuit = true;
-    });
-
-    final response = await http.MultipartRequest(
-            'POST', Uri.parse('$generalRouteForApi/listeFormulePromoAffaire'))
-        .send();
-
-    if (response.statusCode == 200) {
-      final data = jsonDecode(await response.stream.bytesToString());
-      if (data["error"] == false) {
-        setState(() {
-          loadingFormuleGratuit = false;
-          listeDesFormules =
-              List<Map<String, dynamic>>.from(data["listeFormulBoost"]);
-          _message = langUserPhone == "fr"
-              ? "Veuillez choisir une formule."
-              : "Please choose a plan.";
-        });
-      }
-    } else {
-      dangerNoti("Erreur", 'Erreur lors du chargement des formules', context);
     }
   }
 
@@ -229,9 +191,6 @@ class _ModificationProduitServicesPageState
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text(_message,
-                style: GoogleFonts.poppins(fontSize: 16),
-                textAlign: TextAlign.center),
             ElevatedButton(
               onPressed: _isSending ? null : _selectImage,
               style: ElevatedButton.styleFrom(
