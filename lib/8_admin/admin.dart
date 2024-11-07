@@ -99,33 +99,6 @@ class _AdministrationPageState extends State<AdministrationPage> {
               GestureDetector(
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.red,
-                    shape: const StadiumBorder(),
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 13,
-                    ),
-                  ),
-                  child: Text(
-                    "Les valeurs Env",
-                    style: GoogleFonts.poppins(
-                      color: Colors.white,
-                      fontSize: 15,
-                    ),
-                  ),
-                  onPressed: () async {
-                    final Uri _url =
-                        Uri.parse("$generalApiDomaine/admin/interface");
-                    if (!await launchUrl(_url,
-                        mode: LaunchMode.externalApplication)) {
-                      throw 'Could not launch $_url';
-                    }
-                  },
-                ),
-              ),
-              const SizedBox(height: 5),
-              GestureDetector(
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
                     backgroundColor: _desactive2 ? Colors.blue : Colors.red,
                     shape: const StadiumBorder(),
                     padding: const EdgeInsets.symmetric(
