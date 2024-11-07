@@ -90,12 +90,21 @@ class _ModificationProduitServicesPageState
       return;
     }
 
-    if (_textEditingController.text.isEmpty || _imageFile == null) {
+    if (_textEditingController.text.isEmpty && _imageFile == null) {
       dangerNoti(
           "Attention !!!",
-          langUserPhone == "fr"
+          (langUserPhone == "fr")
               ? 'Veuillez entrer un texte et sélectionner une image.'
               : 'Please enter a text and select an image.',
+          context);
+      return;
+    }
+    if (_textEditingController.text.isEmpty) {
+      dangerNoti(
+          "Attention !!!",
+          (langUserPhone == "fr")
+              ? 'Veuillez entrer un texte.'
+              : 'Please enter a text.',
           context);
       return;
     }
@@ -104,44 +113,53 @@ class _ModificationProduitServicesPageState
       _isSending = true;
     });
 
-    final url = Uri.parse('$generalRouteForApi/addProduitService');
+    final url = Uri.parse('$generalRouteForApi/editProduitService');
+
     final request = http.MultipartRequest('POST', url);
-    request.fields.addAll({
-      'idFormulePromoAffaire': idFormulBoost.toString(),
-      'text': _textEditingController.text,
-      'uid': widget.promotion.id,
-      'langUserPhone': langUserPhone.toString(),
-      'mode': load ? "payant" : "gratuit",
-      'paymentMethod': valueMethodePaiement,
-      'tel': telController.text,
-    });
+    request.fields['idPromoAffaire'] = widget.promotion.id;
+    request.fields['text'] = _textEditingController.text;
+    request.fields['uid'] = uidUser;
+    request.fields['langUserPhone'] = langUserPhone.toString();
 
-    final tempDir = await getTemporaryDirectory();
-    final filePath = '${tempDir.path}/temp_image.jpg';
-    final image = img.decodeImage(_imageFile!.readAsBytesSync());
-    final compressedImage = img.encodeJpg(image!, quality: 85);
-    File(filePath).writeAsBytesSync(compressedImage);
+    if (_imageFile != null) {
+      final tempDir = await getTemporaryDirectory();
+      final filePath = '${tempDir.path}/temp_image.jpg';
+      final image = img.decodeImage(_imageFile!.readAsBytesSync());
+      final compressedImage = img.encodeJpg(image!, quality: 85);
+      File(filePath).writeAsBytesSync(compressedImage);
 
-    final imageStream =
-        http.ByteStream(Stream.castFrom(File(filePath).openRead()));
-    final imageLength = await File(filePath).length();
+      final imageStream =
+          http.ByteStream(Stream.castFrom(File(filePath).openRead()));
+      final imageLength = await File(filePath).length();
 
-    final multipartFile = http.MultipartFile('image', imageStream, imageLength,
-        filename: _imageFile!.path);
-    request.files.add(multipartFile);
+      final multipartFile = http.MultipartFile(
+        'image',
+        imageStream,
+        imageLength,
+        filename: _imageFile!.path,
+      );
+
+      request.files.add(multipartFile);
+    } else {
+      // final multipartFile =
+      //     http.MultipartFile('image', null, null, filename: null);
+
+      // request.files.add(multipartFile);
+    }
 
     final response = await request.send();
 
     if (response.statusCode == 200) {
-      final data = jsonDecode(await response.stream.bytesToString());
+      var data1 = await response.stream.bytesToString();
+      var data = jsonDecode(data1);
       if (data["error"] == true) {
         dangerNoti(data["titre"], data["message"], context);
       } else {
         successNoti(
             "Good",
-            langUserPhone == "fr"
-                ? 'Votre demande de promotion a été enregistrée.'
-                : 'Your promotion request has been saved.',
+            (langUserPhone == "fr")
+                ? 'Good. Votre demande de promotion a été enregistrée. Elle sera diffusée si elle est acceptée par un administrateur. Dans le cas contraire, vous devrez la modifier en tenant compte des remarques.'
+                : 'Good. Your promotion request has been saved. It will be released if it is accepted by an administrator. Otherwise, you will need to modify it taking into account the comments.',
             context);
       }
       setState(() {
@@ -286,11 +304,10 @@ class _ModificationProduitServicesPageState
             ElevatedButton(
               onPressed: _isSending ? null : _sendData,
               style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue,
+                  backgroundColor: Colors.green,
                   shape: StadiumBorder(),
                   padding: EdgeInsets.symmetric(vertical: 13)),
-              child: Text(
-                  langUserPhone == "fr" ? 'Envoyer la demande' : 'Send request',
+              child: Text(langUserPhone == "fr" ? 'Modifier' : 'To Modify',
                   style: GoogleFonts.poppins(
                       color: Colors.white, fontWeight: FontWeight.w600)),
             ),
