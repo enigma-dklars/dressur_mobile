@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:dressur/2_promo/liste_boost_affaire.dart';
+import 'package:dressur/2_promo/liste_promo_affaire.dart';
 import 'package:http/http.dart' as http;
 import 'dart:io';
 import 'dart:async';
