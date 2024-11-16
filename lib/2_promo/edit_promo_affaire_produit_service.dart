@@ -237,7 +237,7 @@ class _ModificationProduitServicesPageState
               SelectFormField(
                 decoration: InputDecoration(
                     labelText: langUserPhone == "fr"
-                        ? 'Methode de paiement mobile'
+                        ? 'Moyen de paiement mobile ou par carte'
                         : 'Mobile payment method',
                     border: OutlineInputBorder()),
                 type: SelectFormFieldType.dropdown,

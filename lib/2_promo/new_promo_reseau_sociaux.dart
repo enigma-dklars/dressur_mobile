@@ -223,6 +223,10 @@ class _RegisterForm3State extends State<RegisterForm3> {
         var data = convert.jsonDecode(data1);
         if (data["error"] == false) {
           listSocialNetworks = data["listeFormulePromoReseau"];
+          listeMethodePaiements =
+              (data["listeMethodePaiements"] as List<dynamic>)
+                  .map((item) => item as Map<String, dynamic>)
+                  .toList();
           setState(() {
             _loading_liste_formule = false;
           });
@@ -595,13 +599,13 @@ class _RegisterForm3State extends State<RegisterForm3> {
           const SizedBox(height: 15),
           SelectFormField(
             decoration: const InputDecoration(
-              labelText: 'Methode de paiement mobile',
+              labelText: 'Moyen de paiement mobile ou par carte',
               border: OutlineInputBorder(),
             ),
             type: SelectFormFieldType.dropdown,
             initialValue: 'mtn',
-            labelText: 'Methode de paiement mobile',
-            items: listeMethodePaiement,
+            labelText: 'Moyen de paiement mobile ou par carte',
+            items: listeMethodePaiements,
             onChanged: (val) => onChangeMethodePaiement(val),
             onSaved: (val) => print(val),
           ),
@@ -647,17 +651,6 @@ class _RegisterForm3State extends State<RegisterForm3> {
             ),
           ),
           const SizedBox(height: 15),
-          Text(
-            (langUserPhone == "fr")
-                ? "Pour payer par Wave ou Carte Bancaire, veuillez contacter l'Assistance Dressur par WhatsApp. Merci..."
-                : "To pay by Wave or Credit Card, please contact Dressur Support by WhatsApp. THANKS...",
-            style: GoogleFonts.poppins(
-              fontWeight: FontWeight.w600,
-              fontSize: 12,
-              color: Colors.red,
-            ),
-            textAlign: TextAlign.center,
-          ),
         ],
       ),
     );

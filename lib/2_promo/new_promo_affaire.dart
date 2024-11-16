@@ -290,6 +290,10 @@ class _ProduitsServicesState extends State<ProduitsServices> {
             listeDesFormules = (data["listeFormulBoost"] as List<dynamic>)
                 .map((item) => item as Map<String, dynamic>)
                 .toList();
+            listeMethodePaiements =
+                (data["listeMethodePaiements"] as List<dynamic>)
+                    .map((item) => item as Map<String, dynamic>)
+                    .toList();
             _message = (langUserPhone == "fr")
                 ? "Veuillez choisir une formule."
                 : "Please choose a plan.";
@@ -458,13 +462,13 @@ class _ProduitsServicesState extends State<ProduitsServices> {
           if (load == true) ...[
             SelectFormField(
               decoration: const InputDecoration(
-                labelText: 'Formules de Promotion Affaire Payant',
+                labelText: 'Moyen de paiement mobile ou par carte',
                 border: OutlineInputBorder(),
               ),
               type: SelectFormFieldType.dropdown,
               initialValue: 'mtn',
-              labelText: 'Methode de paiement mobile',
-              items: listeMethodePaiement,
+              labelText: 'Moyen de paiement mobile ou par carte',
+              items: listeMethodePaiements,
               onChanged: (val) => onChangeMethodePaiement(val),
               onSaved: (val) => print(val),
             ),

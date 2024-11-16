@@ -672,6 +672,10 @@ class _PaymentGratuitPageState extends State<PaymentGratuitPage> {
             listeDesFormules = (data["listeFormulBoost"] as List<dynamic>)
                 .map((item) => item as Map<String, dynamic>)
                 .toList();
+            listeMethodePaiements =
+                (data["listeMethodePaiements"] as List<dynamic>)
+                    .map((item) => item as Map<String, dynamic>)
+                    .toList();
             _message = (langUserPhone == "fr")
                 ? "Veuillez choisir une formule."
                 : "Please choose a plan.";
@@ -920,6 +924,10 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
             listeDesFormules = (data["listeFormulBoost"] as List<dynamic>)
                 .map((item) => item as Map<String, dynamic>)
                 .toList();
+            listeMethodePaiements =
+                (data["listeMethodePaiements"] as List<dynamic>)
+                    .map((item) => item as Map<String, dynamic>)
+                    .toList();
             _message = (langUserPhone == "fr")
                 ? "Veuillez choisir une formule."
                 : "Please choose a plan.";
@@ -1108,13 +1116,13 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
               delay: 0, // 1500,
               child: SelectFormField(
                 decoration: const InputDecoration(
-                  labelText: 'Formules de Promotion Affaire Payant',
+                  labelText: 'Moyen de paiement mobile ou par carte',
                   border: OutlineInputBorder(),
                 ),
                 type: SelectFormFieldType.dropdown,
                 initialValue: 'mtn',
-                labelText: 'Methode de paiement mobile',
-                items: listeMethodePaiement,
+                labelText: 'Moyen de paiement mobile ou par carte',
+                items: listeMethodePaiements,
                 onChanged: (val) => onChangeMethodePaiement(val),
                 onSaved: (val) => print(val),
               ),
@@ -1171,18 +1179,7 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
               ),
             ),
             const SizedBox(height: 10),
-            DelayedAnimation(
-              delay: 0, // 1500,
-              child: Text(
-                "Pour payer par Wave ou Carte Bancaire, veuillez contactez l'Assistance Dressur par WhatsApp. Merci...",
-                style: GoogleFonts.poppins(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 12,
-                  color: Colors.red[400],
-                ),
-                textAlign: TextAlign.center,
-              ),
-            ),
+            
           ],
         ),
       ),

@@ -531,11 +531,59 @@ class PaymentPayantPage extends StatefulWidget {
 class _PaymentPayantPageState extends State<PaymentPayantPage> {
   late CampagneMail campagneMail;
 
+  List<Map<String, dynamic>> listeDesFormules = [];
+  bool loading_formule_campagne_mail = false;
   bool _desactive2 = false;
   dynamic data;
   dynamic valueMethodePaiement = "mtn";
   String? boostId;
   final telController = TextEditingController(text: tel);
+
+  void listeFormuleBoost() async {
+    bool isConnected = await isConnectedToInternet();
+    if (isConnected) {
+      setState(() {
+        _desactive2 = true;
+        loading_formule_campagne_mail = true;
+      });
+
+      var request = http.MultipartRequest(
+          'POST', Uri.parse('$generalRouteForApi/listeFormuleCampagneMail'));
+      request.fields.addAll({});
+
+      http.StreamedResponse response = await request.send();
+
+      if (response.statusCode == 200) {
+        var data1 = await response.stream.bytesToString();
+        var data = convert.jsonDecode(data1);
+        if (data["error"] == false) {
+          setState(() {
+            _desactive2 = false;
+            loading_formule_campagne_mail = false;
+            listeDesFormules =
+                (data["listeFormuleCampagneMail"] as List<dynamic>)
+                    .map((item) => item as Map<String, dynamic>)
+                    .toList();
+            listeMethodePaiements =
+                (data["listeMethodePaiements"] as List<dynamic>)
+                    .map((item) => item as Map<String, dynamic>)
+                    .toList();
+          });
+        }
+      }
+    } else {
+      if (langUserPhone != "fr") {
+        dangerNoti(
+            "Mistake!", "You are not connected to the internet.", context);
+      } else {
+        dangerNoti("Erreur!", "Vous n'ètes pas connecté a internet.", context);
+      }
+      setState(() {
+        _desactive2 = false;
+        loading_formule_campagne_mail = false;
+      });
+    }
+  }
 
   onChangeMethodePaiement(val) async {
     setState(() {
@@ -621,6 +669,7 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
   void initState() {
     super.initState();
     campagneMail = widget.campagneMail;
+    listeFormuleBoost();
   }
 
   @override
@@ -660,18 +709,22 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
               ),
             ),
             const SizedBox(height: 20),
-            SelectFormField(
-              decoration: const InputDecoration(
-                labelText: 'Formules de Boost Payant',
-                border: OutlineInputBorder(),
-              ),
-              type: SelectFormFieldType.dropdown,
-              initialValue: 'mtn',
-              labelText: 'Methode de paiement mobile',
-              items: listeMethodePaiement,
-              onChanged: (val) => onChangeMethodePaiement(val),
-              onSaved: (val) => print(val),
-            ),
+            loading_formule_campagne_mail
+                ? const Center(
+                    child: CircularProgressIndicator(),
+                  )
+                : SelectFormField(
+                    decoration: const InputDecoration(
+                      labelText: 'Moyen de paiement mobile ou par carte',
+                      border: OutlineInputBorder(),
+                    ),
+                    type: SelectFormFieldType.dropdown,
+                    initialValue: 'mtn',
+                    labelText: 'Moyen de paiement mobile ou par carte',
+                    items: listeMethodePaiements,
+                    onChanged: (val) => onChangeMethodePaiement(val),
+                    onSaved: (val) => print(val),
+                  ),
             const SizedBox(height: 20),
             TextField(
               controller: telController,
@@ -719,15 +772,7 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
               ),
             ),
             const SizedBox(height: 20),
-            Text(
-              "Pour payer par Wave ou Carte Bancaire, veuillez contactez l'Assistance Dressur par WhatsApp. Merci...",
-              style: GoogleFonts.poppins(
-                fontWeight: FontWeight.w600,
-                fontSize: 12,
-                color: Colors.red[400],
-              ),
-              textAlign: TextAlign.center,
-            ),
+            
           ],
         ),
       ),

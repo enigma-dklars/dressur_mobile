@@ -179,6 +179,10 @@ class _RegisterForm2State extends State<RegisterForm2> {
                 (data["listeFormuleCampagneMail"] as List<dynamic>)
                     .map((item) => item as Map<String, dynamic>)
                     .toList();
+            listeMethodePaiements =
+                (data["listeMethodePaiements"] as List<dynamic>)
+                    .map((item) => item as Map<String, dynamic>)
+                    .toList();
             _message = (langUserPhone == "fr")
                 ? "Veuillez choisir une formule."
                 : "Please choose a plan.";

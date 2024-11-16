@@ -243,68 +243,7 @@ void insertDressurContact() async {
   }
 }
 
-List<Map<String, dynamic>> listeMethodePaiement = [
-  {
-    'value': 'airtel_ne',
-    'label': 'Airtel Niger',
-  },
-  {
-    'value': 'sbin',
-    'label': 'Celtis Cash',
-  },
-  {
-    'value': 'free_sn',
-    'label': 'Free Sénégal',
-  },
-  {
-    'value': 'moov',
-    'label': 'MOOV Flooz Bénin',
-  },
-  {
-    'value': 'moov_bf',
-    'label': 'MOOV Burkina Faso',
-  },
-  {
-    'value': 'moov_ci',
-    'label': "MOOV Côte d'Ivoire",
-  },
-  {
-    'value': 'moov_tg',
-    'label': 'MOOV Flooz Togo',
-  },
-  {
-    'value': 'mtn',
-    'label': 'MTN Mobile Money Bénin',
-  },
-  {
-    'value': 'mtn_ci',
-    'label': "MTN Mobile Money Côte d'Ivoire",
-  },
-  {
-    'value': 'mtn_open_gn',
-    'label': 'MTN Mobile Money Guinée',
-  },
-  {
-    'value': 'orange_bf',
-    'label': 'Orange Burkina Faso',
-  },
-  {
-    'value': 'orange_ci',
-    'label': "Orange Côte d'Ivoire",
-  },
-  {
-    'value': 'orange_ml',
-    'label': 'Orange Mali',
-  },
-  {
-    'value': 'orange_sn',
-    'label': 'Orange Sénégal',
-  },
-  {
-    'value': 'togocel',
-    'label': 'TOGOCEL T-Money',
-  },
-];
+List<Map<String, dynamic>> listeMethodePaiements = [];
 
 // map de tous les pays du monde
 Map<String, String> countryCodes = {

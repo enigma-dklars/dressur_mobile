@@ -203,6 +203,10 @@ class _RegisterFormState extends State<RegisterForm> {
             listeDesFormules = (data["listeFormulBoost"] as List<dynamic>)
                 .map((item) => item as Map<String, dynamic>)
                 .toList();
+            listeMethodePaiements =
+                (data["listeMethodePaiements"] as List<dynamic>)
+                    .map((item) => item as Map<String, dynamic>)
+                    .toList();
             _message = (langUserPhone == "fr")
                 ? "Veuillez choisir une formule."
                 : "Please choose a plan.";
@@ -430,6 +434,10 @@ class _RegisterForm2State extends State<RegisterForm2> {
             listeDesFormules = (data["listeFormulBoost"] as List<dynamic>)
                 .map((item) => item as Map<String, dynamic>)
                 .toList();
+            listeMethodePaiements =
+                (data["listeMethodePaiements"] as List<dynamic>)
+                    .map((item) => item as Map<String, dynamic>)
+                    .toList();
             _message = (langUserPhone == "fr")
                 ? "Veuillez choisir une formule."
                 : "Please choose a plan.";
@@ -665,13 +673,13 @@ class _RegisterForm2State extends State<RegisterForm2> {
           const SizedBox(height: 10),
           SelectFormField(
             decoration: const InputDecoration(
-              labelText: 'Methode de paiement mobile',
+              labelText: 'Moyen de paiement mobile ou par carte',
               border: OutlineInputBorder(),
             ),
             type: SelectFormFieldType.dropdown,
             initialValue: 'mtn',
-            labelText: 'Methode de paiement mobile',
-            items: listeMethodePaiement,
+            labelText: 'Moyen de paiement mobile ou par carte',
+            items: listeMethodePaiements,
             onChanged: (val) => onChangeMethodePaiement(val),
             onSaved: (val) => print(val),
           ),
@@ -717,17 +725,7 @@ class _RegisterForm2State extends State<RegisterForm2> {
             ),
           ),
           const SizedBox(height: 10),
-          Text(
-            (langUserPhone == "fr")
-                ? "Pour payer par Wave ou Carte Bancaire, veuillez contacter l'Assistance Dressur par WhatsApp. Merci..."
-                : "To pay by Wave or Credit Card, please contact Dressur Support by WhatsApp. THANKS...",
-            style: GoogleFonts.poppins(
-              fontWeight: FontWeight.w600,
-              fontSize: 12,
-              color: Colors.red[400],
-            ),
-            textAlign: TextAlign.center,
-          ),
+          
         ],
       ),
     );
