@@ -12,7 +12,7 @@
     https://stackoverflow.com/questions/54610121/flutter-countdown-timer
 
 # 
-    flutter build apk
+    flutter clean; flutter build apk
     flutter clean; flutter build appbundle
 
 # symbols.zip
