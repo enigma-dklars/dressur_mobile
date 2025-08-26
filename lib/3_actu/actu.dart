@@ -6,7 +6,7 @@ import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dressur/1_reception/liste_contact.dart';
 import 'package:dressur/2_promo/new_boost_contact.dart';
-import 'package:dressur/5_autre/cart_visite.dart';
+// import 'package:dressur/5_autre/cart_visite.dart';
 import 'package:dressur/5_autre/profil_user.dart';
 import 'package:dressur/components/padding_and_divider.dart';
 import 'package:flutter/material.dart';
@@ -427,20 +427,20 @@ class _ActuPageState extends State<ActuPage> {
             ),
           ),
           actions: [
-            IconButton(
-              icon: const Icon(
-                Icons.qr_code_scanner,
-                color: Colors.white,
-              ),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => CarteDeVisite(),
-                  ),
-                );
-              },
-            ),
+            // IconButton(
+            //   icon: const Icon(
+            //     Icons.qr_code_scanner,
+            //     color: Colors.white,
+            //   ),
+            //   onPressed: () {
+            //     Navigator.push(
+            //       context,
+            //       MaterialPageRoute(
+            //         builder: (context) => CarteDeVisite(),
+            //       ),
+            //     );
+            //   },
+            // ),
             const Padding(
               padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
               child: VerticalDivider(
