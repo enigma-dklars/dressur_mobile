@@ -16,8 +16,8 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:http/http.dart' as http;
 
 const versionApp = '1.0.10';
-const oldDatabaseName = 'neuf_dressur.db';
-const nowDataBaseName = 'onze_dressur.db';
+const oldDatabaseName = 'onze_dressur.db';
+const nowDataBaseName = 'douze_dressur.db';
 bool modeReconnaissanceContactArrierePlan = false;
 const generalRouteForApi = '$generalApiDomaine/api';
 const generalRouteForPromotionImage = '$generalApiDomaine/promotion/';

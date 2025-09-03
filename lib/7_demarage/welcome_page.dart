@@ -181,12 +181,12 @@ class _PageDepartState extends State<PageDepart> {
     }
 
     // permission camera
-    PermissionStatus permissionStatusCamera = await _getCameraPermission();
-    if (permissionStatusCamera == PermissionStatus.granted) {
-      // OK
-    } else {
-      _handleInvalidPermissionsCamera(permissionStatusCamera);
-    }
+    // PermissionStatus permissionStatusCamera = await _getCameraPermission();
+    // if (permissionStatusCamera == PermissionStatus.granted) {
+    //   // OK
+    // } else {
+    //   _handleInvalidPermissionsCamera(permissionStatusCamera);
+    // }
 
     // permission camera
     PermissionStatus permissionStatusAlarm = await _getAlarmPermission();
@@ -220,16 +220,16 @@ class _PageDepartState extends State<PageDepart> {
     }
   }
 
-  Future<PermissionStatus> _getCameraPermission() async {
-    PermissionStatus permission = await Permission.camera.status;
-    // permission != PermissionStatus.granted && permission != PermissionStatus.permanentlyDenied
-    if (permission != PermissionStatus.granted) {
-      PermissionStatus permissionStatus = await Permission.camera.request();
-      return permissionStatus;
-    } else {
-      return permission;
-    }
-  }
+  // Future<PermissionStatus> _getCameraPermission() async {
+  //   PermissionStatus permission = await Permission.camera.status;
+  //   // permission != PermissionStatus.granted && permission != PermissionStatus.permanentlyDenied
+  //   if (permission != PermissionStatus.granted) {
+  //     PermissionStatus permissionStatus = await Permission.camera.request();
+  //     return permissionStatus;
+  //   } else {
+  //     return permission;
+  //   }
+  // }
 
   Future<PermissionStatus> _getAlarmPermission() async {
     PermissionStatus permission = await Permission.camera.status;

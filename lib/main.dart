@@ -77,10 +77,10 @@ void initializeNotifications() async {
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await _configureLocalTimeZone();
-  initializeNotifications();
+  // Correction: await initializeNotifications();
+  // Correction: await flutterLocalNotificationsPlugin.initialize(...);
 
-  const AndroidInitializationSettings initializationSettingsAndroid =
-      AndroidInitializationSettings('@mipmap/dressur_logo_blanc');
+  const AndroidInitializationSettings initializationSettingsAndroid = AndroidInitializationSettings('@mipmap/ic_launcher'); // Assurez-vous que cette ressource existe
 
   final List<DarwinNotificationCategory> darwinNotificationCategories =
       <DarwinNotificationCategory>[
@@ -150,7 +150,8 @@ void main() async {
   final LinuxInitializationSettings initializationSettingsLinux =
       LinuxInitializationSettings(
     defaultActionName: 'Open notification',
-    defaultIcon: AssetsLinuxIcon('images/dressur_logo_blanc.png'),
+    defaultIcon: AssetsLinuxIcon(
+        'images/dressur_logo_bleu.png'), // Assurez-vous que cette ressource existe
   );
   final InitializationSettings initializationSettings = InitializationSettings(
     android: initializationSettingsAndroid,
@@ -158,6 +159,8 @@ void main() async {
     macOS: initializationSettingsDarwin,
     linux: initializationSettingsLinux,
   );
+
+  // Correction: await ici
   await flutterLocalNotificationsPlugin.initialize(
     initializationSettings,
     onDidReceiveNotificationResponse:
@@ -175,6 +178,10 @@ void main() async {
     },
     onDidReceiveBackgroundNotificationResponse: notificationTapBackground,
   );
+
+  // Appelez initializeNotifications() après l'initialisation du plugin
+  initializeNotifications(); // Cette fonction ne contient pas d'await bloquant l'UI, donc pas besoin de l'await ici si elle ne fait que récupérer des détails
+
   runApp(const MyApp());
 }
 
