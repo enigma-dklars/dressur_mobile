@@ -276,21 +276,21 @@ class _PageDepartState extends State<PageDepart> {
     }
   }
 
-  void _handleInvalidPermissionsCamera(PermissionStatus permissionStatus) {
-    if (permissionStatus != PermissionStatus.granted) {
-      if (langUserPhone != "fr") {
-        warningNoti(
-            "Attention !",
-            "Please authorize Dressur to access your camera for scanning QR codes and automatically saving contacts to your phone.\nThis authorization is necessary to take full advantage of our features.",
-            context);
-      } else {
-        warningNoti(
-            "Attention !",
-            "Veuillez autoriser Dressur à accéder à votre caméra pour le scannage des codes QR et l'enregistrement automatiquement des contacts dans votre téléphone.\nCette autorisation est nécessaire pour profiter pleinement de nos fonctionnalités.",
-            context);
-      }
-    }
-  }
+  // void _handleInvalidPermissionsCamera(PermissionStatus permissionStatus) {
+  //   if (permissionStatus != PermissionStatus.granted) {
+  //     if (langUserPhone != "fr") {
+  //       warningNoti(
+  //           "Attention !",
+  //           "Please authorize Dressur to access your camera for scanning QR codes and automatically saving contacts to your phone.\nThis authorization is necessary to take full advantage of our features.",
+  //           context);
+  //     } else {
+  //       warningNoti(
+  //           "Attention !",
+  //           "Veuillez autoriser Dressur à accéder à votre caméra pour le scannage des codes QR et l'enregistrement automatiquement des contacts dans votre téléphone.\nCette autorisation est nécessaire pour profiter pleinement de nos fonctionnalités.",
+  //           context);
+  //     }
+  //   }
+  // }
 
   void _handleInvalidPermissionsAlarm(PermissionStatus permissionStatus) {
     if (permissionStatus != PermissionStatus.granted) {
