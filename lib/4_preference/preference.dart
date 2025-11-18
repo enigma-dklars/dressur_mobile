@@ -104,9 +104,7 @@ class _PreferencePageState extends State<PreferencePage> {
           elevation: 0,
           backgroundColor: primaryColor,
           title: Text(
-            (langUserPhone == "fr")
-                ? "Préférences et Récompenses"
-                : "Preferences and Rewards",
+            (langUserPhone == "fr") ? "Préférences" : "Preferences",
             style: GoogleFonts.poppins(
               color: Colors.white,
               fontWeight: FontWeight.w400,
