@@ -20,6 +20,7 @@ class _PresentationPageState extends State<PresentationPage> {
   }
 
   @override
+  @override
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: _onWillPop,
@@ -28,17 +29,50 @@ class _PresentationPageState extends State<PresentationPage> {
         body: Column(
           children: [
             Expanded(
-              child: PageView.builder(
-                controller: _pageController,
-                onPageChanged: (int page) {
-                  setState(() {
-                    _currentPage = page;
-                  });
-                },
-                itemCount: _totalPages,
-                itemBuilder: (BuildContext context, int index) {
-                  return buildPage(index);
-                },
+              child: Stack(
+                // ← Nouveau Stack
+                children: [
+                  PageView.builder(
+                    controller: _pageController,
+                    onPageChanged: (int page) {
+                      setState(() {
+                        _currentPage = page;
+                      });
+                    },
+                    itemCount: _totalPages,
+                    itemBuilder: (BuildContext context, int index) {
+                      return buildPage(index);
+                    },
+                  ),
+
+                  // Bouton "Passer" en haut à droite
+                  Align(
+                    alignment: Alignment.topRight,
+                    child: Padding(
+                      padding: const EdgeInsets.only(
+                          top: 50.0, right: 20.0), // ajuste selon ton goût
+                      child: TextButton(
+                        onPressed: () {
+                          // Aller directement à la page suivante (celle avec les boutons Connexion/Inscription)
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => AutrePage()),
+                          );
+                        },
+                        child: Text(
+                          langUserPhone == "fr" ? "Passer" : "Skip",
+                          style: GoogleFonts.poppins(
+                            color: Colors
+                                .white, // garde le blanc pour rester discret
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
             buildIndicator(),

@@ -1,6 +1,7 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'dart:io';
+import 'package:dressur/7_demarage/permissions_required_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -9,7 +10,6 @@ import 'package:dressur/7_demarage/update_app_important.dart';
 import 'package:dressur/7_demarage/presentation_ds.dart';
 import 'package:dressur/components/constant.dart';
 import 'package:dressur/components/sql_helper.dart';
-import 'package:dressur/components/noti.dart';
 import 'package:dressur/components/bottomBar.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
@@ -39,6 +39,48 @@ class PageDepart extends StatefulWidget {
 }
 
 class _PageDepartState extends State<PageDepart> {
+  Future<void> _checkAndRequestPermissions() async {
+    Map<Permission, bool> permissionsStatus =
+        await _requestCriticalPermissions();
+
+    bool allGranted = permissionsStatus.values.every((granted) => granted);
+
+    if (!allGranted) {
+      // Au moins une permission refusée → on bloque l'accès
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(
+            builder: (context) => const PermissionsRequiredPage()),
+        (route) => false, // Supprime toutes les pages précédentes
+      );
+      return;
+    }
+
+    // Toutes les permissions sont OK → on continue
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(builder: (context) => PresentationPage()),
+      (route) => false,
+    );
+  }
+
+  Future<Map<Permission, bool>> _requestCriticalPermissions() async {
+    Map<Permission, bool> results = {};
+
+    // 1. Contacts
+    PermissionStatus contactStatus = await Permission.contacts.request();
+    results[Permission.contacts] = contactStatus.isGranted;
+
+    // 2. Stockage
+    PermissionStatus storageStatus = await Permission.storage.request();
+    results[Permission.storage] = storageStatus.isGranted;
+
+    // 3. Alarme exacte (très important pour les notifications programmées)
+    PermissionStatus alarmStatus =
+        await Permission.scheduleExactAlarm.request();
+    results[Permission.scheduleExactAlarm] = alarmStatus.isGranted;
+
+    return results;
+  }
+
   Future<Future<Object?>> directConnect() async {
     setState(() {
       if (langUserPhone != "fr") {
@@ -127,10 +169,14 @@ class _PageDepartState extends State<PageDepart> {
             .push(MaterialPageRoute(builder: (context) => const BottomBar()));
       }
     } else {
-      _askPermissions();
-
-      return Navigator.of(context)
-          .push(MaterialPageRoute(builder: (context) => PresentationPage()));
+      // Nouveau comportement : on vérifie les permissions AVANT de montrer l'onboarding
+      await _checkAndRequestPermissions();
+      // Si les permissions ne sont pas accordées → on est redirigé vers PermissionsRequiredPage
+      // Si elles le sont → on arrive ici et on continue vers l'onboarding
+      return Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (context) => PresentationPage()),
+        (route) => false,
+      );
     }
   }
 
@@ -158,152 +204,6 @@ class _PageDepartState extends State<PageDepart> {
       } else {
         Navigator.of(context)
             .push(MaterialPageRoute(builder: (context) => PresentationPage()));
-      }
-    }
-  }
-
-  Future<void> _askPermissions([String? routeName]) async {
-    // permission contact
-    PermissionStatus permissionStatus = await _getContactPermission();
-    if (permissionStatus == PermissionStatus.granted) {
-      insertDressurContact();
-    } else {
-      _handleInvalidPermissions(permissionStatus);
-    }
-
-    // permission memoire stockage
-    PermissionStatus permissionStatusStockageMemoire =
-        await _getStockageMemoirePermission();
-    if (permissionStatusStockageMemoire == PermissionStatus.granted) {
-      // OK
-    } else {
-      _handleInvalidPermissionsStockageMemoire(permissionStatusStockageMemoire);
-    }
-
-    // permission camera
-    // PermissionStatus permissionStatusCamera = await _getCameraPermission();
-    // if (permissionStatusCamera == PermissionStatus.granted) {
-    //   // OK
-    // } else {
-    //   _handleInvalidPermissionsCamera(permissionStatusCamera);
-    // }
-
-    // permission camera
-    PermissionStatus permissionStatusAlarm = await _getAlarmPermission();
-    if (permissionStatusAlarm == PermissionStatus.granted) {
-      // OK
-    } else {
-      _handleInvalidPermissionsAlarm(permissionStatusAlarm);
-    }
-  }
-
-  Future<PermissionStatus> _getContactPermission() async {
-    PermissionStatus permission = await Permission.contacts.status;
-    // permission != PermissionStatus.granted && permission != PermissionStatus.permanentlyDenied
-    if (permission != PermissionStatus.granted) {
-      PermissionStatus permissionStatus = await Permission.contacts.request();
-      return permissionStatus;
-    } else {
-      return permission;
-    }
-  }
-
-  Future<PermissionStatus> _getStockageMemoirePermission() async {
-    PermissionStatus permission = await Permission.storage.status;
-    // permission != PermissionStatus.granted && permission != PermissionStatus.permanentlyDenied
-    if (permission != PermissionStatus.granted) {
-      PermissionStatus permissionStatusStockageMemoire =
-          await Permission.storage.request();
-      return permissionStatusStockageMemoire;
-    } else {
-      return permission;
-    }
-  }
-
-  // Future<PermissionStatus> _getCameraPermission() async {
-  //   PermissionStatus permission = await Permission.camera.status;
-  //   // permission != PermissionStatus.granted && permission != PermissionStatus.permanentlyDenied
-  //   if (permission != PermissionStatus.granted) {
-  //     PermissionStatus permissionStatus = await Permission.camera.request();
-  //     return permissionStatus;
-  //   } else {
-  //     return permission;
-  //   }
-  // }
-
-  Future<PermissionStatus> _getAlarmPermission() async {
-    PermissionStatus permission = await Permission.camera.status;
-    // permission != PermissionStatus.granted && permission != PermissionStatus.permanentlyDenied
-    if (permission != PermissionStatus.granted) {
-      PermissionStatus permissionStatus =
-          await Permission.scheduleExactAlarm.request();
-      return permissionStatus;
-    } else {
-      return permission;
-    }
-  }
-
-  void _handleInvalidPermissions(PermissionStatus permissionStatus) {
-    if (permissionStatus != PermissionStatus.granted) {
-      if (langUserPhone != "fr") {
-        warningNoti(
-            "Attention !",
-            "Please allow Dressur to automatically save contacts to your phone.\nThis authorization is necessary to take full advantage of our features.",
-            context);
-      } else {
-        warningNoti(
-            "Attention !",
-            "Veuillez autoriser Dressur a enregistrer automatiquement les contacts dans votre téléphone.\nCette autorisation est nécéssaire pour profiter pleinement de nos fonctionnalités.",
-            context);
-      }
-    }
-  }
-
-  void _handleInvalidPermissionsStockageMemoire(
-      PermissionStatus permissionStatusStockageMemoire) {
-    if (permissionStatusStockageMemoire != PermissionStatus.granted) {
-      if (langUserPhone != "fr") {
-        warningNoti(
-            "Attention !",
-            "Please allow Dressur has accessed your images from your phone for your future deal boosts.\nThis authorization is necessary to take full advantage of our features.",
-            context);
-      } else {
-        warningNoti(
-            "Attention !",
-            "Veuillez autoriser Dressur a accédé à vos images de votre téléphone pour vos futurs boosts affaire.\nCette autorisation est nécéssaire pour profiter pleinement de nos fonctionnalités.",
-            context);
-      }
-    }
-  }
-
-  // void _handleInvalidPermissionsCamera(PermissionStatus permissionStatus) {
-  //   if (permissionStatus != PermissionStatus.granted) {
-  //     if (langUserPhone != "fr") {
-  //       warningNoti(
-  //           "Attention !",
-  //           "Please authorize Dressur to access your camera for scanning QR codes and automatically saving contacts to your phone.\nThis authorization is necessary to take full advantage of our features.",
-  //           context);
-  //     } else {
-  //       warningNoti(
-  //           "Attention !",
-  //           "Veuillez autoriser Dressur à accéder à votre caméra pour le scannage des codes QR et l'enregistrement automatiquement des contacts dans votre téléphone.\nCette autorisation est nécessaire pour profiter pleinement de nos fonctionnalités.",
-  //           context);
-  //     }
-  //   }
-  // }
-
-  void _handleInvalidPermissionsAlarm(PermissionStatus permissionStatus) {
-    if (permissionStatus != PermissionStatus.granted) {
-      if (langUserPhone != "fr") {
-        warningNoti(
-            "Attention !",
-            "Veuillez autoriser Dressur à vous notifier les enregistrements automatiques de contact ainsi que votre messagerie.\nThis authorization is necessary to take full advantage of our features.",
-            context);
-      } else {
-        warningNoti(
-            "Attention !",
-            "Veuillez autoriser Dressur à vous notifier les enregistrements automatiques de contact ainsi que votre messagerie.\nCette autorisation est nécessaire pour profiter pleinement de nos fonctionnalités.",
-            context);
       }
     }
   }
