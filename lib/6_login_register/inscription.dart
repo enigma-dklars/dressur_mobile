@@ -1,8 +1,10 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'package:country_code_picker/country_code_picker.dart';
 import 'package:dressur/components/bottomBar.dart';
 import 'package:flutter/material.dart';
 import 'package:dressur/components/constant.dart';
+import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
 import 'package:dressur/components/noti.dart';
@@ -65,6 +67,7 @@ class RegisterForm extends StatefulWidget {
 }
 
 class _RegisterFormState extends State<RegisterForm> {
+  String selectedCountryCode = "+33"; // Indicatif par défaut (France)
   bool _desactive = false;
   bool isPasswordObscured = true;
   bool isVerificationPasswordObscured = true;
@@ -78,6 +81,13 @@ class _RegisterFormState extends State<RegisterForm> {
   //HTTP REQUEST REGISTER
   void registerIn(String pseudo, String tel, String mail, String password,
       String passwordVerif) async {
+    // Concaténation du numéro complet
+    String fullPhoneNumber = selectedCountryCode + telController.text.trim();
+
+    // Optionnel : nettoyer les espaces ou caractères indésirables
+    fullPhoneNumber = fullPhoneNumber.replaceAll(
+        RegExp(r'\D'), ''); // enlève tout sauf chiffres
+
     bool isConnected = await isConnectedToInternet();
     if (isConnected) {
       setState(() {
@@ -88,8 +98,7 @@ class _RegisterFormState extends State<RegisterForm> {
           'POST', Uri.parse('$generalRouteForApi/inscriptionDS'));
       request.fields.addAll({
         'langUserPhone': langUserPhone.toString(),
-        // 'pseudo': pseudo,
-        'tel': tel,
+        'tel': "+$fullPhoneNumber", // ← Numéro complet envoyé ici
         'mail': mail,
         'password': password,
         'confirmPassword': passwordVerif,
@@ -111,30 +120,31 @@ class _RegisterFormState extends State<RegisterForm> {
             modeReconnaissanceContactArrierePlan = true;
             initUserInformations(data['user']);
           });
-          Navigator.of(context)
-              .push(MaterialPageRoute(builder: (context) => const BottomBar()));
+          Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(builder: (context) => const BottomBar()),
+            (route) => false,
+          );
         }
       } else {
-        if (langUserPhone != "fr") {
-          dangerNoti("Mistake!",
-              "We encountered a problem, contact the administrators.", context);
-        } else {
-          dangerNoti(
-              "Erreur!",
-              "Nous avons rencontré un problème, contacter les administrateurs.",
-              context);
-        }
+        dangerNoti(
+          langUserPhone == "fr" ? "Erreur!" : "Error!",
+          langUserPhone == "fr"
+              ? "Problème de connexion au serveur."
+              : "Connection problem with the server.",
+          context,
+        );
         setState(() {
           _desactive = false;
         });
       }
     } else {
-      if (langUserPhone != "fr") {
-        dangerNoti(
-            "Mistake!", "You are not connected to the internet.", context);
-      } else {
-        dangerNoti("Erreur!", "Vous n'ètes pas connecté a internet.", context);
-      }
+      dangerNoti(
+        langUserPhone == "fr" ? "Erreur!" : "Error!",
+        langUserPhone == "fr"
+            ? "Vous n'êtes pas connecté à internet."
+            : "You are not connected to the internet.",
+        context,
+      );
       setState(() {
         _desactive = false;
       });
@@ -233,31 +243,77 @@ class _RegisterFormState extends State<RegisterForm> {
                           // const SizedBox(height: 15),
                           Text(
                             (langUserPhone == "fr")
-                                ? 'Numéro Whatsapp'
-                                : 'WhatsApp number',
+                                ? 'Numéro WhatsApp'
+                                : 'WhatsApp Number',
                             style: const TextStyle(
                                 color: Colors.black,
                                 fontSize: 18.0,
                                 fontWeight: FontWeight.w500),
                           ),
                           const SizedBox(height: 5),
+
                           Container(
                             decoration: BoxDecoration(
-                                border: Border.all(
-                                    width: 1.0, color: Colors.black38),
-                                borderRadius: BorderRadius.circular(10)),
-                            child: TextFormField(
-                              style: const TextStyle(
-                                color: Colors.black,
-                                fontSize: 20,
-                              ),
-                              controller: telController,
-                              decoration: const InputDecoration(
-                                  border: InputBorder.none,
-                                  prefixIcon: Icon(
-                                    Icons.phone,
-                                    color: primaryColor,
-                                  )),
+                              border:
+                                  Border.all(width: 1.0, color: Colors.black38),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Row(
+                              children: [
+                                // Sélecteur d'indicatif pays
+                                CountryCodePicker(
+                                  onChanged: (countryCode) {
+                                    setState(() {
+                                      selectedCountryCode =
+                                          countryCode.dialCode ?? "+33";
+                                    });
+                                  },
+                                  initialSelection:
+                                      'FR', // Change selon localisation par défaut
+                                  favorite: [
+                                    '+33',
+                                    '+229',
+                                    '+228',
+                                    '+225'
+                                  ], // France, USA, Cameroun, Côte d'Ivoire
+                                  showCountryOnly: false,
+                                  showOnlyCountryWhenClosed: false,
+                                  alignLeft: false,
+                                  padding: const EdgeInsets.all(8),
+                                  textStyle: const TextStyle(
+                                      fontSize: 18, color: Colors.black),
+                                  flagWidth: 30,
+                                ),
+
+                                // Ligne de séparation
+                                Container(
+                                  width: 1,
+                                  height: 40,
+                                  color: Colors.black38,
+                                ),
+
+                                // Champ pour le numéro
+                                Expanded(
+                                  child: TextFormField(
+                                    controller: telController,
+                                    keyboardType: TextInputType.phone,
+                                    style: const TextStyle(
+                                        color: Colors.black, fontSize: 20),
+                                    decoration: const InputDecoration(
+                                      border: InputBorder.none,
+                                      contentPadding: EdgeInsets.symmetric(
+                                          horizontal: 12, vertical: 16),
+                                      hintText: "-- -- -- -- --",
+                                      hintStyle:
+                                          TextStyle(color: Colors.black38),
+                                    ),
+                                    inputFormatters: [
+                                      FilteringTextInputFormatter.digitsOnly,
+                                      LengthLimitingTextInputFormatter(15),
+                                    ],
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                           const SizedBox(height: 15),
