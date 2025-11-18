@@ -37,7 +37,7 @@ Widget SpecialPub() {
             style: TextStyle(
               fontSize: 17,
               fontWeight: FontWeight.w600,
-              color: Colors.black87,
+              // color: Colors.black87,
             ),
           ),
         ),
