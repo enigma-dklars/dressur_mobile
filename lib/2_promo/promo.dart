@@ -445,107 +445,107 @@ class _BoostPageState extends State<BoostPage> {
                 ),
                 DressurDivider(),
               ],
-              Card(
-                margin: const EdgeInsets.only(
-                    left: 10, top: 5, right: 10, bottom: 5),
-                child: Container(
-                  padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Text(
-                        (langUserPhone == "fr")
-                            ? "Campagne Mail"
-                            : "Email Campaign",
-                        style: GoogleFonts.poppins(
-                          color: primaryColor,
-                          fontWeight: FontWeight.w400,
-                          fontSize: 24,
-                        ),
-                      ),
-                      const SizedBox(height: 5),
-                      Text(
-                        (langUserPhone == "fr")
-                            ? "Faites la promotion de vos produits et services grâce à notre Campagne Mail."
-                            : "Promote your products and services with our Mail Campaign.",
-                        style: GoogleFonts.poppins(
-                          fontWeight: FontWeight.w300,
-                          fontSize: 14,
-                        ),
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Column(
-                            children: [
-                              SizedBox(
-                                width: MediaQuery.of(context).size.width * 0.42,
-                                child: ElevatedButton(
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: primaryColor,
-                                      shape: const StadiumBorder(),
-                                      padding: const EdgeInsets.symmetric(
-                                        vertical: 10,
-                                      ),
-                                    ),
-                                    child: Text(
-                                      (langUserPhone == "fr")
-                                          ? "Démarrer"
-                                          : "To start up",
-                                      style: GoogleFonts.poppins(
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                    onPressed: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              NewCampagneMailPage(),
-                                        ),
-                                      );
-                                    }),
-                              )
-                            ],
-                          ),
-                          Column(
-                            children: [
-                              SizedBox(
-                                width: MediaQuery.of(context).size.width * 0.42,
-                                child: ElevatedButton(
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: secondaryColor,
-                                      shape: const StadiumBorder(),
-                                      padding: const EdgeInsets.symmetric(
-                                        vertical: 10,
-                                      ),
-                                    ),
-                                    child: Text(
-                                      (langUserPhone == "fr")
-                                          ? "Voir la liste"
-                                          : "See the list",
-                                      style: GoogleFonts.poppins(
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                    onPressed: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                CampagneMailListePage()),
-                                      );
-                                    }),
-                              )
-                            ],
-                          ),
-                        ],
-                      )
-                    ],
-                  ),
-                ),
-              ),
-              DressurDivider(),
+              // Card(
+              //   margin: const EdgeInsets.only(
+              //       left: 10, top: 5, right: 10, bottom: 5),
+              //   child: Container(
+              //     padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
+              //     child: Column(
+              //       crossAxisAlignment: CrossAxisAlignment.stretch,
+              //       children: [
+              //         Text(
+              //           (langUserPhone == "fr")
+              //               ? "Campagne Mail"
+              //               : "Email Campaign",
+              //           style: GoogleFonts.poppins(
+              //             color: primaryColor,
+              //             fontWeight: FontWeight.w400,
+              //             fontSize: 24,
+              //           ),
+              //         ),
+              //         const SizedBox(height: 5),
+              //         Text(
+              //           (langUserPhone == "fr")
+              //               ? "Faites la promotion de vos produits et services grâce à notre Campagne Mail."
+              //               : "Promote your products and services with our Mail Campaign.",
+              //           style: GoogleFonts.poppins(
+              //             fontWeight: FontWeight.w300,
+              //             fontSize: 14,
+              //           ),
+              //         ),
+              //         Row(
+              //           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              //           children: [
+              //             Column(
+              //               children: [
+              //                 SizedBox(
+              //                   width: MediaQuery.of(context).size.width * 0.42,
+              //                   child: ElevatedButton(
+              //                       style: ElevatedButton.styleFrom(
+              //                         backgroundColor: primaryColor,
+              //                         shape: const StadiumBorder(),
+              //                         padding: const EdgeInsets.symmetric(
+              //                           vertical: 10,
+              //                         ),
+              //                       ),
+              //                       child: Text(
+              //                         (langUserPhone == "fr")
+              //                             ? "Démarrer"
+              //                             : "To start up",
+              //                         style: GoogleFonts.poppins(
+              //                           color: Colors.white,
+              //                         ),
+              //                       ),
+              //                       onPressed: () {
+              //                         Navigator.push(
+              //                           context,
+              //                           MaterialPageRoute(
+              //                             builder: (context) =>
+              //                                 NewCampagneMailPage(),
+              //                           ),
+              //                         );
+              //                       }),
+              //                 )
+              //               ],
+              //             ),
+              //             Column(
+              //               children: [
+              //                 SizedBox(
+              //                   width: MediaQuery.of(context).size.width * 0.42,
+              //                   child: ElevatedButton(
+              //                       style: ElevatedButton.styleFrom(
+              //                         backgroundColor: secondaryColor,
+              //                         shape: const StadiumBorder(),
+              //                         padding: const EdgeInsets.symmetric(
+              //                           vertical: 10,
+              //                         ),
+              //                       ),
+              //                       child: Text(
+              //                         (langUserPhone == "fr")
+              //                             ? "Voir la liste"
+              //                             : "See the list",
+              //                         style: GoogleFonts.poppins(
+              //                           color: Colors.white,
+              //                         ),
+              //                       ),
+              //                       onPressed: () {
+              //                         Navigator.push(
+              //                           context,
+              //                           MaterialPageRoute(
+              //                               builder: (context) =>
+              //                                   CampagneMailListePage()),
+              //                         );
+              //                       }),
+              //                 )
+              //               ],
+              //             ),
+              //           ],
+              //         )
+              //       ],
+              //     ),
+              //   ),
+              // ),
+              // DressurDivider(),
               // Card(
               //   margin: const EdgeInsets.only(
               //       left: 10, top: 5, right: 10, bottom: 5),
