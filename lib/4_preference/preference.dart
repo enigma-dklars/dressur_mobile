@@ -104,7 +104,9 @@ class _PreferencePageState extends State<PreferencePage> {
           elevation: 0,
           backgroundColor: primaryColor,
           title: Text(
-            (langUserPhone == "fr") ? "Préférences" : "Preferences",
+            (langUserPhone == "fr")
+                ? "Préférences et Récompenses"
+                : "Preferences and Rewards",
             style: GoogleFonts.poppins(
               color: Colors.white,
               fontWeight: FontWeight.w400,
@@ -260,96 +262,96 @@ class _PreferencePageState extends State<PreferencePage> {
                   ),
                 ),
                 DressurDivider(),
-                Card(
-                  margin: const EdgeInsets.only(
-                      left: 10, top: 5, right: 10, bottom: 5),
-                  child: Container(
-                    padding: const EdgeInsets.fromLTRB(10, 5, 10, 2),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Text(
-                          (langUserPhone == "fr")
-                              ? "Centres d'intérêt, Loisirs, etc."
-                              : "Center of interest, Leisure, etc.",
-                          style: GoogleFonts.poppins(
-                            fontWeight: FontWeight.w400,
-                            color: primaryColor,
-                            fontSize: 22,
-                          ),
-                          textAlign: TextAlign.left,
-                        ),
-                        const SizedBox(height: 3),
-                        Text(
-                          (langUserPhone == "fr")
-                              ? "NB : Choisissez parmi les options disponibles. Les centres d'intérêt que vous sélectionnerez seront utilisés pour vous proposer des services, des opportunités, des recommandations personnalisées, etc."
-                              : "NB: Choose from the available options. The interests you select will be used to offer you services, opportunities, personalized recommendations, etc.",
-                          style: GoogleFonts.poppins(
-                            fontSize: 10,
-                            fontWeight: FontWeight.w500,
-                          ),
-                          textAlign: TextAlign.left,
-                        ),
-                        const SizedBox(height: 5),
-                        Text(
-                          (langUserPhone == "fr")
-                              ? "Vos choix sont les suivants :"
-                              : "Your choices are :",
-                          style: GoogleFonts.poppins(
-                            fontWeight: FontWeight.w500,
-                            color: primaryColor,
-                            fontSize: 14,
-                          ),
-                          textAlign: TextAlign.left,
-                        ),
-                        const SizedBox(height: 5),
-                        Text(
-                          preferenceCentreInteretLoisirText.toString(),
-                          style: GoogleFonts.poppins(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w400,
-                          ),
-                          textAlign: TextAlign.left,
-                          maxLines: 3,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            SizedBox(
-                              width: MediaQuery.of(context).size.width * 0.35,
-                              child: ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: primaryColor,
-                                  shape: const StadiumBorder(),
-                                  padding: const EdgeInsets.symmetric(
-                                    vertical: 10,
-                                  ),
-                                ),
-                                onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            ChoixDesCentreInteretLoisir()),
-                                  );
-                                },
-                                child: Text(
-                                  (langUserPhone == "fr") ? 'Modifier' : 'Edit',
-                                  style: GoogleFonts.poppins(
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              ),
-                            )
-                          ],
-                        ),
-                        const SizedBox(height: 3),
-                      ],
-                    ),
-                  ),
-                ),
-                DressurDivider(),
+                // Card(
+                //   margin: const EdgeInsets.only(
+                //       left: 10, top: 5, right: 10, bottom: 5),
+                //   child: Container(
+                //     padding: const EdgeInsets.fromLTRB(10, 5, 10, 2),
+                //     child: Column(
+                //       crossAxisAlignment: CrossAxisAlignment.stretch,
+                //       children: [
+                //         Text(
+                //           (langUserPhone == "fr")
+                //               ? "Centres d'intérêt, Loisirs, etc."
+                //               : "Center of interest, Leisure, etc.",
+                //           style: GoogleFonts.poppins(
+                //             fontWeight: FontWeight.w400,
+                //             color: primaryColor,
+                //             fontSize: 22,
+                //           ),
+                //           textAlign: TextAlign.left,
+                //         ),
+                //         const SizedBox(height: 3),
+                //         Text(
+                //           (langUserPhone == "fr")
+                //               ? "NB : Choisissez parmi les options disponibles. Les centres d'intérêt que vous sélectionnerez seront utilisés pour vous proposer des services, des opportunités, des recommandations personnalisées, etc."
+                //               : "NB: Choose from the available options. The interests you select will be used to offer you services, opportunities, personalized recommendations, etc.",
+                //           style: GoogleFonts.poppins(
+                //             fontSize: 10,
+                //             fontWeight: FontWeight.w500,
+                //           ),
+                //           textAlign: TextAlign.left,
+                //         ),
+                //         const SizedBox(height: 5),
+                //         Text(
+                //           (langUserPhone == "fr")
+                //               ? "Vos choix sont les suivants :"
+                //               : "Your choices are :",
+                //           style: GoogleFonts.poppins(
+                //             fontWeight: FontWeight.w500,
+                //             color: primaryColor,
+                //             fontSize: 14,
+                //           ),
+                //           textAlign: TextAlign.left,
+                //         ),
+                //         const SizedBox(height: 5),
+                //         Text(
+                //           preferenceCentreInteretLoisirText.toString(),
+                //           style: GoogleFonts.poppins(
+                //             fontSize: 16,
+                //             fontWeight: FontWeight.w400,
+                //           ),
+                //           textAlign: TextAlign.left,
+                //           maxLines: 3,
+                //           overflow: TextOverflow.ellipsis,
+                //         ),
+                //         Row(
+                //           mainAxisAlignment: MainAxisAlignment.end,
+                //           children: [
+                //             SizedBox(
+                //               width: MediaQuery.of(context).size.width * 0.35,
+                //               child: ElevatedButton(
+                //                 style: ElevatedButton.styleFrom(
+                //                   backgroundColor: primaryColor,
+                //                   shape: const StadiumBorder(),
+                //                   padding: const EdgeInsets.symmetric(
+                //                     vertical: 10,
+                //                   ),
+                //                 ),
+                //                 onPressed: () {
+                //                   Navigator.push(
+                //                     context,
+                //                     MaterialPageRoute(
+                //                         builder: (context) =>
+                //                             ChoixDesCentreInteretLoisir()),
+                //                   );
+                //                 },
+                //                 child: Text(
+                //                   (langUserPhone == "fr") ? 'Modifier' : 'Edit',
+                //                   style: GoogleFonts.poppins(
+                //                     color: Colors.white,
+                //                   ),
+                //                 ),
+                //               ),
+                //             )
+                //           ],
+                //         ),
+                //         const SizedBox(height: 3),
+                //       ],
+                //     ),
+                //   ),
+                // ),
+                // DressurDivider(),
                 const SizedBox(height: 5),
                 SociauxPage(),
                 const SizedBox(height: 5),
