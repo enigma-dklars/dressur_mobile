@@ -22,7 +22,9 @@ bool modeReconnaissanceContactArrierePlan = false;
 const generalRouteForApi = '$generalApiDomaine/api';
 const generalRouteForPromotionImage = '$generalApiDomaine/promotion/';
 
+const tiktokDS = "https://www.tiktok.com/@dressur_ds";
 const facebookDS = "https://www.facebook.com/dressurds";
+const instagramDS = "https://www.instagram.com/dressurds";
 const facebookBLT = "https://www.facebook.com/bluelife.tech";
 const facebookELTCS = "https://www.facebook.com/eliticscore";
 const tiktokBLT = "https://www.tiktok.com/@bluelife.tech";
