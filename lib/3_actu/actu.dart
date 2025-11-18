@@ -441,14 +441,14 @@ class _ActuPageState extends State<ActuPage> {
             //     );
             //   },
             // ),
-            const Padding(
-              padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
-              child: VerticalDivider(
-                width: 0,
-                color: Colors.white,
-                thickness: 1,
-              ),
-            ),
+            // const Padding(
+            //   padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
+            //   child: VerticalDivider(
+            //     width: 0,
+            //     color: Colors.white,
+            //     thickness: 1,
+            //   ),
+            // ),
             IconButton(
               icon: const Icon(
                 Icons.notifications,
