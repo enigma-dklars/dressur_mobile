@@ -51,7 +51,7 @@ class _SociauxPageState extends State<SociauxPage> {
                 : "On the pages below, promo codes will be hidden in the posts, so subscribe to stay up-to-date. You'll also be informed of all the opportunities, tips, training, promotions, and more that you shouldn't miss. Your feedback on the posts is also welcome and will be rewarded every weekend. Thank you. 🙏🙏🙏",
             style: GoogleFonts.poppins(
               color: Colors.white,
-              fontSize: 14,
+              fontSize: 12,
               fontWeight: FontWeight.w500,
             ),
             textAlign: TextAlign.justify,
