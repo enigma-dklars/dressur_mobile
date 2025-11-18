@@ -195,7 +195,7 @@ class _PreferencePageState extends State<PreferencePage> {
                               ? "NB : Sélectionnez parmi les pays disponibles. Ces pays sélectionnés seront ceux à partir desquels vous recevrez des propositions de contacts et d'actualités, ainsi que vers lesquels seront orientées vos promotions commerciales et vos boosts contacts."
                               : "NB : Select from the available countries. These selected countries will be those from which you will receive contact and news proposals, as well as towards which your commercial promotions and contact boosts will be directed.",
                           style: GoogleFonts.poppins(
-                            fontSize: 10,
+                            fontSize: 14,
                             fontWeight: FontWeight.w500,
                           ),
                           textAlign: TextAlign.left,
@@ -208,7 +208,7 @@ class _PreferencePageState extends State<PreferencePage> {
                           style: GoogleFonts.poppins(
                             fontWeight: FontWeight.w500,
                             color: primaryColor,
-                            fontSize: 14,
+                            fontSize: 15,
                           ),
                           textAlign: TextAlign.left,
                         ),
