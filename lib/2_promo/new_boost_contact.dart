@@ -69,8 +69,8 @@ class _NewBoostContactPageState extends State<NewBoostContactPage> {
                     const SizedBox(height: 10),
                     Text(
                       (langUserPhone == "fr")
-                          ? "NB: Les Boosts Gratuit sont beaucoup plus mis en avant ! Il est donc conseillé de faire des Boosts Gratuit plutôt que Payant. Il n'est pas possible de connaitre à l'avance le nombre de contacts après boost ni la tranche rapproché. Vous pouvez programmer plusieurs Boosts Gratuit ou Payant. Parrainé des utilisateurs pour avoir des bonus et ainsi faire des Boosts Gratuit. Votre Boost Contact Devient Inactif si votre dernière connexion remonte à plus de 48H. Connectez-vous donc au minimum une fois par jour pour récupérer les contacts obtenus."
-                          : "NB: Free Boosts are much more highlighted! It is therefore advisable to do Free Boosts rather than Paid Boosts. It is not possible to know in advance the number of contacts after boosting or the close range. You can program several Free or Paid Boosts. Sponsor users to have bonuses and thus do Free Boosts. Your Contact Boost Becomes Inactive if your last connection is more than 48 hours old. So connect at least once a day to recover the contacts obtained.",
+                          ? "Informations : \n- Les Boosts Payant sont beaucoup plus mis en avant ! Il est donc conseillé de faire des Boosts Payant plutôt que Gratuit.\n- Il n'est pas possible de connaitre à l'avance le nombre de contacts après boost ni la tranche rapproché. \n- Vous pouvez programmer plusieurs Boosts Contact Payant. \n-Votre Boost Contact Devient Inactif si votre dernière connexion remonte à plus de 48H. Connectez-vous donc au minimum une fois par jour pour récupérer les contacts obtenus. \n- Après un Boost Contact Gratuit, vous etès obligé de faire au moins un Boost Conatct Payant avant de pouvoir faire encore un Boost Contact Gratuit. \n- Après un Boost Contact, vous vous connectez chaque jour pour que les nouveaux contacts soient enregistrés directement dans votre téléphone."
+                          : "Information: \n- Paid Boosts are much more prominently featured! It is therefore advisable to use Paid Boosts rather than Free ones. \n- It is not possible to know in advance the number of contacts after a boost or the next contact period. \n- You can schedule several Paid Contact Boosts. \n- Your Contact Boost becomes inactive if your last login was more than 48 hours ago. Therefore, log in at least once a day to retrieve the contacts obtained. \n- After a Free Contact Boost, you must complete at least one Paid Contact Boost before you can perform another Free Contact Boost. \n- After a Contact Boost, you log in every day so that new contacts are saved directly to your phone.",
                       style: GoogleFonts.poppins(
                         fontWeight: FontWeight.w600,
                         fontSize: 10,
@@ -240,7 +240,6 @@ class _RegisterFormState extends State<RegisterForm> {
         request.fields.addAll({
           'uid': uidUser,
           'langUserPhone': langUserPhone.toString(),
-          'idFormulBoost': idFormulBoost.toString()
         });
 
         http.StreamedResponse response = await request.send();
@@ -321,7 +320,7 @@ class _RegisterFormState extends State<RegisterForm> {
   @override
   void initState() {
     super.initState();
-    listeFormuleBoost(); // Loading the diary when the app starts
+    // listeFormuleBoost(); // Loading the diary when the app starts
   }
 
   @override
@@ -329,25 +328,11 @@ class _RegisterFormState extends State<RegisterForm> {
     return Container(
       child: Column(
         children: [
-          loading_formule_gratuit
-              ? const Center(
-                  child: CircularProgressIndicator(),
-                )
-              : SelectFormField(
-                  decoration: const InputDecoration(
-                    labelText: 'Formules de Boost',
-                    border: OutlineInputBorder(),
-                  ),
-                  type: SelectFormFieldType.dropdown,
-                  initialValue: '0',
-                  labelText: 'Formules de Boost',
-                  items: listeDesFormules,
-                  onChanged: (val) => onChangeFormulBoost(val),
-                  onSaved: (val) => print(val),
-                ),
           const SizedBox(height: 20),
           Text(
-            _message,
+            (langUserPhone == "fr")
+                ? "Demander un Boost Contact Gratuit de 05 jours"
+                : "Request a Free 5-Day Contact Boost",
             style: GoogleFonts.poppins(
               fontSize: 16,
             ),
@@ -369,7 +354,9 @@ class _RegisterFormState extends State<RegisterForm> {
                     ? (langUserPhone == "fr")
                         ? "Patientez..."
                         : "Wait..."
-                    : "BOOSTER",
+                    : (langUserPhone == "fr")
+                        ? "Demander un Boost Gratuit"
+                        : "Request a Free Boost",
                 style: GoogleFonts.poppins(
                   color: Colors.white,
                 ),
@@ -725,7 +712,6 @@ class _RegisterForm2State extends State<RegisterForm2> {
             ),
           ),
           const SizedBox(height: 10),
-          
         ],
       ),
     );
