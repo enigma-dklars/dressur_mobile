@@ -81,8 +81,8 @@ class _PromotionFormPageState extends State<PromotionFormPage> {
                     const SizedBox(height: 10),
                     Text(
                       (langUserPhone == "fr")
-                          ? "NB : Après avoir rempli et valider votre promotion, elle sera analysée par les administrateurs de Dressur. Si votre promotion est acceptée, elle sera visible par des milliers d'utilisateurs correspondants à vos préférences pays. Si la promotion est rejetée, vous aurez la possibilité de la modifier."
-                          : "NB : After completing and validating your promotion, it will be analyzed by Dressur administrators. If your promotion is accepted, it will be visible to thousands of users corresponding to your country preferences. If the promotion is rejected, you will have the opportunity to modify it.",
+                          ? "Informations : \n- Après avoir rempli et envoyer votre promotion, elle sera analysée par les administrateurs de Dressur. Si votre promotion est acceptée, elle sera visible par des milliers d'utilisateurs correspondants à vos préférences pays. \n- Si la promotion est rejetée, vous aurez la possibilité de la modifier. \n- Les utilisateurs intéressés par votre Promotion Affaire vous contacterons sur votre numéro WhatsApp. \n- Les Promotions Affaires (Offre d'emploi et Demande d'emploi) sont gratuites."
+                          : "Information: \n- After completing and submitting your promotion, it will be reviewed by Dressur administrators. If your promotion is accepted, it will be visible to thousands of users matching your country preferences. \n- If the promotion is rejected, you will have the option to modify it. \n- Users interested in your Business Promotion will contact you on your WhatsApp number. \n- Business Promotions (Job Offer and Job Application) are free.",
                       style: GoogleFonts.poppins(
                         fontWeight: FontWeight.w600,
                         color: Colors.white,
@@ -220,7 +220,7 @@ class _ProduitsServicesState extends State<ProduitsServices> {
     request.fields['text'] = _textEditingController.text;
     request.fields['uid'] = uidUser;
     request.fields['langUserPhone'] = langUserPhone.toString();
-    request.fields['mode'] = load ? "payant" : "gratuit";
+    request.fields['mode'] = "payant";
     request.fields['paymentMethod'] = valueMethodePaiement;
     request.fields['tel'] = telController.text;
 
@@ -327,8 +327,8 @@ class _ProduitsServicesState extends State<ProduitsServices> {
     setState(() {
       idFormulBoost = val;
       _message = (langUserPhone == "fr")
-          ? "Cette formule vous offre une promotion affaire de $jours jour(s) pour $prix Bonus ou $prix FCFA."
-          : "This formula offers you a business promotion of $jours day(s) for $prix Bonus or $prix FCFA.";
+          ? "Cette formule vous offre une promotion affaire de $jours jour(s) pour $prix FCFA."
+          : "This formula offers you a business promotion of $jours day(s) for $prix FCFA.";
     });
   }
 
@@ -367,7 +367,7 @@ class _ProduitsServicesState extends State<ProduitsServices> {
                   onChanged: (val) => onChangeFormulBoost(val),
                   onSaved: (val) => print(val),
                 ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 16.0),
           Text(
             _message,
             style: GoogleFonts.poppins(
@@ -375,7 +375,28 @@ class _ProduitsServicesState extends State<ProduitsServices> {
             ),
             textAlign: TextAlign.center,
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 16.0),
+          SelectFormField(
+            decoration: const InputDecoration(
+              labelText: 'Moyen de paiement mobile ou par carte',
+              border: OutlineInputBorder(),
+            ),
+            type: SelectFormFieldType.dropdown,
+            initialValue: 'mtn',
+            labelText: 'Moyen de paiement mobile ou par carte',
+            items: listeMethodePaiements,
+            onChanged: (val) => onChangeMethodePaiement(val),
+            onSaved: (val) => print(val),
+          ),
+          const SizedBox(height: 16.0),
+          TextField(
+            controller: telController,
+            decoration: const InputDecoration(
+              labelText: 'Indicatif + Numéro du paiement',
+              border: OutlineInputBorder(),
+            ),
+          ),
+          const SizedBox(height: 16.0),
           ElevatedButton(
             onPressed: _isSending ? null : _selectImage,
             style: ElevatedButton.styleFrom(
@@ -387,8 +408,8 @@ class _ProduitsServicesState extends State<ProduitsServices> {
             ),
             child: Text(
               (langUserPhone == "fr")
-                  ? 'Sélectionner une image'
-                  : 'Select an image',
+                  ? "Sélectionner l'image de la promotion"
+                  : 'Select the promotional image',
               style: GoogleFonts.poppins(
                 color: Colors.white,
                 fontWeight: FontWeight.w600,
@@ -415,73 +436,6 @@ class _ProduitsServicesState extends State<ProduitsServices> {
             ),
           ),
           const SizedBox(height: 16.0),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                (langUserPhone == "fr") ? 'Gratuit' : 'Free',
-                style: GoogleFonts.poppins(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w800,
-                  color: Colors.green,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(width: 10),
-              Switch(
-                trackOutlineColor:
-                    MaterialStateColor.resolveWith((states) => primaryColor),
-                activeColor: Colors.red,
-                activeTrackColor: primaryColor,
-                inactiveThumbColor: Colors.green,
-                inactiveTrackColor: primaryColor,
-                value: load,
-                onChanged: (bool? newValue) {
-                  setState(() {
-                    if (newValue == true) {
-                      load = true;
-                    } else {
-                      load = false;
-                    }
-                  });
-                },
-              ),
-              const SizedBox(width: 10),
-              Text(
-                (langUserPhone == "fr") ? 'Payant' : 'Paid',
-                style: GoogleFonts.poppins(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w800,
-                  color: Colors.red,
-                ),
-                textAlign: TextAlign.center,
-              ),
-            ],
-          ),
-          const SizedBox(height: 16.0),
-          if (load == true) ...[
-            SelectFormField(
-              decoration: const InputDecoration(
-                labelText: 'Moyen de paiement mobile ou par carte',
-                border: OutlineInputBorder(),
-              ),
-              type: SelectFormFieldType.dropdown,
-              initialValue: 'mtn',
-              labelText: 'Moyen de paiement mobile ou par carte',
-              items: listeMethodePaiements,
-              onChanged: (val) => onChangeMethodePaiement(val),
-              onSaved: (val) => print(val),
-            ),
-            const SizedBox(height: 20),
-            TextField(
-              controller: telController,
-              decoration: const InputDecoration(
-                labelText: 'Indicatif + Numéro du paiement',
-                border: OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 10),
-          ],
           ElevatedButton(
             onPressed: _isSending ? null : _sendData,
             style: ElevatedButton.styleFrom(
