@@ -44,18 +44,18 @@ class _SociauxPageState extends State<SociauxPage> {
             ),
             textAlign: TextAlign.center,
           ),
-          const SizedBox(height: 10),
-          Text(
-            (langUserPhone == "fr")
-                ? "Sur les pages ci-dessous, seront dissimulés des codes promos dans les postes, abonnez-vous pour ne rien manquer. Vous serez également informé de toutes les opportunités, astuces, formations, promotions, etc. que vous ne devez pas manquer. Vos réactions aux postes sont aussi les bienvenus et sont récompensé chaque fin de semaine. Merci. 🙏🙏🙏"
-                : "On the pages below, promo codes will be hidden in the posts, so subscribe to stay up-to-date. You'll also be informed of all the opportunities, tips, training, promotions, and more that you shouldn't miss. Your feedback on the posts is also welcome and will be rewarded every weekend. Thank you. 🙏🙏🙏",
-            style: GoogleFonts.poppins(
-              color: Colors.white,
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
-            ),
-            textAlign: TextAlign.justify,
-          ),
+          // const SizedBox(height: 10),
+          // Text(
+          //   (langUserPhone == "fr")
+          //       ? "Sur les pages ci-dessous, seront dissimulés des codes promos dans les postes, abonnez-vous pour ne rien manquer. Vous serez également informé de toutes les opportunités, astuces, formations, promotions, etc. que vous ne devez pas manquer. Vos réactions aux postes sont aussi les bienvenus et sont récompensé chaque fin de semaine. Merci. 🙏🙏🙏"
+          //       : "On the pages below, promo codes will be hidden in the posts, so subscribe to stay up-to-date. You'll also be informed of all the opportunities, tips, training, promotions, and more that you shouldn't miss. Your feedback on the posts is also welcome and will be rewarded every weekend. Thank you. 🙏🙏🙏",
+          //   style: GoogleFonts.poppins(
+          //     color: Colors.white,
+          //     fontSize: 12,
+          //     fontWeight: FontWeight.w500,
+          //   ),
+          //   textAlign: TextAlign.justify,
+          // ),
           const SizedBox(height: 10),
           Column(
             children: [

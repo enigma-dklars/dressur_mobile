@@ -168,7 +168,6 @@ class RegisterForm extends StatefulWidget {
 class _RegisterFormState extends State<RegisterForm> {
   bool _desactive = false;
   bool loading_formule_gratuit = false;
-  var _message = "";
   dynamic data;
   dynamic idFormulBoost = 1;
   String? boostId;
@@ -207,9 +206,6 @@ class _RegisterFormState extends State<RegisterForm> {
                 (data["listeMethodePaiements"] as List<dynamic>)
                     .map((item) => item as Map<String, dynamic>)
                     .toList();
-            _message = (langUserPhone == "fr")
-                ? "Veuillez choisir une formule."
-                : "Please choose a plan.";
           });
         }
       }
@@ -311,9 +307,6 @@ class _RegisterFormState extends State<RegisterForm> {
     }
     setState(() {
       idFormulBoost = val;
-      _message = (langUserPhone == "fr")
-          ? "Cette formule vous offre un boost de $jours jour(s) pour $prix Bonus."
-          : "This formula offers you a boost of $jours day(s) for $prix Bonus.";
     });
   }
 

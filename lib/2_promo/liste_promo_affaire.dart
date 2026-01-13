@@ -4,7 +4,6 @@ import 'dart:convert';
 import 'dart:convert' as convert;
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dressur/2_promo/edit_promo_affaire_produit_service.dart';
-import 'package:dressur/components/delayed_animation.dart';
 import 'package:dressur/components/noti.dart';
 import 'package:dressur/components/noti_sys.dart';
 import 'package:flutter/material.dart';
@@ -515,8 +514,8 @@ class PromotionDetailPage extends StatelessWidget {
                   const SizedBox(height: 5),
                   Text(
                     (langUserPhone == "fr")
-                        ? 'Votre demande de promotion a été acceptée. Vous pouvez démarrer la promotion à titre gratuite ou payante.'
-                        : 'Your promotion request has been accepted. You can start the promotion for free or paid.',
+                        ? 'Votre demande de promotion a été acceptée.'
+                        : 'Your promotion request has been accepted.',
                     style: GoogleFonts.poppins(
                         fontSize: 16, fontWeight: FontWeight.w600),
                     textAlign: TextAlign.center,
@@ -524,20 +523,14 @@ class PromotionDetailPage extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
-                      ElevatedButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  PaymentGratuitPage(promotion: promotion),
-                            ),
-                          );
-                        },
-                        child:
-                            Text((langUserPhone == "fr") ? 'Gratuite' : 'Free'),
-                      ),
-                      ElevatedButton(
+                      ElevatedButton.icon(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.orange,
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 0, horizontal: 15),
+                        ),
+                        icon: const Icon(Icons.payment,
+                            color: Colors.white, size: 13),
                         onPressed: () {
                           Navigator.push(
                             context,
@@ -547,8 +540,13 @@ class PromotionDetailPage extends StatelessWidget {
                             ),
                           );
                         },
-                        child:
-                            Text((langUserPhone == "fr") ? 'Payante' : 'Paid'),
+                        label: Text(
+                          (langUserPhone == "fr") ? 'Payer' : 'Pay',
+                          style: GoogleFonts.poppins(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w400,
+                              fontSize: 13),
+                        ),
                       ),
                     ],
                   ),
@@ -625,256 +623,6 @@ class PromotionDetailPage extends StatelessWidget {
   }
 }
 
-class PaymentGratuitPage extends StatefulWidget {
-  final Promotion promotion;
-
-  PaymentGratuitPage({required this.promotion});
-
-  @override
-  _PaymentGratuitPageState createState() => _PaymentGratuitPageState();
-}
-
-class _PaymentGratuitPageState extends State<PaymentGratuitPage> {
-  bool _desactive = false;
-  bool loading_formule_gratuit = false;
-  var _message = "";
-  dynamic data;
-  dynamic idFormulBoost = 1;
-  String? boostId;
-
-  List<Map<String, dynamic>> listeDesFormules = [];
-  int value = 0;
-  var label = "";
-  int prix = 0;
-  int jours = 0;
-
-  void listeFormulePromoAffaire() async {
-    bool isConnected = await isConnectedToInternet();
-    if (isConnected) {
-      setState(() {
-        _desactive = true;
-        loading_formule_gratuit = true;
-      });
-
-      var request = http.MultipartRequest(
-          'POST', Uri.parse('$generalRouteForApi/listeFormulePromoAffaire'));
-      request.fields.addAll({});
-
-      http.StreamedResponse response = await request.send();
-
-      if (response.statusCode == 200) {
-        var data1 = await response.stream.bytesToString();
-        var data = convert.jsonDecode(data1);
-        if (data["error"] == false) {
-          setState(() {
-            _desactive = false;
-            loading_formule_gratuit = false;
-            listeDesFormules = (data["listeFormulBoost"] as List<dynamic>)
-                .map((item) => item as Map<String, dynamic>)
-                .toList();
-            listeMethodePaiements =
-                (data["listeMethodePaiements"] as List<dynamic>)
-                    .map((item) => item as Map<String, dynamic>)
-                    .toList();
-            _message = (langUserPhone == "fr")
-                ? "Veuillez choisir une formule."
-                : "Please choose a plan.";
-          });
-        }
-      }
-    } else {
-      if (langUserPhone != "fr") {
-        dangerNoti(
-            "Mistake!", "You are not connected to the internet.", context);
-      } else {
-        dangerNoti("Erreur!", "Vous n'ètes pas connecté a internet.", context);
-      }
-      setState(() {
-        _desactive = false;
-        loading_formule_gratuit = false;
-      });
-    }
-  }
-
-  void newPromo() async {
-    if (telIsVerified == true) {
-      bool isConnected = await isConnectedToInternet();
-      if (isConnected) {
-        setState(() {
-          _desactive = true;
-        });
-
-        var request = http.MultipartRequest(
-            'POST', Uri.parse('$generalRouteForApi/newPromo'));
-        request.fields.addAll({
-          'uid': uidUser,
-          'idPromotion': widget.promotion.id,
-          'langUserPhone': langUserPhone.toString(),
-          'idFormulBoost': idFormulBoost.toString()
-        });
-
-        http.StreamedResponse response = await request.send();
-
-        if (response.statusCode == 200) {
-          var data1 = await response.stream.bytesToString();
-          var data = convert.jsonDecode(data1);
-          if (data["error"] == false) {
-            setState(() {
-              _desactive = false;
-              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                backgroundColor: Colors.red,
-                behavior: SnackBarBehavior.floating,
-                content: Text(
-                  'Votre Promo a déja démarer.',
-                  style: GoogleFonts.poppins(
-                    color: Colors.white,
-                  ),
-                ),
-              ));
-            });
-          } else {
-            dangerNoti(data["titre"], data["message"], context);
-            setState(() {
-              _desactive = false;
-            });
-          }
-        }
-      } else {
-        if (langUserPhone != "fr") {
-          dangerNoti(
-              "Mistake!", "You are not connected to the internet.", context);
-        } else {
-          dangerNoti(
-              "Erreur!", "Vous n'ètes pas connecté a internet.", context);
-        }
-        setState(() {
-          _desactive = false;
-        });
-      }
-    } else {
-      dangerNoti("Accès Refusé !",
-          "Veuillez d'abord confirmer votre numéro WhatsApp.", context);
-    }
-  }
-
-  onChangeFormulBoost(val) async {
-    for (var service in listeDesFormules) {
-      if ("$val" == "${service['value']}") {
-        setState(() {
-          value = service['value'];
-          label = service['label'];
-          prix = service['prix'];
-          jours = service['jours'];
-        });
-      }
-    }
-    setState(() {
-      idFormulBoost = val;
-      _message = (langUserPhone == "fr")
-          ? "Cette formule vous offre une promotion affaire de $jours jour(s) pour $prix Bonus."
-          : "This formula offers you a business promotion of $jours day(s) for $prix Bonus.";
-    });
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    listeFormulePromoAffaire(); // Loading the diary when the app starts
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'Page de Démarrage Gratuit',
-          style: GoogleFonts.poppins(
-            fontWeight: FontWeight.w400,
-            color: Colors.white,
-          ),
-        ),
-        leading: IconButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          icon: const Icon(
-            Icons.arrow_back,
-            size: 30,
-            color: Colors.white,
-          ),
-        ),
-        backgroundColor: primaryColor,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            loading_formule_gratuit
-                ? const Center(
-                    child: CircularProgressIndicator(),
-                  )
-                : SelectFormField(
-                    decoration: const InputDecoration(
-                      labelText: 'Formules de Promotion Affaire Payant',
-                      border: OutlineInputBorder(),
-                    ),
-                    type: SelectFormFieldType.dropdown,
-                    initialValue: '0',
-                    labelText: 'Formules de Promotion Affaire',
-                    items: listeDesFormules,
-                    onChanged: (val) => onChangeFormulBoost(val),
-                    onSaved: (val) => print(val),
-                  ),
-            const SizedBox(height: 20),
-            Text(
-              _message,
-              style: GoogleFonts.poppins(
-                fontSize: 16,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 20),
-            SizedBox(
-              width: MediaQuery.of(context).size.width * 0.95,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: primaryColor,
-                  shape: const StadiumBorder(),
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 13,
-                  ),
-                ),
-                child: Text(
-                  _desactive
-                      ? (langUserPhone == "fr")
-                          ? "Patientez..."
-                          : "Wait..."
-                      : "BOOSTER",
-                  style: GoogleFonts.poppins(
-                    color: Colors.white,
-                  ),
-                ),
-                onPressed: () {
-                  if (!telIsVerified) {
-                    showConfNumeroWhatsapp(context);
-                  } else if (!mailIsVerified) {
-                    warningNoti(
-                        "Configuration du compte",
-                        "Veuillez d'abord confirmer votre adresse mail...",
-                        context);
-                  } else {
-                    _desactive ? null : newPromo();
-                  }
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class PaymentPayantPage extends StatefulWidget {
   final Promotion promotion;
 
@@ -902,6 +650,7 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
 
   void listeFormulePromoAffaire() async {
     bool isConnected = await isConnectedToInternet();
+
     if (isConnected) {
       setState(() {
         _desactive2 = true;
@@ -916,6 +665,7 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
 
       if (response.statusCode == 200) {
         var data1 = await response.stream.bytesToString();
+
         var data = convert.jsonDecode(data1);
         if (data["error"] == false) {
           setState(() {
@@ -941,6 +691,7 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
       } else {
         dangerNoti("Erreur!", "Vous n'ètes pas connecté a internet.", context);
       }
+
       setState(() {
         _desactive2 = false;
         loading_formule_payant = false;
@@ -959,6 +710,7 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
         });
       }
     }
+
     setState(() {
       idFormulBoost = val;
       _message = (langUserPhone == "fr")
@@ -976,6 +728,7 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
   void newPromoPayant() async {
     if (telIsVerified == true) {
       bool isConnected = await isConnectedToInternet();
+
       if (isConnected) {
         setState(() {
           _desactive2 = true;
@@ -996,6 +749,7 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
 
         if (response.statusCode == 200) {
           var data1 = await response.stream.bytesToString();
+
           var data = convert.jsonDecode(data1);
           if (data["error"] == false) {
             setState(() {
@@ -1022,6 +776,7 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
             // var idTransaction = data["idTransaction"];
           } else {
             dangerNoti(data["titre"], data["message"], context);
+
             setState(() {
               _desactive2 = false;
             });
@@ -1035,6 +790,7 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
           dangerNoti(
               "Erreur!", "Vous n'ètes pas connecté a internet.", context);
         }
+
         setState(() {
           _desactive2 = false;
         });
@@ -1042,6 +798,7 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
     } else {
       dangerNoti("Accès Refusé !",
           "Veuillez d'abord confirmer votre numéro WhatsApp.", context);
+
       setState(() {
         _desactive2 = false;
       });
@@ -1052,6 +809,12 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
   void initState() {
     super.initState(); // Loading the diary when the app starts
     listeFormulePromoAffaire();
+  }
+
+  @override
+  void dispose() {
+    telController.dispose();
+    super.dispose();
   }
 
   @override
@@ -1085,101 +848,85 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
                 ? const Center(
                     child: CircularProgressIndicator(),
                   )
-                : DelayedAnimation(
-                    delay: 0, // 1500,
-                    child: SelectFormField(
-                      decoration: const InputDecoration(
-                        labelText: 'Formules de Promotion Affaire Payant',
-                        border: OutlineInputBorder(),
-                      ),
-                      type: SelectFormFieldType.dropdown,
-                      initialValue: '0',
-                      labelText: 'Formules de Promotion Payante',
-                      items: listeDesFormules,
-                      onChanged: (val) => onChangeFormulBoost(val),
-                      onSaved: (val) => print(val),
+                : SelectFormField(
+                    decoration: const InputDecoration(
+                      labelText: 'Formules de Promotion Affaire Payant',
+                      border: OutlineInputBorder(),
                     ),
+                    type: SelectFormFieldType.dropdown,
+                    initialValue: '0',
+                    labelText: 'Formules de Promotion Payante',
+                    items: listeDesFormules,
+                    onChanged: (val) => onChangeFormulBoost(val),
+                    onSaved: (val) => print(val),
                   ),
             const SizedBox(height: 20),
-            DelayedAnimation(
-              delay: 0, // 1000,
-              child: Text(
-                _message,
-                style: GoogleFonts.poppins(
-                  fontSize: 16,
-                ),
-                textAlign: TextAlign.center,
+            Text(
+              _message,
+              style: GoogleFonts.poppins(
+                fontSize: 16,
               ),
+              textAlign: TextAlign.center,
             ),
             const SizedBox(height: 20),
-            DelayedAnimation(
-              delay: 0, // 1500,
-              child: SelectFormField(
-                decoration: const InputDecoration(
-                  labelText: 'Moyen de paiement mobile ou par carte',
-                  border: OutlineInputBorder(),
-                ),
-                type: SelectFormFieldType.dropdown,
-                initialValue: 'mtn',
+            SelectFormField(
+              decoration: const InputDecoration(
                 labelText: 'Moyen de paiement mobile ou par carte',
-                items: listeMethodePaiements,
-                onChanged: (val) => onChangeMethodePaiement(val),
-                onSaved: (val) => print(val),
+                border: OutlineInputBorder(),
               ),
+              type: SelectFormFieldType.dropdown,
+              initialValue: 'mtn',
+              labelText: 'Moyen de paiement mobile ou par carte',
+              items: listeMethodePaiements,
+              onChanged: (val) => onChangeMethodePaiement(val),
+              onSaved: (val) => print(val),
             ),
             const SizedBox(height: 20),
-            DelayedAnimation(
-              delay: 0, // 1500,
-              child: TextField(
-                controller: telController,
-                decoration: const InputDecoration(
-                  labelText: 'Indicatif + Numéro du paiement',
-                  border: OutlineInputBorder(),
-                ),
+            TextField(
+              controller: telController,
+              decoration: const InputDecoration(
+                labelText: 'Indicatif + Numéro du paiement',
+                border: OutlineInputBorder(),
               ),
             ),
             const SizedBox(height: 10),
-            DelayedAnimation(
-              delay: 0,
-              child: SizedBox(
-                width: MediaQuery.of(context).size.width * 0.95,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: primaryColor,
-                    shape: const StadiumBorder(),
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 13,
-                    ),
+            SizedBox(
+              width: MediaQuery.of(context).size.width * 0.95,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: primaryColor,
+                  shape: const StadiumBorder(),
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 13,
                   ),
-                  child: Text(
-                    _desactive2
-                        ? (langUserPhone == "fr")
-                            ? "Patientez..."
-                            : "Wait..."
-                        : (langUserPhone == "fr")
-                            ? "Payer et Booster"
-                            : "Pay and Boost",
-                    style: GoogleFonts.poppins(
-                      color: Colors.white,
-                    ),
-                  ),
-                  onPressed: () {
-                    if (!telIsVerified) {
-                      showConfNumeroWhatsapp(context);
-                    } else if (!mailIsVerified) {
-                      warningNoti(
-                          "Configuration du compte",
-                          "Veuillez d'abord confirmer votre adresse mail...",
-                          context);
-                    } else {
-                      _desactive2 ? null : newPromoPayant();
-                    }
-                  },
                 ),
+                child: Text(
+                  _desactive2
+                      ? (langUserPhone == "fr")
+                          ? "Patientez..."
+                          : "Wait..."
+                      : (langUserPhone == "fr")
+                          ? "Payer et Booster"
+                          : "Pay and Boost",
+                  style: GoogleFonts.poppins(
+                    color: Colors.white,
+                  ),
+                ),
+                onPressed: () {
+                  if (!telIsVerified) {
+                    showConfNumeroWhatsapp(context);
+                  } else if (!mailIsVerified) {
+                    warningNoti(
+                        "Configuration du compte",
+                        "Veuillez d'abord confirmer votre adresse mail...",
+                        context);
+                  } else {
+                    _desactive2 ? null : newPromoPayant();
+                  }
+                },
               ),
             ),
             const SizedBox(height: 10),
-            
           ],
         ),
       ),

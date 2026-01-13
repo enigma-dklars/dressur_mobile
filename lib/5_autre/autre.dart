@@ -165,30 +165,30 @@ class _SettingPageState extends State<SettingPage> {
               //     );
               //   },
               // ),
-              ProfileMenu(
-                text: (langUserPhone == "fr")
-                    ? "Invitez vos amis (Parrainage & Promo)"
-                    : "Invite your friends (Sponsorship & Promo)",
-                Myicon: const Icon(Icons.group_add),
-                press: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => AddFriendPage()),
-                  );
-                },
-              ),
-              ProfileMenu(
-                text: (langUserPhone == "fr")
-                    ? "Liste des Bonus Reçu"
-                    : "List of Bonuses Received",
-                Myicon: const Icon(Icons.list),
-                press: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => ListeBonusPage()),
-                  );
-                },
-              ),
+              // ProfileMenu(
+              //   text: (langUserPhone == "fr")
+              //       ? "Invitez vos amis (Parrainage & Promo)"
+              //       : "Invite your friends (Sponsorship & Promo)",
+              //   Myicon: const Icon(Icons.group_add),
+              //   press: () {
+              //     Navigator.push(
+              //       context,
+              //       MaterialPageRoute(builder: (context) => AddFriendPage()),
+              //     );
+              //   },
+              // ),
+              // ProfileMenu(
+              //   text: (langUserPhone == "fr")
+              //       ? "Liste des Bonus Reçu"
+              //       : "List of Bonuses Received",
+              //   Myicon: const Icon(Icons.list),
+              //   press: () {
+              //     Navigator.push(
+              //       context,
+              //       MaterialPageRoute(builder: (context) => ListeBonusPage()),
+              //     );
+              //   },
+              // ),
               ProfileMenu(
                 text: (langUserPhone == "fr")
                     ? "Modifier le mot de passe"
