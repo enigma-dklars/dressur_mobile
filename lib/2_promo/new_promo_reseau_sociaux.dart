@@ -71,8 +71,8 @@ class _PromotionReseauSociauxFormPageState
                     const SizedBox(height: 10),
                     Text(
                       (langUserPhone == "fr")
-                          ? "NB: Vos préférences sur Dressur ne s'appliquent pas aux Promotions Réseau Sociaux. Les comptes qui interagiront avec votre promotion seront sélectionnés par le réseau social, sans que Dressur puisse intervenir."
-                          : "NB: Your preferences on Dressur do not apply to Social Network Promotions. The accounts that will interact with your promotion will be selected by the social network, without Dressur being able to intervene.",
+                          ? "Informations : \n- Vos préférences sur Dressur ne s’appliquent pas aux promotions sur les réseaux sociaux. \n- Les comptes qui interagiront avec votre promotion seront sélectionnés directement par le réseau social, sans que Dressur puisse intervenir. \n- Ce service peut vous aider à obtenir des votes sur les réseaux sociaux, notamment pour les systèmes de vote basés sur les likes, les commentaires, les partages, etc. \n- Ce service vous permet d’attirer davantage l’attention sur vos réseaux sociaux, car aujourd’hui l’être humain accorde plus facilement sa confiance aux comptes ayant un grand nombre d’abonnés, de likes et d’interactions. \n- Lisez correctement la description du service réseau auquel vous voulez souscrire."
+                          : "Information: \n - Your Dressur preferences do not apply to social media promotions. \n - The accounts that will interact with your promotion will be selected directly by the social network, without Dressur's intervention. \n - This service can help you get votes on social media, especially for voting systems based on likes, comments, shares, etc. \n - This service allows you to attract more attention on your social media, because today people more readily trust accounts with a large number of followers, likes, and interactions. \n- Read carefully the description of the network service you want to subscribe to.",
                       style: GoogleFonts.poppins(
                         fontWeight: FontWeight.w600,
                         fontSize: 10,
@@ -450,16 +450,17 @@ class _RegisterForm3State extends State<RegisterForm3> {
                         child: SingleChildScrollView(
                           controller:
                               _scrollController, // Attach the ScrollController here
-                          padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+                          padding: const EdgeInsets.fromLTRB(0, 0, 0, 25),
                           scrollDirection: Axis.horizontal,
                           child: Padding(
                             padding:
                                 const EdgeInsets.symmetric(horizontal: 0.0),
                             child: Row(
+                              spacing: 10,
                               children: List.generate(
                                 listSocialNetworks.length,
                                 (index) => Padding(
-                                  padding: const EdgeInsets.only(right: 10),
+                                  padding: const EdgeInsets.only(right: 0),
                                   child: ActionChip(
                                     label: Row(
                                       children: [
