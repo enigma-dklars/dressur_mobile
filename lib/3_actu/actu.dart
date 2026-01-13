@@ -92,6 +92,69 @@ class _ActuPageState extends State<ActuPage> {
     super.dispose();
   }
 
+  void showWarningDialog(BuildContext context) {
+    int countdown = 5;
+
+    showDialog(
+      context: context,
+      barrierDismissible: false, // ❌ clic extérieur désactivé
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            // Timer déclenché une seule fois
+            Future.delayed(const Duration(seconds: 1), () {
+              if (countdown > 0) {
+                setState(() => countdown--);
+              }
+            });
+
+            return WillPopScope(
+              onWillPop: () async => false, // ❌ bouton retour désactivé
+              child: AlertDialog(
+                // backgroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  side: const BorderSide(color: Colors.red),
+                ),
+                title: Row(
+                  children: const [
+                    Icon(Icons.warning_amber_rounded, color: Colors.red),
+                    SizedBox(width: 8),
+                    Text(
+                      "Avertissement important",
+                      style: TextStyle(color: Colors.red),
+                    ),
+                  ],
+                ),
+                content: const Text(
+                  "Dressur ne peut garantir la fiabilité ou la moralité des utilisateurs.\n\n"
+                  "Il est fortement conseillé de ne jamais envoyer de l’argent pour un service "
+                  "sans être certain de pouvoir entrer en possession de ce pour quoi vous payez.\n\n"
+                  "Dressur décline toute responsabilité en cas d’arnaque ou de perte financière "
+                  "causée par un autre utilisateur.",
+                ),
+                actions: [
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red,
+                    ),
+                    onPressed: countdown == 0
+                        ? () => Navigator.of(context).pop()
+                        : null,
+                    child: Text(
+                      countdown > 0 ? "Fermer ($countdown)" : "Fermer",
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
   void _scrollListener() {
     if (_scrollController.position.userScrollDirection ==
         ScrollDirection.reverse) {
@@ -156,7 +219,8 @@ class _ActuPageState extends State<ActuPage> {
           initUserInformations(data['user']);
           lesPublicites = data['user']["lesPublicites"];
           print(jsonDecode(lesPublicites).length);
-          _futureAdvertisements = fetchAdvertisements();
+          _futureAdvertisements =
+              fetchAdvertisements();
           _loading = false;
         });
       } else {
@@ -188,6 +252,16 @@ class _ActuPageState extends State<ActuPage> {
   }
 
   Future<List<Advertisement>> fetchAdvertisements() async {
+    if (nbrAffichageAvertissement == 0) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        showWarningDialog(context);
+      });
+    }
+
+    setState(() {
+      nbrAffichageAvertissement++;
+    });
+
     if (lesPublicites.toString().isNotEmpty) {
       havePublicites = true;
       final jsonData = jsonDecode(lesPublicites) as List<dynamic>;
