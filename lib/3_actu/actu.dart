@@ -219,8 +219,7 @@ class _ActuPageState extends State<ActuPage> {
           initUserInformations(data['user']);
           lesPublicites = data['user']["lesPublicites"];
           print(jsonDecode(lesPublicites).length);
-          _futureAdvertisements =
-              fetchAdvertisements();
+          _futureAdvertisements = fetchAdvertisements();
           _loading = false;
         });
       } else {
