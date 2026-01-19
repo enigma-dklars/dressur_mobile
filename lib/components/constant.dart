@@ -15,7 +15,7 @@ import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:http/http.dart' as http;
 
-const versionApp = '1.0.12';
+const versionApp = '1.0.13';
 const oldDatabaseName = 'onze_dressur.db';
 const nowDataBaseName = 'douze_dressur.db';
 bool modeReconnaissanceContactArrierePlan = false;
@@ -93,7 +93,7 @@ var modeMotDePasseOublier = false;
 var mailConnexion = "";
 var textChargementEvolution = "Chargement ...";
 var addUserOnAutreProfilPage = "oui";
-var myDressurVersion = '1.0.12';
+var myDressurVersion = '1.0.13';
 var lesPublicites;
 var uidAutreUser;
 var uidUser;
