@@ -89,6 +89,7 @@ bool ihaveConnexion = false;
 bool admin = false;
 bool permissionAdd = false;
 bool boostEnCours = false;
+bool isInscritProgrammeRecompense = false;
 var modeMotDePasseOublier = false;
 var mailConnexion = "";
 var textChargementEvolution = "Chargement ...";
@@ -173,6 +174,8 @@ Future<void> initUserInformations(userInfos) async {
   totalImpressionsText = userInfos["totalImpressionsText"];
   totalVuesText = userInfos["totalVuesText"];
   boostEnCours = userInfos["boostEnCours"];
+  isInscritProgrammeRecompense =
+      userInfos["isInscritProgrammeRecompense"] ?? false;
 
   SQLHelper.viderLaBaseDeDonneeLocal();
 

@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:async';
 import 'package:dressur/1_reception/liste_contact.dart';
+import 'package:dressur/1_reception/recompense.dart';
 import 'package:dressur/components/padding_and_divider.dart';
 import 'package:dressur/components/pub_smt_2024.dart';
 import 'package:dressur/components/sociaux.dart';
@@ -114,6 +115,80 @@ class _ReceptionPageState extends State<ReceptionPage> {
             children: [
               const SizedBox(height: 5),
               SpecialPub(),
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          ProgrammeRecompensePage(), // Page dédiée aux récompenses
+                    ),
+                  );
+                },
+                child: Card(
+                  margin:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  child: Container(
+                    padding: EdgeInsets.zero,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        // Icône dans un cercle (ex: un trophée ou cadeau)
+                        Container(
+                          padding: const EdgeInsets.all(10.0),
+                          margin: const EdgeInsets.all(10.0),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(
+                            Icons.emoji_events, // Icône trophée
+                            color: primaryColor,
+                            size: 24,
+                          ),
+                        ),
+                        // Texte principal et sous-texte
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                "Récompenses",
+                                style: GoogleFonts.poppins(
+                                  color: primaryColor,
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              const SizedBox(height: 5),
+                              Text(
+                                (langUserPhone == "fr")
+                                    ? "Gagnez et suivez vos récompenses"
+                                    : "Earn and track your rewards",
+                                style: GoogleFonts.poppins(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w300,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
+                          ),
+                        ),
+                        // Flèche de navigation
+                        Container(
+                          padding: const EdgeInsets.all(5),
+                          margin: const EdgeInsets.all(5),
+                          child: const Icon(
+                            Icons.chevron_right,
+                            size: 24,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
               GestureDetector(
                 onTap: () {
                   Navigator.push(
