@@ -404,7 +404,7 @@ class _PromotionListPageState extends State<PromotionListPage> {
           onPressed: () {
             Navigator.pop(context);
           },
-          icon: const Icon(Icons.arrow_back, size: 30, color: Colors.white),
+          icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
         ),
         backgroundColor: primaryColor,
         actions: [
@@ -486,7 +486,7 @@ class PromotionDetailPage extends StatelessWidget {
           onPressed: () {
             Navigator.pop(context);
           },
-          icon: const Icon(Icons.arrow_back, size: 30, color: Colors.white),
+          icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
         ),
         backgroundColor: primaryColor,
       ),
@@ -833,8 +833,7 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
             Navigator.pop(context);
           },
           icon: const Icon(
-            Icons.arrow_back,
-            size: 30,
+            Icons.arrow_back_ios,
             color: Colors.white,
           ),
         ),

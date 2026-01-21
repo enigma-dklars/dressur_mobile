@@ -138,8 +138,7 @@ class _CampagneMailListePageState extends State<CampagneMailListePage> {
             Navigator.pop(context);
           },
           icon: const Icon(
-            Icons.arrow_back,
-            size: 30,
+            Icons.arrow_back_ios,
             color: Colors.white,
           ),
         ),
@@ -420,8 +419,7 @@ class CampagneMailDetailPage extends StatelessWidget {
             Navigator.pop(context);
           },
           icon: const Icon(
-            Icons.arrow_back,
-            size: 30,
+            Icons.arrow_back_ios,
             color: Colors.white,
           ),
         ),
@@ -688,8 +686,7 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
             Navigator.pop(context);
           },
           icon: const Icon(
-            Icons.arrow_back,
-            size: 30,
+            Icons.arrow_back_ios,
             color: Colors.white,
           ),
         ),
@@ -772,7 +769,6 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
               ),
             ),
             const SizedBox(height: 20),
-            
           ],
         ),
       ),

@@ -139,6 +139,7 @@ Future<void> insertNumTelUserIntoDataBase(numberTel) async {
 }
 
 Future<void> initUserInformations(userInfos) async {
+  print(userInfos);
   myDressurVersion = userInfos["myDressurVersion"];
   mailIsMaxxFire = userInfos["mailIsMaxxFire"];
   uidUser = userInfos["uid"];
@@ -176,7 +177,8 @@ Future<void> initUserInformations(userInfos) async {
   boostEnCours = userInfos["boostEnCours"];
   isInscritProgrammeRecompense =
       userInfos["isInscritProgrammeRecompense"] ?? false;
-
+  print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+  print(userInfos["isInscritProgrammeRecompense"]);
   SQLHelper.viderLaBaseDeDonneeLocal();
 
   SQLHelper.insert("userInfos", {

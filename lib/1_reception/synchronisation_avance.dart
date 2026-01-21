@@ -222,8 +222,7 @@ class _PageDepartState extends State<PageDepart> {
             Navigator.pop(context);
           },
           icon: const Icon(
-            Icons.arrow_back,
-            size: 30,
+            Icons.arrow_back_ios,
             color: Colors.white,
           ),
         ),

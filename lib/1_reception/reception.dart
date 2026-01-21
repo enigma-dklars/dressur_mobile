@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'dart:async';
 import 'package:dressur/1_reception/liste_contact.dart';
-import 'package:dressur/1_reception/recompense.dart';
+import 'package:dressur/1_reception/recompense_start.dart';
 import 'package:dressur/components/padding_and_divider.dart';
 import 'package:dressur/components/pub_smt_2024.dart';
 import 'package:dressur/components/sociaux.dart';

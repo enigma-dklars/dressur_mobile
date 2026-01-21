@@ -179,7 +179,6 @@ class _AutreProfilPageState extends State<AutreProfilPage> {
 
   @override
   Widget build(BuildContext context) {
-
     if (_firstLoad) {
       WidgetsBinding.instance.addPostFrameCallback((_) async {
         fetchAutreProfil();
@@ -254,8 +253,7 @@ class _AutreProfilPageState extends State<AutreProfilPage> {
                                                   shape: BoxShape.circle,
                                                 ),
                                                 child: Icon(
-                                                  Icons.arrow_back,
-                                                  size: 25,
+                                                  Icons.arrow_back_ios,
                                                   color: Colors.white,
                                                 ),
                                               ),

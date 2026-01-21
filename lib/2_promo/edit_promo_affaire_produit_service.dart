@@ -183,7 +183,7 @@ class _ModificationProduitServicesPageState
                 fontWeight: FontWeight.w400, color: Colors.white)),
         leading: IconButton(
             onPressed: () => Navigator.pop(context),
-            icon: Icon(Icons.arrow_back, size: 30, color: Colors.white)),
+            icon: Icon(Icons.arrow_back_ios, color: Colors.white)),
         backgroundColor: primaryColor,
       ),
       body: SingleChildScrollView(
