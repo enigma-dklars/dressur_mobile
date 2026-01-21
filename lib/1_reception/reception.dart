@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:async';
 import 'package:dressur/1_reception/liste_contact.dart';
+import 'package:dressur/1_reception/recompense_dashboard.dart';
 import 'package:dressur/1_reception/recompense_start.dart';
 import 'package:dressur/components/padding_and_divider.dart';
 import 'package:dressur/components/pub_smt_2024.dart';
@@ -120,8 +121,11 @@ class _ReceptionPageState extends State<ReceptionPage> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) =>
-                          ProgrammeRecompensePage(), // Page dédiée aux récompenses
+                      builder: (context) => isInscritProgrammeRecompense
+                          ? ProgrammeRecompenseDashboard()
+                          : ProgrammeRecompensePage(
+                              optionPage: false,
+                            ), // Page dédiée aux récompenses
                     ),
                   );
                 },

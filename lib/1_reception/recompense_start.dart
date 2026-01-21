@@ -1,5 +1,6 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
 
+import 'package:dressur/1_reception/recompense_dashboard.dart';
 import 'package:dressur/components/noti.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -8,7 +9,9 @@ import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
 
 class ProgrammeRecompensePage extends StatefulWidget {
-  const ProgrammeRecompensePage({super.key});
+  final dynamic optionPage;
+
+  const ProgrammeRecompensePage({super.key, required this.optionPage});
 
   @override
   State<ProgrammeRecompensePage> createState() =>
@@ -99,9 +102,11 @@ class _ProgrammeRecompensePageState extends State<ProgrammeRecompensePage> {
           onPressed: () => Navigator.pop(context),
         ),
       ),
-      body: isInscritProgrammeRecompense
-          ? _pageInformationApresInscription(context)
-          : _pagePresentationProgramme(context),
+      body: widget.optionPage
+          ? _pagePresentationProgramme(context)
+          : isInscritProgrammeRecompense
+              ? _pageInformationApresInscription(context)
+              : _pagePresentationProgramme(context),
     );
   }
 
@@ -473,36 +478,6 @@ class _ProgrammeRecompensePageState extends State<ProgrammeRecompensePage> {
                           ],
                         ),
                       ),
-
-                      SizedBox(height: 40),
-
-                      // Bouton principal
-                      SizedBox(
-                        width: double.infinity,
-                        height: 55,
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: primaryColor,
-                            elevation: 0,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(15),
-                            ),
-                          ),
-                          onPressed: () {
-                            // TODO: navigation vers les promotions
-                          },
-                          child: Text(
-                            "Voir les promotions disponibles",
-                            style: GoogleFonts.poppins(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                      ),
-
-                      SizedBox(height: 20),
                     ],
                   ),
                 ],
@@ -553,7 +528,14 @@ class _ProgrammeRecompensePageState extends State<ProgrammeRecompensePage> {
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(15)),
               ),
-              onPressed: () {},
+              onPressed: () {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => ProgrammeRecompenseDashboard(),
+                  ),
+                );
+              },
               child: Text("Commencer",
                   style: GoogleFonts.poppins(
                       color: Colors.white, fontWeight: FontWeight.w600)),
