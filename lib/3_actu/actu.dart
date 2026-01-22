@@ -25,6 +25,105 @@ import 'package:dressur/components/sql_helper.dart';
 import 'package:dressur/5_autre/support_assistance.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+class AnimatedRewardBadge extends StatefulWidget {
+  final VoidCallback onTap;
+  const AnimatedRewardBadge({Key? key, required this.onTap}) : super(key: key);
+
+  @override
+  State<AnimatedRewardBadge> createState() => _AnimatedRewardBadgeState();
+}
+
+class _AnimatedRewardBadgeState extends State<AnimatedRewardBadge>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _scaleAnimation;
+  late Animation<double> _glowAnimation;
+  late Animation<Color?> _colorAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 2000),
+    )..repeat(reverse: true);
+
+    _scaleAnimation = Tween<double>(begin: 1.0, end: 1.12).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
+    );
+
+    _glowAnimation = Tween<double>(begin: 5.0, end: 18.0).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
+    );
+
+    // Animation de couleur entre la couleur primaire et une variante plus vive (dorée/orange)
+    _colorAnimation = ColorTween(
+      begin: primaryColor,
+      end: Colors
+          .red, // Vous pouvez changer pour Colors.amber ou une autre couleur vive
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.linear));
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, child) {
+        final currentColor = _colorAnimation.value ?? primaryColor;
+
+        return Transform.scale(
+          scale: _scaleAnimation.value,
+          child: GestureDetector(
+            onTap: widget.onTap,
+            child: Container(
+              padding: const EdgeInsets.all(5),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: LinearGradient(
+                  colors: [
+                    currentColor.withOpacity(0.95),
+                    currentColor.withOpacity(0.7),
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                border: Border.all(
+                  color: Colors.white.withOpacity(0.9),
+                  width: 1,
+                ),
+                boxShadow: [
+                  // Lueur colorée animée
+                  BoxShadow(
+                    color: currentColor.withOpacity(0.6),
+                    blurRadius: _glowAnimation.value,
+                    spreadRadius: _glowAnimation.value / 3,
+                  ),
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.3),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: const Icon(
+                Icons.stars,
+                color: Colors.white,
+                size: 20,
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
 class Advertisement {
   final String uidUser;
   final int id;
@@ -1128,45 +1227,13 @@ class _ActuPageState extends State<ActuPage> {
                                                       if (advertisement
                                                           .inProgrammeRecompense)
                                                         Positioned(
-                                                          top: 12,
-                                                          right: 12,
+                                                          top: 10,
+                                                          right: 10,
                                                           child:
-                                                              GestureDetector(
+                                                              AnimatedRewardBadge(
                                                             onTap: () =>
                                                                 _showRewardInfo(
                                                                     context),
-                                                            child: Container(
-                                                              padding:
-                                                                  EdgeInsets
-                                                                      .all(8),
-                                                              decoration:
-                                                                  BoxDecoration(
-                                                                color:
-                                                                    primaryColor,
-                                                                shape: BoxShape
-                                                                    .circle,
-                                                                boxShadow: [
-                                                                  BoxShadow(
-                                                                    color: Colors
-                                                                        .black
-                                                                        .withOpacity(
-                                                                            0.2),
-                                                                    blurRadius:
-                                                                        8,
-                                                                    offset:
-                                                                        Offset(
-                                                                            0,
-                                                                            2),
-                                                                  ),
-                                                                ],
-                                                              ),
-                                                              child: Icon(
-                                                                Icons.stars,
-                                                                color: Colors
-                                                                    .white,
-                                                                size: 22,
-                                                              ),
-                                                            ),
                                                           ),
                                                         ),
                                                     ],
@@ -1399,28 +1466,8 @@ class AdvertisementDetailPage extends StatelessWidget {
                   Positioned(
                     top: 10,
                     right: 10,
-                    child: GestureDetector(
+                    child: AnimatedRewardBadge(
                       onTap: () => _showRewardInfo(context),
-                      child: Container(
-                        padding: EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color:
-                              primaryColor, // Assurez-vous que primaryColor est défini
-                          shape: BoxShape.circle,
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black26,
-                              blurRadius: 5,
-                              offset: Offset(0, 2),
-                            ),
-                          ],
-                        ),
-                        child: Icon(
-                          Icons.stars,
-                          color: Colors.white,
-                          size: 20,
-                        ),
-                      ),
                     ),
                   ),
               ],
