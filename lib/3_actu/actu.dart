@@ -366,7 +366,6 @@ class _ActuPageState extends State<ActuPage> {
       havePublicites = true;
       final jsonData = jsonDecode(lesPublicites) as List<dynamic>;
       final advertisements = jsonData.map((data) {
-        print(data['inProgrammeRecompense']);
         return Advertisement(
           uidUser: data['uidUser'],
           id: data['id'],
