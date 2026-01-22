@@ -37,7 +37,7 @@ class Advertisement {
   final String nombreImpression;
   final String typePromotionAffaire;
   final String annotherInfo;
-  final bool isInProgrammeRecompense;
+  final bool inProgrammeRecompense;
 
   Advertisement({
     required this.uidUser,
@@ -51,7 +51,7 @@ class Advertisement {
     required this.nombreImpression,
     required this.typePromotionAffaire,
     required this.annotherInfo,
-    required this.isInProgrammeRecompense,
+    required this.inProgrammeRecompense,
   });
 }
 
@@ -267,6 +267,7 @@ class _ActuPageState extends State<ActuPage> {
       havePublicites = true;
       final jsonData = jsonDecode(lesPublicites) as List<dynamic>;
       final advertisements = jsonData.map((data) {
+        print(data['inProgrammeRecompense']);
         return Advertisement(
           uidUser: data['uidUser'],
           id: data['id'],
@@ -281,8 +282,8 @@ class _ActuPageState extends State<ActuPage> {
           annotherInfo: data['annotherInfo'] != null
               ? jsonEncode(data['annotherInfo'])
               : "",
-          isInProgrammeRecompense:
-              data['isInProgrammeRecompense'] == 1 ? true : false,
+          inProgrammeRecompense:
+              data['inProgrammeRecompense'] == 1 ? true : false,
         );
       }).toList();
       // Mélanger l'ordre des éléments
@@ -475,6 +476,138 @@ class _ActuPageState extends State<ActuPage> {
           bottom: MediaQuery.of(context).viewInsets.bottom + 0,
         ),
         child: PasDeContactAdd(),
+      ),
+    );
+  }
+
+  // ---------------------------------------------------------------------------
+  // BOTTOM MODAL D'INFORMATION
+  // ---------------------------------------------------------------------------
+  void _showRewardInfo(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (context) => Container(
+        padding: EdgeInsets.all(24),
+        decoration: BoxDecoration(
+          color: theme.scaffoldBackgroundColor,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Barre de drag
+            Container(
+              width: 40,
+              height: 5,
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+            SizedBox(height: 25),
+
+            // Icône et Titre
+            Icon(Icons.stars, color: primaryColor, size: 50),
+            SizedBox(height: 15),
+            Text(
+              "Promotion Éligible !",
+              style: GoogleFonts.poppins(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+                color: theme.textTheme.titleLarge?.color,
+              ),
+            ),
+            SizedBox(height: 10),
+            Text(
+              "Cette promotion fait partie du programme de récompenses Dressur.",
+              textAlign: TextAlign.center,
+              style: GoogleFonts.poppins(
+                fontSize: 14,
+                color: isDark ? Colors.grey[400] : Colors.grey[600],
+              ),
+            ),
+
+            SizedBox(height: 30),
+
+            // Détails fictifs
+            _infoRow(context, Icons.visibility, "Objectif",
+                "Atteindre min. 250 vues"),
+            _infoRow(context, Icons.account_balance_wallet, "Gain estimé",
+                "Jusqu'à 2 500 FCFA"),
+            _infoRow(context, Icons.timer, "Délai", "20 heures de visibilité"),
+
+            SizedBox(height: 30),
+
+            // Bouton d'action
+            SizedBox(
+              width: double.infinity,
+              height: 55,
+              child: ElevatedButton(
+                onPressed: () => Navigator.pop(context),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: primaryColor,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                ),
+                child: Text(
+                  "J'ai compris",
+                  style: GoogleFonts.poppins(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(height: 10),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _infoRow(
+      BuildContext context, IconData icon, String label, String value) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 15),
+      child: Row(
+        children: [
+          Container(
+            padding: EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: primaryColor.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(icon, color: primaryColor, size: 20),
+          ),
+          SizedBox(width: 15),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                style: GoogleFonts.poppins(
+                  fontSize: 12,
+                  color: isDark ? Colors.grey[400] : Colors.grey[600],
+                ),
+              ),
+              Text(
+                value,
+                style: GoogleFonts.poppins(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                  color: Theme.of(context).textTheme.bodyLarge?.color,
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
@@ -968,23 +1101,75 @@ class _ActuPageState extends State<ActuPage> {
                                               },
                                               child: Column(
                                                 children: [
-                                                  ClipRRect(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            3),
-                                                    child: CachedNetworkImage(
-                                                      imageUrl:
-                                                          advertisement.image,
-                                                      placeholder: (context,
-                                                              url) =>
-                                                          Image.asset(
-                                                              'images/placeholder.png'),
-                                                      errorWidget: (context,
-                                                              url, error) =>
-                                                          Image.asset(
-                                                              'images/error_image.png'),
-                                                      fit: BoxFit.cover,
-                                                    ),
+                                                  Stack(
+                                                    children: [
+                                                      ClipRRect(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(3),
+                                                        child:
+                                                            CachedNetworkImage(
+                                                          imageUrl:
+                                                              advertisement
+                                                                  .image,
+                                                          placeholder: (context,
+                                                                  url) =>
+                                                              Image.asset(
+                                                                  'images/placeholder.png'),
+                                                          errorWidget: (context,
+                                                                  url, error) =>
+                                                              Image.asset(
+                                                                  'images/error_image.png'),
+                                                          fit: BoxFit.cover,
+                                                        ),
+                                                      ),
+
+                                                      // BADGE ÉLIGIBILITÉ (Affiche si inProgrammeRecompense est vrai)
+                                                      if (advertisement
+                                                          .inProgrammeRecompense)
+                                                        Positioned(
+                                                          top: 12,
+                                                          right: 12,
+                                                          child:
+                                                              GestureDetector(
+                                                            onTap: () =>
+                                                                _showRewardInfo(
+                                                                    context),
+                                                            child: Container(
+                                                              padding:
+                                                                  EdgeInsets
+                                                                      .all(8),
+                                                              decoration:
+                                                                  BoxDecoration(
+                                                                color:
+                                                                    primaryColor,
+                                                                shape: BoxShape
+                                                                    .circle,
+                                                                boxShadow: [
+                                                                  BoxShadow(
+                                                                    color: Colors
+                                                                        .black
+                                                                        .withOpacity(
+                                                                            0.2),
+                                                                    blurRadius:
+                                                                        8,
+                                                                    offset:
+                                                                        Offset(
+                                                                            0,
+                                                                            2),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                              child: Icon(
+                                                                Icons.stars,
+                                                                color: Colors
+                                                                    .white,
+                                                                size: 22,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                    ],
                                                   ),
                                                   const SizedBox(height: 10),
                                                   Padding(
@@ -1140,6 +1325,29 @@ class AdvertisementDetailPage extends StatelessWidget {
     }
   }
 
+  void _showRewardInfo(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(25))),
+      builder: (context) => Container(
+        padding: EdgeInsets.all(20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.stars, color: primaryColor, size: 40),
+            SizedBox(height: 10),
+            Text("Promotion Éligible",
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+            SizedBox(height: 10),
+            Text("Partagez cette promotion pour gagner des récompenses !"),
+            SizedBox(height: 20),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final Map<String, dynamic> infoMap = (advertisement.annotherInfo != "")
@@ -1171,16 +1379,51 @@ class AdvertisementDetailPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(3),
-              child: CachedNetworkImage(
-                imageUrl: advertisement.image,
-                placeholder: (context, url) =>
-                    Image.asset('images/placeholder.png'),
-                errorWidget: (context, url, error) =>
-                    Image.asset('images/error_image.png'),
-                fit: BoxFit.cover,
-              ),
+            Stack(
+              children: [
+                // L'image de la promotion
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(3),
+                  child: CachedNetworkImage(
+                    imageUrl: advertisement.image,
+                    placeholder: (context, url) =>
+                        Image.asset('images/placeholder.png'),
+                    errorWidget: (context, url, error) =>
+                        Image.asset('images/error_image.png'),
+                    fit: BoxFit.cover,
+                  ),
+                ),
+
+                // LE BADGE (Doit être un enfant direct du Stack pour être visible)
+                if (advertisement.inProgrammeRecompense)
+                  Positioned(
+                    top: 10,
+                    right: 10,
+                    child: GestureDetector(
+                      onTap: () => _showRewardInfo(context),
+                      child: Container(
+                        padding: EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color:
+                              primaryColor, // Assurez-vous que primaryColor est défini
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black26,
+                              blurRadius: 5,
+                              offset: Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: Icon(
+                          Icons.stars,
+                          color: Colors.white,
+                          size: 20,
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
             ),
             const SizedBox(height: 5),
             Container(
