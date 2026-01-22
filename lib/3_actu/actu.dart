@@ -37,6 +37,7 @@ class Advertisement {
   final String nombreImpression;
   final String typePromotionAffaire;
   final String annotherInfo;
+  final bool isInProgrammeRecompense;
 
   Advertisement({
     required this.uidUser,
@@ -50,6 +51,7 @@ class Advertisement {
     required this.nombreImpression,
     required this.typePromotionAffaire,
     required this.annotherInfo,
+    required this.isInProgrammeRecompense,
   });
 }
 
@@ -279,6 +281,8 @@ class _ActuPageState extends State<ActuPage> {
           annotherInfo: data['annotherInfo'] != null
               ? jsonEncode(data['annotherInfo'])
               : "",
+          isInProgrammeRecompense:
+              data['isInProgrammeRecompense'] == 1 ? true : false,
         );
       }).toList();
       // Mélanger l'ordre des éléments

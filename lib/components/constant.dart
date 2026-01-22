@@ -118,6 +118,7 @@ var totalImpressions;
 var totalVues;
 var totalImpressionsText;
 var totalVuesText;
+var soldeProgrammeRecompense;
 
 Future<bool> isConnectedToInternet() async {
   try {
@@ -176,6 +177,7 @@ Future<void> initUserInformations(userInfos) async {
   boostEnCours = userInfos["boostEnCours"];
   isInscritProgrammeRecompense =
       userInfos["isInscritProgrammeRecompense"] ?? false;
+  soldeProgrammeRecompense = userInfos["soldeProgrammeRecompense"] ?? 0;
   SQLHelper.viderLaBaseDeDonneeLocal();
 
   SQLHelper.insert("userInfos", {

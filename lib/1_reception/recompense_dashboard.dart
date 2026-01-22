@@ -246,7 +246,7 @@ class _ProgrammeRecompenseDashboardState
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                "3 450 FCFA",
+                "$soldeProgrammeRecompense FCFA",
                 style: GoogleFonts.poppins(
                   color: Colors.white,
                   fontSize: 32,
