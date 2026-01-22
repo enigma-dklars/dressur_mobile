@@ -16,7 +16,6 @@ class _ProgrammeRecompenseDashboardState
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
       appBar: AppBar(
@@ -375,7 +374,6 @@ class _ProgrammeRecompenseDashboardState
 
   Widget _historyItem(BuildContext context, String title, String amount,
       String date, String views, bool isValidated) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Padding(
       padding: const EdgeInsets.only(bottom: 15),
       child: Row(
