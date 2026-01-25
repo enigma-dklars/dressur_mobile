@@ -1,5 +1,10 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
 
+import 'dart:async';
+import 'dart:convert';
+import 'package:dressur/components/noti.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert' as convert;
 import 'package:dressur/1_reception/business_promotions_page.dart';
 import 'package:dressur/1_reception/recompense_start.dart';
 import 'package:flutter/material.dart';
@@ -14,6 +19,44 @@ class ProgrammeRecompenseDashboard extends StatefulWidget {
 
 class _ProgrammeRecompenseDashboardState
     extends State<ProgrammeRecompenseDashboard> {
+  var vuesTotales = 0;
+  var gainsTotales = 0;
+  partageInProgrammeRecompense() async {
+    try {
+      var request = http.MultipartRequest(
+          'POST',
+          Uri.parse(
+              '$generalRouteForApi/getMyProgrammeRecompenseInformations'));
+      request.fields.addAll({
+        'uid': uidUser,
+        'langUserPhone': langUserPhone.toString(),
+      });
+
+      http.StreamedResponse response = await request.send();
+
+      if (response.statusCode == 200) {
+        var data1 = await response.stream.bytesToString();
+        var data = convert.jsonDecode(data1);
+
+        if (data["error"] == true) {
+          dangerNoti(data["titre"], data["message"], context);
+        } else {
+          vuesTotales = data["vuesTotales"];
+          gainsTotales = data["gainsTotales"];
+          soldeProgrammeRecompense = data["soldeDisponible"];
+        }
+      }
+    } catch (e) {
+      print("Erreur: $e");
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    partageInProgrammeRecompense();
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -65,10 +108,10 @@ class _ProgrammeRecompenseDashboardState
                   _sectionTitle(context, "Mes Statistiques"),
                   Row(
                     children: [
-                      _statItem(context, "Vues Totales", "12.5K",
+                      _statItem(context, "Vues Totales", "$vuesTotales",
                           Icons.visibility, Colors.blue, theme),
                       SizedBox(width: 15),
-                      _statItem(context, "Gains retirés", "8 500 F",
+                      _statItem(context, "Gains Totales", "$gainsTotales F",
                           Icons.account_balance_wallet, Colors.green, theme),
                     ],
                   ),
@@ -275,7 +318,7 @@ class _ProgrammeRecompenseDashboardState
               ),
             ],
           ),
-          SizedBox(height: 20),
+          SizedBox(height: 8),
           Divider(color: Colors.white.withOpacity(0.2)),
           SizedBox(height: 10),
           Text(
