@@ -122,7 +122,7 @@ class _ProgrammeRecompenseDashboardState
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      _sectionTitle(context, "Promotions en cours"),
+                      _sectionTitle(context, "Historique de participation…"),
                       TextButton(
                         onPressed: () {
                           // Action pour voir toutes les promotions en cours
@@ -133,36 +133,35 @@ class _ProgrammeRecompenseDashboardState
                       )
                     ],
                   ),
-                  // On affiche une seule promotion comme demandé
-                  _activePromotionCard(context, "Promotion iPhone 15 Pro",
-                      "Soumission dans 04h 22m", 0.8, Colors.orange, theme),
+                  _promotionItem(
+                      context,
+                      "Vente Flash Chaussures",
+                      "500 FCFA",
+                      "12 Janv",
+                      "1.2K vues",
+                      true,
+                      "https://images.unsplash.com/photo-1542291026-7eec264c27ff"),
 
+                  _promotionItem(
+                      context,
+                      "Promo Restaurant Le Gourmet",
+                      "200 FCFA",
+                      "10 Janv",
+                      "850 vues",
+                      true,
+                      "https://images.unsplash.com/photo-1504674900247-0877df9cc836"),
+
+                  _promotionItem(
+                      context,
+                      "Lancement App Dressur",
+                      "En attente",
+                      "Hier",
+                      "420 vues",
+                      false,
+                      "https://images.unsplash.com/photo-1503023345310-bd7c1de61c7d",
+                      isSharing: true // Exemple avec le spinner actif
+                      ),
                   SizedBox(height: 10),
-
-                  // 5. HISTORIQUE RÉCENT
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      _sectionTitle(context, "Historique récent"),
-                      TextButton(
-                        onPressed: () {
-                          // Action pour voir tout l'historique
-                        },
-                        child: Text("Voir tout",
-                            style: GoogleFonts.poppins(
-                                color: primaryColor, fontSize: 12)),
-                      )
-                    ],
-                  ),
-                  // On affiche trois éléments d'historique comme demandé
-                  _historyItem(context, "Vente Flash Chaussures", "500 FCFA",
-                      "12 Janv", "1.2K vues", true),
-                  _historyItem(context, "Promo Restaurant Le Gourmet",
-                      "200 FCFA", "10 Janv", "850 vues", true),
-                  _historyItem(context, "Lancement App Dressur", "En attente",
-                      "Hier", "420 vues", false),
-
-                  SizedBox(height: 40),
                 ],
               ),
             ),
@@ -170,16 +169,6 @@ class _ProgrammeRecompenseDashboardState
         ),
       ),
       // BOUTON FLOTTANT POUR AJOUTER UNE PROMO
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          // Navigation vers la liste des promotions éligibles
-        },
-        backgroundColor: primaryColor,
-        icon: Icon(Icons.add, color: Colors.white),
-        label: Text("Nouvelle Promo",
-            style: GoogleFonts.poppins(
-                color: Colors.white, fontWeight: FontWeight.w600)),
-      ),
     );
   }
 
@@ -302,19 +291,33 @@ class _ProgrammeRecompenseDashboardState
                 ),
               ),
               ElevatedButton(
+                onPressed: () {
+                  // Action de retrait
+                },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.white,
                   foregroundColor: primaryColor,
                   elevation: 0,
                   shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15)),
-                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                    borderRadius: BorderRadius.circular(13),
+                  ),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
                 ),
-                onPressed: () {
-                  // Action de retrait
-                },
-                child: Text("Retirer",
-                    style: GoogleFonts.poppins(fontWeight: FontWeight.bold)),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.account_balance_wallet_outlined, size: 20),
+                    const SizedBox(width: 8),
+                    Text(
+                      "Retirer",
+                      style: GoogleFonts.poppins(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
@@ -368,125 +371,6 @@ class _ProgrammeRecompenseDashboardState
     );
   }
 
-  Widget _activePromotionCard(BuildContext context, String title,
-      String timeLeft, double progress, Color color, theme) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    return Container(
-      padding: EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: isDark ? Colors.white.withOpacity(0.05) : Colors.white,
-        borderRadius: BorderRadius.circular(15),
-        boxShadow: isDark
-            ? []
-            : [
-                BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    blurRadius: 10,
-                    offset: Offset(0, 4))
-              ],
-        border: Border.all(color: theme.dividerColor.withOpacity(0.1)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                padding: EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                    color: color.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(10)),
-                child: Icon(Icons.campaign, color: color),
-              ),
-              SizedBox(width: 15),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(title,
-                        style: GoogleFonts.poppins(
-                            fontWeight: FontWeight.bold, fontSize: 14)),
-                    Text(timeLeft,
-                        style: GoogleFonts.poppins(
-                            fontSize: 12,
-                            color: color,
-                            fontWeight: FontWeight.w500)),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _historyItem(BuildContext context, String title, String amount,
-      String date, String views, bool isValidated) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 15),
-      child: Row(
-        children: [
-          Container(
-            width: 45,
-            height: 45,
-            decoration: BoxDecoration(
-              color: isValidated
-                  ? Colors.green.withOpacity(0.1)
-                  : Colors.orange.withOpacity(0.1),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(
-              isValidated ? Icons.check : Icons.access_time,
-              color: isValidated ? Colors.green : Colors.orange,
-              size: 20,
-            ),
-          ),
-          SizedBox(width: 15),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(title,
-                    style: GoogleFonts.poppins(
-                        fontWeight: FontWeight.w600, fontSize: 14)),
-                Row(
-                  children: [
-                    Text(date,
-                        style: GoogleFonts.poppins(
-                            fontSize: 12, color: Colors.grey)),
-                    SizedBox(width: 8),
-                    Container(
-                      width: 3,
-                      height: 3,
-                      decoration: BoxDecoration(
-                          color: Colors.grey, shape: BoxShape.circle),
-                    ),
-                    SizedBox(width: 8),
-                    Icon(Icons.visibility_outlined,
-                        size: 12, color: Colors.grey),
-                    SizedBox(width: 4),
-                    Text(views,
-                        style: GoogleFonts.poppins(
-                            fontSize: 12, color: Colors.grey)),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          Text(
-            amount,
-            style: GoogleFonts.poppins(
-              fontWeight: FontWeight.bold,
-              fontSize: 14,
-              color: isValidated ? Colors.green : Colors.orange,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget _sectionTitle(BuildContext context, String title) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 15),
@@ -496,6 +380,156 @@ class _ProgrammeRecompenseDashboardState
           fontSize: 16,
           fontWeight: FontWeight.bold,
           color: Theme.of(context).textTheme.bodyLarge?.color,
+        ),
+      ),
+    );
+  }
+
+  Widget _promotionItem(
+      BuildContext context,
+      String title,
+      String amount,
+      String date,
+      String views,
+      bool isValidated,
+      String imageUrl, // Nouvelle info : l'image
+      {bool isSharing = false,
+      VoidCallback? onShare} // Optionnel : pour le spinner
+      ) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 15),
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: isDark ? Colors.white.withOpacity(0.05) : Colors.white,
+          borderRadius: BorderRadius.circular(15),
+          border: Border.all(
+              color: Theme.of(context).dividerColor.withOpacity(0.1)),
+        ),
+        child: Row(
+          children: [
+            // --- L'IMAGE DE LA PROMOTION (Fusion de l'icône et de l'image) ---
+            Container(
+              width: 55,
+              height: 55,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                image: DecorationImage(
+                  image: NetworkImage(imageUrl),
+                  fit: BoxFit.cover,
+                ),
+              ),
+              // Petit indicateur de statut sur l'image
+              child: Align(
+                alignment: Alignment.bottomRight,
+                child: Container(
+                  padding: const EdgeInsets.all(2),
+                  decoration: BoxDecoration(
+                    color: isValidated ? Colors.green : Colors.orange,
+                    shape: BoxShape.circle,
+                    border: Border.all(color: Colors.white, width: 1.5),
+                  ),
+                  child: Icon(
+                    isValidated ? Icons.check : Icons.access_time,
+                    color: Colors.white,
+                    size: 10,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(width: 15),
+
+            // --- INFOS CENTRALES ---
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: GoogleFonts.poppins(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 14,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  Row(
+                    children: [
+                      Text(date,
+                          style: GoogleFonts.poppins(
+                              fontSize: 12, color: Colors.grey)),
+                      const SizedBox(width: 8),
+                      Container(
+                          width: 3,
+                          height: 3,
+                          decoration: const BoxDecoration(
+                              color: Colors.grey, shape: BoxShape.circle)),
+                      const SizedBox(width: 8),
+                      const Icon(Icons.visibility_outlined,
+                          size: 12, color: Colors.grey),
+                      const SizedBox(width: 4),
+                      Text(views,
+                          style: GoogleFonts.poppins(
+                              fontSize: 12, color: Colors.grey)),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+
+            // --- MONTANT & BOUTON PARTAGE ---
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text(
+                  amount,
+                  style: GoogleFonts.poppins(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                    color: isValidated ? Colors.green : Colors.orange,
+                  ),
+                ),
+                const SizedBox(height: 5),
+                // Bouton de partage compact avec Spinner
+                GestureDetector(
+                  onTap: isSharing ? null : onShare,
+                  child: Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: primaryColor.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: isSharing
+                        ? const SizedBox(
+                            width: 14,
+                            height: 14,
+                            child: CircularProgressIndicator(
+                                strokeWidth: 2, color: primaryColor),
+                          )
+                        : Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(Icons.share,
+                                  size: 12, color: primaryColor),
+                              const SizedBox(width: 4),
+                              Text(
+                                "Partager",
+                                style: GoogleFonts.poppins(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.bold,
+                                  color: primaryColor,
+                                ),
+                              ),
+                            ],
+                          ),
+                  ),
+                ),
+              ],
+            ),
+          ],
         ),
       ),
     );
