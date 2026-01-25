@@ -134,33 +134,63 @@ class _ProgrammeRecompenseDashboardState
                     ],
                   ),
                   _promotionItem(
-                      context,
-                      "Vente Flash Chaussures",
-                      "500 FCFA",
-                      "12 Janv",
-                      "1.2K vues",
-                      true,
-                      "https://images.unsplash.com/photo-1542291026-7eec264c27ff"),
+                    context,
+                    "Vente Flash Chaussures",
+                    "0 FCFA",
+                    "01/01/2026",
+                    "0 vues",
+                    "https://images.unsplash.com/photo-1542291026-7eec264c27ff",
+                    "en_cours",
+                  ),
 
                   _promotionItem(
-                      context,
-                      "Promo Restaurant Le Gourmet",
-                      "200 FCFA",
-                      "10 Janv",
-                      "850 vues",
-                      true,
-                      "https://images.unsplash.com/photo-1504674900247-0877df9cc836"),
+                    context,
+                    "Promo Restaurant Le Gourmet",
+                    "0 FCFA",
+                    "05/01/2026",
+                    "0 vues",
+                    "https://images.unsplash.com/photo-1504674900247-0877df9cc836",
+                    "en_attente",
+                  ),
 
                   _promotionItem(
-                      context,
-                      "Lancement App Dressur",
-                      "En attente",
-                      "Hier",
-                      "420 vues",
-                      false,
-                      "https://images.unsplash.com/photo-1503023345310-bd7c1de61c7d",
-                      isSharing: true // Exemple avec le spinner actif
-                      ),
+                    context,
+                    "Lancement App Dressur",
+                    "0 FCFA",
+                    "10/01/2026",
+                    "0 vues",
+                    "https://images.unsplash.com/photo-1503023345310-bd7c1de61c7d",
+                    "echouer",
+                  ),
+                  _promotionItem(
+                    context,
+                    "Il a voler pipo en live",
+                    "1000 FCFA",
+                    "12/01/2026",
+                    "2000 vues",
+                    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSe2hdyqq3znwzVGlkW8wPfcUiuw491RqXU7PRohH9ZLMjfmdfrz_H47K20Jks1MwvMi0sQoVM4Gdrsq5_oodpK28sxG7__sDx1zcbi9w&s=10",
+                    "refuser",
+                  ),
+
+                  _promotionItem(
+                    context,
+                    "App Dressur Boost Contact",
+                    "0 FCFA",
+                    "15/01/2026",
+                    "0 vues",
+                    "https://dressur.site/assets/img/hero.jpg",
+                    "terminer",
+                  ),
+
+                  _promotionItem(
+                    context,
+                    "App Dressur Bot",
+                    "2500 FCFA",
+                    "20/01/2026",
+                    "4500 vues",
+                    "https://dressur.site/assets/img/dressur-bot.jpg",
+                    "approuver",
+                  ),
                   SizedBox(height: 10),
                 ],
               ),
@@ -386,17 +416,16 @@ class _ProgrammeRecompenseDashboardState
   }
 
   Widget _promotionItem(
-      BuildContext context,
-      String title,
-      String amount,
-      String date,
-      String views,
-      bool isValidated,
-      String imageUrl, // Nouvelle info : l'image
-      {bool isSharing = false,
-      VoidCallback? onShare} // Optionnel : pour le spinner
-      ) {
+    BuildContext context,
+    String title,
+    String amount,
+    String date,
+    String views,
+    String imageUrl,
+    String status,
+  ) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final statusConfig = getStatusBadgeConfig(status);
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 15),
@@ -427,12 +456,24 @@ class _ProgrammeRecompenseDashboardState
                 child: Container(
                   padding: const EdgeInsets.all(2),
                   decoration: BoxDecoration(
-                    color: isValidated ? Colors.green : Colors.orange,
+                    color: (status == "approuver")
+                        ? Colors.green
+                        : (status == "echouer" || status == "refuser")
+                            ? Colors.red
+                            : (status == "en_attente")
+                                ? Colors.orange
+                                : Colors.black,
                     shape: BoxShape.circle,
                     border: Border.all(color: Colors.white, width: 1.5),
                   ),
                   child: Icon(
-                    isValidated ? Icons.check : Icons.access_time,
+                    (status == "approuver")
+                        ? Icons.check_circle
+                        : (status == "echouer" || status == "refuser")
+                            ? Icons.cancel
+                            : (status == "en_attente")
+                                ? Icons.access_time
+                                : Icons.help_outline,
                     color: Colors.white,
                     size: 10,
                   ),
@@ -488,43 +529,43 @@ class _ProgrammeRecompenseDashboardState
                   style: GoogleFonts.poppins(
                     fontWeight: FontWeight.bold,
                     fontSize: 14,
-                    color: isValidated ? Colors.green : Colors.orange,
+                    color: (status == "approuver")
+                        ? Colors.green
+                        : (status == "echouer" || status == "refuser")
+                            ? Colors.red
+                            : (status == "en_attente")
+                                ? Colors.orange
+                                : null,
                   ),
                 ),
                 const SizedBox(height: 5),
                 // Bouton de partage compact avec Spinner
-                GestureDetector(
-                  onTap: isSharing ? null : onShare,
-                  child: Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: primaryColor.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: isSharing
-                        ? const SizedBox(
-                            width: 14,
-                            height: 14,
-                            child: CircularProgressIndicator(
-                                strokeWidth: 2, color: primaryColor),
-                          )
-                        : Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const Icon(Icons.share,
-                                  size: 12, color: primaryColor),
-                              const SizedBox(width: 4),
-                              Text(
-                                "Partager",
-                                style: GoogleFonts.poppins(
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.bold,
-                                  color: primaryColor,
-                                ),
-                              ),
-                            ],
-                          ),
+
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: statusConfig["color"].withOpacity(0.15),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        statusConfig["icon"],
+                        size: 12,
+                        color: statusConfig["color"],
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        statusConfig["label"],
+                        style: GoogleFonts.poppins(
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                          color: statusConfig["color"],
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
@@ -533,5 +574,52 @@ class _ProgrammeRecompenseDashboardState
         ),
       ),
     );
+  }
+
+  Map<String, dynamic> getStatusBadgeConfig(String status) {
+    switch (status) {
+      case "en_attente":
+        return {
+          "label": "Attente validation",
+          "icon": Icons.access_time,
+          "color": Colors.orange,
+        };
+      case "terminer":
+        return {
+          "label": "Preuves requises",
+          "icon": Icons.check_circle,
+          "color": Colors.green,
+        };
+      case "echouer":
+        return {
+          "label": "Échoué",
+          "icon": Icons.cancel,
+          "color": Colors.red,
+        };
+      case "refuser":
+        return {
+          "label": "Refusé",
+          "icon": Icons.cancel,
+          "color": Colors.red,
+        };
+      case "approuver":
+        return {
+          "label": "Approuvé",
+          "icon": Icons.verified,
+          "color": Colors.green,
+        };
+      case "en_cours":
+        return {
+          "label": "En cours",
+          "icon": Icons.sync,
+          "color": Colors.blue,
+        };
+      default:
+        return {
+          "label": "Inconnu",
+          "icon": Icons.help_outline,
+          "color": Colors.grey,
+        };
+    }
   }
 }
