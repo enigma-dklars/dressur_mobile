@@ -252,8 +252,6 @@ class _BusinessPromotionsPageState extends State<BusinessPromotionsPage> {
             );
           } else {
             return ListView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
               itemCount: snapshot.data!.length,
               itemBuilder: (context, index) {
                 Advertisement advertisement = snapshot.data![index];
