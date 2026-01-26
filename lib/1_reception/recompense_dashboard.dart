@@ -2,6 +2,8 @@
 
 import 'dart:async';
 import 'dart:convert';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:dressur/1_reception/historique_complet_page.dart';
 import 'package:dressur/components/noti.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
@@ -11,6 +13,26 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:dressur/components/constant.dart';
 
+class HistoriqueRecompense {
+  final String title;
+  final String amount;
+  final String date;
+  final String views;
+  final String imageUrl;
+  final String status;
+  final String description;
+
+  HistoriqueRecompense({
+    required this.title,
+    required this.amount,
+    required this.date,
+    required this.views,
+    required this.imageUrl,
+    required this.status,
+    required this.description,
+  });
+}
+
 class ProgrammeRecompenseDashboard extends StatefulWidget {
   @override
   State<ProgrammeRecompenseDashboard> createState() =>
@@ -19,9 +41,11 @@ class ProgrammeRecompenseDashboard extends StatefulWidget {
 
 class _ProgrammeRecompenseDashboardState
     extends State<ProgrammeRecompenseDashboard> {
+  late List<dynamic> allHistorique = [];
+  late Future<List<HistoriqueRecompense>> _futureHistoriqueRecompense;
   var vuesTotales = 0;
   var gainsTotales = 0;
-  partageInProgrammeRecompense() async {
+  Future<List<HistoriqueRecompense>> partageInProgrammeRecompense() async {
     try {
       var request = http.MultipartRequest(
           'POST',
@@ -40,21 +64,41 @@ class _ProgrammeRecompenseDashboardState
 
         if (data["error"] == true) {
           dangerNoti(data["titre"], data["message"], context);
+          return [];
         } else {
-          vuesTotales = data["vuesTotales"];
-          gainsTotales = data["gainsTotales"];
-          soldeProgrammeRecompense = data["soldeDisponible"];
+          setState(() {
+            vuesTotales = data["vuesTotales"];
+            gainsTotales = data["gainsTotales"];
+            soldeProgrammeRecompense = data["soldeDisponible"];
+          });
+
+          allHistorique = data["allHistorique"];
+          final List<dynamic> sixLastHistorique = data["sixLastHistorique"];
+
+          return sixLastHistorique.map((data) {
+            return HistoriqueRecompense(
+              imageUrl: generalRouteForPromotionImage + data['imageUrl'],
+              title: data['title'] ?? "",
+              amount: data['amount'].toString(),
+              date: data['date'] ?? "",
+              views: data['views'].toString(),
+              status: data['status'] ?? "",
+              description: data['description'] ?? "",
+            );
+          }).toList();
         }
       }
+      return [];
     } catch (e) {
       print("Erreur: $e");
+      return [];
     }
   }
 
   @override
   void initState() {
     super.initState();
-    partageInProgrammeRecompense();
+    _futureHistoriqueRecompense = partageInProgrammeRecompense();
   }
 
   @override
@@ -125,7 +169,14 @@ class _ProgrammeRecompenseDashboardState
                       _sectionTitle(context, "Historique de participation…"),
                       TextButton(
                         onPressed: () {
-                          // Action pour voir toutes les promotions en cours
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => HistoriqueCompletPage(
+                                allHistorique: allHistorique,
+                              ),
+                            ),
+                          );
                         },
                         child: Text("Voir tout",
                             style: GoogleFonts.poppins(
@@ -133,65 +184,51 @@ class _ProgrammeRecompenseDashboardState
                       )
                     ],
                   ),
-                  _promotionItem(
-                    context,
-                    "Vente Flash Chaussures",
-                    "0 FCFA",
-                    "01/01/2026",
-                    "0 vues",
-                    "https://images.unsplash.com/photo-1542291026-7eec264c27ff",
-                    "en_cours",
-                  ),
 
-                  _promotionItem(
-                    context,
-                    "Promo Restaurant Le Gourmet",
-                    "0 FCFA",
-                    "05/01/2026",
-                    "0 vues",
-                    "https://images.unsplash.com/photo-1504674900247-0877df9cc836",
-                    "en_attente",
-                  ),
+                  FutureBuilder<List<HistoriqueRecompense>>(
+                    future: _futureHistoriqueRecompense,
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Padding(
+                          padding: EdgeInsets.all(20),
+                          child: Center(child: CircularProgressIndicator()),
+                        );
+                      }
 
-                  _promotionItem(
-                    context,
-                    "Lancement App Dressur",
-                    "0 FCFA",
-                    "10/01/2026",
-                    "0 vues",
-                    "https://images.unsplash.com/photo-1503023345310-bd7c1de61c7d",
-                    "echouer",
-                  ),
-                  _promotionItem(
-                    context,
-                    "Il a voler pipo en live",
-                    "1000 FCFA",
-                    "12/01/2026",
-                    "2000 vues",
-                    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSe2hdyqq3znwzVGlkW8wPfcUiuw491RqXU7PRohH9ZLMjfmdfrz_H47K20Jks1MwvMi0sQoVM4Gdrsq5_oodpK28sxG7__sDx1zcbi9w&s=10",
-                    "refuser",
-                  ),
+                      if (snapshot.hasError) {
+                        return Center(child: Text("Erreur de chargement"));
+                      }
 
-                  _promotionItem(
-                    context,
-                    "App Dressur Boost Contact",
-                    "0 FCFA",
-                    "15/01/2026",
-                    "0 vues",
-                    "https://dressur.site/assets/img/hero.jpg",
-                    "terminer",
-                  ),
+                      if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                        return Center(
+                          child: Text(
+                            "Aucun historique disponible",
+                            style: GoogleFonts.poppins(fontSize: 12),
+                          ),
+                        );
+                      }
 
-                  _promotionItem(
-                    context,
-                    "App Dressur Bot",
-                    "2500 FCFA",
-                    "20/01/2026",
-                    "4500 vues",
-                    "https://dressur.site/assets/img/dressur-bot.jpg",
-                    "approuver",
+                      return ListView.builder(
+                        itemCount: snapshot.data!.length,
+                        shrinkWrap: true, // 🔑 IMPORTANT
+                        physics:
+                            const NeverScrollableScrollPhysics(), // 🔑 IMPORTANT
+                        itemBuilder: (context, index) {
+                          final item = snapshot.data![index];
+
+                          return _promotionItem(
+                            context,
+                            item.title,
+                            "${item.amount} FCFA",
+                            item.date,
+                            "${item.views} vues",
+                            item.imageUrl,
+                            item.status,
+                          );
+                        },
+                      );
+                    },
                   ),
-                  SizedBox(height: 10),
                 ],
               ),
             ),
@@ -428,9 +465,9 @@ class _ProgrammeRecompenseDashboardState
     final statusConfig = getStatusBadgeConfig(status);
 
     return Padding(
-      padding: const EdgeInsets.only(bottom: 15),
+      padding: const EdgeInsets.only(bottom: 10),
       child: Container(
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
           color: isDark ? Colors.white.withOpacity(0.05) : Colors.white,
           borderRadius: BorderRadius.circular(15),
@@ -439,48 +476,65 @@ class _ProgrammeRecompenseDashboardState
         ),
         child: Row(
           children: [
-            // --- L'IMAGE DE LA PROMOTION (Fusion de l'icône et de l'image) ---
             Container(
               width: 55,
               height: 55,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(12),
-                image: DecorationImage(
-                  image: NetworkImage(imageUrl),
-                  fit: BoxFit.cover,
-                ),
               ),
-              // Petit indicateur de statut sur l'image
-              child: Align(
-                alignment: Alignment.bottomRight,
-                child: Container(
-                  padding: const EdgeInsets.all(2),
-                  decoration: BoxDecoration(
-                    color: (status == "approuver")
-                        ? Colors.green
-                        : (status == "echouer" || status == "refuser")
-                            ? Colors.red
-                            : (status == "en_attente")
-                                ? Colors.orange
-                                : Colors.black,
-                    shape: BoxShape.circle,
-                    border: Border.all(color: Colors.white, width: 1.5),
+              child: Stack(
+                children: [
+                  // ✅ Image avec cache
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: CachedNetworkImage(
+                      imageUrl: imageUrl,
+                      width: 55,
+                      height: 55,
+                      fit: BoxFit.cover,
+                      placeholder: (context, url) => Image.asset(
+                          'images/placeholder.png',
+                          fit: BoxFit.cover),
+                      errorWidget: (context, url, error) => Image.asset(
+                          'images/error_image.png',
+                          fit: BoxFit.cover),
+                    ),
                   ),
-                  child: Icon(
-                    (status == "approuver")
-                        ? Icons.check_circle
-                        : (status == "echouer" || status == "refuser")
-                            ? Icons.cancel
-                            : (status == "en_attente")
-                                ? Icons.access_time
-                                : Icons.help_outline,
-                    color: Colors.white,
-                    size: 10,
+
+                  // ✅ Badge de statut
+                  Positioned(
+                    bottom: 2,
+                    right: 2,
+                    child: Container(
+                      padding: const EdgeInsets.all(2),
+                      decoration: BoxDecoration(
+                        color: (status == "approuver")
+                            ? Colors.green
+                            : (status == "echouer" || status == "refuser")
+                                ? Colors.red
+                                : (status == "en_attente")
+                                    ? Colors.orange
+                                    : Colors.black,
+                        shape: BoxShape.circle,
+                        border: Border.all(color: Colors.white, width: 1.5),
+                      ),
+                      child: Icon(
+                        (status == "approuver")
+                            ? Icons.check_circle
+                            : (status == "echouer" || status == "refuser")
+                                ? Icons.cancel
+                                : (status == "en_attente")
+                                    ? Icons.access_time
+                                    : Icons.help_outline,
+                        color: Colors.white,
+                        size: 10,
+                      ),
+                    ),
                   ),
-                ),
+                ],
               ),
             ),
-            const SizedBox(width: 15),
+            const SizedBox(width: 10),
 
             // --- INFOS CENTRALES ---
             Expanded(
@@ -496,6 +550,7 @@ class _ProgrammeRecompenseDashboardState
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
+                  const SizedBox(height: 10),
                   Row(
                     children: [
                       Text(date,
@@ -503,10 +558,13 @@ class _ProgrammeRecompenseDashboardState
                               fontSize: 12, color: Colors.grey)),
                       const SizedBox(width: 8),
                       Container(
-                          width: 3,
-                          height: 3,
-                          decoration: const BoxDecoration(
-                              color: Colors.grey, shape: BoxShape.circle)),
+                        width: 3,
+                        height: 3,
+                        decoration: const BoxDecoration(
+                          color: Colors.grey,
+                          shape: BoxShape.circle,
+                        ),
+                      ),
                       const SizedBox(width: 8),
                       const Icon(Icons.visibility_outlined,
                           size: 12, color: Colors.grey),
