@@ -134,7 +134,7 @@ class _ProduitsServicesState extends State<ProduitsServices> {
   TextEditingController _textEditingController = TextEditingController();
   bool _isSending = false;
   var _message = "";
-  dynamic idFormulBoost = 1;
+  dynamic idFormulBoost = 0;
   dynamic valueMethodePaiement = "mtn";
   bool loading_formule_gratuit = false;
   List<Map<String, dynamic>> listeDesFormules = [];
@@ -144,43 +144,102 @@ class _ProduitsServicesState extends State<ProduitsServices> {
   int jours = 0;
   final telController = TextEditingController(text: tel);
 
+  int prixBoost = 0;
+  // --- NOUVELLES VARIABLES POUR LES OPTIONS ---
+  bool _participateInReward = false;
+  int _minPeopleToReward = 10;
+  int _rewardViewsLevel = 250; // 250, 500, 1000, 2000, 4000
+  int _totalViewsGoal = 2500; // Minimum 2500 vues
+
+  int joursBoost = 0;
+  String _boostMessage = "";
+  double get _subTotal =>
+      prixBoost + _rewardProgramAmount + _dressurStatusAmount;
+
+  double get _fedapayMin => _subTotal * 0.018;
+  double get _fedapayMax => _subTotal * 0.04;
+  double get _totalWithMaxCommission => _subTotal + _fedapayMax;
+
+  bool _publishOnDressurStatus = false;
+  int _dressurStatusPricePer7Days = 5000;
+
+  final List<Map<String, dynamic>> _rewardViewsItems = [
+    {'value': 250, 'label': '250 vues'},
+    {'value': 500, 'label': '500 vues'},
+    {'value': 1000, 'label': '1000 vues'},
+    {'value': 2000, 'label': '2000 vues'},
+    {'value': 4000, 'label': '4000 vues'},
+  ];
+
+  // --- CALCULS DES MONTANTS ---
+  double get _rewardProgramAmount {
+    if (!_participateInReward) return 0.0;
+
+    // Calcul basé sur les paliers de vues
+    // 4000 vues = 2500 FCFA
+    // Règle de 3 : (vues * 2500) / 4000
+    double baseAmountPerPerson = (_rewardViewsLevel * 2500) / 4000;
+
+    // Montant total pour toutes les personnes
+    double totalBase = baseAmountPerPerson * _minPeopleToReward;
+
+    // Ajout de 20% de commission plateforme
+    return totalBase * 1.2;
+  }
+
+  double get _dressurStatusAmount {
+    if (!_publishOnDressurStatus || jours == 0) return 0.0;
+    // 5000 FCFA pour 7 jours. Règle de 3 basée sur la durée de la formule choisie.
+    return (jours * _dressurStatusPricePer7Days) / 7;
+  }
+
+  double get _fedapayCommission {
+    // Commission Fedapay estimée à 3% + fixe (ajustez selon les besoins réels)
+    if (_subTotal == 0) return 0.0;
+    return (_subTotal * 0.03) + 100;
+  }
+
+  double get _totalAmount {
+    return _subTotal + _fedapayCommission;
+  }
+
   bool isImageSquare(File imageFile) {
     final image = img.decodeImage(File(imageFile.path).readAsBytesSync());
-    if (image == null) {
-      return false;
-    }
-
+    if (image == null) return false;
     final width = image.width;
     final height = image.height;
     final aspectRatio = width / height;
-
     return aspectRatio >= 0.8 && aspectRatio <= 1.2;
+  }
+
+  void _onFormuleChanged(val) {
+    final selected = listeDesFormules
+        .firstWhere((e) => e['value'].toString() == val.toString());
+    setState(() {
+      idFormulBoost = int.parse(val.toString());
+      prixBoost = selected['prix'];
+      joursBoost = selected['jours'];
+      _boostMessage = "Formule de $joursBoost jour(s) pour $prixBoost FCFA.";
+    });
   }
 
   Future<void> _selectImage() async {
     final picker = ImagePicker();
     final pickedImage = await picker.pickImage(source: ImageSource.gallery);
-
     if (pickedImage != null) {
       final imageFile = File(pickedImage.path);
-
       final fileSize = await imageFile.length();
-      final fileSizeInMB = fileSize / (1024 * 1024);
-
-      if (fileSizeInMB > 1) {
+      if (fileSize / (1024 * 1024) > 1) {
         dangerNoti(
             "Attention !!!",
             (langUserPhone == "fr")
-                ? "La taille de l'image ne peut pas dépasser 1 Mo."
+                ? "L'image ne peut pas dépasser 1 Mo."
                 : "Image size cannot exceed 1 MB.",
             context);
         return;
       }
-
       if (isImageSquare(imageFile)) {
-        setState(() {
-          _imageFile = imageFile;
-        });
+        setState(() => _imageFile = imageFile);
       } else {
         dangerNoti(
             "Attention !!!",
@@ -197,25 +256,22 @@ class _ProduitsServicesState extends State<ProduitsServices> {
       showConfNumeroWhatsapp(context);
       return;
     }
-
-    if (_textEditingController.text.isEmpty || _imageFile == null) {
+    if (idFormulBoost == 0 ||
+        idFormulBoost.toString().isEmpty ||
+        _textEditingController.text.isEmpty ||
+        _imageFile == null) {
       dangerNoti(
           "Attention !!!",
           (langUserPhone == "fr")
-              ? 'Veuillez entrer un texte et sélectionner une image.'
-              : 'Please enter a text and select an image.',
+              ? 'Veuillez choisir une formule, entrer un texte et sélectionner une image.'
+              : 'Please choose a formula, enter some text and select an image.',
           context);
       return;
     }
-
-    setState(() {
-      _isSending = true;
-    });
-
+    setState(() => _isSending = true);
     final url = Uri.parse('$generalRouteForApi/addProduitService');
-
     final request = http.MultipartRequest('POST', url);
-    request.fields['idFormulePromoAffaire'] = idFormulBoost;
+    request.fields['idFormulePromoAffaire'] = idFormulBoost.toString();
     request.fields['text'] = _textEditingController.text;
     request.fields['uid'] = uidUser;
     request.fields['langUserPhone'] = langUserPhone.toString();
@@ -223,76 +279,60 @@ class _ProduitsServicesState extends State<ProduitsServices> {
     request.fields['paymentMethod'] = valueMethodePaiement;
     request.fields['tel'] = telController.text;
 
+    // Envoi des nouvelles options (à traiter en back-end plus tard)
+    request.fields['inProgrammeRecompense'] = _participateInReward ? "1" : "0";
+    request.fields['minPeopleToReward'] = _minPeopleToReward.toString();
+    request.fields['rewardViewsLevel'] = _rewardViewsLevel.toString();
+    request.fields['publishOnDressurStatus'] =
+        _publishOnDressurStatus ? "1" : "0";
+    request.fields['totalAmount'] = _totalAmount.toStringAsFixed(0);
+
     final tempDir = await getTemporaryDirectory();
     final filePath = '${tempDir.path}/temp_image.jpg';
     final image = img.decodeImage(_imageFile!.readAsBytesSync());
     final compressedImage = img.encodeJpg(image!, quality: 85);
     File(filePath).writeAsBytesSync(compressedImage);
-
-    final imageStream =
-        http.ByteStream(Stream.castFrom(File(filePath).openRead()));
-    final imageLength = await File(filePath).length();
-
-    final multipartFile = http.MultipartFile(
-      'image',
-      imageStream,
-      imageLength,
-      filename: _imageFile!.path,
-    );
-
-    request.files.add(multipartFile);
+    request.files.add(await http.MultipartFile.fromPath('image', filePath));
 
     final response = await request.send();
-
     if (response.statusCode == 200) {
-      var data1 = await response.stream.bytesToString();
-      var data = jsonDecode(data1);
+      var data = jsonDecode(await response.stream.bytesToString());
       if (data["error"] == true) {
         dangerNoti(data["titre"], data["message"], context);
+        setState(() => _isSending = false);
       } else {
         successNoti(
-            "Good",
+            "Succès",
             (langUserPhone == "fr")
-                ? 'Good. Votre demande de promotion a été enregistrée. Elle sera diffusée si elle est acceptée par un administrateur. Dans le cas contraire, vous devrez la modifier en tenant compte des remarques.'
-                : 'Good. Your promotion request has been saved. It will be released if it is accepted by an administrator. Otherwise, you will need to modify it taking into account the comments.',
+                ? 'Votre demande a été enregistrée.'
+                : 'Your request has been saved.',
             context);
+        setState(() {
+          _textEditingController.clear();
+          _imageFile = null;
+          _isSending = false;
+        });
       }
-      setState(() {
-        _textEditingController.clear();
-        _imageFile = null;
-        _isSending = false;
-      });
     } else {
-      dangerNoti("Attention !!!", 'Erreur : ${response.statusCode}', context);
+      dangerNoti("Erreur", 'Code : ${response.statusCode}', context);
+      setState(() => _isSending = false);
     }
   }
 
   void listeFormulePromoAffaire() async {
-    bool isConnected = await isConnectedToInternet();
-    if (isConnected) {
-      setState(() {
-        loading_formule_gratuit = true;
-      });
-
-      var request = http.MultipartRequest(
-          'POST', Uri.parse('$generalRouteForApi/listeFormulePromoAffaire'));
-      request.fields.addAll({});
-
-      http.StreamedResponse response = await request.send();
-
+    if (await isConnectedToInternet()) {
+      setState(() => loading_formule_gratuit = true);
+      var response = await http
+          .post(Uri.parse('$generalRouteForApi/listeFormulePromoAffaire'));
       if (response.statusCode == 200) {
-        var data1 = await response.stream.bytesToString();
-        var data = convert.jsonDecode(data1);
+        var data = jsonDecode(response.body);
         if (data["error"] == false) {
           setState(() {
             loading_formule_gratuit = false;
-            listeDesFormules = (data["listeFormulBoost"] as List<dynamic>)
-                .map((item) => item as Map<String, dynamic>)
-                .toList();
+            listeDesFormules =
+                List<Map<String, dynamic>>.from(data["listeFormulBoost"]);
             listeMethodePaiements =
-                (data["listeMethodePaiements"] as List<dynamic>)
-                    .map((item) => item as Map<String, dynamic>)
-                    .toList();
+                List<Map<String, dynamic>>.from(data["listeMethodePaiements"]);
             _message = (langUserPhone == "fr")
                 ? "Veuillez choisir une formule."
                 : "Please choose a plan.";
@@ -300,41 +340,135 @@ class _ProduitsServicesState extends State<ProduitsServices> {
         }
       }
     } else {
-      if (langUserPhone != "fr") {
-        dangerNoti(
-            "Mistake!", "You are not connected to the internet.", context);
-      } else {
-        dangerNoti("Erreur!", "Vous n'ètes pas connecté a internet.", context);
-      }
-      setState(() {
-        loading_formule_gratuit = false;
-      });
+      dangerNoti(
+          "Erreur",
+          (langUserPhone == "fr")
+              ? "Pas de connexion internet."
+              : "No internet connection.",
+          context);
+      setState(() => loading_formule_gratuit = false);
     }
   }
 
-  onChangeFormulBoost(val) async {
-    for (var service in listeDesFormules) {
-      if ("$val" == "${service['value']}") {
-        setState(() {
-          value = service['value'];
-          label = service['label'];
-          prix = service['prix'];
-          jours = service['jours'];
-        });
-      }
-    }
+  onChangeFormulBoost(val) {
+    final selected = listeDesFormules
+        .firstWhere((e) => e['value'].toString() == val.toString());
     setState(() {
+      idFormulBoost = int.parse(val.toString());
+      prixBoost = selected['prix'];
+      joursBoost = selected['jours'];
+      _boostMessage = "Formule de $joursBoost jour(s) pour $prixBoost FCFA.";
+
+      value = selected['value'];
+      label = selected['label'];
+      prix = selected['prix'];
+      jours = selected['jours'];
       idFormulBoost = val;
       _message = (langUserPhone == "fr")
-          ? "Cette formule vous offre une promotion affaire de $jours jour(s) pour $prix FCFA."
-          : "This formula offers you a business promotion of $jours day(s) for $prix FCFA.";
+          ? "Formule de $jours jour(s) pour $prix FCFA."
+          : "Plan of $jours day(s) for $prix FCFA.";
     });
   }
 
-  onChangeMethodePaiement(val) async {
-    setState(() {
-      valueMethodePaiement = val;
-    });
+  Widget _buildNumberInput(String label, int value, Function(int) onChanged) {
+    return Row(
+      children: [
+        Expanded(child: Text(label, style: TextStyle(fontSize: 13))),
+        SizedBox(
+          width: 100,
+          child: TextField(
+            keyboardType: TextInputType.number,
+            decoration:
+                InputDecoration(isDense: true, border: OutlineInputBorder()),
+            onChanged: (v) => onChanged(int.tryParse(v) ?? 0),
+            controller: TextEditingController(text: value.toString())
+              ..selection =
+                  TextSelection.collapsed(offset: value.toString().length),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _infoBox(String text, Color color) {
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.all(10),
+      decoration: BoxDecoration(
+          color: color.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: color.withOpacity(0.3))),
+      child: Text(text,
+          style: TextStyle(
+              color: color, fontWeight: FontWeight.bold, fontSize: 13),
+          textAlign: TextAlign.center),
+    );
+  }
+
+  Widget _buildRecap() {
+    return Container(
+      padding: EdgeInsets.all(15),
+      decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: Colors.grey[300]!)),
+      child: Column(
+        children: [
+          _recapRow("Formule Boost", prixBoost.toDouble()),
+          if (_participateInReward)
+            _recapRow("Programme Récompense", _rewardProgramAmount),
+          if (_publishOnDressurStatus)
+            _recapRow("Statut Dressur", _dressurStatusAmount),
+          Divider(height: 20),
+          _recapRow("Sous-total", _subTotal, isBold: true),
+          _recapRow("Commission Fedapay (approx.)", _fedapayMax, isSmall: true),
+          const SizedBox(height: 10),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text("TOTAL ESTIMÉ",
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                  )),
+              Text("${_totalWithMaxCommission.toStringAsFixed(0)} FCFA",
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                    color: primaryColor,
+                  )),
+            ],
+          ),
+          const SizedBox(height: 5),
+          Text(
+              "Note: La commission Fedapay varie entre 1.8% et 4% selon le moyen de paiement.",
+              style: TextStyle(
+                  fontSize: 10,
+                  color: Colors.grey[600],
+                  fontStyle: FontStyle.italic),
+              textAlign: TextAlign.center),
+        ],
+      ),
+    );
+  }
+
+  Widget _recapRow(String label, double amount,
+      {bool isBold = false, bool isSmall = false}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 2),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(label,
+              style: TextStyle(
+                  fontSize: isSmall ? 11 : 13,
+                  fontWeight: isBold ? FontWeight.bold : FontWeight.normal)),
+          Text("${amount.toStringAsFixed(0)} F",
+              style: TextStyle(
+                  fontSize: isSmall ? 11 : 13,
+                  fontWeight: isBold ? FontWeight.bold : FontWeight.normal)),
+        ],
+      ),
+    );
   }
 
   @override
@@ -345,114 +479,194 @@ class _ProduitsServicesState extends State<ProduitsServices> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Container(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           const SizedBox(height: 5),
           loading_formule_gratuit
-              ? const Center(
-                  child: CircularProgressIndicator(),
-                )
+              ? const Center(child: CircularProgressIndicator())
               : SelectFormField(
                   decoration: const InputDecoration(
-                    labelText: 'Formules de Promotion Affaire',
-                    border: OutlineInputBorder(),
-                  ),
+                      labelText: 'Formule de Boost',
+                      border: OutlineInputBorder()),
                   type: SelectFormFieldType.dropdown,
                   initialValue: '0',
-                  labelText: 'Formules de Promotion Affaire',
                   items: listeDesFormules,
                   onChanged: (val) => onChangeFormulBoost(val),
-                  onSaved: (val) => print(val),
                 ),
-          const SizedBox(height: 16.0),
-          Text(
-            _message,
-            style: GoogleFonts.poppins(
-              fontSize: 16,
-            ),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 16.0),
-          SelectFormField(
-            decoration: const InputDecoration(
-              labelText: 'Moyen de paiement mobile ou par carte',
-              border: OutlineInputBorder(),
-            ),
-            type: SelectFormFieldType.dropdown,
-            initialValue: 'mtn',
-            labelText: 'Moyen de paiement mobile ou par carte',
-            items: listeMethodePaiements,
-            onChanged: (val) => onChangeMethodePaiement(val),
-            onSaved: (val) => print(val),
-          ),
-          const SizedBox(height: 16.0),
-          TextField(
-            controller: telController,
-            decoration: const InputDecoration(
-              labelText: 'Indicatif + Numéro du paiement',
-              border: OutlineInputBorder(),
-            ),
-          ),
-          const SizedBox(height: 16.0),
+          const SizedBox(height: 10),
+          if (_message.isNotEmpty)
+            Text(_message,
+                style: GoogleFonts.poppins(fontSize: 14, color: primaryColor),
+                textAlign: TextAlign.center),
+          const SizedBox(height: 15),
+
           ElevatedButton(
             onPressed: _isSending ? null : _selectImage,
             style: ElevatedButton.styleFrom(
-              backgroundColor: primaryColor,
-              shape: const StadiumBorder(),
-              padding: const EdgeInsets.symmetric(
-                vertical: 13,
-              ),
-            ),
+                backgroundColor: primaryColor,
+                shape: const StadiumBorder(),
+                padding: const EdgeInsets.symmetric(vertical: 13)),
             child: Text(
-              (langUserPhone == "fr")
-                  ? "Sélectionner l'image de la promotion"
-                  : 'Select the promotional image',
-              style: GoogleFonts.poppins(
-                color: Colors.white,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
+                (langUserPhone == "fr")
+                    ? "Sélectionner l'image"
+                    : 'Select image',
+                style: GoogleFonts.poppins(
+                    color: Colors.white, fontWeight: FontWeight.w600)),
           ),
           if (_imageFile != null)
             Container(
-              margin: const EdgeInsets.only(top: 16.0),
-              child: Image.file(
-                _imageFile!,
-                fit: BoxFit.contain,
+                margin: const EdgeInsets.only(top: 10),
+                child: Image.file(_imageFile!, fit: BoxFit.contain)),
+          const SizedBox(height: 10),
+          TextField(
+              controller: _textEditingController,
+              minLines: 1,
+              maxLines: 10,
+              decoration: InputDecoration(
+                  labelText: 'Description',
+                  border: const OutlineInputBorder())),
+
+          const SizedBox(height: 10),
+
+          // --- SECTION PROGRAMME DE RÉCOMPENSE ---
+          _buildOptionHeader(
+              Icons.stars, "Programme de Récompense", _participateInReward),
+          SwitchListTile(
+            title: Text("Ajouter votre promotion au programme",
+                style: GoogleFonts.poppins(
+                    fontSize: 14, fontWeight: FontWeight.w500)),
+            subtitle: Text(
+                "Attirez plus de vues en récompensant les utilisateurs qui le publieront sur leur statut WhatsApp. Dressur se charge de la mise en application et de la vérification.",
+                style: TextStyle(fontSize: 11)),
+            value: _participateInReward,
+            activeColor: primaryColor,
+            onChanged: (val) => setState(() => _participateInReward = val),
+          ),
+          if (_participateInReward) ...[
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Column(
+                children: [
+                  _buildNumberInput(
+                    "Objectif de vues total (min. 2500)",
+                    _totalViewsGoal,
+                    (v) => setState(() => _totalViewsGoal = v),
+                  ),
+                  const SizedBox(height: 10),
+                  _infoBox(
+                    "Montant de récompense : ${_rewardProgramAmount.toStringAsFixed(0)} FCFA",
+                    Colors.orange,
+                  ),
+                ],
               ),
             ),
-          const SizedBox(height: 16.0),
-          TextField(
-            controller: _textEditingController,
-            maxLines: null,
-            decoration: InputDecoration(
-              labelText: (langUserPhone == "fr")
-                  ? 'Description de la promotion'
-                  : 'Description of the promotion',
-              border: const OutlineInputBorder(),
-            ),
+          ],
+
+          const SizedBox(height: 15),
+
+          // --- SECTION STATUT DRESSUR ---
+          _buildOptionHeader(
+            Icons.verified_user,
+            "Statut Dressur",
+            _publishOnDressurStatus,
           ),
-          const SizedBox(height: 16.0),
+          SwitchListTile(
+            title: Text(
+              "Publier sur le statut de Dressur",
+              style: GoogleFonts.poppins(
+                  fontSize: 14, fontWeight: FontWeight.w500),
+            ),
+            subtitle: Text(
+              "Bénéficiez d’une visibilité maximale sur le statut WhatsApp de Dressur pendant toute la durée de votre promotion.",
+              style: TextStyle(fontSize: 11),
+            ),
+            value: _publishOnDressurStatus,
+            activeColor: primaryColor,
+            onChanged: (val) => setState(() => _publishOnDressurStatus = val),
+          ),
+          if (_publishOnDressurStatus)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10),
+              child: Column(
+                children: [
+                  _infoBox(
+                      "Frais Statut Dressur : ${_dressurStatusAmount.toStringAsFixed(0)} FCFA",
+                      Colors.blue),
+                ],
+              ),
+            ),
+
+          const SizedBox(height: 15),
+          _buildRecap(),
+          const SizedBox(height: 15),
+
+          SelectFormField(
+            decoration: const InputDecoration(
+                labelText: 'Moyen de paiement', border: OutlineInputBorder()),
+            type: SelectFormFieldType.dropdown,
+            initialValue: 'mtn',
+            items: listeMethodePaiements,
+            onChanged: (val) => setState(() => valueMethodePaiement = val),
+          ),
+          const SizedBox(height: 10),
+          TextField(
+              controller: telController,
+              decoration: const InputDecoration(
+                  labelText: 'Numéro du paiement',
+                  border: OutlineInputBorder())),
+
+          const SizedBox(height: 15),
           ElevatedButton(
             onPressed: _isSending ? null : _sendData,
             style: ElevatedButton.styleFrom(
-              backgroundColor: primaryColor,
-              shape: const StadiumBorder(),
-              padding: const EdgeInsets.symmetric(
-                vertical: 13,
-              ),
-            ),
+                backgroundColor: primaryColor,
+                shape: const StadiumBorder(),
+                padding: const EdgeInsets.symmetric(vertical: 15)),
             child: _isSending
-                ? const Text('Wait ...')
+                ? const CircularProgressIndicator(color: Colors.white)
                 : Text(
-                    (langUserPhone == "fr") ? 'Envoyer' : 'Send',
+                    (langUserPhone == "fr")
+                        ? 'VALIDER ET PAYER'
+                        : 'VALIDATE AND PAY',
                     style: GoogleFonts.poppins(
-                      color: Colors.white,
-                    ),
-                  ),
+                        color: Colors.white, fontWeight: FontWeight.bold)),
           ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildOptionHeader(IconData icon, String title, bool isActive) {
+    return Row(
+      children: [
+        Icon(icon, color: isActive ? primaryColor : Colors.grey, size: 20),
+        SizedBox(width: 10),
+        Text(title,
+            style: GoogleFonts.poppins(
+                fontWeight: FontWeight.bold,
+                fontSize: 15,
+                color: isActive ? primaryColor : Colors.grey[700])),
+      ],
+    );
+  }
+
+  Widget _priceRow(String label, double amount, {bool isSmall = false}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 2),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(label,
+              style: TextStyle(
+                  fontSize: isSmall ? 11 : 13,
+                  color: isSmall ? Colors.grey : null)),
+          Text("${amount.toStringAsFixed(0)} F",
+              style: TextStyle(
+                  fontSize: isSmall ? 11 : 13,
+                  fontWeight: isSmall ? FontWeight.normal : FontWeight.w500)),
         ],
       ),
     );
