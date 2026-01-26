@@ -131,7 +131,7 @@ class ProduitsServices extends StatefulWidget {
 class _ProduitsServicesState extends State<ProduitsServices> {
   bool load = false;
   File? _imageFile;
-  TextEditingController _textEditingController = TextEditingController();
+  final TextEditingController _textEditingController = TextEditingController();
   bool _isSending = false;
   var _message = "";
   dynamic idFormulBoost = 0;
@@ -145,46 +145,37 @@ class _ProduitsServicesState extends State<ProduitsServices> {
   final telController = TextEditingController(text: tel);
 
   int prixBoost = 0;
-  // --- NOUVELLES VARIABLES POUR LES OPTIONS ---
   bool _participateInReward = false;
-  int _minPeopleToReward = 10;
-  int _rewardViewsLevel = 250; // 250, 500, 1000, 2000, 4000
-  int _totalViewsGoal = 2500; // Minimum 2500 vues
+  int _totalViewsGoal = 2500;
+
+  final TextEditingController _viewsController =
+      TextEditingController(text: "2500");
 
   int joursBoost = 0;
-  String _boostMessage = "";
   double get _subTotal =>
       prixBoost + _rewardProgramAmount + _dressurStatusAmount;
 
-  double get _fedapayMin => _subTotal * 0.018;
   double get _fedapayMax => _subTotal * 0.04;
   double get _totalWithMaxCommission => _subTotal + _fedapayMax;
 
   bool _publishOnDressurStatus = false;
-  int _dressurStatusPricePer7Days = 5000;
+  final int _dressurStatusPricePer7Days = 5000;
 
-  final List<Map<String, dynamic>> _rewardViewsItems = [
-    {'value': 250, 'label': '250 vues'},
-    {'value': 500, 'label': '500 vues'},
-    {'value': 1000, 'label': '1000 vues'},
-    {'value': 2000, 'label': '2000 vues'},
-    {'value': 4000, 'label': '4000 vues'},
-  ];
 
   // --- CALCULS DES MONTANTS ---
   double get _rewardProgramAmount {
     if (!_participateInReward) return 0.0;
 
-    // Calcul basé sur les paliers de vues
-    // 4000 vues = 2500 FCFA
-    // Règle de 3 : (vues * 2500) / 4000
-    double baseAmountPerPerson = (_rewardViewsLevel * 2500) / 4000;
+    // --- MODIFICATION : CALCUL DYNAMIQUE BASÉ SUR _totalViewsGoal ---
+    // On s'assure que le calcul utilise au minimum 2500 vues
+    int effectiveViews = _totalViewsGoal < 2500 ? 2500 : _totalViewsGoal;
 
-    // Montant total pour toutes les personnes
-    double totalBase = baseAmountPerPerson * _minPeopleToReward;
+    // Règle de 3 : 4000 vues = 2500 FCFA de récompense
+    // Montant de base = (vues * 2500) / 4000
+    double baseReward = (effectiveViews * 2500) / 4000;
 
     // Ajout de 20% de commission plateforme
-    return totalBase * 1.2;
+    return baseReward * 1.2;
   }
 
   double get _dressurStatusAmount {
@@ -219,7 +210,15 @@ class _ProduitsServicesState extends State<ProduitsServices> {
       idFormulBoost = int.parse(val.toString());
       prixBoost = selected['prix'];
       joursBoost = selected['jours'];
-      _boostMessage = "Formule de $joursBoost jour(s) pour $prixBoost FCFA.";
+
+      value = selected['value'];
+      label = selected['label'];
+      prix = selected['prix'];
+      jours = selected['jours'];
+      idFormulBoost = val;
+      _message = (langUserPhone == "fr")
+          ? "Formule de $jours jour(s) pour $prix FCFA."
+          : "Plan of $jours day(s) for $prix FCFA.";
     });
   }
 
@@ -281,8 +280,7 @@ class _ProduitsServicesState extends State<ProduitsServices> {
 
     // Envoi des nouvelles options (à traiter en back-end plus tard)
     request.fields['inProgrammeRecompense'] = _participateInReward ? "1" : "0";
-    request.fields['minPeopleToReward'] = _minPeopleToReward.toString();
-    request.fields['rewardViewsLevel'] = _rewardViewsLevel.toString();
+    request.fields['totalViewsGoal'] = _totalViewsGoal.toString();
     request.fields['publishOnDressurStatus'] =
         _publishOnDressurStatus ? "1" : "0";
     request.fields['totalAmount'] = _totalAmount.toStringAsFixed(0);
@@ -296,22 +294,61 @@ class _ProduitsServicesState extends State<ProduitsServices> {
 
     final response = await request.send();
     if (response.statusCode == 200) {
-      var data = jsonDecode(await response.stream.bytesToString());
+      var data1 = await response.stream.bytesToString();
+      var data = jsonDecode(data1);
       if (data["error"] == true) {
         dangerNoti(data["titre"], data["message"], context);
         setState(() => _isSending = false);
       } else {
-        successNoti(
-            "Succès",
-            (langUserPhone == "fr")
-                ? 'Votre demande a été enregistrée.'
-                : 'Your request has been saved.',
-            context);
         setState(() {
-          _textEditingController.clear();
-          _imageFile = null;
+          // 1. Réinitialisation des états de chargement et financiers
           _isSending = false;
+          prixBoost = 0;
+          joursBoost = 0;
+          prix = 0;
+          jours = 0;
+          value = 0;
+          idFormulBoost = 0;
+
+          // 2. Réinitialisation des médias
+          _imageFile = null;
+
+          // 3. Réinitialisation des contrôleurs de texte
+          _textEditingController.clear(); // Description
+          _viewsController.text = "2500"; // Vues par défaut
+          // telController.text = tel;    // Optionnel : remettre le tel par défaut si besoin
+
+          // 4. Réinitialisation des messages et labels
+          _message = (langUserPhone == "fr")
+              ? "Veuillez choisir une formule."
+              : "Please choose a plan.";
+          label = "";
+
+          // 5. Réinitialisation des options spécifiques (Reward & Status)
+          _participateInReward = false;
+          _totalViewsGoal = 2500;
+          _publishOnDressurStatus = false;
+
+          // 6. Réinitialisation du mode de paiement par défaut
+          valueMethodePaiement = "mtn";
         });
+
+        if (data["direct"] == true) {
+          successNoti(
+              "Succès",
+              (langUserPhone == "fr")
+                  ? "Veuillez confirmer le paiement pour finaliser l'enregistrement de votre promotion."
+                  : "Please confirm payment to finalize the registration of your promotion.",
+              context);
+        } else {
+          launchPaiement(data["url"]);
+          successNoti(
+              "Succès",
+              (langUserPhone == "fr")
+                  ? "Veuillez confirmer le paiement pour finaliser l'enregistrement de votre promotion."
+                  : "Please confirm payment to finalize the registration of your promotion.",
+              context);
+        }
       }
     } else {
       dangerNoti("Erreur", 'Code : ${response.statusCode}', context);
@@ -357,7 +394,6 @@ class _ProduitsServicesState extends State<ProduitsServices> {
       idFormulBoost = int.parse(val.toString());
       prixBoost = selected['prix'];
       joursBoost = selected['jours'];
-      _boostMessage = "Formule de $joursBoost jour(s) pour $prixBoost FCFA.";
 
       value = selected['value'];
       label = selected['label'];
@@ -370,20 +406,36 @@ class _ProduitsServicesState extends State<ProduitsServices> {
     });
   }
 
-  Widget _buildNumberInput(String label, int value, Function(int) onChanged) {
+  // --- MODIFICATION : AJOUT D'UN LISTENER POUR LES VUES ---
+  @override
+  void initState() {
+    super.initState();
+    listeFormulePromoAffaire();
+    _viewsController.addListener(() {
+      final val = int.tryParse(_viewsController.text) ?? 0;
+      setState(() {
+        _totalViewsGoal = val;
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _viewsController.dispose();
+    super.dispose();
+  }
+
+  Widget _buildNumberInput(String label, TextEditingController controller) {
     return Row(
       children: [
         Expanded(child: Text(label, style: TextStyle(fontSize: 13))),
         SizedBox(
           width: 100,
           child: TextField(
+            controller: controller,
             keyboardType: TextInputType.number,
             decoration:
                 InputDecoration(isDense: true, border: OutlineInputBorder()),
-            onChanged: (v) => onChanged(int.tryParse(v) ?? 0),
-            controller: TextEditingController(text: value.toString())
-              ..selection =
-                  TextSelection.collapsed(offset: value.toString().length),
           ),
         ),
       ],
@@ -472,12 +524,6 @@ class _ProduitsServicesState extends State<ProduitsServices> {
   }
 
   @override
-  void initState() {
-    super.initState();
-    listeFormulePromoAffaire();
-  }
-
-  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Container(
@@ -550,10 +596,10 @@ class _ProduitsServicesState extends State<ProduitsServices> {
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Column(
                 children: [
+                  // --- MODIFICATION : UTILISATION DU CONTROLLER ---
                   _buildNumberInput(
                     "Objectif de vues total (min. 2500)",
-                    _totalViewsGoal,
-                    (v) => setState(() => _totalViewsGoal = v),
+                    _viewsController,
                   ),
                   const SizedBox(height: 10),
                   _infoBox(
