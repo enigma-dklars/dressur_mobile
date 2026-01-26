@@ -380,8 +380,7 @@ class _ActuPageState extends State<ActuPage> {
           annotherInfo: data['annotherInfo'] != null
               ? jsonEncode(data['annotherInfo'])
               : "",
-          inProgrammeRecompense:
-              data['inProgrammeRecompense'] == 1 ? true : false,
+          inProgrammeRecompense: data['inProgrammeRecompense'] == 1,
         );
       }).toList();
       // Mélanger l'ordre des éléments

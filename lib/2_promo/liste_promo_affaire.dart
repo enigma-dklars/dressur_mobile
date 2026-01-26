@@ -27,6 +27,8 @@ class Promotion {
   final String motif;
   final String typePromotionAffaire;
   final String annotherInfo;
+  final bool inProgrammeRecompense;
+  final bool publishOnDressurStatus;
 
   Promotion({
     required this.id,
@@ -42,6 +44,8 @@ class Promotion {
     required this.motif,
     required this.typePromotionAffaire,
     required this.annotherInfo,
+    required this.inProgrammeRecompense,
+    required this.publishOnDressurStatus,
   });
 }
 
@@ -82,6 +86,8 @@ class _PromotionListPageState extends State<PromotionListPage> {
             annotherInfo: data['annotherInfo'] != null
                 ? jsonEncode(data['annotherInfo'])
                 : "",
+            inProgrammeRecompense: data['inProgrammeRecompense'] == 1,
+            publishOnDressurStatus: data['publishOnDressurStatus'] == 1,
           );
         }).toList();
 
@@ -207,6 +213,83 @@ class _PromotionListPageState extends State<PromotionListPage> {
                 ],
               ),
             ),
+            const SizedBox(height: 1.5),
+            if (promotion.inProgrammeRecompense == true ||
+                promotion.publishOnDressurStatus == true)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 4),
+                child: Wrap(
+                  spacing: 5, // Espace horizontal entre les badges
+                  runSpacing:
+                      4.0, // Espace vertical si les badges passent à la ligne
+                  children: [
+                    // Badge Programme de Récompense
+                    if (promotion.inProgrammeRecompense == true)
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 1),
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [Colors.orange[700]!, Colors.orange[400]!],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(Icons.stars,
+                                color: Colors.white, size: 12),
+                            const SizedBox(width: 6),
+                            Text(
+                              "Programme Récompense",
+                              style: GoogleFonts.poppins(
+                                color: Colors.white,
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+
+                    // Badge Statut Dressur
+                    if (promotion.publishOnDressurStatus == true)
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 1),
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [
+                              primaryColor,
+                              primaryColor.withOpacity(0.7)
+                            ],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(Icons.verified_user,
+                                color: Colors.white, size: 12),
+                            const SizedBox(width: 6),
+                            Text(
+                              "Statut Dressur",
+                              style: GoogleFonts.poppins(
+                                color: Colors.white,
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                  ],
+                ),
+              ),
             const SizedBox(height: 5),
             if ([
               "Completed",
