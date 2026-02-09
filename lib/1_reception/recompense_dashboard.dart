@@ -17,6 +17,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:image_picker/image_picker.dart';
 
 class HistoriqueRecompense {
+  final int id;
   final String title;
   final String amount;
   final String date;
@@ -26,6 +27,7 @@ class HistoriqueRecompense {
   final String description;
 
   HistoriqueRecompense({
+    required this.id,
     required this.title,
     required this.amount,
     required this.date,
@@ -87,6 +89,7 @@ class _ProgrammeRecompenseDashboardState
           return sixLastHistorique.map((data) {
             return HistoriqueRecompense(
               imageUrl: generalRouteForPromotionImage + data['imageUrl'],
+              id: data['id'] ?? 0,
               title: data['title'] ?? "",
               amount: data['amount'].toString(),
               date: data['date'] ?? "",
@@ -721,52 +724,6 @@ class _ProgrammeRecompenseDashboardState
     );
   }
 
-  Widget _proofCard(
-      BuildContext context, String number, String title, String content) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    return Container(
-      width: double.infinity,
-      margin: EdgeInsets.only(bottom: 12),
-      padding: EdgeInsets.all(15),
-      decoration: BoxDecoration(
-        color: isDark ? Colors.white.withOpacity(0.05) : Colors.green[50],
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              CircleAvatar(
-                radius: 12,
-                backgroundColor: primaryColor,
-                child: Text(number,
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold)),
-              ),
-              SizedBox(width: 10),
-              Expanded(
-                child: Text(
-                  title,
-                  style: GoogleFonts.poppins(
-                      fontWeight: FontWeight.bold, fontSize: 14),
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: 8),
-          Padding(
-            padding: const EdgeInsets.only(left: 30),
-            child: Text(content,
-                style: GoogleFonts.poppins(fontSize: 13, height: 1.4)),
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget _buildStatusContent(
       HistoriqueRecompense item, StateSetter setModalState) {
     switch (item.status) {
@@ -868,7 +825,7 @@ class _ProgrammeRecompenseDashboardState
     return Container(
       padding: const EdgeInsets.all(15),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(15),
         border: Border.all(color: Colors.grey[300]!),
       ),
       child: Column(
@@ -877,30 +834,49 @@ class _ProgrammeRecompenseDashboardState
             "Formulaire de soumission",
             style: GoogleFonts.poppins(fontWeight: FontWeight.bold),
           ),
-          const SizedBox(height: 10),
-          _proofCard(context, "1", "Capture – Liste des statuts",
-              "• Affiche la liste des statuts WhatsApp\n• Le statut de la promotion doit être visible"),
-          _uploadPlaceholder("Capture – Liste des statuts"),
           const SizedBox(height: 15),
-          _proofCard(context, "2", "Capture – Statut ouvert",
-              "• Image complète\n• Texte descriptif complet\n• Nombre de vues, date et heure visibles"),
-          _uploadPlaceholder("Capture – Statut ouvert"),
+
+          // Capture 1
+          _proofCard(
+              "1",
+              "Capture – Liste des statuts",
+              "• Affiche la liste des statuts WhatsApp\n• Le statut de la promotion doit être visible",
+              _proofImage1,
+              () => _pickImage(1, setModalState)),
+
           const SizedBox(height: 15),
+
+          // Capture 2
+          _proofCard(
+              "2",
+              "Capture – Statut ouvert",
+              "• Image complète\n• Texte descriptif complet\n• Nombre de vues, date et heure visibles",
+              _proofImage2,
+              () => _pickImage(2, setModalState)),
+
+          const SizedBox(height: 20),
+
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(
-              onPressed: () {
-                // Logique de soumission à implémenter
-                successNoti("Info",
-                    "Fonctionnalité de soumission bientôt disponible", context);
-              },
+              onPressed: _isSubmitting
+                  ? null
+                  : () => _submitProofs(item, setModalState),
               style: ElevatedButton.styleFrom(
                 backgroundColor: primaryColor,
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10)),
+                padding: EdgeInsets.symmetric(vertical: 12),
               ),
-              child: Text("Soumettre les preuves",
-                  style: TextStyle(color: Colors.white)),
+              child: _isSubmitting
+                  ? SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                          color: Colors.white, strokeWidth: 2))
+                  : Text("Soumettre les preuves",
+                      style: TextStyle(
+                          color: Colors.white, fontWeight: FontWeight.bold)),
             ),
           ),
         ],
@@ -908,24 +884,131 @@ class _ProgrammeRecompenseDashboardState
     );
   }
 
-  Widget _uploadPlaceholder(String label) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: Colors.grey[300]!),
-      ),
-      child: Row(
-        children: [
-          Icon(Icons.image_outlined, color: Colors.grey),
-          const SizedBox(width: 10),
-          Expanded(
-              child: Text(label,
-                  style: TextStyle(fontSize: 12, color: Colors.grey[600]))),
-          Icon(Icons.add_a_photo, size: 18, color: primaryColor),
-        ],
-      ),
+  Widget _proofCard(String number, String title, String instructions,
+      File? image, VoidCallback onTap) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            CircleAvatar(
+                radius: 10,
+                backgroundColor: primaryColor,
+                child: Text(number,
+                    style: TextStyle(color: Colors.white, fontSize: 10))),
+            const SizedBox(width: 8),
+            Text(title,
+                style: GoogleFonts.poppins(
+                    fontSize: 13, fontWeight: FontWeight.w600)),
+          ],
+        ),
+        const SizedBox(height: 5),
+        Text(instructions,
+            style: TextStyle(fontSize: 11, color: Colors.grey[600])),
+        const SizedBox(height: 10),
+        InkWell(
+          onTap: onTap,
+          child: Container(
+            height: 120,
+            width: double.infinity,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: Colors.grey[300]!),
+              image: image != null
+                  ? DecorationImage(image: FileImage(image), fit: BoxFit.cover)
+                  : null,
+            ),
+            child: image == null
+                ? Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.add_a_photo, color: primaryColor, size: 30),
+                      const SizedBox(height: 5),
+                      Text("Cliquez pour choisir",
+                          style: TextStyle(fontSize: 12, color: Colors.grey)),
+                    ],
+                  )
+                : Stack(
+                    children: [
+                      Positioned(
+                        top: 5,
+                        right: 5,
+                        child: CircleAvatar(
+                            radius: 12,
+                            backgroundColor: Colors.black54,
+                            child: Icon(Icons.edit,
+                                size: 14, color: Colors.white)),
+                      )
+                    ],
+                  ),
+          ),
+        ),
+      ],
     );
+  }
+
+  Future<void> _pickImage(int index, StateSetter setModalState) async {
+    final XFile? pickedFile =
+        await _picker.pickImage(source: ImageSource.gallery, imageQuality: 80);
+    if (pickedFile != null) {
+      setState(() {
+        if (index == 1)
+          _proofImage1 = File(pickedFile.path);
+        else
+          _proofImage2 = File(pickedFile.path);
+      });
+      setModalState(() {}); // Mettre à jour le BottomSheet
+    }
+  }
+
+  Future<void> _submitProofs(
+      HistoriqueRecompense item, StateSetter setModalState) async {
+    if (_proofImage1 == null || _proofImage2 == null) {
+      dangerNoti("Attention",
+          "Veuillez sélectionner les deux captures d'écran.", context);
+      return;
+    }
+
+    setModalState(() => _isSubmitting = true);
+    setState(() => _isSubmitting = true);
+
+    try {
+      var request = http.MultipartRequest('POST',
+          Uri.parse('$generalRouteForApi/submitProgrammeRecompenseProofs'));
+
+      request.fields['uid'] = uidUser;
+      request.fields['langUserPhone'] = langUserPhone.toString();
+      request.fields['idHistorique'] = item.id.toString();
+
+      request.files.add(
+          await http.MultipartFile.fromPath('capture1', _proofImage1!.path));
+      request.files.add(
+          await http.MultipartFile.fromPath('capture2', _proofImage2!.path));
+
+      var response = await request.send();
+      var responseData = await response.stream.bytesToString();
+      var data = jsonDecode(responseData);
+
+      if (response.statusCode == 200 && data['error'] == false) {
+        Navigator.pop(context); // Fermer le BottomSheet
+        successNoti("Succès",
+            data['message'] ?? "Preuves soumises avec succès !", context);
+        // Rafraîchir l'historique
+        setState(() {
+          _futureHistoriqueRecompense = partageInProgrammeRecompense();
+        });
+      } else {
+        dangerNoti(
+            "Erreur",
+            data['message'] ?? "Une erreur est survenue lors de l'envoi.",
+            context);
+      }
+    } catch (e) {
+      dangerNoti("Erreur", "Impossible de contacter le serveur.", context);
+    } finally {
+      setModalState(() => _isSubmitting = false);
+      setState(() => _isSubmitting = false);
+    }
   }
 
   Widget _buildWhatsAppButton() {
