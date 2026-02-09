@@ -2,6 +2,7 @@
 
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dressur/1_reception/historique_complet_page.dart';
 import 'package:dressur/components/noti.dart';
@@ -13,6 +14,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:dressur/components/constant.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:image_picker/image_picker.dart';
 
 class HistoriqueRecompense {
   final String title;
@@ -46,6 +48,12 @@ class _ProgrammeRecompenseDashboardState
   late Future<List<HistoriqueRecompense>> _futureHistoriqueRecompense;
   var vuesTotales = 0;
   var gainsTotales = 0;
+
+  File? _proofImage1;
+  File? _proofImage2;
+  bool _isSubmitting = false;
+  final ImagePicker _picker = ImagePicker();
+
   Future<List<HistoriqueRecompense>> partageInProgrammeRecompense() async {
     try {
       var request = http.MultipartRequest(
@@ -230,15 +238,7 @@ class _ProgrammeRecompenseDashboardState
                         itemBuilder: (context, index) {
                           final item = snapshot.data![index];
 
-                          return _promotionItem(
-                              context,
-                              item.title,
-                              "${item.amount} FCFA",
-                              item.date,
-                              "${item.views} vues",
-                              item.imageUrl,
-                              item.status,
-                              item);
+                          return _promotionItem(context, item);
                         },
                       );
                     },
@@ -467,18 +467,14 @@ class _ProgrammeRecompenseDashboardState
     );
   }
 
-  Widget _promotionItem(BuildContext context, String title, String amount,
-      String date, String views, String imageUrl, String status, historique) {
+  Widget _promotionItem(BuildContext context, HistoriqueRecompense item) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final statusConfig = getStatusBadgeConfig(status);
+    final statusConfig = getStatusBadgeConfig(item.status);
 
     return InkWell(
-      onTap: () => _showStatusDetailsBottomSheet(
-          context, status, title, amount, historique),
-      onDoubleTap: () => _showStatusDetailsBottomSheet(
-          context, status, title, amount, historique),
-      onLongPress: () => _showStatusDetailsBottomSheet(
-          context, status, title, amount, historique),
+      onTap: () => _showStatusDetailsBottomSheet(context, item),
+      onDoubleTap: () => _showStatusDetailsBottomSheet(context, item),
+      onLongPress: () => _showStatusDetailsBottomSheet(context, item),
       child: Padding(
         padding: const EdgeInsets.only(bottom: 10),
         child: Container(
@@ -503,7 +499,7 @@ class _ProgrammeRecompenseDashboardState
                     ClipRRect(
                       borderRadius: BorderRadius.circular(12),
                       child: CachedNetworkImage(
-                        imageUrl: imageUrl,
+                        imageUrl: item.imageUrl,
                         width: 55,
                         height: 55,
                         fit: BoxFit.cover,
@@ -523,22 +519,24 @@ class _ProgrammeRecompenseDashboardState
                       child: Container(
                         padding: const EdgeInsets.all(2),
                         decoration: BoxDecoration(
-                          color: (status == "approuver")
+                          color: (item.status == "approuver")
                               ? Colors.green
-                              : (status == "echouer" || status == "refuser")
+                              : (item.status == "echouer" ||
+                                      item.status == "refuser")
                                   ? Colors.red
-                                  : (status == "en_attente")
+                                  : (item.status == "en_attente")
                                       ? Colors.orange
                                       : Colors.black,
                           shape: BoxShape.circle,
                           border: Border.all(color: Colors.white, width: 1.5),
                         ),
                         child: Icon(
-                          (status == "approuver")
+                          (item.status == "approuver")
                               ? Icons.check_circle
-                              : (status == "echouer" || status == "refuser")
+                              : (item.status == "echouer" ||
+                                      item.status == "refuser")
                                   ? Icons.cancel
-                                  : (status == "en_attente")
+                                  : (item.status == "en_attente")
                                       ? Icons.access_time
                                       : Icons.help_outline,
                           color: Colors.white,
@@ -557,7 +555,7 @@ class _ProgrammeRecompenseDashboardState
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      title,
+                      item.title,
                       style: GoogleFonts.poppins(
                         fontWeight: FontWeight.w600,
                         fontSize: 14,
@@ -568,7 +566,7 @@ class _ProgrammeRecompenseDashboardState
                     const SizedBox(height: 10),
                     Row(
                       children: [
-                        Text(date,
+                        Text(item.date,
                             style: GoogleFonts.poppins(
                                 fontSize: 12, color: Colors.grey)),
                         const SizedBox(width: 8),
@@ -584,7 +582,7 @@ class _ProgrammeRecompenseDashboardState
                         const Icon(Icons.visibility_outlined,
                             size: 12, color: Colors.grey),
                         const SizedBox(width: 4),
-                        Text(views,
+                        Text(item.views,
                             style: GoogleFonts.poppins(
                                 fontSize: 12, color: Colors.grey)),
                       ],
@@ -598,15 +596,16 @@ class _ProgrammeRecompenseDashboardState
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Text(
-                    amount,
+                    item.amount,
                     style: GoogleFonts.poppins(
                       fontWeight: FontWeight.bold,
                       fontSize: 14,
-                      color: (status == "approuver")
+                      color: (item.status == "approuver")
                           ? Colors.green
-                          : (status == "echouer" || status == "refuser")
+                          : (item.status == "echouer" ||
+                                  item.status == "refuser")
                               ? Colors.red
-                              : (status == "en_attente")
+                              : (item.status == "en_attente")
                                   ? Colors.orange
                                   : null,
                     ),
@@ -650,8 +649,12 @@ class _ProgrammeRecompenseDashboardState
     );
   }
 
-  void _showStatusDetailsBottomSheet(BuildContext context, String status,
-      String title, String amount, historique) {
+  void _showStatusDetailsBottomSheet(
+      BuildContext context, HistoriqueRecompense item) {
+    setState(() {
+      _proofImage1 = null;
+      _proofImage2 = null;
+    });
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -659,53 +662,58 @@ class _ProgrammeRecompenseDashboardState
         borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
       ),
       builder: (context) {
-        return DraggableScrollableSheet(
-          initialChildSize: 0.6,
-          minChildSize: 0.4,
-          maxChildSize: 0.9,
-          expand: false,
-          builder: (context, scrollController) {
-            return SingleChildScrollView(
-              controller: scrollController,
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Center(
-                    child: Container(
-                      width: 40,
-                      height: 5,
-                      decoration: BoxDecoration(
-                        color: Colors.grey[300],
-                        borderRadius: BorderRadius.circular(10),
+        return StatefulBuilder(
+          // Utiliser StatefulBuilder pour mettre à jour le BottomSheet
+          builder: (context, setModalState) {
+            return DraggableScrollableSheet(
+              initialChildSize: 0.7,
+              minChildSize: 0.4,
+              maxChildSize: 0.95,
+              expand: false,
+              builder: (context, scrollController) {
+                return SingleChildScrollView(
+                  controller: scrollController,
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Center(
+                        child: Container(
+                          width: 40,
+                          height: 5,
+                          decoration: BoxDecoration(
+                            color: Colors.grey[300],
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
                       ),
-                    ),
+                      const SizedBox(height: 20),
+                      Text(
+                        item.title,
+                        style: GoogleFonts.poppins(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(
+                        "Récompense : ${item.amount} FCFA",
+                        style: GoogleFonts.poppins(
+                          fontSize: 14,
+                          color: primaryColor,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      const Divider(height: 30),
+                      _buildStatusContent(item, setModalState),
+                      const SizedBox(height: 30),
+                      if (item.status == "terminer" ||
+                          item.status == "en_cours" ||
+                          item.status == "en_attente")
+                        _buildWhatsAppButton(),
+                    ],
                   ),
-                  const SizedBox(height: 20),
-                  Text(
-                    title,
-                    style: GoogleFonts.poppins(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  Text(
-                    "Récompense : $amount",
-                    style: GoogleFonts.poppins(
-                      fontSize: 14,
-                      color: primaryColor,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  const Divider(height: 30),
-                  _buildStatusContent(status),
-                  const SizedBox(height: 30),
-                  if (status == "terminer" ||
-                      status == "en_cours" ||
-                      status == "en_attente")
-                    _buildWhatsAppButton(),
-                ],
-              ),
+                );
+              },
             );
           },
         );
@@ -759,8 +767,9 @@ class _ProgrammeRecompenseDashboardState
     );
   }
 
-  Widget _buildStatusContent(String status) {
-    switch (status) {
+  Widget _buildStatusContent(
+      HistoriqueRecompense item, StateSetter setModalState) {
+    switch (item.status) {
       case "en_attente":
         return _statusInfo(
           Icons.hourglass_empty,
@@ -778,7 +787,7 @@ class _ProgrammeRecompenseDashboardState
               "Le temps de participation est terminé. Vous devez maintenant soumettre vos preuves (les deux captures d'écran) via le formulaire ci-dessous.\n\nNote : La capture vidéo doit être envoyée séparément par WhatsApp.",
             ),
             const SizedBox(height: 20),
-            _buildSubmissionForm(),
+            _buildSubmissionForm(item, setModalState),
           ],
         );
       case "echouer":
@@ -812,7 +821,7 @@ class _ProgrammeRecompenseDashboardState
               "Le temps de soumission n'est pas encore arrivé. Cependant, si vous estimez avoir déjà atteint votre objectif, vous pouvez soumettre vos preuves dès maintenant.",
             ),
             const SizedBox(height: 20),
-            _buildSubmissionForm(),
+            _buildSubmissionForm(item, setModalState),
           ],
         );
       default:
@@ -854,7 +863,8 @@ class _ProgrammeRecompenseDashboardState
     );
   }
 
-  Widget _buildSubmissionForm() {
+  Widget _buildSubmissionForm(
+      HistoriqueRecompense item, StateSetter setModalState) {
     return Container(
       padding: const EdgeInsets.all(15),
       decoration: BoxDecoration(
