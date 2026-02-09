@@ -231,14 +231,14 @@ class _ProgrammeRecompenseDashboardState
                           final item = snapshot.data![index];
 
                           return _promotionItem(
-                            context,
-                            item.title,
-                            "${item.amount} FCFA",
-                            item.date,
-                            "${item.views} vues",
-                            item.imageUrl,
-                            item.status,
-                          );
+                              context,
+                              item.title,
+                              "${item.amount} FCFA",
+                              item.date,
+                              "${item.views} vues",
+                              item.imageUrl,
+                              item.status,
+                              item);
                         },
                       );
                     },
@@ -467,25 +467,18 @@ class _ProgrammeRecompenseDashboardState
     );
   }
 
-  Widget _promotionItem(
-    BuildContext context,
-    String title,
-    String amount,
-    String date,
-    String views,
-    String imageUrl,
-    String status,
-  ) {
+  Widget _promotionItem(BuildContext context, String title, String amount,
+      String date, String views, String imageUrl, String status, historique) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final statusConfig = getStatusBadgeConfig(status);
 
     return InkWell(
-      onTap: () =>
-          _showStatusDetailsBottomSheet(context, status, title, amount),
-      onDoubleTap: () =>
-          _showStatusDetailsBottomSheet(context, status, title, amount),
-      onLongPress: () =>
-          _showStatusDetailsBottomSheet(context, status, title, amount),
+      onTap: () => _showStatusDetailsBottomSheet(
+          context, status, title, amount, historique),
+      onDoubleTap: () => _showStatusDetailsBottomSheet(
+          context, status, title, amount, historique),
+      onLongPress: () => _showStatusDetailsBottomSheet(
+          context, status, title, amount, historique),
       child: Padding(
         padding: const EdgeInsets.only(bottom: 10),
         child: Container(
@@ -657,8 +650,8 @@ class _ProgrammeRecompenseDashboardState
     );
   }
 
-  void _showStatusDetailsBottomSheet(
-      BuildContext context, String status, String title, String amount) {
+  void _showStatusDetailsBottomSheet(BuildContext context, String status,
+      String title, String amount, historique) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -717,6 +710,52 @@ class _ProgrammeRecompenseDashboardState
           },
         );
       },
+    );
+  }
+
+  Widget _proofCard(
+      BuildContext context, String number, String title, String content) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return Container(
+      width: double.infinity,
+      margin: EdgeInsets.only(bottom: 12),
+      padding: EdgeInsets.all(15),
+      decoration: BoxDecoration(
+        color: isDark ? Colors.white.withOpacity(0.05) : Colors.green[50],
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              CircleAvatar(
+                radius: 12,
+                backgroundColor: primaryColor,
+                child: Text(number,
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold)),
+              ),
+              SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  title,
+                  style: GoogleFonts.poppins(
+                      fontWeight: FontWeight.bold, fontSize: 14),
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 8),
+          Padding(
+            padding: const EdgeInsets.only(left: 30),
+            child: Text(content,
+                style: GoogleFonts.poppins(fontSize: 13, height: 1.4)),
+          ),
+        ],
+      ),
     );
   }
 
@@ -819,8 +858,7 @@ class _ProgrammeRecompenseDashboardState
     return Container(
       padding: const EdgeInsets.all(15),
       decoration: BoxDecoration(
-        color: Colors.grey[100],
-        borderRadius: BorderRadius.circular(15),
+        borderRadius: BorderRadius.circular(10),
         border: Border.all(color: Colors.grey[300]!),
       ),
       child: Column(
@@ -829,11 +867,15 @@ class _ProgrammeRecompenseDashboardState
             "Formulaire de soumission",
             style: GoogleFonts.poppins(fontWeight: FontWeight.bold),
           ),
-          const SizedBox(height: 15),
-          _uploadPlaceholder("Capture d'écran 1 (Début)"),
           const SizedBox(height: 10),
-          _uploadPlaceholder("Capture d'écran 2 (Fin)"),
-          const SizedBox(height: 20),
+          _proofCard(context, "1", "Capture – Liste des statuts",
+              "• Affiche la liste des statuts WhatsApp\n• Le statut de la promotion doit être visible"),
+          _uploadPlaceholder("Capture – Liste des statuts"),
+          const SizedBox(height: 15),
+          _proofCard(context, "2", "Capture – Statut ouvert",
+              "• Image complète\n• Texte descriptif complet\n• Nombre de vues, date et heure visibles"),
+          _uploadPlaceholder("Capture – Statut ouvert"),
+          const SizedBox(height: 15),
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(
@@ -860,7 +902,6 @@ class _ProgrammeRecompenseDashboardState
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
       decoration: BoxDecoration(
-        color: Colors.white,
         borderRadius: BorderRadius.circular(10),
         border: Border.all(color: Colors.grey[300]!),
       ),
