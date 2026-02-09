@@ -12,6 +12,7 @@ import 'package:dressur/1_reception/recompense_start.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:dressur/components/constant.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class HistoriqueRecompense {
   final String title;
@@ -478,13 +479,13 @@ class _ProgrammeRecompenseDashboardState
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final statusConfig = getStatusBadgeConfig(status);
 
-    return GestureDetector(
-      onTap: () {
-        print("onTap");
-      },
-      onDoubleTap: () {
-        print("onDoubleTap");
-      },
+    return InkWell(
+      onTap: () =>
+          _showStatusDetailsBottomSheet(context, status, title, amount),
+      onDoubleTap: () =>
+          _showStatusDetailsBottomSheet(context, status, title, amount),
+      onLongPress: () =>
+          _showStatusDetailsBottomSheet(context, status, title, amount),
       child: Padding(
         padding: const EdgeInsets.only(bottom: 10),
         child: Container(
@@ -651,6 +652,250 @@ class _ProgrammeRecompenseDashboardState
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  void _showStatusDetailsBottomSheet(
+      BuildContext context, String status, String title, String amount) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+      ),
+      builder: (context) {
+        return DraggableScrollableSheet(
+          initialChildSize: 0.6,
+          minChildSize: 0.4,
+          maxChildSize: 0.9,
+          expand: false,
+          builder: (context, scrollController) {
+            return SingleChildScrollView(
+              controller: scrollController,
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Center(
+                    child: Container(
+                      width: 40,
+                      height: 5,
+                      decoration: BoxDecoration(
+                        color: Colors.grey[300],
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Text(
+                    title,
+                    style: GoogleFonts.poppins(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Text(
+                    "Récompense : $amount",
+                    style: GoogleFonts.poppins(
+                      fontSize: 14,
+                      color: primaryColor,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  const Divider(height: 30),
+                  _buildStatusContent(status),
+                  const SizedBox(height: 30),
+                  if (status == "terminer" ||
+                      status == "en_cours" ||
+                      status == "en_attente")
+                    _buildWhatsAppButton(),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Widget _buildStatusContent(String status) {
+    switch (status) {
+      case "en_attente":
+        return _statusInfo(
+          Icons.hourglass_empty,
+          Colors.orange,
+          "En attente d'approbation",
+          "Vous avez soumis vos preuves de participation. Notre équipe examine actuellement votre demande.\n\nSi vous ne l'avez pas encore fait, veuillez envoyer la capture vidéo comme dernière preuve par WhatsApp au numéro d'assistance de Dressur.",
+        );
+      case "terminer":
+        return Column(
+          children: [
+            _statusInfo(
+              Icons.timer_off,
+              Colors.green,
+              "Temps écoulé - Soumission requise",
+              "Le temps de participation est terminé. Vous devez maintenant soumettre vos preuves (les deux captures d'écran) via le formulaire ci-dessous.\n\nNote : La capture vidéo doit être envoyée séparément par WhatsApp.",
+            ),
+            const SizedBox(height: 20),
+            _buildSubmissionForm(),
+          ],
+        );
+      case "echouer":
+        return _statusInfo(
+          Icons.error_outline,
+          Colors.red,
+          "Participation échouée",
+          "Malheureusement, vous n'avez pas soumis vos preuves de participation dans les délais impartis. Il est désormais trop tard pour le faire pour cette promotion.",
+        );
+      case "refuser":
+        return _statusInfo(
+          Icons.block,
+          Colors.red,
+          "Preuves refusées",
+          "Les preuves que vous avez fournies n'ont pas été jugées recevables par notre équipe de modération. En conséquence, la récompense ne peut pas être accordée.",
+        );
+      case "approuver":
+        return _statusInfo(
+          Icons.verified,
+          Colors.green,
+          "Félicitations ! Approuvé",
+          "Vos preuves de participation ont été vérifiées et validées. La récompense a été créditée sur votre solde Dressur.",
+        );
+      case "en_cours":
+        return Column(
+          children: [
+            _statusInfo(
+              Icons.sync,
+              Colors.blue,
+              "Participation en cours",
+              "Le temps de soumission n'est pas encore arrivé. Cependant, si vous estimez avoir déjà atteint votre objectif, vous pouvez soumettre vos preuves dès maintenant.",
+            ),
+            const SizedBox(height: 20),
+            _buildSubmissionForm(),
+          ],
+        );
+      default:
+        return Text("Statut inconnu");
+    }
+  }
+
+  Widget _statusInfo(
+      IconData icon, Color color, String title, String description) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Icon(icon, color: color, size: 28),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                title,
+                style: GoogleFonts.poppins(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: color,
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 15),
+        Text(
+          description,
+          style: GoogleFonts.poppins(
+            fontSize: 14,
+            color: Colors.grey[700],
+            height: 1.5,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSubmissionForm() {
+    return Container(
+      padding: const EdgeInsets.all(15),
+      decoration: BoxDecoration(
+        color: Colors.grey[100],
+        borderRadius: BorderRadius.circular(15),
+        border: Border.all(color: Colors.grey[300]!),
+      ),
+      child: Column(
+        children: [
+          Text(
+            "Formulaire de soumission",
+            style: GoogleFonts.poppins(fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 15),
+          _uploadPlaceholder("Capture d'écran 1 (Début)"),
+          const SizedBox(height: 10),
+          _uploadPlaceholder("Capture d'écran 2 (Fin)"),
+          const SizedBox(height: 20),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: () {
+                // Logique de soumission à implémenter
+                successNoti("Info",
+                    "Fonctionnalité de soumission bientôt disponible", context);
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: primaryColor,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10)),
+              ),
+              child: Text("Soumettre les preuves",
+                  style: TextStyle(color: Colors.white)),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _uploadPlaceholder(String label) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: Colors.grey[300]!),
+      ),
+      child: Row(
+        children: [
+          Icon(Icons.image_outlined, color: Colors.grey),
+          const SizedBox(width: 10),
+          Expanded(
+              child: Text(label,
+                  style: TextStyle(fontSize: 12, color: Colors.grey[600]))),
+          Icon(Icons.add_a_photo, size: 18, color: primaryColor),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildWhatsAppButton() {
+    return SizedBox(
+      width: double.infinity,
+      child: OutlinedButton.icon(
+        onPressed: () async {
+          final whatsappUrl =
+              "https://wa.me/229XXXXXXXX"; // Remplacer par le vrai numéro
+          if (await canLaunchUrl(Uri.parse(whatsappUrl))) {
+            await launchUrl(Uri.parse(whatsappUrl));
+          }
+        },
+        icon: Icon(Icons.chat, size: 18),
+        label: Text("Envoyer la vidéo sur WhatsApp"),
+        style: OutlinedButton.styleFrom(
+          foregroundColor: Colors.green,
+          side: BorderSide(color: Colors.green),
+          padding: EdgeInsets.symmetric(vertical: 12),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
         ),
       ),
     );
