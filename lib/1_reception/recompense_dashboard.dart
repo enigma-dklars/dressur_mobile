@@ -149,7 +149,7 @@ class _ProgrammeRecompenseDashboardState
                   SizedBox(height: 10),
 
                   // 3. STATISTIQUES RAPIDES
-                  _sectionTitle(context, "Mes Statistiques"),
+                  _sectionTitle(context, "Mes Statistiques", 15),
                   Row(
                     children: [
                       _statItem(context, "Vues Totales", "$vuesTotales",
@@ -166,7 +166,7 @@ class _ProgrammeRecompenseDashboardState
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      _sectionTitle(context, "Historique de participation…"),
+                      _sectionTitle(context, "Historique de participation…", 0),
                       TextButton(
                         onPressed: () {
                           Navigator.push(
@@ -178,13 +178,26 @@ class _ProgrammeRecompenseDashboardState
                             ),
                           );
                         },
-                        child: Text("Voir tout",
-                            style: GoogleFonts.poppins(
-                                color: primaryColor, fontSize: 12)),
+                        child: Text(
+                          "Voir tout",
+                          style: GoogleFonts.poppins(
+                            color: primaryColor,
+                            fontSize: 12,
+                          ),
+                        ),
                       )
                     ],
                   ),
-
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 10),
+                    child: Text(
+                      "Sélectionnez un historique pour voir les options possibles…",
+                      style: GoogleFonts.poppins(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                  ),
                   FutureBuilder<List<HistoriqueRecompense>>(
                     future: _futureHistoriqueRecompense,
                     builder: (context, snapshot) {
@@ -438,9 +451,10 @@ class _ProgrammeRecompenseDashboardState
     );
   }
 
-  Widget _sectionTitle(BuildContext context, String title) {
+  Widget _sectionTitle(
+      BuildContext context, String title, double padingBottom) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 15),
+      padding: EdgeInsets.only(bottom: padingBottom),
       child: Text(
         title,
         style: GoogleFonts.poppins(
@@ -464,171 +478,179 @@ class _ProgrammeRecompenseDashboardState
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final statusConfig = getStatusBadgeConfig(status);
 
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
-      child: Container(
-        padding: const EdgeInsets.all(10),
-        decoration: BoxDecoration(
-          color: isDark ? Colors.white.withOpacity(0.05) : Colors.white,
-          borderRadius: BorderRadius.circular(15),
-          border: Border.all(
-              color: Theme.of(context).dividerColor.withOpacity(0.1)),
-        ),
-        child: Row(
-          children: [
-            Container(
-              width: 55,
-              height: 55,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Stack(
-                children: [
-                  // ✅ Image avec cache
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
-                    child: CachedNetworkImage(
-                      imageUrl: imageUrl,
-                      width: 55,
-                      height: 55,
-                      fit: BoxFit.cover,
-                      placeholder: (context, url) => Image.asset(
-                          'images/placeholder.png',
-                          fit: BoxFit.cover),
-                      errorWidget: (context, url, error) => Image.asset(
-                          'images/error_image.png',
-                          fit: BoxFit.cover),
-                    ),
-                  ),
-
-                  // ✅ Badge de statut
-                  Positioned(
-                    bottom: 2,
-                    right: 2,
-                    child: Container(
-                      padding: const EdgeInsets.all(2),
-                      decoration: BoxDecoration(
-                        color: (status == "approuver")
-                            ? Colors.green
-                            : (status == "echouer" || status == "refuser")
-                                ? Colors.red
-                                : (status == "en_attente")
-                                    ? Colors.orange
-                                    : Colors.black,
-                        shape: BoxShape.circle,
-                        border: Border.all(color: Colors.white, width: 1.5),
-                      ),
-                      child: Icon(
-                        (status == "approuver")
-                            ? Icons.check_circle
-                            : (status == "echouer" || status == "refuser")
-                                ? Icons.cancel
-                                : (status == "en_attente")
-                                    ? Icons.access_time
-                                    : Icons.help_outline,
-                        color: Colors.white,
-                        size: 10,
+    return GestureDetector(
+      onTap: () {
+        print("onTap");
+      },
+      onDoubleTap: () {
+        print("onDoubleTap");
+      },
+      child: Padding(
+        padding: const EdgeInsets.only(bottom: 10),
+        child: Container(
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: isDark ? Colors.white.withOpacity(0.05) : Colors.white,
+            borderRadius: BorderRadius.circular(15),
+            border: Border.all(
+                color: Theme.of(context).dividerColor.withOpacity(0.1)),
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 55,
+                height: 55,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Stack(
+                  children: [
+                    // ✅ Image avec cache
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: CachedNetworkImage(
+                        imageUrl: imageUrl,
+                        width: 55,
+                        height: 55,
+                        fit: BoxFit.cover,
+                        placeholder: (context, url) => Image.asset(
+                            'images/placeholder.png',
+                            fit: BoxFit.cover),
+                        errorWidget: (context, url, error) => Image.asset(
+                            'images/error_image.png',
+                            fit: BoxFit.cover),
                       ),
                     ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(width: 10),
 
-            // --- INFOS CENTRALES ---
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                    // ✅ Badge de statut
+                    Positioned(
+                      bottom: 2,
+                      right: 2,
+                      child: Container(
+                        padding: const EdgeInsets.all(2),
+                        decoration: BoxDecoration(
+                          color: (status == "approuver")
+                              ? Colors.green
+                              : (status == "echouer" || status == "refuser")
+                                  ? Colors.red
+                                  : (status == "en_attente")
+                                      ? Colors.orange
+                                      : Colors.black,
+                          shape: BoxShape.circle,
+                          border: Border.all(color: Colors.white, width: 1.5),
+                        ),
+                        child: Icon(
+                          (status == "approuver")
+                              ? Icons.check_circle
+                              : (status == "echouer" || status == "refuser")
+                                  ? Icons.cancel
+                                  : (status == "en_attente")
+                                      ? Icons.access_time
+                                      : Icons.help_outline,
+                          color: Colors.white,
+                          size: 10,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 10),
+
+              // --- INFOS CENTRALES ---
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: GoogleFonts.poppins(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 14,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 10),
+                    Row(
+                      children: [
+                        Text(date,
+                            style: GoogleFonts.poppins(
+                                fontSize: 12, color: Colors.grey)),
+                        const SizedBox(width: 8),
+                        Container(
+                          width: 3,
+                          height: 3,
+                          decoration: const BoxDecoration(
+                            color: Colors.grey,
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        const Icon(Icons.visibility_outlined,
+                            size: 12, color: Colors.grey),
+                        const SizedBox(width: 4),
+                        Text(views,
+                            style: GoogleFonts.poppins(
+                                fontSize: 12, color: Colors.grey)),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+
+              // --- MONTANT & BOUTON PARTAGE ---
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Text(
-                    title,
+                    amount,
                     style: GoogleFonts.poppins(
-                      fontWeight: FontWeight.w600,
+                      fontWeight: FontWeight.bold,
                       fontSize: 14,
+                      color: (status == "approuver")
+                          ? Colors.green
+                          : (status == "echouer" || status == "refuser")
+                              ? Colors.red
+                              : (status == "en_attente")
+                                  ? Colors.orange
+                                  : null,
                     ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
                   ),
-                  const SizedBox(height: 10),
-                  Row(
-                    children: [
-                      Text(date,
-                          style: GoogleFonts.poppins(
-                              fontSize: 12, color: Colors.grey)),
-                      const SizedBox(width: 8),
-                      Container(
-                        width: 3,
-                        height: 3,
-                        decoration: const BoxDecoration(
-                          color: Colors.grey,
-                          shape: BoxShape.circle,
+                  const SizedBox(height: 5),
+                  // Bouton de partage compact avec Spinner
+
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: statusConfig["color"].withOpacity(0.15),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          statusConfig["icon"],
+                          size: 12,
+                          color: statusConfig["color"],
                         ),
-                      ),
-                      const SizedBox(width: 8),
-                      const Icon(Icons.visibility_outlined,
-                          size: 12, color: Colors.grey),
-                      const SizedBox(width: 4),
-                      Text(views,
+                        const SizedBox(width: 4),
+                        Text(
+                          statusConfig["label"],
                           style: GoogleFonts.poppins(
-                              fontSize: 12, color: Colors.grey)),
-                    ],
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                            color: statusConfig["color"],
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
-            ),
-
-            // --- MONTANT & BOUTON PARTAGE ---
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Text(
-                  amount,
-                  style: GoogleFonts.poppins(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14,
-                    color: (status == "approuver")
-                        ? Colors.green
-                        : (status == "echouer" || status == "refuser")
-                            ? Colors.red
-                            : (status == "en_attente")
-                                ? Colors.orange
-                                : null,
-                  ),
-                ),
-                const SizedBox(height: 5),
-                // Bouton de partage compact avec Spinner
-
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: statusConfig["color"].withOpacity(0.15),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        statusConfig["icon"],
-                        size: 12,
-                        color: statusConfig["color"],
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        statusConfig["label"],
-                        style: GoogleFonts.poppins(
-                          fontSize: 10,
-                          fontWeight: FontWeight.bold,
-                          color: statusConfig["color"],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
