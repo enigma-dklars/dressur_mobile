@@ -341,7 +341,7 @@ class _ProgrammeRecompensePageState extends State<ProgrammeRecompensePage> {
                 ),
 
                 SizedBox(height: 10),
-                
+
                 _infoText(
                   context,
                   "📌 Si vous faites partie du Programme des récompenses et que vous souhaitez "
