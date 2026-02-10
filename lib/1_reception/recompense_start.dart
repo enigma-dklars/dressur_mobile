@@ -304,6 +304,75 @@ class _ProgrammeRecompensePageState extends State<ProgrammeRecompensePage> {
 
                 _divider(context),
 
+                // ---------------------------------------------------------------------------
+// 14. Retrait automatique et moyens de paiement
+// ---------------------------------------------------------------------------
+                _sectionTitle(
+                    context, "Retrait automatique et moyens de paiement"),
+
+                _paragraph(
+                  context,
+                  "Les retraits des gains du Programme des récompenses se font automatiquement "
+                  "lorsque votre solde atteint ou dépasse 1 000 FCFA.",
+                ),
+
+                _bulletItem(
+                  context,
+                  Icons.autorenew,
+                  "Les retraits sont déclenchés automatiquement dès que le seuil minimum est atteint.",
+                ),
+
+                _bulletItem(
+                  context,
+                  Icons.phone_android,
+                  "Les paiements sont envoyés vers les réseaux Mobile Money suivants :",
+                ),
+
+                _paddingMobileMoney(context),
+
+                _infoText(
+                  context,
+                  "📌 Si vous n'avez pas accès aux moyens de paiement Mobile Money pris en charge "
+                  "et que vous ne souhaitez pas utiliser vos gains pour payer des services sur Dressur "
+                  "(Boost Contact, promotions affaires, promotions réseaux sociaux, etc.), "
+                  "nous vous recommandons de ne pas participer au Programme des récompenses pour le moment. "
+                  "Vous pourrez rejoindre le programme plus tard lorsque de nouveaux moyens de paiement "
+                  "seront ajoutés et compatibles avec votre pays ou votre réseau.",
+                ),
+
+                SizedBox(height: 10),
+                
+                _infoText(
+                  context,
+                  "📌 Si vous faites partie du Programme des récompenses et que vous souhaitez "
+                  "payer un service sur Dressur (Boost Contact, promotions affaires, promotions "
+                  "réseaux sociaux, etc.), votre solde de récompense sera automatiquement utilisé "
+                  "pour régler la facture si le montant du service est inférieur ou égal à votre "
+                  "solde disponible. Dans ce cas, aucun paiement supplémentaire ne vous sera demandé.",
+                ),
+
+                _divider(context),
+
+                // ---------------------------------------------------------------------------
+                // 15. Configuration du numéro de paiement
+                // ---------------------------------------------------------------------------
+                _sectionTitle(context, "Configuration du numéro de paiement"),
+
+                _paragraph(
+                  context,
+                  "Après avoir accepté de participer au programme, vous devrez sélectionner "
+                  "votre réseau Mobile Money et renseigner le numéro correspondant. "
+                  "Les gains seront envoyés directement sur ce numéro.",
+                ),
+
+                _bulletItem(
+                  context,
+                  Icons.edit,
+                  "Vous pouvez modifier votre réseau et votre numéro de paiement à tout moment.",
+                ),
+
+                _divider(context),
+
                 // 12. Message important
                 _sectionTitle(context, "Message important"),
                 _paragraph(context,
@@ -486,6 +555,25 @@ class _ProgrammeRecompensePageState extends State<ProgrammeRecompensePage> {
               ],
             ),
           ),
+        ],
+      ),
+    );
+  }
+
+// ---------------------------------------------------------------------------
+// WIDGET LISTE MOBILE MONEY
+// ---------------------------------------------------------------------------
+  Widget _paddingMobileMoney(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 10, bottom: 10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _bulletItem(context, Icons.check, "MTN Mobile Money Bénin"),
+          _bulletItem(context, Icons.check, "MOOV Money Bénin"),
+          _bulletItem(context, Icons.check, "MTN Mobile Money Côte d’Ivoire"),
+          _bulletItem(context, Icons.check, "MOOV Togo"),
+          _bulletItem(context, Icons.check, "TOGOCEL T-Money"),
         ],
       ),
     );
