@@ -143,7 +143,7 @@ class _ProgrammeRecompenseDashboardState
           children: [
             // 1. CARTE PORTEFEUILLE (WALLET)
             _buildWalletCard(context),
-            SizedBox(height: 13),
+            SizedBox(height: 10),
 
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -156,7 +156,7 @@ class _ProgrammeRecompenseDashboardState
                   SizedBox(height: 10),
 
                   // 2. BOUTON PROMOTIONS AFFAIRES (DÉPLACÉ ICI)
-                  _buildBusinessPromotionsButton(context),
+                  _buildBusinessPromotionsButton(context, theme),
 
                   SizedBox(height: 10),
 
@@ -272,16 +272,16 @@ class _ProgrammeRecompenseDashboardState
                     ProgrammeRecompensePage(optionPage: true)));
       },
       child: Container(
-        padding: EdgeInsets.all(16),
+        padding: EdgeInsets.all(10),
         decoration: BoxDecoration(
           color: primaryColor.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(15),
+          borderRadius: BorderRadius.circular(10),
           border: Border.all(color: primaryColor.withOpacity(0.3)),
         ),
         child: Row(
           children: [
             Icon(Icons.info_outline, color: primaryColor),
-            SizedBox(width: 15),
+            SizedBox(width: 10),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -313,29 +313,49 @@ class _ProgrammeRecompenseDashboardState
   }
 
   // Bouton pour voir les promotions affaire
-  Widget _buildBusinessPromotionsButton(BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
-      child: OutlinedButton.icon(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => BusinessPromotionsPage(),
-            ),
-          );
-        },
-        icon: Icon(Icons.business_center_outlined, size: 18),
-        label: Text(
-          "Voir les promotions affaire disponibles",
-          style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+  Widget _buildBusinessPromotionsButton(BuildContext context, theme) {
+    return InkWell(
+      onTap: () {
+        // Navigation vers ProgrammeRecompensePage
+        Navigator.push(context,
+            MaterialPageRoute(builder: (context) => BusinessPromotionsPage()));
+      },
+      child: Container(
+        padding: EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          color: primaryColor.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: primaryColor.withOpacity(0.3)),
         ),
-        style: OutlinedButton.styleFrom(
-          foregroundColor: primaryColor,
-          side: BorderSide(color: primaryColor),
-          padding: EdgeInsets.symmetric(vertical: 12),
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+        child: Row(
+          children: [
+            Icon(Icons.business_center_outlined, color: primaryColor),
+            SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "Explorer les promotions affaires",
+                    style: GoogleFonts.poppins(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                      color: theme.textTheme.bodyLarge?.color,
+                    ),
+                  ),
+                  SizedBox(height: 2),
+                  Text(
+                    "Découvrez les offres du programme de récompenses",
+                    style: GoogleFonts.poppins(
+                      fontSize: 11,
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Icon(Icons.arrow_forward_ios, size: 14, color: primaryColor),
+          ],
         ),
       ),
     );
@@ -344,60 +364,46 @@ class _ProgrammeRecompenseDashboardState
   Widget _buildWalletCard(BuildContext context) {
     return Container(
       width: double.infinity,
-      margin: EdgeInsets.fromLTRB(10, 15, 10, 0),
-      padding: EdgeInsets.all(24),
+      margin: EdgeInsets.fromLTRB(10, 12, 10, 0),
+      padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [primaryColor, primaryColor.withOpacity(0.8)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(15),
+        borderRadius: BorderRadius.circular(10),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            "Solde disponible",
-            style: GoogleFonts.poppins(
-                color: Colors.white.withOpacity(0.8), fontSize: 14),
-          ),
-          SizedBox(height: 8),
+          // HEADER
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                "$soldeProgrammeRecompense FCFA",
+                "Solde disponible",
                 style: GoogleFonts.poppins(
-                  color: Colors.white,
-                  fontSize: 32,
-                  fontWeight: FontWeight.bold,
+                  color: Colors.white.withOpacity(0.85),
+                  fontSize: 14,
                 ),
               ),
-              ElevatedButton(
-                onPressed: () {
-                  // Action de retrait
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.white,
-                  foregroundColor: primaryColor,
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(13),
-                  ),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.15),
+                  borderRadius: BorderRadius.circular(20),
                 ),
                 child: Row(
-                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.account_balance_wallet_outlined, size: 20),
-                    const SizedBox(width: 8),
+                    Icon(Icons.sync, color: Colors.white, size: 13),
+                    SizedBox(width: 4),
                     Text(
-                      "Retirer",
+                      "Automatique",
                       style: GoogleFonts.poppins(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 15,
+                        color: Colors.white,
+                        fontSize: 10,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
                   ],
@@ -405,13 +411,87 @@ class _ProgrammeRecompenseDashboardState
               ),
             ],
           ),
+
           SizedBox(height: 8),
+
+          // SOLDE
+          Text(
+            "$soldeProgrammeRecompense FCFA",
+            style: GoogleFonts.poppins(
+              color: Colors.white,
+              fontSize: 30,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+
+          SizedBox(height: 10),
           Divider(color: Colors.white.withOpacity(0.2)),
           SizedBox(height: 10),
+
+          // TEXTE INFO
           Text(
-            "Prochain retrait possible à partir de 1 000 FCFA",
+            "Les retraits sont automatiques à partir de 1 000 FCFA vers votre numéro configuré.",
             style: GoogleFonts.poppins(
-                color: Colors.white.withOpacity(0.7), fontSize: 11),
+              color: Colors.white.withOpacity(0.75),
+              fontSize: 12.5,
+              height: 1.4,
+            ),
+          ),
+
+          SizedBox(height: 12),
+
+          // ACTIONS EN BAS
+          Row(
+            children: [
+              Expanded(
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    // TODO: configuration retrait
+                  },
+                  icon: Icon(Icons.settings_outlined, size: 18),
+                  label: Text(
+                    "Configuration",
+                    style: GoogleFonts.poppins(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 13,
+                    ),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    foregroundColor: primaryColor,
+                    elevation: 0,
+                    padding: EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(width: 10),
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: () {
+                    // TODO: historique des retraits
+                  },
+                  icon: Icon(Icons.history, size: 18, color: Colors.white),
+                  label: Text(
+                    "Historique",
+                    style: GoogleFonts.poppins(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 13,
+                      color: Colors.white,
+                    ),
+                  ),
+                  style: OutlinedButton.styleFrom(
+                    side: BorderSide(color: Colors.white.withOpacity(0.6)),
+                    padding: EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
         ],
       ),
