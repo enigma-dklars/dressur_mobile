@@ -4,6 +4,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:dressur/1_reception/configuration_retrait_page.dart';
 import 'package:dressur/1_reception/historique_complet_page.dart';
 import 'package:dressur/components/noti.dart';
 import 'package:http/http.dart' as http;
@@ -446,7 +447,10 @@ class _ProgrammeRecompenseDashboardState
               Expanded(
                 child: ElevatedButton.icon(
                   onPressed: () {
-                    // TODO: configuration retrait
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => ConfigurationRetraitPage()));
                   },
                   icon: Icon(Icons.settings_outlined, size: 18),
                   label: Text(
