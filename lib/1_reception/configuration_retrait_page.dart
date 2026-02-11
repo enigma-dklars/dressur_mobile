@@ -170,7 +170,7 @@ class _ConfigurationRetraitPageState extends State<ConfigurationRetraitPage> {
           ? Center(child: CircularProgressIndicator(color: primaryColor))
           : SingleChildScrollView(
               physics: BouncingScrollPhysics(),
-              padding: const EdgeInsets.all(20.0),
+              padding: const EdgeInsets.all(15.0),
               child: Form(
                 key: _formKey,
                 child: Column(
@@ -183,7 +183,7 @@ class _ConfigurationRetraitPageState extends State<ConfigurationRetraitPage> {
                     SizedBox(height: 10),
 
                     _buildReseauDropdown(theme),
-                    SizedBox(height: 25),
+                    SizedBox(height: 15),
 
                     _sectionTitle("Numéro de téléphone associé"),
                     SizedBox(height: 10),
@@ -193,11 +193,11 @@ class _ConfigurationRetraitPageState extends State<ConfigurationRetraitPage> {
 
                     // NOUVEAU : Indication du format
                     _buildFormatHint(),
-                    SizedBox(height: 30),
+                    SizedBox(height: 15),
 
                     // NOUVEAU : Boîte d'avertissement
                     _buildWarningBox(),
-                    SizedBox(height: 30),
+                    SizedBox(height: 15),
 
                     _buildSaveButton(),
                   ],

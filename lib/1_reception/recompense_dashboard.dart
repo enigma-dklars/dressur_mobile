@@ -159,10 +159,10 @@ class _ProgrammeRecompenseDashboardState
                   // 2. BOUTON PROMOTIONS AFFAIRES (DÉPLACÉ ICI)
                   _buildBusinessPromotionsButton(context, theme),
 
-                  SizedBox(height: 10),
+                  SizedBox(height: 15),
 
                   // 3. STATISTIQUES RAPIDES
-                  _sectionTitle(context, "Mes Statistiques", 15),
+                  _sectionTitle(context, "Mes Statistiques", 10),
                   Row(
                     children: [
                       _statItem(context, "Vues Totales", "$vuesTotales",
