@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:dressur/5_autre/support_assistance.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:dressur/components/constant.dart';
@@ -206,165 +207,258 @@ class _PromotionReseauSociauxListePageState
     );
   }
 
+  // --- WIDGET DE CARTE "APERÇU" ---
   Widget _buildPromotionCard(PromotionReseauSociaux promo) {
     final statusInfo = _getStatusInfo(promo.status);
+    final int qteDemandee = int.tryParse(promo.qteDemander) ?? 0;
+    final int qteRestante = int.tryParse(promo.compteurRestant) ?? 0;
+    final int qteCompletee = qteDemandee - qteRestante;
+    final double progress =
+        (qteDemandee > 0) ? qteCompletee / qteDemandee : 0.0;
+    final bool showProgress =
+        statusInfo['label'] == 'En cours' || statusInfo['label'] == 'Terminé';
 
     return Card(
       elevation: 0.5,
       margin: EdgeInsets.only(bottom: 12),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // --- EN-TÊTE : TITRE ET STATUT ---
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: Text(
-                    promo.titre,
-                    style: GoogleFonts.poppins(
-                        fontSize: 18, fontWeight: FontWeight.bold),
+      child: InkWell(
+        onTap: () => _showDetailsModal(context, promo),
+        borderRadius: BorderRadius.circular(15),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // --- EN-TÊTE : TITRE ET STATUT ---
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Text(
+                      promo.titre,
+                      style: GoogleFonts.poppins(
+                          fontSize: 17, fontWeight: FontWeight.bold),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  SizedBox(width: 10),
+                  _buildBadge(statusInfo['label']!, statusInfo['color']!),
+                ],
+              ),
+              SizedBox(height: 12),
+              // --- BARRE DE PROGRESSION (si applicable) ---
+              if (showProgress) ...[
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: LinearProgressIndicator(
+                    value: progress,
+                    minHeight: 6,
+                    backgroundColor: Colors.grey[200],
+                    color: statusInfo['color'],
                   ),
                 ),
-                SizedBox(width: 10),
-                _buildBadge(statusInfo['label']!, statusInfo['color']!),
+                SizedBox(height: 6),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "$qteCompletee / $qteDemandee",
+                      style: GoogleFonts.poppins(
+                          fontSize: 12,
+                          color: Colors.grey[600],
+                          fontWeight: FontWeight.w500),
+                    ),
+                    Text(
+                      "${(progress * 100).toStringAsFixed(0)}%",
+                      style: GoogleFonts.poppins(
+                          fontSize: 12,
+                          color: statusInfo['color'],
+                          fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
+              ] else ...[
+                // Message alternatif si pas de progression
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "Référence: ${promo.reference}",
+                      style: GoogleFonts.poppins(
+                          fontSize: 13, color: Colors.grey[600]),
+                    ),
+                    // Option 3: Style "Bouton Discret"
+
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        FaIcon(
+                          FontAwesomeIcons.circleInfo,
+                          size: 14,
+                          color:
+                              primaryColor, // Utilise la couleur principale de votre app
+                        ),
+                        SizedBox(width: 8),
+                        Text(
+                          "Autres Détails",
+                          style: GoogleFonts.poppins(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: primaryColor,
+                          ),
+                        ),
+                        SizedBox(width: 8),
+                        Icon(
+                          Icons
+                              .arrow_forward_ios_rounded, // Flèche pour indiquer une action
+                          size: 12,
+                          color: primaryColor,
+                        )
+                      ],
+                    )
+                  ],
+                )
               ],
-            ),
-            SizedBox(height: 15),
-
-            // --- BLOC 1 : COMPTEURS ---
-            _buildDetailRow(
-              item1: _buildDetailItem(
-                  icon: Icons.flag_outlined,
-                  label: "Compteur Début",
-                  value: promo.compteurDebut),
-              item2: _buildDetailItem(
-                  icon: Icons.hourglass_bottom_rounded,
-                  label: "Compteur Restant",
-                  value: promo.compteurRestant),
-            ),
-            Divider(height: 20),
-
-            // --- BLOC 2 : COMMANDE ---
-            _buildDetailRow(
-              item1: _buildDetailItem(
-                  icon: Icons.inventory_2_outlined,
-                  label: "Quantité Demandée",
-                  value: promo.qteDemander),
-              item2: _buildDetailItem(
-                  icon: Icons.monetization_on_outlined,
-                  label: "Prix Fixé",
-                  value: promo.prixFixer),
-            ),
-            Divider(height: 20),
-
-            // --- BLOC 3 : INFORMATIONS TECHNIQUES ---
-            _buildDetailItem(
-                icon: Icons.tag, label: "Référence", value: promo.reference),
-            SizedBox(height: 10),
-            _buildUrlItem(promo.url), // Widget spécifique pour l'URL cliquable
-
-            // --- PIED DE PAGE : DATES ---
-            Divider(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                _buildDateText("Créé le", promo.createdAt),
-                _buildDateText("Modifié le", promo.updatedAt),
-              ],
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
   }
 
-  // --- WIDGETS HELPERS ---
-
-  Widget _buildDetailRow({required Widget item1, required Widget item2}) {
-    return Row(
-      children: [
-        Expanded(child: item1),
-        SizedBox(width: 10),
-        Expanded(child: item2),
-      ],
+  // --- MODAL SHEET POUR LES DÉTAILS ---
+  void _showDetailsModal(BuildContext context, PromotionReseauSociaux promo) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(25))),
+      backgroundColor: isDark ? Color(0xFF1E1E1E) : Colors.white,
+      builder: (context) {
+        return Padding(
+          padding: EdgeInsets.only(
+              top: 12,
+              left: 20,
+              right: 20,
+              bottom: MediaQuery.of(context).viewInsets.bottom + 30),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Container(
+                  width: 40,
+                  height: 5,
+                  decoration: BoxDecoration(
+                      color: Colors.grey[300],
+                      borderRadius: BorderRadius.circular(10)),
+                ),
+              ),
+              SizedBox(height: 25),
+              Text(promo.titre,
+                  style: GoogleFonts.poppins(
+                      fontSize: 22, fontWeight: FontWeight.bold)),
+              SizedBox(height: 20),
+              _buildSectionTitle("Détails de la Commande"),
+              _buildDetailRow(
+                  icon: Icons.inventory_2_outlined,
+                  label: "Quantité Demandée",
+                  value: promo.qteDemander),
+              _buildDetailRow(
+                  icon: Icons.monetization_on_outlined,
+                  label: "Prix Fixé",
+                  value: promo.prixFixer),
+              SizedBox(height: 15),
+              _buildSectionTitle("Suivi de la Campagne"),
+              _buildDetailRow(
+                  icon: Icons.flag_outlined,
+                  label: "Compteur au Début",
+                  value: promo.compteurDebut),
+              _buildDetailRow(
+                  icon: Icons.hourglass_bottom_rounded,
+                  label: "Compteur Restant",
+                  value: promo.compteurRestant),
+              SizedBox(height: 15),
+              _buildSectionTitle("Informations Techniques"),
+              _buildDetailRow(
+                  icon: Icons.tag, label: "Référence", value: promo.reference),
+              _buildUrlItem(promo.url),
+              SizedBox(height: 15),
+              _buildSectionTitle("Historique"),
+              _buildDetailRow(
+                  icon: Icons.calendar_today_outlined,
+                  label: "Créé le",
+                  value: promo.createdAt),
+              _buildDetailRow(
+                  icon: Icons.edit_calendar_outlined,
+                  label: "Modifié le",
+                  value: promo.updatedAt),
+            ],
+          ),
+        );
+      },
     );
   }
 
-  Widget _buildDetailItem(
+  // --- WIDGETS HELPERS ---
+
+  Widget _buildSectionTitle(String title) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10.0),
+      child: Text(title,
+          style: GoogleFonts.poppins(
+              fontSize: 16, fontWeight: FontWeight.bold, color: primaryColor)),
+    );
+  }
+
+  Widget _buildDetailRow(
       {required IconData icon, required String label, required String value}) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: GoogleFonts.poppins(fontSize: 12, color: Colors.grey[600]),
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-        ),
-        SizedBox(height: 2),
-        Row(
-          children: [
-            Icon(icon, color: primaryColor, size: 16),
-            SizedBox(width: 6),
-            Expanded(
-              child: Text(
-                value,
-                style: GoogleFonts.poppins(
-                    fontWeight: FontWeight.w600, fontSize: 15),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6.0),
+      child: Row(
+        children: [
+          Icon(icon, color: Colors.grey[500], size: 18),
+          SizedBox(width: 12),
+          Text("$label:", style: GoogleFonts.poppins(color: Colors.grey[600])),
+          SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              value,
+              style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+              textAlign: TextAlign.end,
             ),
-          ],
-        ),
-      ],
+          ),
+        ],
+      ),
     );
   }
 
   Widget _buildUrlItem(String url) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          "URL",
-          style: GoogleFonts.poppins(fontSize: 12, color: Colors.grey[600]),
-        ),
-        SizedBox(height: 2),
-        Row(
-          children: [
-            Icon(Icons.link, color: primaryColor, size: 16),
-            SizedBox(width: 6),
-            Expanded(
-              child: Linkify(
-                onOpen: (link) async {
-                  if (!await launchUrl(Uri.parse(link.url))) {
-                    print('Could not launch ${link.url}');
-                  }
-                },
-                text: url,
-                style: GoogleFonts.poppins(
-                    fontWeight: FontWeight.w600, fontSize: 15),
-                linkStyle: TextStyle(
-                    color: Colors.blue, decoration: TextDecoration.none),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6.0),
+      child: Row(
+        children: [
+          Icon(Icons.link, color: Colors.grey[500], size: 18),
+          SizedBox(width: 12),
+          Text("URL:", style: GoogleFonts.poppins(color: Colors.grey[600])),
+          SizedBox(width: 8),
+          Expanded(
+            child: Linkify(
+              onOpen: (link) => launchUrl(Uri.parse(link.url)),
+              text: url,
+              textAlign: TextAlign.end,
+              style: GoogleFonts.poppins(
+                  fontWeight: FontWeight.w600, color: Colors.blue),
+              linkStyle: TextStyle(decoration: TextDecoration.none),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
-          ],
-        ),
-      ],
-    );
-  }
-
-  Widget _buildDateText(String label, String date) {
-    return Text(
-      "$label: $date",
-      style: GoogleFonts.poppins(fontSize: 11, color: Colors.grey[500]),
+          ),
+        ],
+      ),
     );
   }
 
