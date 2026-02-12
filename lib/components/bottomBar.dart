@@ -81,21 +81,44 @@ class _BottomBarState extends State<BottomBar> with WidgetsBindingObserver {
         children: _screens,
       ),
       // La barre de navigation n'a plus de bouton flottant ni d'encoche
+      // Alternative 1: Style "Indicateur Flottant"
       bottomNavigationBar: AnimatedBottomNavigationBar.builder(
         itemCount: _iconList.length,
         tabBuilder: (int index, bool isActive) {
-          // Style spécial pour le bouton central "Actu"
-          bool isCenterButton = index == 2;
+          // Pour cette version, nous utilisons toujours les icônes "outlined"
+          // pour un look plus épuré.
+          final color = isActive ? primaryColor : Colors.grey[500];
 
-          return isCenterButton
-              ? _buildCenterButton(isActive)
-              : _buildNormalButton(index, isActive);
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // L'icône
+              Icon(
+                _iconList[index],
+                size: isActive ? 28 : 24, // L'icône active est plus grande
+                color: color,
+              ),
+              SizedBox(height: 4),
+              // L'indicateur animé
+              AnimatedContainer(
+                duration: Duration(milliseconds: 200),
+                height: 4,
+                width: isActive ? 12 : 0, // L'indicateur apparaît si actif
+                decoration: BoxDecoration(
+                  color: primaryColor,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              )
+            ],
+          );
         },
         activeIndex: _selectedIndex,
-        gapLocation: GapLocation.none, // Plus d'encoche
+        gapLocation: GapLocation.none,
         notchSmoothness: NotchSmoothness.softEdge,
-        leftCornerRadius: 0, // Bords droits pour un look classique
-        rightCornerRadius: 0,
+        backgroundColor: Theme.of(context).brightness == Brightness.dark
+            ? Color(0xFF1C1C1E)
+            : Colors.white,
         onTap: (index) {
           setState(() => _selectedIndex = index);
           _pageController.animateToPage(
