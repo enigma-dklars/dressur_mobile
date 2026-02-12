@@ -225,7 +225,7 @@ class _ActuPageState extends State<ActuPage> {
                     SizedBox(width: 8),
                     Text(
                       "Avertissement important",
-                      style: TextStyle(color: Colors.red),
+                      style: TextStyle(color: Colors.red, fontSize: 16),
                     ),
                   ],
                 ),

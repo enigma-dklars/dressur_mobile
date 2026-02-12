@@ -4,11 +4,13 @@ import 'dart:convert';
 import 'package:dressur/5_autre/autre_profil.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:dressur/1_reception/synchronisation_avance.dart';
 import 'package:dressur/5_autre/support_assistance.dart';
 import 'package:dressur/components/constant.dart';
 import 'package:http/http.dart' as http;
+import 'package:shimmer/shimmer.dart';
 
 class ContactDS {
   final String id;
@@ -44,15 +46,14 @@ class ContactPage extends StatefulWidget {
 }
 
 class _ContactPageState extends State<ContactPage> {
-  static const espaceEntreLesOptionsContact = 10.0;
-  bool _loading = false;
+  bool _isLoading = true;
   List<ContactDS> _contacts = [];
   List<ContactDS> _filteredContacts = [];
-  String _searchText = '';
+  final TextEditingController _searchController = TextEditingController();
 
   Future<void> fetchContactDSs() async {
     setState(() {
-      _loading = true;
+      _isLoading = true;
       nombreContacts = 0;
     });
     final url =
@@ -80,7 +81,7 @@ class _ContactPageState extends State<ContactPage> {
       }).toList();
 
       setState(() {
-        _loading = false;
+        _isLoading = false;
         _contacts = contacts;
         nombreContacts = contacts.length;
         _filteredContacts =
@@ -109,7 +110,7 @@ class _ContactPageState extends State<ContactPage> {
         },
       );
       setState(() {
-        _loading = false;
+        _isLoading = false;
       });
     }
   }
@@ -118,6 +119,24 @@ class _ContactPageState extends State<ContactPage> {
   void initState() {
     super.initState();
     fetchContactDSs();
+    _searchController.addListener(_filterContacts);
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  void _filterContacts() {
+    final query = _searchController.text.toLowerCase();
+    setState(() {
+      _filteredContacts = _contacts.where((contact) {
+        return contact.nom.toLowerCase().contains(query) ||
+            contact.pseudo.toLowerCase().contains(query) ||
+            contact.tel.toLowerCase().contains(query);
+      }).toList();
+    });
   }
 
   @override
@@ -148,7 +167,7 @@ class _ContactPageState extends State<ContactPage> {
               PopupMenuItem(
                 value: 1,
                 onTap: () {
-                  _loading ? '' : fetchContactDSs();
+                  _isLoading ? '' : fetchContactDSs();
                 },
                 child: Row(
                   children: [
@@ -220,215 +239,212 @@ class _ContactPageState extends State<ContactPage> {
       ),
       body: Column(
         children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: TextField(
-              onChanged: (value) {
-                setState(() {
-                  _searchText = value;
-                  _filterContacts();
-                });
-              },
-              decoration: InputDecoration(
-                labelText: (langUserPhone == "fr")
-                    ? "Rechercher ..."
-                    : "To research ...",
-                prefixIcon: const Icon(Icons.search),
-                border: const OutlineInputBorder(),
-              ),
-            ),
+          // --- BARRE DE RECHERCHE AMÉLIORÉE ---
+          _buildSearchBar(),
+          // --- AFFICHAGE CONDITIONNEL ---
+          Expanded(
+            child: _isLoading
+                ? _buildShimmerList()
+                : _filteredContacts.isEmpty
+                    ? _buildEmptyState()
+                    : _buildContactList(),
           ),
-          _loading
-              ? const Center(
-                  child: CircularProgressIndicator(),
-                )
-              : _filteredContacts.isEmpty
-                  ? Center(
-                      child: Text(
-                        (langUserPhone == "fr")
-                            ? "Aucun contact trouvé."
-                            : "No contacts found.",
-                        style: const TextStyle(fontSize: 16),
-                      ),
-                    )
-                  : Expanded(
-                      child: ListView.builder(
-                        itemCount: _filteredContacts.length,
-                        itemBuilder: (BuildContext context, int index) {
-                          final contact = _filteredContacts[index];
-
-                          return ListTile(
-                            title: Text(
-                              contact.nom,
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            subtitle: Row(
-                              children: [
-                                GestureDetector(
-                                  onTap: () {
-                                    launchPhoneCall(contact.tel);
-                                  },
-                                  child: Container(
-                                    padding: EdgeInsets.fromLTRB(5, 5, 5, 5),
-                                    decoration: BoxDecoration(
-                                      color: primaryColor,
-                                      shape: BoxShape.circle,
-                                    ),
-                                    child: Icon(
-                                      Icons.phone,
-                                      size: 20,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(
-                                    width: espaceEntreLesOptionsContact),
-                                GestureDetector(
-                                  onTap: () {
-                                    launchSMS(contact.tel);
-                                  },
-                                  child: Container(
-                                    padding: EdgeInsets.fromLTRB(5, 5, 5, 5),
-                                    decoration: BoxDecoration(
-                                      color: primaryColor,
-                                      shape: BoxShape.circle,
-                                    ),
-                                    child: Icon(
-                                      Icons.message,
-                                      size: 20,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(
-                                    width: espaceEntreLesOptionsContact),
-                                GestureDetector(
-                                  onTap: () {
-                                    launchEmail(contact.mail);
-                                  },
-                                  child: Container(
-                                    padding: EdgeInsets.fromLTRB(5, 5, 5, 5),
-                                    decoration: BoxDecoration(
-                                      color: primaryColor,
-                                      shape: BoxShape.circle,
-                                    ),
-                                    child: Icon(
-                                      Icons.mail,
-                                      size: 20,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(
-                                    width: espaceEntreLesOptionsContact),
-                                GestureDetector(
-                                  onTap: () {
-                                    launchWhatsApp(contact.tel);
-                                  },
-                                  child: Container(
-                                    padding: EdgeInsets.fromLTRB(5, 5, 5, 5),
-                                    decoration: BoxDecoration(
-                                      color: primaryColor,
-                                      shape: BoxShape.circle,
-                                    ),
-                                    child: Image.asset(
-                                      'images/logo_whatsapp.png',
-                                      width: 20,
-                                      height: 20,
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(
-                                    width: espaceEntreLesOptionsContact),
-                                GestureDetector(
-                                  onTap: () {
-                                    setState(() {
-                                      uidAutreUser = contact.id;
-                                      addUserOnAutreProfilPage = "non";
-                                    });
-                                    Navigator.of(context).push(
-                                      MaterialPageRoute(
-                                        builder: (context) => AutreProfilPage(),
-                                      ),
-                                    );
-                                  },
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      color: primaryColor,
-                                    ),
-                                    padding: EdgeInsets.fromLTRB(5, 5, 5, 5),
-                                    child: Icon(
-                                      Icons.info,
-                                      size: 20,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            leading: SizedBox(
-                              height: 60,
-                              width: 60,
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  CircleAvatar(
-                                    backgroundImage: AssetImage(
-                                        "images-pays/${contact.pays}.png"),
-                                    backgroundColor: Colors.transparent,
-                                    child: AssetImage(
-                                                "images-pays/${contact.pays}.png") ==
-                                            null
-                                        ? Image.asset(
-                                            "images-pays/no_pays.png",
-                                          )
-                                        : null,
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    contact.pays,
-                                    style: const TextStyle(
-                                      fontSize: 10,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
         ],
       ),
     );
   }
 
-  void _filterContacts() {
-    if (_searchText.isEmpty) {
-      setState(() {
-        _filteredContacts = List.from(_contacts);
-      });
-    } else {
-      final filteredList = _contacts
-          .where((contact) =>
-              contact.pseudo
-                  .toLowerCase()
-                  .contains(_searchText.toLowerCase()) ||
-              contact.nom.toLowerCase().contains(_searchText.toLowerCase()) ||
-              contact.mail.toLowerCase().contains(_searchText.toLowerCase()) ||
-              contact.pays.toLowerCase().contains(_searchText.toLowerCase()) ||
-              contact.tel.toLowerCase().contains(_searchText.toLowerCase()))
-          .toList();
+  // --- WIDGETS DE CONSTRUCTION ---
 
-      setState(() {
-        _filteredContacts = filteredList;
-      });
-    }
+  Widget _buildSearchBar() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
+      child: TextField(
+        controller: _searchController,
+        style: GoogleFonts.poppins(),
+        decoration: InputDecoration(
+          hintText: (langUserPhone == "fr")
+              ? "Rechercher par nom, pseudo..."
+              : "Search by name, pseudo...",
+          hintStyle: GoogleFonts.poppins(color: Colors.grey[500]),
+          prefixIcon: Icon(Icons.search, color: Colors.grey[500], size: 22),
+          filled: true,
+          fillColor: Theme.of(context).brightness == Brightness.dark
+              ? Colors.grey[850]
+              : Colors.white,
+          border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(15),
+              borderSide: BorderSide.none),
+          contentPadding: EdgeInsets.symmetric(vertical: 14),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildContactList() {
+    return ListView.builder(
+      physics: BouncingScrollPhysics(),
+      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      itemCount: _filteredContacts.length,
+      itemBuilder: (context, index) {
+        final contact = _filteredContacts[index];
+        return _buildContactCard(contact);
+      },
+    );
+  }
+
+  Widget _buildContactCard(ContactDS contact) {
+    return Card(
+      elevation: 0.5,
+      margin: EdgeInsets.only(bottom: 12),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      child: Padding(
+        padding: const EdgeInsets.all(12.0),
+        child: Column(
+          children: [
+            // --- PARTIE HAUTE : AVATAR, NOM, PSEUDO ---
+            Row(
+              children: [
+                CircleAvatar(
+                  radius: 28,
+                  backgroundImage:
+                      AssetImage("images-pays/${contact.pays}.png"),
+                  onBackgroundImageError: (e, s) => print("Erreur image"),
+                  child: AssetImage("images-pays/${contact.pays}.png") == null
+                      ? Image.asset("images-pays/no_pays.png")
+                      : null,
+                ),
+                SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(contact.nom,
+                          style: GoogleFonts.poppins(
+                              fontSize: 17, fontWeight: FontWeight.bold),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis),
+                      if (contact.pseudo != null && contact.pseudo.isNotEmpty)
+                        Text("@${contact.pseudo}",
+                            style: GoogleFonts.poppins(
+                                fontSize: 14, color: Colors.grey[600])),
+                    ],
+                  ),
+                ),
+                IconButton(
+                  icon:
+                      Icon(Icons.info_outline_rounded, color: Colors.grey[400]),
+                  onPressed: () {
+                    uidAutreUser = contact.id;
+                    addUserOnAutreProfilPage = "non";
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => AutreProfilPage()));
+                  },
+                ),
+              ],
+            ),
+            Divider(height: 20, thickness: 0.5),
+            // --- PARTIE BASSE : ACTIONS ---
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                _buildActionButton(
+                    icon: Icons.phone_outlined,
+                    onTap: () => launchPhoneCall(contact.tel)),
+                _buildActionButton(
+                    icon: Icons.sms_outlined,
+                    onTap: () => launchSMS(contact.tel)),
+                _buildActionButton(
+                    icon: Icons.mail_outline_rounded,
+                    onTap: () => launchEmail(contact.mail)),
+                _buildActionButton(
+                    icon: FontAwesomeIcons.whatsapp,
+                    onTap: () => launchWhatsApp(contact.tel)),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildActionButton(
+      {required IconData icon, required VoidCallback onTap}) {
+    return IconButton(
+      onPressed: onTap,
+      icon: Icon(icon, color: primaryColor, size: 22),
+      splashRadius: 24,
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.search_off, size: 60, color: Colors.grey[400]),
+          SizedBox(height: 15),
+          Text(
+            _searchController.text.isEmpty
+                ? ((langUserPhone == "fr")
+                    ? "Votre liste de contacts est vide"
+                    : "Your contact list is empty")
+                : ((langUserPhone == "fr")
+                    ? "Aucun contact trouvé"
+                    : "No contact found"),
+            style: GoogleFonts.poppins(fontSize: 16, color: Colors.grey[600]),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildShimmerList() {
+    return Shimmer.fromColors(
+      baseColor: Colors.grey[300]!,
+      highlightColor: Colors.grey[100]!,
+      child: ListView.builder(
+        padding: EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+        itemCount: 5, // Affiche 5 cartes squelettes
+        itemBuilder: (context, index) => Card(
+          margin: EdgeInsets.only(bottom: 12),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+          child: Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    CircleAvatar(radius: 28, backgroundColor: Colors.white),
+                    SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                              width: 150, height: 18, color: Colors.white),
+                          SizedBox(height: 5),
+                          Container(
+                              width: 100, height: 14, color: Colors.white),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                Divider(height: 20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: List.generate(
+                      4,
+                      (_) => CircleAvatar(
+                          radius: 18, backgroundColor: Colors.white)),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }
