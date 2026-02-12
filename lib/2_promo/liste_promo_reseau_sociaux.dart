@@ -43,12 +43,12 @@ class PromotionReseauSociauxListePage extends StatefulWidget {
 
 class _PromotionReseauSociauxListePageState
     extends State<PromotionReseauSociauxListePage> {
-  bool _loading = false;
+  bool _isLoading = false;
   List<PromotionReseauSociaux> _promotionReseauSociaux = [];
 
   Future<void> fetchPromotionReseauSociaux() async {
     setState(() {
-      _loading = true;
+      _isLoading = true;
     });
     final url = Uri.parse(
         '$generalRouteForApi/listPromoReseau/$uidUser/$langUserPhone');
@@ -76,7 +76,7 @@ class _PromotionReseauSociauxListePageState
 
       setState(() {
         _promotionReseauSociaux = promotionReseauSociaux;
-        _loading = false;
+        _isLoading = false;
       });
     } else {
       showDialog(
@@ -184,7 +184,7 @@ class _PromotionReseauSociauxListePageState
           ),
         ],
       ),
-      body: _loading
+      body: _isLoading
           ? const Center(
               child: CircularProgressIndicator(),
             )
