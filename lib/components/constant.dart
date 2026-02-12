@@ -22,9 +22,11 @@ bool modeReconnaissanceContactArrierePlan = false;
 const generalRouteForApi = '$generalApiDomaine/api';
 const generalRouteForPromotionImage = '$generalApiDomaine/promotion/';
 
-const tiktokDS = "https://www.tiktok.com/@dressur_ds";
+const tiktokDS = "https://www.tiktok.com/@bluelife.tech";
 const facebookDS = "https://www.facebook.com/dressurds";
-const instagramDS = "https://www.instagram.com/dressurds";
+const instagramDS =
+    "https://www.instagram.com/bluelife.tech?igsh=Mjcyc2tpMmw4dXhu";
+const chaineWhatsApp = "https://whatsapp.com/channel/0029Vag8B6cCBtxMRvCqaA3t";
 const facebookBLT = "https://www.facebook.com/bluelife.tech";
 const facebookELTCS = "https://www.facebook.com/eliticscore";
 const tiktokBLT = "https://www.tiktok.com/@bluelife.tech";
