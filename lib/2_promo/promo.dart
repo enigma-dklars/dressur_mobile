@@ -142,544 +142,197 @@ class _BoostPageState extends State<BoostPage> {
         body: SingleChildScrollView(
           child: Column(
             children: [
-              const SizedBox(height: 5),
-              Card(
-                margin: const EdgeInsets.only(
-                    left: 10, top: 5, right: 10, bottom: 5),
-                child: Container(
-                  padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Text(
-                        "Boost Contact",
-                        style: GoogleFonts.poppins(
-                          color: primaryColor,
-                          fontWeight: FontWeight.w400,
-                          fontSize: 24,
-                        ),
-                      ),
-                      const SizedBox(height: 5),
-                      Text(
-                        (langUserPhone == "fr")
-                            ? "Rendez visible le ($tel) aux contacts correspondant à vos préférences pays."
-                            : "Make the ($tel) visible to contacts corresponding to your country preferences.",
-                        style: GoogleFonts.poppins(
-                          fontWeight: FontWeight.w300,
-                          fontSize: 14,
-                        ),
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Column(
-                            children: [
-                              SizedBox(
-                                width: MediaQuery.of(context).size.width * 0.42,
-                                child: ElevatedButton(
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: primaryColor,
-                                      shape: const StadiumBorder(),
-                                      padding: const EdgeInsets.symmetric(
-                                        vertical: 10,
-                                      ),
-                                    ),
-                                    child: Text(
-                                      (langUserPhone == "fr")
-                                          ? "Faire un Boost"
-                                          : "Boost",
-                                      style: GoogleFonts.poppins(
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                    onPressed: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                NewBoostContactPage()),
-                                      );
-                                    }),
-                              )
-                            ],
-                          ),
-                          Column(
-                            children: [
-                              SizedBox(
-                                width: MediaQuery.of(context).size.width * 0.42,
-                                child: ElevatedButton(
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: secondaryColor,
-                                      shape: const StadiumBorder(),
-                                      padding: const EdgeInsets.symmetric(
-                                        vertical: 10,
-                                      ),
-                                    ),
-                                    child: Text(
-                                      (langUserPhone == "fr")
-                                          ? "Voir la liste"
-                                          : "See the list",
-                                      style: GoogleFonts.poppins(
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                    onPressed: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                ListeBoostContactPage()),
-                                      );
-                                    }),
-                              )
-                            ],
-                          ),
-                        ],
-                      )
-                    ],
-                  ),
-                ),
+              SizedBox(height: 10),
+              _buildServiceCard(
+                context: context,
+                icon: Icons.contact_phone_rounded,
+                title: "Boost Contact",
+                description: (langUserPhone == "fr")
+                    ? "Rendez visible le ($tel) aux contacts correspondant à vos préférences pays."
+                    : "Make the ($tel) visible to contacts corresponding to your country preferences.",
+                primaryActionText:
+                    (langUserPhone == "fr") ? "Faire un Boost" : "Boost",
+                onPrimaryAction: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => NewBoostContactPage())),
+                secondaryActionText:
+                    (langUserPhone == "fr") ? "Voir la liste" : "See the list",
+                onSecondaryAction: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => ListeBoostContactPage())),
               ),
-              DressurDivider(),
-              Card(
-                margin: const EdgeInsets.only(
-                    left: 10, top: 5, right: 10, bottom: 5),
-                child: Container(
-                  padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Text(
-                        (langUserPhone == "fr")
-                            ? "Promotion Affaire"
-                            : "Business Promotion",
-                        style: GoogleFonts.poppins(
-                          color: primaryColor,
-                          fontWeight: FontWeight.w400,
-                          fontSize: 24,
-                        ),
-                      ),
-                      const SizedBox(height: 5),
-                      Text(
-                        (langUserPhone == "fr")
-                            ? "Faite la promotion de vos produits et services. Les utilisateurs intéressés vous contacterons."
-                            : "Promote your products and services. Interested users will contact you.",
-                        style: GoogleFonts.poppins(
-                          fontWeight: FontWeight.w300,
-                          fontSize: 14,
-                        ),
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Column(
-                            children: [
-                              SizedBox(
-                                width: MediaQuery.of(context).size.width * 0.42,
-                                child: ElevatedButton(
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: primaryColor,
-                                      shape: const StadiumBorder(),
-                                      padding: const EdgeInsets.symmetric(
-                                        vertical: 10,
-                                      ),
-                                    ),
-                                    child: Text(
-                                      (langUserPhone == "fr")
-                                          ? "Faire une Promo"
-                                          : "Make a Promo",
-                                      style: GoogleFonts.poppins(
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                    onPressed: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                PromotionFormPage()),
-                                      );
-                                    }),
-                              )
-                            ],
-                          ),
-                          Column(
-                            children: [
-                              SizedBox(
-                                width: MediaQuery.of(context).size.width * 0.42,
-                                child: ElevatedButton(
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: secondaryColor,
-                                      shape: const StadiumBorder(),
-                                      padding: const EdgeInsets.symmetric(
-                                        vertical: 10,
-                                      ),
-                                    ),
-                                    child: Text(
-                                      (langUserPhone == "fr")
-                                          ? "Voir la liste"
-                                          : "See the list",
-                                      style: GoogleFonts.poppins(
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                    onPressed: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                PromotionListPage()),
-                                      );
-                                    }),
-                              )
-                            ],
-                          ),
-                        ],
-                      )
-                    ],
-                  ),
-                ),
+              SizedBox(height: 10),
+              _buildServiceCard(
+                context: context,
+                icon: Icons.storefront_rounded,
+                title: (langUserPhone == "fr")
+                    ? "Promotion Affaire"
+                    : "Business Promotion",
+                description: (langUserPhone == "fr")
+                    ? "Faite la promotion de vos produits et services. Les utilisateurs intéressés vous contacterons."
+                    : "Promote your products and services. Interested users will contact you.",
+                primaryActionText: (langUserPhone == "fr")
+                    ? "Faire une Promo"
+                    : "Make a Promo",
+                onPrimaryAction: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => PromotionFormPage())),
+                secondaryActionText:
+                    (langUserPhone == "fr") ? "Voir la liste" : "See the list",
+                onSecondaryAction: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => PromotionListPage())),
               ),
-              DressurDivider(),
+              SizedBox(height: 10),
               if (mailIsMaxxFire == false) ...[
-                Card(
-                  margin: const EdgeInsets.only(
-                      left: 10, top: 5, right: 10, bottom: 5),
-                  child: Container(
-                    padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Text(
-                          (langUserPhone == "fr")
-                              ? "Promotion Réseau Sociaux"
-                              : "Social Network Promotion",
-                          style: GoogleFonts.poppins(
-                            color: primaryColor,
-                            fontWeight: FontWeight.w400,
-                            fontSize: 24,
-                          ),
-                        ),
-                        const SizedBox(height: 5),
-                        Text(
-                          (langUserPhone == "fr")
-                              ? "Payer pour des abonnés, des vues, des likes, etc. sur TikTok, Instagram, Telegram, YouTube, etc."
-                              : "Pay for subscribers, views, likes, etc. on TikTok, Instagram, Telegram, YouTube, etc.",
-                          style: GoogleFonts.poppins(
-                            fontWeight: FontWeight.w300,
-                            fontSize: 14,
-                          ),
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Column(
-                              children: [
-                                SizedBox(
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.42,
-                                  child: ElevatedButton(
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: primaryColor,
-                                        shape: const StadiumBorder(),
-                                        padding: const EdgeInsets.symmetric(
-                                          vertical: 10,
-                                        ),
-                                      ),
-                                      child: Text(
-                                        (langUserPhone == "fr")
-                                            ? "Démarrer"
-                                            : "To start up",
-                                        style: GoogleFonts.poppins(
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                                      onPressed: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  PromotionReseauSociauxFormPage()),
-                                        );
-                                      }),
-                                )
-                              ],
-                            ),
-                            Column(
-                              children: [
-                                SizedBox(
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.42,
-                                  child: ElevatedButton(
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: secondaryColor,
-                                        shape: const StadiumBorder(),
-                                        padding: const EdgeInsets.symmetric(
-                                          vertical: 10,
-                                        ),
-                                      ),
-                                      child: Text(
-                                        (langUserPhone == "fr")
-                                            ? "Voir la liste"
-                                            : "See the list",
-                                        style: GoogleFonts.poppins(
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                                      onPressed: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  PromotionReseauSociauxListePage()),
-                                        );
-                                      }),
-                                )
-                              ],
-                            ),
-                          ],
-                        )
-                      ],
-                    ),
-                  ),
+                _buildServiceCard(
+                  context: context,
+                  icon: Icons.trending_up_rounded,
+                  title: (langUserPhone == "fr")
+                      ? "Promotion Réseau Sociaux"
+                      : "Social Network Promotion",
+                  description: (langUserPhone == "fr")
+                      ? "Payer pour des abonnés, des vues, des likes, etc. sur TikTok, Instagram, Telegram, YouTube, etc."
+                      : "Pay for subscribers, views, likes, etc. on TikTok, Instagram, Telegram, YouTube, etc.",
+                  primaryActionText:
+                      (langUserPhone == "fr") ? "Démarrer" : "To start up",
+                  onPrimaryAction: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) =>
+                              PromotionReseauSociauxFormPage())),
+                  secondaryActionText: (langUserPhone == "fr")
+                      ? "Voir la liste"
+                      : "See the list",
+                  onSecondaryAction: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) =>
+                              PromotionReseauSociauxListePage())),
                 ),
-                DressurDivider(),
               ],
-              // Card(
-              //   margin: const EdgeInsets.only(
-              //       left: 10, top: 5, right: 10, bottom: 5),
-              //   child: Container(
-              //     padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
-              //     child: Column(
-              //       crossAxisAlignment: CrossAxisAlignment.stretch,
-              //       children: [
-              //         Text(
-              //           (langUserPhone == "fr")
-              //               ? "Campagne Mail"
-              //               : "Email Campaign",
-              //           style: GoogleFonts.poppins(
-              //             color: primaryColor,
-              //             fontWeight: FontWeight.w400,
-              //             fontSize: 24,
-              //           ),
-              //         ),
-              //         const SizedBox(height: 5),
-              //         Text(
-              //           (langUserPhone == "fr")
-              //               ? "Faites la promotion de vos produits et services grâce à notre Campagne Mail."
-              //               : "Promote your products and services with our Mail Campaign.",
-              //           style: GoogleFonts.poppins(
-              //             fontWeight: FontWeight.w300,
-              //             fontSize: 14,
-              //           ),
-              //         ),
-              //         Row(
-              //           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              //           children: [
-              //             Column(
-              //               children: [
-              //                 SizedBox(
-              //                   width: MediaQuery.of(context).size.width * 0.42,
-              //                   child: ElevatedButton(
-              //                       style: ElevatedButton.styleFrom(
-              //                         backgroundColor: primaryColor,
-              //                         shape: const StadiumBorder(),
-              //                         padding: const EdgeInsets.symmetric(
-              //                           vertical: 10,
-              //                         ),
-              //                       ),
-              //                       child: Text(
-              //                         (langUserPhone == "fr")
-              //                             ? "Démarrer"
-              //                             : "To start up",
-              //                         style: GoogleFonts.poppins(
-              //                           color: Colors.white,
-              //                         ),
-              //                       ),
-              //                       onPressed: () {
-              //                         Navigator.push(
-              //                           context,
-              //                           MaterialPageRoute(
-              //                             builder: (context) =>
-              //                                 NewCampagneMailPage(),
-              //                           ),
-              //                         );
-              //                       }),
-              //                 )
-              //               ],
-              //             ),
-              //             Column(
-              //               children: [
-              //                 SizedBox(
-              //                   width: MediaQuery.of(context).size.width * 0.42,
-              //                   child: ElevatedButton(
-              //                       style: ElevatedButton.styleFrom(
-              //                         backgroundColor: secondaryColor,
-              //                         shape: const StadiumBorder(),
-              //                         padding: const EdgeInsets.symmetric(
-              //                           vertical: 10,
-              //                         ),
-              //                       ),
-              //                       child: Text(
-              //                         (langUserPhone == "fr")
-              //                             ? "Voir la liste"
-              //                             : "See the list",
-              //                         style: GoogleFonts.poppins(
-              //                           color: Colors.white,
-              //                         ),
-              //                       ),
-              //                       onPressed: () {
-              //                         Navigator.push(
-              //                           context,
-              //                           MaterialPageRoute(
-              //                               builder: (context) =>
-              //                                   CampagneMailListePage()),
-              //                         );
-              //                       }),
-              //                 )
-              //               ],
-              //             ),
-              //           ],
-              //         )
-              //       ],
-              //     ),
-              //   ),
-              // ),
-              // DressurDivider(),
-              // Card(
-              //   margin: const EdgeInsets.only(
-              //       left: 10, top: 5, right: 10, bottom: 5),
-              //   child: Container(
-              //     padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
-              //     child: Column(
-              //       crossAxisAlignment: CrossAxisAlignment.stretch,
-              //       children: [
-              //         Text(
-              //           (langUserPhone == "fr")
-              //               ? "Campagne SMS"
-              //               : "SMS Campaign",
-              //           style: GoogleFonts.poppins(
-              //             color: primaryColor,
-              //             fontWeight: FontWeight.w400,
-              //             fontSize: 24,
-              //           ),
-              //         ),
-              //         const SizedBox(height: 5),
-              //         Text(
-              //           (langUserPhone == "fr")
-              //               ? "Grâce à notre Campagne SMS, Faites la promotion de vos produits et services."
-              //               : "Thanks to our SMS Campaign, promote your products and services.",
-              //           style: GoogleFonts.poppins(
-              //             fontWeight: FontWeight.w300,
-              //             fontSize: 14,
-              //           ),
-              //         ),
-              //         const SizedBox(height: 10),
-              //         Text(
-              //           (langUserPhone == "fr")
-              //               ? "Ce service est actuellement en maintenance. Vous serez notifié dès lors qu'elle sera de nouveau disponible. Merci pour votre compréhension et votre confiance."
-              //               : "This service is currently under maintenance. You will be notified when it is available again. Thank you for your understanding and trust.",
-              //           style: GoogleFonts.poppins(
-              //             color: Colors.red,
-              //             fontWeight: FontWeight.w700,
-              //             fontSize: 15,
-              //           ),
-              //         ),
-              //         const SizedBox(height: 5),
-              //         // Row(
-              //         //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              //         //   children: [
-              //         //     Column(
-              //         //       children: [
-              //         //         SizedBox(
-              //         //           width: MediaQuery.of(context).size.width * 0.42,
-              //         //           child: ElevatedButton(
-              //         //               style: ElevatedButton.styleFrom(
-              //         //                 backgroundColor: primaryColor,
-              //         //                 shape: const StadiumBorder(),
-              //         //                 padding: const EdgeInsets.symmetric(
-              //         //                   vertical: 10,
-              //         //                 ),
-              //         //               ),
-              //         //               child: Text(
-              //         //                 (langUserPhone == "fr")
-              //         //                     ? "Démarrer"
-              //         //                     : "To start up",
-              //         //                 style: GoogleFonts.poppins(
-              //         //                   color: Colors.white,
-              //         //                 ),
-              //         //               ),
-              //         //               onPressed: () {
-              //         //                 warningNoti(
-              //         //                     (langUserPhone == "fr")
-              //         //                         ? "Désoler"
-              //         //                         : "Sorry",
-              //         //                     (langUserPhone == "fr")
-              //         //                         ? "Ce service est momentanément indisponible"
-              //         //                         : "This service is temporarily unavailable",
-              //         //                     context);
-              //         //                 // Navigator.push(
-              //         //                 //   context,
-              //         //                 //   MaterialPageRoute(
-              //         //                 //       builder: (context) =>
-              //         //                 //           NewBoostContactPage()),
-              //         //                 // );
-              //         //               }),
-              //         //         )
-              //         //       ],
-              //         //     ),
-              //         //     Column(
-              //         //       children: [
-              //         //         SizedBox(
-              //         //           width: MediaQuery.of(context).size.width * 0.42,
-              //         //           child: ElevatedButton(
-              //         //               style: ElevatedButton.styleFrom(
-              //         //                 backgroundColor: secondaryColor,
-              //         //                 shape: const StadiumBorder(),
-              //         //                 padding: const EdgeInsets.symmetric(
-              //         //                   vertical: 10,
-              //         //                 ),
-              //         //               ),
-              //         //               child: Text(
-              //         //                 (langUserPhone == "fr")
-              //         //                     ? "Voir la liste"
-              //         //                     : "See the list",
-              //         //                 style: GoogleFonts.poppins(
-              //         //                   color: Colors.white,
-              //         //                 ),
-              //         //               ),
-              //         //               onPressed: () {
-              //         //                 warningNoti(
-              //         //                     (langUserPhone == "fr")
-              //         //                         ? "Désoler"
-              //         //                         : "Sorry",
-              //         //                     (langUserPhone == "fr")
-              //         //                         ? "Ce service est momentanément indisponible"
-              //         //                         : "This service is temporarily unavailable",
-              //         //                     context);
-              //         //                 // Navigator.push(
-              //         //                 //   context,
-              //         //                 //   MaterialPageRoute(
-              //         //                 //       builder: (context) =>
-              //         //                 //           ListeBoostContactPage()),
-              //         //                 // );
-              //         //               }),
-              //         //         )
-              //         //       ],
-              //         //     ),
-              //         //   ],
-              //         // )
-              //       ],
-              //     ),
-              //   ),
-              // ),
-              // DressurDivider(),
-              const SizedBox(height: 5),
+              const SizedBox(height: 10),
               SociauxPage(),
-              const SizedBox(height: 5),
+              const SizedBox(height: 10),
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildServiceCard({
+    required BuildContext context,
+    required IconData icon,
+    required String title,
+    required String description,
+    required String primaryActionText,
+    required VoidCallback onPrimaryAction,
+    required String secondaryActionText,
+    required VoidCallback onSecondaryAction,
+  }) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: isDark ? Color(0xFF1E1E1E) : Colors.white,
+        borderRadius: BorderRadius.circular(15),
+        border: Border.all(
+            color: isDark ? Colors.grey[800]! : Colors.grey[200]!, width: 1),
+        boxShadow: [
+          BoxShadow(
+            color: isDark
+                ? Colors.black.withOpacity(0.2)
+                : Colors.grey.withOpacity(0.1),
+            blurRadius: 10,
+            offset: Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: primaryColor.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(icon, color: primaryColor, size: 28),
+              ),
+              SizedBox(width: 15),
+              Expanded(
+                child: Text(
+                  title,
+                  style: GoogleFonts.poppins(
+                    color: isDark ? Colors.white : Colors.black87,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 18,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 15),
+          Text(
+            description,
+            style: GoogleFonts.poppins(
+              color: isDark ? Colors.grey[400] : Colors.grey[700],
+              fontSize: 14,
+              height: 1.5,
+            ),
+          ),
+          SizedBox(height: 20),
+          Row(
+            children: [
+              Expanded(
+                child: ElevatedButton(
+                  onPressed: onPrimaryAction,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: primaryColor,
+                    foregroundColor: Colors.white,
+                    padding: EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12)),
+                    elevation: 2,
+                  ),
+                  child: Text(
+                    primaryActionText,
+                    style: GoogleFonts.poppins(
+                        fontWeight: FontWeight.w600, fontSize: 14),
+                  ),
+                ),
+              ),
+              SizedBox(width: 12),
+              Expanded(
+                child: OutlinedButton(
+                  onPressed: onSecondaryAction,
+                  style: OutlinedButton.styleFrom(
+                    side: BorderSide(color: secondaryColor.withOpacity(0.7)),
+                    foregroundColor: secondaryColor,
+                    padding: EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12)),
+                  ),
+                  child: Text(
+                    secondaryActionText,
+                    style: GoogleFonts.poppins(
+                        fontWeight: FontWeight.w600, fontSize: 14),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }

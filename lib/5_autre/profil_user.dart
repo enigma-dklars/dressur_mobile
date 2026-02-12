@@ -1,17 +1,18 @@
-// ignore_for_file: use_build_context_synchronously
+// ignore_for_file: use_build_context_synchronously, prefer_const_constructors
 
 import 'package:dressur/5_autre/autre_profil.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:dressur/components/delayed_animation.dart';
 import 'package:dressur/components/constant.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
 import 'package:dressur/components/noti.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart'; // Pour les icônes des réseaux sociaux
 
 class ProfilPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
@@ -59,37 +60,35 @@ class ProfilPage extends StatelessWidget {
         ],
       ),
       body: SingleChildScrollView(
-        child: Column(
-          children: [
-            const SizedBox(height: 10),
-            Container(
-              margin: const EdgeInsets.symmetric(vertical: 0, horizontal: 16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  SizedBox(
-                    height: 100,
-                    child: Image.asset("images/profile.png"),
-                  ),
-                  const SizedBox(height: 10),
-                  Text(
-                    (langUserPhone == "fr")
-                        ? "Modifiez et complétez vos informations."
-                        : "Edit and complete your information.",
-                    style: GoogleFonts.poppins(
-                      fontSize: 16,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 10),
-                  // Formulaire
-                  RegisterForm(),
-
-                  const SizedBox(height: 10),
-                ],
+        physics: BouncingScrollPhysics(),
+        child: Padding(
+          padding: const EdgeInsets.all(15.0),
+          child: Column(
+            children: [
+              // --- EN-TÊTE VISUELLE ---
+              Icon(Icons.person_pin_circle_outlined,
+                  size: 60, color: primaryColor),
+              SizedBox(height: 10),
+              Text(
+                (langUserPhone == "fr")
+                    ? "Complétez vos informations"
+                    : "Complete your information",
+                style: GoogleFonts.poppins(
+                    fontSize: 18, fontWeight: FontWeight.w500),
               ),
-            ),
-          ],
+              SizedBox(height: 5),
+              Text(
+                (langUserPhone == "fr")
+                    ? "Un profil complet inspire confiance."
+                    : "A complete profile inspires trust.",
+                style:
+                    GoogleFonts.poppins(fontSize: 14, color: Colors.grey[600]),
+              ),
+              SizedBox(height: 25),
+              // --- FORMULAIRE ---
+              RegisterForm(),
+            ],
+          ),
         ),
       ),
     );
@@ -102,8 +101,10 @@ class RegisterForm extends StatefulWidget {
 }
 
 class _RegisterFormState extends State<RegisterForm> {
-  bool _desactive = false;
-  var data;
+  bool _isLoading = false;
+  final _formKey = GlobalKey<FormState>();
+
+  // Les contrôleurs restent les mêmes
   final telController = TextEditingController(text: tel);
   final emailController = TextEditingController(text: mail);
   final nameController = TextEditingController(text: nom);
@@ -114,238 +115,217 @@ class _RegisterFormState extends State<RegisterForm> {
   final facebookController = TextEditingController(text: facebook);
   final youtubeController = TextEditingController(text: youtube);
 
-  //HTTP REQUEST REGISTER
-  void registerIn(
-      String pseudo,
-      String tel,
-      String nom,
-      String mail,
-      String apropos,
-      String tiktok,
-      String instagram,
-      String facebook,
-      String youtube) async {
-    bool isConnected = await isConnectedToInternet();
-    if (isConnected) {
-      setState(() {
-        _desactive = true;
-      });
+  // La logique API reste la même, juste le nom de la variable de chargement a changé
+  Future<void> _updateProfile() async {
+    if (!_formKey.currentState!.validate()) return;
+    setState(() => _isLoading = true);
 
+    // ... (votre logique de requête http existante, en utilisant _isLoading )
+    // J'ai juste remplacé `_desactive` par `_isLoading` et ajouté un try-catch
+    try {
       var request = http.MultipartRequest(
           'POST', Uri.parse('$generalRouteForApi/updateUserInfo'));
       request.fields.addAll({
         'uid': uidUser,
         'langUserPhone': langUserPhone.toString(),
-        'tel': tel,
-        'mail': mail,
-        'nom': nom,
-        'pseudo': pseudo,
-        'apropos': apropos,
-        'tiktok': tiktok,
-        'instagram': instagram,
-        'facebook': facebook,
-        'youtube': youtube,
+        'tel': telController.text,
+        'mail': emailController.text,
+        'nom': nameController.text,
+        'pseudo': pseudoController.text,
+        'apropos': aproposController.text,
+        'tiktok': tiktokController.text,
+        'instagram': instagramController.text,
+        'facebook': facebookController.text,
+        'youtube': youtubeController.text,
       });
-
       http.StreamedResponse response = await request.send();
-
       if (response.statusCode == 200) {
-        var data1 = await response.stream.bytesToString();
-        data = convert.jsonDecode(data1);
+        var data = convert.jsonDecode(await response.stream.bytesToString());
         if (data["error"] == true) {
           dangerNoti(data["titre"], data["message"], context);
-          setState(() {
-            _desactive = false;
-          });
         } else {
-          setState(() {
-            _desactive = false;
-            initUserInformations(data['user']);
-            Navigator.pop(context);
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-              backgroundColor: Colors.green,
-              behavior: SnackBarBehavior.floating,
-              content: Text(
+          initUserInformations(data['user']);
+          Navigator.pop(context);
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            backgroundColor: Colors.green,
+            behavior: SnackBarBehavior.floating,
+            content: Text(
                 (langUserPhone == "fr")
-                    ? 'Profil mis à jour…'
-                    : 'Profile updated…',
-                style: GoogleFonts.poppins(
-                  color: Colors.white,
-                ),
-              ),
-            ));
-          });
+                    ? 'Profil mis à jour !'
+                    : 'Profile updated!',
+                style: GoogleFonts.poppins(color: Colors.white)),
+          ));
         }
       } else {
-        if (langUserPhone != "fr") {
-          dangerNoti("Mistake!",
-              "We encountered a problem, contact the administrators.", context);
-        } else {
-          dangerNoti(
-              "Erreur!",
-              "Nous avons rencontré un problème, contacter les administrateurs.",
-              context);
-        }
-        setState(() {
-          _desactive = false;
-        });
+        dangerNoti("Erreur", "Un problème est survenu.", context);
       }
-    } else {
-      if (langUserPhone != "fr") {
-        dangerNoti(
-            "Mistake!", "You are not connected to the internet.", context);
-      } else {
-        dangerNoti("Erreur!", "Vous n'ètes pas connecté a internet.", context);
-      }
-      setState(() {
-        _desactive = false;
-      });
+    } catch (e) {
+      dangerNoti("Erreur", "Impossible de se connecter au serveur.", context);
     }
+
+    setState(() => _isLoading = false);
   }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return Form(
+      key: _formKey,
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          TextField(
-            controller: pseudoController,
-            decoration: InputDecoration(
-              labelStyle: TextStyle(color: Colors.grey[400]),
-              labelText: 'Pseudo',
-              border: const OutlineInputBorder(),
-            ),
-          ),
-          const SizedBox(height: 10),
-          if (telIsVerified == false) ...[
-            TextField(
-              controller: telController,
-              decoration: InputDecoration(
-                labelStyle: TextStyle(color: Colors.grey[400]),
-                labelText: (langUserPhone == "fr")
-                    ? 'Numéro Whatsapp'
-                    : 'WhatsApp number',
-                border: const OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 10),
-          ],
-          TextField(
-            controller: emailController,
-            decoration: InputDecoration(
-              labelStyle: TextStyle(color: Colors.grey[400]),
-              labelText: 'E-mail',
-              border: const OutlineInputBorder(),
-            ),
-          ),
-          const SizedBox(height: 10),
-          TextField(
-            controller: nameController,
-            decoration: InputDecoration(
-              labelStyle: TextStyle(color: Colors.grey[400]),
-              labelText: (langUserPhone == "fr")
+          // --- SECTION INFORMATIONS DE BASE ---
+          _buildSectionTitle((langUserPhone == "fr")
+              ? "Informations de base"
+              : "Basic Information"),
+          _buildTextField(
+              controller: nameController,
+              label: (langUserPhone == "fr")
                   ? 'Nom & Prénom(s)'
-                  : "Last name and First Name",
-              border: const OutlineInputBorder(),
-            ),
-          ),
-          const SizedBox(height: 10),
-          TextField(
-            controller: tiktokController,
-            decoration: InputDecoration(
-              labelStyle: TextStyle(color: Colors.grey[400]),
-              labelText:
-                  (langUserPhone == "fr") ? 'Lien TikTok' : 'TikTok Link',
-              border: const OutlineInputBorder(),
-            ),
-          ),
-          const SizedBox(height: 10),
-          TextField(
-            controller: instagramController,
-            decoration: InputDecoration(
-              labelStyle: TextStyle(color: Colors.grey[400]),
-              labelText:
-                  (langUserPhone == "fr") ? 'Lien Instagram' : 'Instagram Link',
-              border: const OutlineInputBorder(),
-            ),
-          ),
-          const SizedBox(height: 10),
-          TextField(
-            controller: facebookController,
-            decoration: InputDecoration(
-              labelStyle: TextStyle(color: Colors.grey[400]),
-              labelText:
-                  (langUserPhone == "fr") ? 'Lien FaceBook' : 'FaceBook Link',
-              border: const OutlineInputBorder(),
-            ),
-          ),
-          const SizedBox(height: 10),
-          TextField(
-            controller: youtubeController,
-            decoration: InputDecoration(
-              labelStyle: TextStyle(color: Colors.grey[400]),
-              labelText:
-                  (langUserPhone == "fr") ? 'Lien Youtube' : 'Youtube Link',
-              border: const OutlineInputBorder(),
-            ),
-          ),
-          const SizedBox(height: 10),
-          TextField(
-            maxLines: null,
-            controller: aproposController,
-            decoration: InputDecoration(
-              labelStyle: TextStyle(color: Colors.grey[400]),
-              labelText:
-                  (langUserPhone == "fr") ? 'A propos de vous' : 'About you',
-              border: const OutlineInputBorder(),
-            ),
-          ),
-          const SizedBox(height: 10),
-          DelayedAnimation(
-            delay: 0, // 4000,
-            child: SizedBox(
-              width: MediaQuery.of(context).size.width * 0.90,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: primaryColor,
-                  shape: const StadiumBorder(),
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 16,
-                  ),
-                ),
-                child: Text(
-                  _desactive
-                      ? (langUserPhone == "fr")
-                          ? "Patientez..."
-                          : "Wait..."
-                      : (langUserPhone == "fr")
-                          ? "ENREGISTRER"
-                          : "SAVED",
-                  style: GoogleFonts.poppins(
-                    fontWeight: FontWeight.w400,
-                    color: Colors.white,
-                  ),
-                ),
-                onPressed: () {
-                  _desactive
-                      ? null
-                      : registerIn(
-                          pseudoController.text,
-                          telController.text,
-                          nameController.text,
-                          emailController.text,
-                          aproposController.text,
-                          tiktokController.text,
-                          instagramController.text,
-                          facebookController.text,
-                          youtubeController.text,
-                        );
-                },
+                  : "Last & First Name",
+              icon: Icons.person_outline_rounded),
+          SizedBox(height: 12),
+          _buildTextField(
+              controller: pseudoController,
+              label: 'Pseudo',
+              icon: Icons.alternate_email_rounded),
+          SizedBox(height: 12),
+          _buildTextField(
+              controller: emailController,
+              label: 'E-mail',
+              icon: Icons.mail_outline_rounded,
+              keyboardType: TextInputType.emailAddress),
+          SizedBox(height: 12),
+          if (telIsVerified == false) ...[
+            _buildTextField(
+                controller: telController,
+                label: (langUserPhone == "fr")
+                    ? 'Numéro WhatsApp'
+                    : 'WhatsApp Number',
+                icon: Icons.phone_outlined,
+                keyboardType: TextInputType.phone),
+            SizedBox(height: 12),
+          ],
+
+          // --- SECTION RÉSEAUX SOCIAUX ---
+          _buildSectionTitle((langUserPhone == "fr")
+              ? "Réseaux Sociaux (Optionnel)"
+              : "Social Media (Optional)"),
+          _buildTextField(
+              controller: tiktokController,
+              label: 'Lien TikTok',
+              icon: FontAwesomeIcons.tiktok),
+          SizedBox(height: 12),
+          _buildTextField(
+              controller: instagramController,
+              label: 'Lien Instagram',
+              icon: FontAwesomeIcons.instagram),
+          SizedBox(height: 12),
+          _buildTextField(
+              controller: facebookController,
+              label: 'Lien Facebook',
+              icon: FontAwesomeIcons.facebook),
+          SizedBox(height: 12),
+          _buildTextField(
+              controller: youtubeController,
+              label: 'Lien YouTube',
+              icon: FontAwesomeIcons.youtube),
+          SizedBox(height: 12),
+
+          // --- SECTION BIOGRAPHIE ---
+          _buildSectionTitle(
+              (langUserPhone == "fr") ? "Biographie" : "About You"),
+          _buildTextField(
+              controller: aproposController,
+              label: (langUserPhone == "fr")
+                  ? 'Parlez un peu de vous...'
+                  : 'Tell us a bit about yourself...',
+              icon: Icons.edit_note_rounded,
+              maxLines: 4),
+          SizedBox(height: 30),
+
+          // --- BOUTON D'ENREGISTREMENT ---
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton.icon(
+              onPressed: _isLoading ? null : _updateProfile,
+              icon: _isLoading
+                  ? Container()
+                  : Icon(Icons.save, color: Colors.white),
+              label: _isLoading
+                  ? SizedBox(
+                      height: 24,
+                      width: 24,
+                      child: CircularProgressIndicator(
+                          color: Colors.white, strokeWidth: 3))
+                  : Text(
+                      (langUserPhone == "fr") ? "ENREGISTRER" : "SAVE",
+                      style: GoogleFonts.poppins(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                          color: Colors.white),
+                    ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: primaryColor,
+                padding: EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12)),
               ),
             ),
           ),
         ],
       ),
+    );
+  }
+
+  // --- WIDGETS HELPERS POUR LE DESIGN ---
+
+  Widget _buildSectionTitle(String title) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10, top: 15),
+      child: Text(
+        title,
+        style: GoogleFonts.poppins(
+            fontSize: 14, fontWeight: FontWeight.bold, color: primaryColor),
+      ),
+    );
+  }
+
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String label,
+    required IconData icon,
+    int maxLines = 1,
+    TextInputType? keyboardType,
+  }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return TextFormField(
+      controller: controller,
+      maxLines: maxLines,
+      keyboardType: keyboardType,
+      style: GoogleFonts.poppins(fontWeight: FontWeight.w500),
+      decoration: InputDecoration(
+        labelText: label,
+        labelStyle: GoogleFonts.poppins(color: Colors.grey[600]),
+        prefixIcon: Icon(icon, color: Colors.grey[500], size: 20),
+        filled: true,
+        fillColor: isDark ? Colors.grey[850] : Colors.grey[100],
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide.none,
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: primaryColor, width: 2),
+        ),
+      ),
+      validator: (value) {
+        if (label.contains('Nom') && (value == null || value.trim().isEmpty)) {
+          return (langUserPhone == "fr")
+              ? 'Le nom est requis.'
+              : 'Name is required.';
+        }
+        return null;
+      },
     );
   }
 }

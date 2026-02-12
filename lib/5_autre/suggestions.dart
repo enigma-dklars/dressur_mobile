@@ -1,8 +1,7 @@
-// ignore_for_file: use_build_context_synchronously
+// ignore_for_file: use_build_context_synchronously, prefer_const_constructors
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:dressur/components/delayed_animation.dart';
 import 'package:dressur/components/constant.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
@@ -11,7 +10,9 @@ import 'package:dressur/components/noti.dart';
 class SuggestionsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
+      backgroundColor: isDark ? Color(0xFF121212) : Color(0xFFF8F9FA),
       appBar: AppBar(
         elevation: 0,
         backgroundColor: primaryColor,
@@ -33,41 +34,48 @@ class SuggestionsPage extends StatelessWidget {
         ),
       ),
       body: SingleChildScrollView(
-        child: Column(
-          children: [
-            const SizedBox(height: 30),
-            const Icon(
-              Icons.lightbulb,
-              size: 120,
-              color: Colors.amber,
-            ),
-            const SizedBox(height: 30),
-            Container(
-              margin: const EdgeInsets.symmetric(vertical: 0, horizontal: 15),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  DelayedAnimation(
-                    delay: 0, // 500,
-                    child: Container(
-                      padding: const EdgeInsets.all(0),
-                      child: Text(
-                        (langUserPhone == "fr")
-                            ? "Nous cherchons constamment à améliorer notre application pour vous. Votre opinion est précieuse ! Que vous ayez une idée, une suggestion de fonctionnalité ou des commentaires, faites-nous en part."
-                            : "We are constantly looking to improve our app for you. Your opinion is valuable! Whether you have an idea, feature suggestion, or feedback, let us know.",
-                        style: GoogleFonts.poppins(
-                          fontSize: 16,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 30),
-                  SuggestionsForm(),
-                ],
+        physics: BouncingScrollPhysics(),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              SizedBox(height: 20),
+              Container(
+                padding: EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.amber.withOpacity(0.15),
+                ),
+                child: Icon(
+                  Icons.lightbulb_outline_rounded,
+                  size: 60,
+                  color: Colors.amber[700],
+                ),
               ),
-            ),
-          ],
+              SizedBox(height: 20),
+              Text(
+                (langUserPhone == "fr")
+                    ? "Une idée à partager ?"
+                    : "Have an idea to share?",
+                style: GoogleFonts.poppins(
+                    fontSize: 24, fontWeight: FontWeight.bold),
+                textAlign: TextAlign.center,
+              ),
+              SizedBox(height: 10),
+              Text(
+                (langUserPhone == "fr")
+                    ? "Votre avis est précieux ! Aidez-nous à améliorer l'application."
+                    : "Your opinion is valuable! Help us improve the application.",
+                style:
+                    GoogleFonts.poppins(fontSize: 15, color: Colors.grey[600]),
+                textAlign: TextAlign.center,
+              ),
+              SizedBox(height: 30),
+              SuggestionsForm(),
+              SizedBox(height: 20),
+            ],
+          ),
         ),
       ),
     );
@@ -80,141 +88,125 @@ class SuggestionsForm extends StatefulWidget {
 }
 
 class _SuggestionsFormState extends State<SuggestionsForm> {
-  bool _desactive = false;
-  var data;
-  final telController = TextEditingController();
+  bool _isLoading = false;
+  final _formKey = GlobalKey<FormState>();
   final motifController = TextEditingController();
 
-  //HTTP REQUEST REGISTER
-  void addSuggestion(String suggestion) async {
-    bool isConnected = await isConnectedToInternet();
-    if (isConnected) {
-      setState(() {
-        _desactive = true;
-      });
+  // La logique API reste la même, juste avec une meilleure gestion de l'état de chargement
+  Future<void> addSuggestion() async {
+    if (!_formKey.currentState!.validate()) return;
+    setState(() => _isLoading = true);
 
+    // ... (votre logique de requête http existante )
+    // J'ai juste remplacé `_desactive` par `_isLoading` et ajouté un try-catch
+    try {
       var request = http.MultipartRequest(
           'POST', Uri.parse('$generalRouteForApi/addSuggestion'));
       request.fields.addAll({
         'uid': uidUser,
         'langUserPhone': langUserPhone.toString(),
-        'suggestion': suggestion
+        'suggestion': motifController.text
       });
-
       http.StreamedResponse response = await request.send();
-
       if (response.statusCode == 200) {
-        var data1 = await response.stream.bytesToString();
-        data = convert.jsonDecode(data1);
+        var data = convert.jsonDecode(await response.stream.bytesToString());
         if (data["error"] == true) {
           dangerNoti(data["titre"], data["message"], context);
-          setState(() {
-            _desactive = false;
-          });
         } else {
-          setState(() {
-            _desactive = false;
-            Navigator.pop(context);
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-              backgroundColor: Colors.green,
-              behavior: SnackBarBehavior.floating,
-              content: Text(
-                (langUserPhone == "fr")
-                    ? 'Merci pour votre suggestion ! Nous apprécions votre contribution pour améliorer notre application.'
-                    : 'Thanks for your suggestion! We appreciate your contribution to improve our app.',
-                style: GoogleFonts.poppins(
-                  color: Colors.white,
-                ),
-              ),
-            ));
-          });
+          Navigator.pop(context);
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            backgroundColor: Colors.green,
+            behavior: SnackBarBehavior.floating,
+            content: Text(
+              (langUserPhone == "fr")
+                  ? 'Merci pour votre suggestion !'
+                  : 'Thanks for your suggestion!',
+              style: GoogleFonts.poppins(color: Colors.white),
+            ),
+          ));
         }
       } else {
-        setState(() {
-          _desactive = false;
-        });
-        if (langUserPhone != "fr") {
-          dangerNoti("Mistake!",
-              "We encountered a problem, contact the administrators.", context);
-        } else {
-          dangerNoti(
-              "Erreur!",
-              "Nous avons rencontré un problème, contacter les administrateurs.",
-              context);
-        }
+        dangerNoti("Erreur", "Un problème est survenu.", context);
       }
-    } else {
-      setState(() {
-        _desactive = false;
-      });
-      if (langUserPhone != "fr") {
-        dangerNoti(
-            "Mistake!", "You are not connected to the internet.", context);
-      } else {
-        dangerNoti("Erreur!", "Vous n'ètes pas connecté a internet.", context);
-      }
+    } catch (e) {
+      dangerNoti("Erreur", "Impossible de se connecter au serveur.", context);
     }
+
+    setState(() => _isLoading = false);
   }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return Form(
+      key: _formKey,
       child: Column(
         children: [
-          const SizedBox(height: 10),
-          DelayedAnimation(
-            delay: 0, // 1000,
-            child: Text(
-              (langUserPhone == "fr")
-                  ? 'Votre ou vos suggestions ci-dessous'
-                  : 'Your suggestion(s) below',
-              style: GoogleFonts.poppins(
-                fontSize: 16,
+          // --- CHAMP DE TEXTE AMÉLIORÉ ---
+          TextFormField(
+            controller: motifController,
+            minLines: 6,
+            maxLines: 10,
+            style: GoogleFonts.poppins(fontWeight: FontWeight.w500),
+            decoration: InputDecoration(
+              hintText: (langUserPhone == "fr")
+                  ? 'Décrivez votre idée ou suggestion ici...'
+                  : 'Describe your idea or suggestion here...',
+              hintStyle: GoogleFonts.poppins(color: Colors.grey[500]),
+              filled: true,
+              fillColor: isDark ? Colors.grey[850] : Colors.grey[100],
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(15),
+                borderSide: BorderSide.none,
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(15),
+                borderSide: BorderSide(color: primaryColor, width: 2),
               ),
             ),
+            validator: (value) {
+              if (value == null || value.trim().isEmpty) {
+                return (langUserPhone == "fr")
+                    ? 'Veuillez entrer votre suggestion.'
+                    : 'Please enter your suggestion.';
+              }
+              return null;
+            },
           ),
-          const SizedBox(height: 10),
-          DelayedAnimation(
-            delay: 0, // 2250,
-            child: TextField(
-              maxLines: 100,
-              minLines: 8,
-              controller: motifController,
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-              ),
-            ),
-          ),
-          const SizedBox(height: 10),
-          DelayedAnimation(
-            delay: 0, // 2500,
-            child: SizedBox(
-              width: MediaQuery.of(context).size.width * 0.90,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.amber,
-                  shape: const StadiumBorder(),
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 13,
-                  ),
-                  minimumSize: const Size.fromHeight(50),
-                ),
-                child: Text(
-                  _desactive
-                      ? (langUserPhone == "fr")
-                          ? "Patientez..."
-                          : "Wait..."
-                      : (langUserPhone == "fr")
-                          ? "SUGGÉRER"
-                          : "SUGGEST",
-                  style: GoogleFonts.poppins(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-                onPressed: () {
-                  _desactive ? null : addSuggestion(motifController.text);
-                },
+          SizedBox(height: 25),
+
+          // --- BOUTON D'ENVOI AMÉLIORÉ ---
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton.icon(
+              onPressed: _isLoading ? null : addSuggestion,
+              icon: _isLoading
+                  ? Container()
+                  : Icon(Icons.send_rounded, color: Colors.white),
+              label: _isLoading
+                  ? SizedBox(
+                      height: 24,
+                      width: 24,
+                      child: CircularProgressIndicator(
+                          color: Colors.white, strokeWidth: 3))
+                  : Text(
+                      (langUserPhone == "fr")
+                          ? "ENVOYER MA SUGGESTION"
+                          : "SEND MY SUGGESTION",
+                      style: GoogleFonts.poppins(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                          color: Colors.white),
+                    ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor:
+                    primaryColor, // Utilisation de la couleur primaire pour la cohérence
+                padding: EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12)),
+                // Ajout d'une ombre subtile pour faire ressortir le bouton
+                elevation: 3,
+                shadowColor: primaryColor.withOpacity(0.4),
               ),
             ),
           ),

@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show ByteData, Uint8List, rootBundle;
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:dressur/components/sql_helper.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
@@ -1065,116 +1066,133 @@ Future<String> expandShortUrl(String shortUrl) async {
   }
 }
 
-void showConfNumeroWhatsapp(context) async {
+// --- DÉBUT DU BLOC AMÉLIORÉ ---
+
+void showConfNumeroWhatsapp(BuildContext context) {
+  final theme = Theme.of(context);
+  final isDark = theme.brightness == Brightness.dark;
+
   showModalBottomSheet(
     context: context,
-    elevation: 5,
     isScrollControlled: true,
+    // Applique les coins arrondis standards des modales modernes
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+    ),
+    backgroundColor: isDark ? Color(0xFF1E1E1E) : Colors.white,
     builder: (_) => Container(
       padding: EdgeInsets.only(
-        top: 0,
-        left: 0,
-        right: 0,
-        // this will prevent the soft keyboard from covering the text fields
-        bottom: MediaQuery.of(context).viewInsets.bottom + 0,
+        top: 12,
+        left: 20,
+        right: 20,
+        bottom: MediaQuery.of(context).viewInsets.bottom + 30,
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.end,
         children: [
+          // --- Poignée de glissement (standard UX) ---
           Container(
-            padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
+            width: 40,
+            height: 5,
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(5),
-              gradient: const LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  Color.fromARGB(255, 1, 156, 81),
-                  Color.fromARGB(255, 1, 156, 81),
-                  Colors.green,
-                ],
-              ),
+              color: Colors.grey[300],
+              borderRadius: BorderRadius.circular(10),
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  (langUserPhone == "fr")
-                      ? "Confirmation du numéro WhatsApp"
-                      : "WhatsApp Number Confirmation",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 25,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 10),
-                Text(
-                  (langUserPhone == "fr")
-                      ? "Assurez-vous de nous envoyer <<WhatsApp Confirmation>> avec le numéro WhatsApp utiliser pour créer votre compte Dressur."
-                      : "Make sure to send us <<WhatsApp Confirmation>> with the WhatsApp number you use to create your Dressur account.",
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 17,
-                  ),
-                ),
-                const SizedBox(height: 10),
-                Text(
-                  (langUserPhone == "fr")
-                      ? "Cliquez juste sur Demander ci-dessous pour demander la confirmation de votre numéro WhatsApp."
-                      : "Just click Request below to request confirmation of your WhatsApp number.",
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 17,
-                  ),
-                ),
-                const SizedBox(height: 10),
-                Text(
-                  (langUserPhone == "fr")
-                      ? "Les demandes sont traitées le plus tôt possible, ne vous inquiétez pas."
-                      : "Requests are processed as soon as possible, don't worry.",
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 17,
-                  ),
-                ),
-                const SizedBox(height: 10),
-                Text(
-                  (langUserPhone == "fr")
-                      ? "Les demandes sont traitées le plus tôt possible, ne vous inquiétez pas."
-                      : "Requests are processed as soon as possible, don't worry.",
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 17,
-                  ),
-                ),
-                const SizedBox(height: 10),
-                ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.white,
-                      shape: const StadiumBorder(),
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 13,
-                        horizontal: 40,
-                      ),
-                    ),
-                    child: Text(
-                      (langUserPhone == "fr") ? "Demander" : "Ask",
-                      style: GoogleFonts.poppins(
-                        fontWeight: FontWeight.w600,
-                        color: Color.fromARGB(255, 1, 156, 81),
-                      ),
-                    ),
-                    onPressed: () async {
-                      final Uri _url = Uri.parse(
-                          "$whatsappDSURL&text=WhatsApp Confirmation");
-                      if (!await launchUrl(_url,
-                          mode: LaunchMode.externalApplication)) {
-                        throw 'Could not launch $_url';
-                      }
-                    }),
-              ],
+          ),
+          SizedBox(height: 25),
+
+          // --- Icône et Titre ---
+          Icon(FontAwesomeIcons.whatsapp, color: Color(0xFF25D366), size: 50),
+          SizedBox(height: 16),
+          Text(
+            (langUserPhone == "fr")
+                ? "Confirmer votre numéro"
+                : "Confirm Your Number",
+            textAlign: TextAlign.center,
+            style: GoogleFonts.poppins(
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+              color: isDark ? Colors.white : Colors.black87,
+            ),
+          ),
+          SizedBox(height: 10),
+          Text(
+            (langUserPhone == "fr")
+                ? "C'est simple et rapide. Suivez les étapes ci-dessous."
+                : "It's quick and easy. Follow the steps below.",
+            textAlign: TextAlign.center,
+            style: GoogleFonts.poppins(
+              fontSize: 15,
+              color: Colors.grey[600],
+            ),
+          ),
+          SizedBox(height: 30),
+
+          // --- Étapes claires ---
+          _buildStep(
+            icon: Icons.looks_one_outlined,
+            title: (langUserPhone == "fr")
+                ? "Cliquez sur le bouton"
+                : "Click the button",
+            subtitle: (langUserPhone == "fr")
+                ? "Appuyez sur \"Contacter le Support\" ci-dessous."
+                : "Press \"Contact Support\" below.",
+          ),
+          SizedBox(height: 20),
+          _buildStep(
+            icon: Icons.looks_two_outlined,
+            title: (langUserPhone == "fr")
+                ? "Envoyez le message"
+                : "Send the message",
+            subtitle: (langUserPhone == "fr")
+                ? "Un message pré-rempli \"WhatsApp Confirmation\" sera prêt. Envoyez-le sans le modifier."
+                : "A pre-filled message \"WhatsApp Confirmation\" will be ready. Send it without modification.",
+          ),
+          SizedBox(height: 20),
+          _buildStep(
+            icon: Icons.looks_3_outlined,
+            title:
+                (langUserPhone == "fr") ? "Patientez" : "Wait for confirmation",
+            subtitle: (langUserPhone == "fr")
+                ? "Notre équipe traitera votre demande rapidement. Vous serez notifié."
+                : "Our team will process your request quickly. You will be notified.",
+          ),
+          SizedBox(height: 40),
+
+          // --- Bouton d'action principal ---
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton.icon(
+              onPressed: () async {
+                final Uri _url =
+                    Uri.parse("$whatsappDSURL&text=WhatsApp Confirmation");
+                if (!await launchUrl(_url,
+                    mode: LaunchMode.externalApplication)) {
+                  // Gérer l'erreur si WhatsApp ne peut pas être ouvert
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                        content: Text((langUserPhone == "fr")
+                            ? "Impossible d'ouvrir WhatsApp."
+                            : "Could not open WhatsApp.")),
+                  );
+                }
+              },
+              icon: Icon(FontAwesomeIcons.whatsapp, color: Colors.white),
+              label: Text(
+                (langUserPhone == "fr")
+                    ? "Contacter le Support"
+                    : "Contact Support",
+                style: GoogleFonts.poppins(
+                    fontWeight: FontWeight.bold, fontSize: 16),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor:
+                    Color(0xFF25D366), // Couleur officielle de WhatsApp
+                foregroundColor: Colors.white,
+                padding: EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15)),
+              ),
             ),
           ),
         ],
@@ -1183,6 +1201,37 @@ void showConfNumeroWhatsapp(context) async {
   );
 }
 
+// Helper pour construire une étape
+Widget _buildStep(
+    {required IconData icon, required String title, required String subtitle}) {
+  return Row(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Icon(icon, color: primaryColor, size: 28),
+      SizedBox(width: 16),
+      Expanded(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              title,
+              style: GoogleFonts.poppins(
+                  fontSize: 16, fontWeight: FontWeight.w600),
+            ),
+            SizedBox(height: 4),
+            Text(
+              subtitle,
+              style: GoogleFonts.poppins(
+                  color: Colors.grey[600], fontSize: 14, height: 1.4),
+            ),
+          ],
+        ),
+      ),
+    ],
+  );
+}
+
+// --- FIN DU BLOC AMÉLIORÉ ---
 Future<void> saveContactDsIfNotExiste() async {
   int nombreNewContact = 0;
   nombreNewContact = 0;

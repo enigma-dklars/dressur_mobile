@@ -114,233 +114,146 @@ class _ReceptionPageState extends State<ReceptionPage> {
         body: SingleChildScrollView(
           child: Column(
             children: [
-              const SizedBox(height: 5),
-              SpecialPub(),
-              GestureDetector(
+              const SizedBox(height: 10),
+              SpecialPub(context),
+              const SizedBox(height: 10),
+              _buildNavigationItem(
+                context: context,
+                icon: Icons.emoji_events_rounded,
+                title: "Récompenses",
+                subtitle: (langUserPhone == "fr")
+                    ? "Gagnez et suivez vos récompenses"
+                    : "Earn and track your rewards",
                 onTap: () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (context) => isInscritProgrammeRecompense
                           ? ProgrammeRecompenseDashboard()
-                          : ProgrammeRecompensePage(
-                              optionPage: false,
-                            ), // Page dédiée aux récompenses
+                          : ProgrammeRecompensePage(optionPage: false),
                     ),
                   );
                 },
-                child: Card(
-                  margin:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                  child: Container(
-                    padding: EdgeInsets.zero,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        // Icône dans un cercle (ex: un trophée ou cadeau)
-                        Container(
-                          padding: const EdgeInsets.all(10.0),
-                          margin: const EdgeInsets.all(10.0),
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Icon(
-                            Icons.emoji_events, // Icône trophée
-                            color: primaryColor,
-                            size: 24,
-                          ),
-                        ),
-                        // Texte principal et sous-texte
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                "Récompenses",
-                                style: GoogleFonts.poppins(
-                                  color: primaryColor,
-                                  fontSize: 22,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                              const SizedBox(height: 5),
-                              Text(
-                                (langUserPhone == "fr")
-                                    ? "Gagnez et suivez vos récompenses"
-                                    : "Earn and track your rewards",
-                                style: GoogleFonts.poppins(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w300,
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ],
-                          ),
-                        ),
-                        // Flèche de navigation
-                        Container(
-                          padding: const EdgeInsets.all(5),
-                          margin: const EdgeInsets.all(5),
-                          child: const Icon(
-                            Icons.chevron_right,
-                            size: 24,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
               ),
-              GestureDetector(
+              const SizedBox(height: 10),
+              _buildNavigationItem(
+                context: context,
+                icon: Icons.contacts_rounded,
+                title: "Contacts",
+                subtitle: (langUserPhone == "fr")
+                    ? "Gérez vos contacts ajoutés et scannés"
+                    : "Manage your added and scanned contacts",
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => ContactPage()),
+                  );
+                },
+              ),
+              const SizedBox(height: 10),
+              _buildNavigationItem(
+                context: context,
+                icon: Icons.notifications_rounded,
+                title: "Notifications",
+                subtitle: (langUserPhone == "fr")
+                    ? "Cadeaux, astuces, recommandations..."
+                    : "Gifts, tips, recommendations...",
                 onTap: () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => ContactPage(),
-                    ),
+                        builder: (context) => ListeNotification()),
                   );
                 },
-                child: Card(
-                  margin: const EdgeInsets.only(
-                      left: 10, top: 5, right: 10, bottom: 5),
-                  child: Container(
-                    padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        // Première colonne avec une icône centrée dans un cercle vert
-                        Container(
-                          padding: const EdgeInsets.all(10.0),
-                          margin: const EdgeInsets.all(10.0),
-                          decoration: const BoxDecoration(
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Icon(
-                            Icons.contacts,
-                            color: primaryColor,
-                            size: 20,
-                          ),
-                        ),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                "Contacts",
-                                style: GoogleFonts.poppins(
-                                  color: primaryColor,
-                                  fontSize: 22,
-                                  fontWeight: FontWeight.w400,
-                                ),
-                              ),
-                              const SizedBox(height: 5),
-                              Text(
-                                (langUserPhone == "fr")
-                                    ? "Contacts ajouter et scanner"
-                                    : "Contacts add and scan",
-                                style: GoogleFonts.poppins(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w300,
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ],
-                          ),
-                        ),
-
-                        Container(
-                          padding: const EdgeInsets.all(5),
-                          margin: const EdgeInsets.all(5),
-                          child: const Icon(
-                            Icons.chevron_right,
-                            size: 24,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
               ),
-              GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => ListeNotification(),
-                    ),
-                  );
-                },
-                child: Card(
-                  margin: const EdgeInsets.only(
-                      left: 10, top: 5, right: 10, bottom: 5),
-                  child: Container(
-                    padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(10.0),
-                          margin: const EdgeInsets.all(10.0),
-                          decoration: const BoxDecoration(
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Icon(
-                            Icons.notifications,
-                            color: primaryColor,
-                            size: 20,
-                          ),
-                        ),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                "Notifications",
-                                style: GoogleFonts.poppins(
-                                  color: primaryColor,
-                                  fontSize: 22,
-                                  fontWeight: FontWeight.w400,
-                                ),
-                              ),
-                              const SizedBox(height: 5),
-                              Text(
-                                (langUserPhone == "fr")
-                                    ? "Cadeaux, Astuces, Recommandations, Informations, Avertissements, "
-                                    : "Gifts, Tips, Recommendations, Information, Warnings, ",
-                                style: GoogleFonts.poppins(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w300,
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ],
-                          ),
-                        ),
-                        Container(
-                          padding: const EdgeInsets.all(5),
-                          margin: const EdgeInsets.all(5),
-                          child: const Icon(
-                            Icons.chevron_right,
-                            size: 24,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-              DressurDivider(),
-              const SizedBox(height: 5),
+              const SizedBox(height: 10),
               SociauxPage(),
-              const SizedBox(height: 5),
+              const SizedBox(height: 10),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNavigationItem({
+    required BuildContext context,
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required VoidCallback onTap,
+  }) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
+        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
+        decoration: BoxDecoration(
+          color: isDark ? Color(0xFF1E1E1E) : Colors.white,
+          borderRadius: BorderRadius.circular(15),
+          border: Border.all(
+              color: isDark ? Colors.grey[800]! : Colors.grey[200]!, width: 1),
+          boxShadow: [
+            BoxShadow(
+              color: isDark
+                  ? Colors.black.withOpacity(0.15)
+                  : Colors.grey.withOpacity(0.08),
+              blurRadius: 8,
+              offset: Offset(0, 3),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            // --- Icône stylisée ---
+            Container(
+              padding: EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: primaryColor.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: Icon(icon, color: primaryColor, size: 26),
+            ),
+            SizedBox(width: 16),
+
+            // --- Textes ---
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: GoogleFonts.poppins(
+                      color: isDark ? Colors.white : Colors.black87,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 17,
+                    ),
+                  ),
+                  SizedBox(height: 3),
+                  Text(
+                    subtitle,
+                    style: GoogleFonts.poppins(
+                      color: isDark ? Colors.grey[400] : Colors.grey[600],
+                      fontSize: 13,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(width: 8),
+
+            // --- Flèche de navigation ---
+            Icon(
+              Icons.arrow_forward_ios_rounded,
+              color: isDark ? Colors.grey[600] : Colors.grey[400],
+              size: 18,
+            ),
+          ],
         ),
       ),
     );

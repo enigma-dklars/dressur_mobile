@@ -6,6 +6,7 @@ import 'package:dressur/components/sql_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:dressur/components/constant.dart';
 import 'package:http/http.dart' as http;
@@ -247,7 +248,7 @@ class _AutreProfilPageState extends State<AutreProfilPage> {
                                               },
                                               child: Container(
                                                 padding: EdgeInsets.fromLTRB(
-                                                    5, 5, 5, 5),
+                                                    13, 5, 5, 5),
                                                 decoration: BoxDecoration(
                                                   color: primaryColor,
                                                   shape: BoxShape.circle,
@@ -280,96 +281,43 @@ class _AutreProfilPageState extends State<AutreProfilPage> {
                                         ),
                                         const SizedBox(height: 6),
                                       ],
+                                      // Remplacez votre ancienne Row par celle-ci
+
                                       Row(
                                         mainAxisAlignment:
                                             MainAxisAlignment.center,
+                                        spacing: 10,
                                         children: [
-                                          GestureDetector(
-                                            onTap: () {
-                                              launchPhoneCall(autre_tel);
-                                            },
-                                            child: Container(
-                                              padding: EdgeInsets.fromLTRB(
-                                                  5, 5, 5, 5),
-                                              decoration: BoxDecoration(
-                                                color: primaryColor,
-                                                shape: BoxShape.circle,
-                                              ),
-                                              child: Icon(
-                                                Icons.phone,
-                                                size: 20,
-                                                color: Colors.white,
-                                              ),
-                                            ),
+                                          _buildActionIcon(
+                                            icon: Icons.phone_outlined,
+                                            tooltip: (langUserPhone == "fr")
+                                                ? "Appeler"
+                                                : "Call",
+                                            onTap: () =>
+                                                launchPhoneCall(autre_tel),
                                           ),
-                                          const SizedBox(
-                                              width:
-                                                  espaceEntreLesOptionsContact),
-                                          GestureDetector(
-                                            onTap: () {
-                                              launchSMS(autre_tel);
-                                            },
-                                            child: Container(
-                                              padding: EdgeInsets.fromLTRB(
-                                                  5, 5, 5, 5),
-                                              decoration: BoxDecoration(
-                                                color: primaryColor,
-                                                shape: BoxShape.circle,
-                                              ),
-                                              child: Icon(
-                                                Icons.message,
-                                                size: 20,
-                                                color: Colors.white,
-                                              ),
-                                            ),
+                                          _buildActionIcon(
+                                            icon: Icons.sms_outlined,
+                                            tooltip: "SMS",
+                                            onTap: () => launchSMS(autre_tel),
                                           ),
-                                          const SizedBox(
-                                              width:
-                                                  espaceEntreLesOptionsContact),
-                                          GestureDetector(
-                                            onTap: () {
-                                              launchEmail(autre_mail);
-                                            },
-                                            child: Container(
-                                              padding: EdgeInsets.fromLTRB(
-                                                  5, 5, 5, 5),
-                                              decoration: BoxDecoration(
-                                                color: primaryColor,
-                                                shape: BoxShape.circle,
-                                              ),
-                                              child: Icon(
-                                                Icons.mail,
-                                                size: 20,
-                                                color: Colors.white,
-                                              ),
-                                            ),
+                                          _buildActionIcon(
+                                            icon: Icons.mail_outline_rounded,
+                                            tooltip: "Email",
+                                            onTap: () =>
+                                                launchEmail(autre_mail),
                                           ),
-                                          const SizedBox(
-                                              width:
-                                                  espaceEntreLesOptionsContact),
-                                          GestureDetector(
-                                            onTap: () {
-                                              launchWhatsApp(autre_tel);
-                                            },
-                                            child: Container(
-                                              padding: EdgeInsets.fromLTRB(
-                                                  5, 5, 5, 5),
-                                              decoration: BoxDecoration(
-                                                color: primaryColor,
-                                                shape: BoxShape.circle,
-                                              ),
-                                              child: Image.asset(
-                                                'images/logo_whatsapp.png',
-                                                width: 20,
-                                                height: 20,
-                                              ),
-                                            ),
+                                          // Pour WhatsApp, on utilise FontAwesome pour avoir l'icône officielle
+                                          _buildActionIcon(
+                                            icon: FontAwesomeIcons
+                                                .whatsapp, // Assurez-vous d'avoir le package font_awesome_flutter
+                                            tooltip: "WhatsApp",
+                                            onTap: () =>
+                                                launchWhatsApp(autre_tel),
                                           ),
-                                          const SizedBox(
-                                              width:
-                                                  espaceEntreLesOptionsContact),
                                         ],
                                       ),
+
                                       Padding(
                                         padding: const EdgeInsets.all(10.0),
                                         child: Column(
@@ -422,6 +370,43 @@ class _AutreProfilPageState extends State<AutreProfilPage> {
     );
   }
 
+// Collez cette fonction à l'intérieur de votre classe _AutreProfilPageState
+
+  Widget _buildActionIcon({
+    required IconData icon,
+    required String tooltip,
+    required VoidCallback onTap,
+  }) {
+    return Tooltip(
+      message: tooltip,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius:
+            BorderRadius.circular(50), // Pour un effet "splash" circulaire
+        child: Container(
+          padding: const EdgeInsets.all(12.0),
+          decoration: BoxDecoration(
+            color: primaryColor,
+            shape: BoxShape.circle,
+            boxShadow: [
+              BoxShadow(
+                color: primaryColor.withOpacity(0.3),
+                blurRadius: 8,
+                offset: Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Icon(
+            icon,
+            size:
+                24, // Taille d'icône légèrement plus grande pour un meilleur impact
+            color: Colors.white,
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget buildInfoCard(String title, String content) {
     return SizedBox(
       width: double.infinity,
@@ -451,6 +436,7 @@ class _AutreProfilPageState extends State<AutreProfilPage> {
     return Card(
       margin: EdgeInsets.only(bottom: 10),
       child: ListTile(
+        // Le changement est ici : la fonction retourne directement le bon widget
         leading: getSocialMediaIcon(platform),
         title: Text(
           platform,
@@ -466,18 +452,29 @@ class _AutreProfilPageState extends State<AutreProfilPage> {
     );
   }
 
-  Icon getSocialMediaIcon(String platform) {
-    switch (platform) {
-      case "TikTok":
-        return Icon(Icons.music_note);
-      case "Youtube":
-        return Icon(Icons.video_library, color: Colors.red);
-      case "Facebook":
-        return Icon(Icons.facebook, color: Colors.blue);
-      case "Instagram":
-        return Icon(Icons.camera_alt, color: Colors.purple);
+// La fonction améliorée qui retourne un FaIcon
+  FaIcon getSocialMediaIcon(String platform) {
+    switch (platform.toLowerCase()) {
+      // Utiliser toLowerCase() pour plus de robustesse
+      case "tiktok":
+        // FontAwesome a une icône spécifique pour TikTok
+        return FaIcon(FontAwesomeIcons.tiktok);
+
+      case "youtube":
+        return FaIcon(FontAwesomeIcons.youtube);
+
+      case "facebook":
+        return FaIcon(
+            FontAwesomeIcons.facebook); // Couleur officielle de Facebook
+
+      case "instagram":
+        // L'icône Instagram est souvent représentée par un dégradé,
+        // mais une couleur unie comme le magenta est une bonne alternative.
+        return FaIcon(FontAwesomeIcons.instagram);
+
       default:
-        return Icon(Icons.link);
+        // Une icône de lien générique si la plateforme n'est pas reconnue
+        return FaIcon(FontAwesomeIcons.link);
     }
   }
 }

@@ -13,6 +13,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_linkify/flutter_linkify.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:dressur/5_autre/confirme_mail_user.dart';
 import 'package:dressur/1_reception/liste_notification.dart';
@@ -559,25 +561,158 @@ class _ActuPageState extends State<ActuPage> {
         false;
   }
 
-  void _showPasDeContactAdd(context) async {
+  void _showPasDeContactAdd(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     showModalBottomSheet(
       context: context,
-      elevation: 5,
       isScrollControlled: true,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+      ),
+      backgroundColor: isDark ? Color(0xFF1E1E1E) : Colors.white,
       builder: (_) => Container(
         padding: EdgeInsets.only(
-          top: 0,
-          left: 0,
-          right: 0,
-          // this will prevent the soft keyboard from covering the text fields
-          bottom: MediaQuery.of(context).viewInsets.bottom + 0,
+          top: 12,
+          left: 20,
+          right: 20,
+          bottom: MediaQuery.of(context).viewInsets.bottom + 30,
         ),
-        child: PasDeContactAdd(),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // --- Poignée de glissement ---
+            Container(
+              width: 40,
+              height: 5,
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+            SizedBox(height: 25),
+
+            // --- EN-TÊTE : LE CONSTAT ---
+            Icon(Icons.search_off_rounded, color: primaryColor, size: 50),
+            SizedBox(height: 16),
+            Text(
+              (langUserPhone == "fr")
+                  ? "Aucun contact disponible"
+                  : "No Contacts Available",
+              textAlign: TextAlign.center,
+              style: GoogleFonts.poppins(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            SizedBox(height: 10),
+            Text(
+              (langUserPhone == "fr")
+                  ? "Pour le moment, aucun utilisateur correspondant à vos préférences n'a fait de boost."
+                  : "Currently, no users matching your preferences have boosted.",
+              textAlign: TextAlign.center,
+              style: GoogleFonts.poppins(fontSize: 15, color: Colors.grey[600]),
+            ),
+            SizedBox(height: 30),
+
+            // --- TITRE DES SOLUTIONS ---
+            Text(
+              (langUserPhone == "fr")
+                  ? "Que faire maintenant ?"
+                  : "What to do now?",
+              style: GoogleFonts.poppins(
+                  fontSize: 18, fontWeight: FontWeight.w600),
+            ),
+            SizedBox(height: 20),
+
+            // --- CARTE D'ACTION 1 : FAIRE UN BOOST ---
+            _buildActionCard(
+              context: context,
+              icon: Icons.rocket_launch_outlined,
+              title:
+                  (langUserPhone == "fr") ? "Faire un Boost" : "Make a Boost",
+              subtitle: (langUserPhone == "fr")
+                  ? "Soyez proactif ! Obtenez de nombreux contacts instantanément."
+                  : "Be proactive! Get many contacts instantly.",
+              buttonText: (langUserPhone == "fr")
+                  ? "Démarrer un Boost"
+                  : "Start a Boost",
+              buttonColor: primaryColor,
+              onTap: () {
+                Navigator.pop(context); // Ferme la modale avant de naviguer
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => NewBoostContactPage()),
+                );
+              },
+            ),
+            SizedBox(height: 15),
+
+            // --- CARTE D'ACTION 2 : PARTAGER ---
+          ],
+        ),
       ),
     );
   }
 
-  // ---------------------------------------------------------------------------
+// --- WIDGET HELPER POUR LES CARTES D'ACTION ---
+  Widget _buildActionCard({
+    required BuildContext context,
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required String buttonText,
+    required Color buttonColor,
+    required VoidCallback onTap,
+  }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return Container(
+      padding: EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: isDark ? Colors.grey[850] : Colors.white,
+        borderRadius: BorderRadius.circular(15),
+        border:
+            Border.all(color: isDark ? Colors.grey[800]! : Colors.grey[200]!),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(icon, color: buttonColor, size: 24),
+              SizedBox(width: 12),
+              Text(title,
+                  style: GoogleFonts.poppins(
+                      fontSize: 16, fontWeight: FontWeight.bold)),
+            ],
+          ),
+          SizedBox(height: 8),
+          Text(
+            subtitle,
+            style: GoogleFonts.poppins(color: Colors.grey[600], fontSize: 14),
+          ),
+          SizedBox(height: 16),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: onTap,
+              child: Text(buttonText,
+                  style: GoogleFonts.poppins(fontWeight: FontWeight.w600)),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: buttonColor,
+                foregroundColor: Colors.white,
+                padding: EdgeInsets.symmetric(vertical: 12),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10)),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  } // ---------------------------------------------------------------------------
+
   // BOTTOM MODAL D'INFORMATION
   // ---------------------------------------------------------------------------
   void _showRewardInfo(BuildContext context) {
@@ -734,28 +869,6 @@ class _ActuPageState extends State<ActuPage> {
             ),
           ),
           actions: [
-            // IconButton(
-            //   icon: const Icon(
-            //     Icons.qr_code_scanner,
-            //     color: Colors.white,
-            //   ),
-            //   onPressed: () {
-            //     Navigator.push(
-            //       context,
-            //       MaterialPageRoute(
-            //         builder: (context) => CarteDeVisite(),
-            //       ),
-            //     );
-            //   },
-            // ),
-            // const Padding(
-            //   padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
-            //   child: VerticalDivider(
-            //     width: 0,
-            //     color: Colors.white,
-            //     thickness: 1,
-            //   ),
-            // ),
             IconButton(
               icon: const Icon(
                 Icons.notifications,
@@ -838,314 +951,58 @@ class _ActuPageState extends State<ActuPage> {
                 child: ListView(
                   controller: _scrollController,
                   children: [
-                    const SizedBox(height: 5),
-                    if ((nombreContactDispo <= 0 && boostEnCours == false) ||
-                        telIsVerified == false ||
-                        mailIsVerified == false ||
-                        nom.toString().replaceAll(' ', '').isEmpty ||
-                        nom == null)
-                      Container(
-                        padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
-                        child: Text(
-                          (langUserPhone == "fr")
-                              ? "Vous devez :"
-                              : "You must :",
-                          style: GoogleFonts.poppins(
-                            fontWeight: FontWeight.w300,
-                            fontSize: 20,
-                          ),
-                        ),
-                      ),
-                    !telIsVerified
-                        ? ListTile(
-                            dense: true,
-                            contentPadding: EdgeInsets.symmetric(
-                                vertical: 0, horizontal: 10),
-                            leading: Icon(
-                              Icons.fiber_manual_record,
-                              color: Colors.red,
-                            ),
-                            title: Text(
-                              (langUserPhone == "fr")
-                                  ? "Confirmation du numéro WhatsApp"
-                                  : "WhatsApp Number Confirmation",
-                              style: GoogleFonts.poppins(),
-                            ),
-                            onTap: () {
-                              showConfNumeroWhatsapp(context);
-                            },
-                          )
-                        : const SizedBox(height: 0),
-                    !mailIsVerified
-                        ? ListTile(
-                            dense: true,
-                            contentPadding: EdgeInsets.symmetric(
-                                vertical: 0, horizontal: 10),
-                            leading: Icon(
-                              Icons.fiber_manual_record,
-                              color: Colors.red,
-                            ),
-                            title: Text(
-                              (langUserPhone == "fr")
-                                  ? "Confirmation de l'Email"
-                                  : "Email Confirmation",
-                              style: GoogleFonts.poppins(),
-                            ),
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) =>
-                                        CodeMailConfirmePage()),
-                              );
-                            },
-                          )
-                        : const SizedBox(height: 0),
-                    (nom.toString().replaceAll(' ', '').isEmpty || nom == null)
-                        ? ListTile(
-                            dense: true,
-                            contentPadding: EdgeInsets.symmetric(
-                                vertical: 0, horizontal: 10),
-                            leading: Icon(
-                              Icons.fiber_manual_record,
-                              color: Colors.red,
-                            ),
-                            title: Text(
-                              (langUserPhone == "fr")
-                                  ? "Compléter le Profil"
-                                  : "Complete the Profile",
-                              style: GoogleFonts.poppins(),
-                            ),
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => ProfilPage()),
-                              );
-                            },
-                          )
-                        : const SizedBox(height: 0),
-                    (nombreContactDispo <= 0 && boostEnCours == false)
-                        ? ListTile(
-                            dense: true,
-                            contentPadding: EdgeInsets.symmetric(
-                                vertical: 0, horizontal: 10),
-                            leading: Icon(
-                              Icons.fiber_manual_record,
-                              color: Colors.red,
-                            ),
-                            title: Text(
-                              (langUserPhone == "fr")
-                                  ? "Boost Contact"
-                                  : "Boost Contact",
-                              style: GoogleFonts.poppins(),
-                            ),
-                            onTap: () {
-                              _showPasDeContactAdd(context);
-                            },
-                          )
-                        : const SizedBox(height: 0),
+                    const SizedBox(height: 10),
+                    // Affiche la checklist des actions requises
+                    _buildActionChecklist(
+                      context: context,
+                      showTel: !telIsVerified && mailIsVerified,
+                      showMail: !mailIsVerified,
+                      showProfile:
+                          (nom.toString().replaceAll(' ', '').isEmpty ||
+                              nom == null),
+                      showBoost: (nombreContactDispo <= 100 &&
+                          boostEnCours == false &&
+                          telIsVerified &&
+                          mailIsVerified),
+                    ),
+                    const SizedBox(height: 10),
+                    // Affiche la carte de mise à jour si nécessaire
                     if (int.parse(versionApp.toString().replaceAll(".", "")) <
                         int.parse(
                             myDressurVersion.toString().replaceAll(".", "")))
-                      Card(
-                        margin: const EdgeInsets.only(
-                            left: 10, top: 5, right: 10, bottom: 5),
-                        child: Container(
-                          padding: const EdgeInsets.fromLTRB(10, 3, 10, 6),
-                          child: Column(
-                            children: [
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    (langUserPhone == "fr")
-                                        ? "Nouvelle Version Disponible"
-                                        : "New Version Available",
-                                    style: GoogleFonts.poppins(
-                                      fontWeight: FontWeight.w500,
-                                      color: Colors.red,
-                                      fontSize: 24,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              Text(
-                                (langUserPhone == "fr")
-                                    ? "Pour votre sécurité et une meilleure performance de nos services, veuillez faire la mise à jour."
-                                    : "For your security and better performance of our services, please update.",
-                                style: GoogleFonts.poppins(
-                                  fontWeight: FontWeight.w300,
-                                  fontSize: 14,
-                                ),
-                              ),
-                              const SizedBox(height: 5),
-                              ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.red,
-                                  shape: const StadiumBorder(),
-                                  minimumSize: const Size.fromHeight(40),
-                                ),
-                                child: Text(
-                                  (langUserPhone == "fr")
-                                      ? "Télécharger"
-                                      : "Download",
-                                  style: GoogleFonts.poppins(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                                onPressed: () async {
-                                  final Uri _url =
-                                      Uri.parse(dressurUrlPlaystore);
-                                  if (!await launchUrl(_url,
-                                      mode: LaunchMode.externalApplication)) {
-                                    throw 'Could not launch $_url';
-                                  }
-                                },
-                              ),
-                            ],
-                          ),
-                        ),
+                      _buildUpdateCard(
+                        context: context,
+                        onUpdate: () async {
+                          final Uri _url = Uri.parse(dressurUrlPlaystore);
+                          if (!await launchUrl(_url,
+                              mode: LaunchMode.externalApplication)) {
+                            throw 'Could not launch $_url';
+                          }
+                        },
                       ),
 
                     if (nombreContactDispo > 0)
-                      Card(
-                        margin: const EdgeInsets.only(
-                            left: 10, top: 5, right: 10, bottom: 5),
-                        child: Container(
-                          padding: const EdgeInsets.fromLTRB(10, 0, 10, 3),
-                          child: Column(
-                            children: [
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    (langUserPhone == "fr")
-                                        ? "ADD DS Disponible"
-                                        : "ADD DS Available",
-                                    style: GoogleFonts.poppins(
-                                      fontWeight: FontWeight.w500,
-                                      color: primaryColor,
-                                      fontSize: 24,
-                                    ),
-                                  ),
-                                  IconButton(
-                                    onPressed: () {
-                                      _loading ? '' : actualise(true);
-                                    },
-                                    icon: const Icon(
-                                      color: primaryColor,
-                                      Icons.refresh,
-                                      size: 25,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              Text(
-                                (langUserPhone == "fr")
-                                    ? "$nombreContactDispo contact(s) disponible(s) selon vos préférences pays."
-                                    : "$nombreContactDispo contact available according to your country preferences.",
-                                style: GoogleFonts.poppins(
-                                  fontWeight: FontWeight.w300,
-                                  fontSize: 14,
-                                ),
-                              ),
-                              const SizedBox(height: 5),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Column(
-                                    children: [
-                                      SizedBox(
-                                        width:
-                                            MediaQuery.of(context).size.width *
-                                                0.42,
-                                        child: ElevatedButton(
-                                            style: ElevatedButton.styleFrom(
-                                              backgroundColor: _loading
-                                                  ? Colors.red
-                                                  : primaryColor,
-                                              shape: const StadiumBorder(),
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                vertical: 10,
-                                              ),
-                                            ),
-                                            child: Text(
-                                              (_loading == true)
-                                                  ? (langUserPhone == "fr")
-                                                      ? "Patientez..."
-                                                      : "Wait..."
-                                                  : (langUserPhone == "fr")
-                                                      ? "Enregistrer Tous"
-                                                      : "Save All",
-                                              style: GoogleFonts.poppins(
-                                                color: Colors.white,
-                                              ),
-                                            ),
-                                            onPressed: () {
-                                              if (!telIsVerified) {
-                                                showConfNumeroWhatsapp(context);
-                                              } else {
-                                                _loading
-                                                    ? ''
-                                                    : addTousLesContacts();
-                                              }
-                                            }),
-                                      )
-                                    ],
-                                  ),
-                                  Column(
-                                    children: [
-                                      SizedBox(
-                                        width:
-                                            MediaQuery.of(context).size.width *
-                                                0.42,
-                                        child: ElevatedButton(
-                                            style: ElevatedButton.styleFrom(
-                                              backgroundColor: secondaryColor,
-                                              shape: const StadiumBorder(),
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                vertical: 10,
-                                              ),
-                                            ),
-                                            child: Text(
-                                              (langUserPhone == "fr")
-                                                  ? "Mes Contacts"
-                                                  : "My Contacts",
-                                              style: GoogleFonts.poppins(
-                                                color: Colors.white,
-                                              ),
-                                            ),
-                                            onPressed: () {
-                                              Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        ContactPage()),
-                                              );
-                                            }),
-                                      )
-                                    ],
-                                  ),
-                                ],
-                              )
-                            ],
-                          ),
-                        ),
+                      _buildAvailableContactsCard(
+                        context: context,
+                        contactCount: nombreContactDispo,
+                        isLoading: _loading,
+                        onRefresh: () => actualise(true),
+                        onSaveAll: () {
+                          if (!telIsVerified) {
+                            showConfNumeroWhatsapp(context);
+                          } else {
+                            addTousLesContacts();
+                          }
+                        },
+                        onGoToContacts: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => ContactPage()),
+                          );
+                        },
                       ),
-                    if ((nombreContactDispo <= 0 && boostEnCours == false) ||
-                        telIsVerified == false ||
-                        mailIsVerified == false ||
-                        nom.toString().replaceAll(' ', '').isEmpty ||
-                        nom == null)
-                      DressurDivider(),
+                    const SizedBox(height: 10),
                     if (havePublicites == true)
                       FutureBuilder<List<Advertisement>>(
                         future: _futureAdvertisements,
@@ -1177,7 +1034,6 @@ class _ActuPageState extends State<ActuPage> {
                                       left: 7, top: 0, right: 7, bottom: 0),
                                   child: Column(
                                     children: [
-                                      const SizedBox(height: 1),
                                       Card(
                                         child: Column(
                                           children: [
@@ -1203,7 +1059,7 @@ class _ActuPageState extends State<ActuPage> {
                                                       ClipRRect(
                                                         borderRadius:
                                                             BorderRadius
-                                                                .circular(3),
+                                                                .circular(10),
                                                         child:
                                                             CachedNetworkImage(
                                                           imageUrl:
@@ -1239,8 +1095,7 @@ class _ActuPageState extends State<ActuPage> {
                                                   const SizedBox(height: 10),
                                                   Padding(
                                                     padding: const EdgeInsets
-                                                        .fromLTRB(
-                                                        10, 0, 10, 10),
+                                                        .fromLTRB(12, 0, 12, 5),
                                                     child: Column(
                                                       children: [
                                                         Text(
@@ -1251,12 +1106,12 @@ class _ActuPageState extends State<ActuPage> {
                                                           maxLines: 4,
                                                           overflow: TextOverflow
                                                               .ellipsis,
-                                                          style:
-                                                              const TextStyle(
-                                                            fontWeight:
-                                                                FontWeight.w400,
-                                                            fontSize: 16,
-                                                          ),
+                                                          style: GoogleFonts
+                                                              .poppins(
+                                                                  fontSize: 15,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w400),
                                                         ),
                                                       ],
                                                     ),
@@ -1265,74 +1120,25 @@ class _ActuPageState extends State<ActuPage> {
                                               ),
                                             ),
                                             // les icons
-                                            const SizedBox(height: 5),
-                                            Padding(
-                                              padding:
-                                                  const EdgeInsets.fromLTRB(
-                                                      10, 0, 10, 10),
-                                              child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
-                                                children: [
-                                                  Row(
-                                                    children: [
-                                                      const Icon(
-                                                          Icons.visibility),
-                                                      const SizedBox(width: 4),
-                                                      Text(advertisement
-                                                          .nombreImpression
-                                                          .toString()),
-                                                      const SizedBox(width: 16),
-                                                      const Icon(
-                                                          Icons.touch_app),
-                                                      const SizedBox(width: 4),
-                                                      Text(advertisement
-                                                          .nombreDeVues
-                                                          .toString()),
-                                                    ],
-                                                  ),
-                                                  Row(
-                                                    children: [
-                                                      GestureDetector(
-                                                        child: Row(
-                                                          children: [
-                                                            Icon(Icons.share),
-                                                            const SizedBox(
-                                                                width: 5),
-                                                            Text(
-                                                              (langUserPhone ==
-                                                                      "fr")
-                                                                  ? "Partager"
-                                                                  : "Share",
-                                                              style: GoogleFonts
-                                                                  .poppins(
-                                                                fontSize: 15,
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                        onTap: (() {
-                                                          sharePromotion(
-                                                              context,
-                                                              advertisement
-                                                                  .image,
-                                                              advertisement
-                                                                  .imageName,
-                                                              advertisement
-                                                                  .description);
-                                                        }),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ],
-                                              ),
+                                            _buildActionFooter(
+                                              context: context,
+                                              impressionCount: advertisement
+                                                  .nombreImpression,
+                                              viewCount:
+                                                  advertisement.nombreDeVues,
+                                              onShare: () {
+                                                sharePromotion(
+                                                  context,
+                                                  advertisement.image,
+                                                  advertisement.imageName,
+                                                  advertisement.description,
+                                                );
+                                              },
                                             ),
                                           ],
                                         ),
                                       ),
-                                      const SizedBox(height: 1),
-                                      DressurDivider(),
+                                      const SizedBox(height: 5),
                                     ],
                                   ),
                                 );
@@ -1343,7 +1149,7 @@ class _ActuPageState extends State<ActuPage> {
                       ),
                     const SizedBox(height: 5),
                     SociauxPage(),
-                    const SizedBox(height: 5),
+                    const SizedBox(height: 10),
                     // essai notification
                   ],
                 ),
@@ -1354,12 +1160,446 @@ class _ActuPageState extends State<ActuPage> {
       ),
     );
   }
+
+  Widget _buildActionChecklist({
+    required BuildContext context,
+    required bool showTel,
+    required bool showMail,
+    required bool showProfile,
+    required bool showBoost,
+  }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    // Liste des actions à afficher
+    final List<Widget> actions = [];
+
+    if (showTel) {
+      actions.add(_buildActionItem(
+        context,
+        icon: Icons.phone_android_rounded,
+        text: (langUserPhone == "fr")
+            ? "Confirmer le numéro WhatsApp"
+            : "Confirm WhatsApp Number",
+        onTap: () => showConfNumeroWhatsapp(context),
+      ));
+    }
+    if (showMail) {
+      actions.add(_buildActionItem(
+        context,
+        icon: Icons.mail_outline_rounded,
+        text: (langUserPhone == "fr")
+            ? "Confirmer l'adresse e-mail"
+            : "Confirm E-mail Address",
+        onTap: () => Navigator.push(context,
+            MaterialPageRoute(builder: (context) => CodeMailConfirmePage())),
+      ));
+    }
+    if (showProfile) {
+      actions.add(_buildActionItem(
+        context,
+        icon: Icons.person_outline_rounded,
+        text: (langUserPhone == "fr")
+            ? "Compléter votre profil"
+            : "Complete Your Profile",
+        onTap: () => Navigator.push(
+            context, MaterialPageRoute(builder: (context) => ProfilPage())),
+      ));
+    }
+    if (showBoost) {
+      actions.add(_buildActionItem(
+        context,
+        icon: Icons.rocket_launch_outlined,
+        text: (langUserPhone == "fr")
+            ? "Activer le Boost Contact"
+            : "Activate Boost Contact",
+        onTap: () => _showPasDeContactAdd(context),
+      ));
+    }
+
+    // Ne rien afficher si la liste est vide
+    if (actions.isEmpty) return SizedBox.shrink();
+
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: isDark ? Color(0xFF1E1E1E) : Colors.white,
+        borderRadius: BorderRadius.circular(15),
+        border:
+            Border.all(color: isDark ? Colors.grey[800]! : Colors.grey[200]!),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            (langUserPhone == "fr")
+                ? "Pour commencer, vous devez :"
+                : "To get started, you need to:",
+            style: GoogleFonts.poppins(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: isDark ? Colors.white : Colors.black87,
+            ),
+          ),
+          SizedBox(height: 10),
+          // Affiche les actions avec des séparateurs
+          ...List.generate(actions.length, (index) {
+            return Column(
+              children: [
+                if (index > 0)
+                  Divider(
+                      color: isDark ? Colors.grey[800] : Colors.grey[200],
+                      height: 1),
+                actions[index],
+              ],
+            );
+          }),
+        ],
+      ),
+    );
+  }
+
+// Helper pour chaque ligne de la checklist
+  Widget _buildActionItem(BuildContext context,
+      {required IconData icon,
+      required String text,
+      required VoidCallback onTap}) {
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 12.0),
+        child: Row(
+          children: [
+            Icon(icon, color: Colors.redAccent, size: 24),
+            SizedBox(width: 16),
+            Expanded(
+              child: Text(
+                text,
+                style: GoogleFonts.poppins(
+                    fontSize: 15, fontWeight: FontWeight.w500),
+              ),
+            ),
+            Icon(Icons.arrow_forward_ios_rounded,
+                size: 16, color: Colors.grey[400]),
+          ],
+        ),
+      ),
+    );
+  }
+
+// Helper pour la carte de mise à jour
+  Widget _buildUpdateCard(
+      {required BuildContext context, required VoidCallback onUpdate}) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Colors.red, Colors.redAccent.shade700],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.red.withOpacity(0.3),
+            blurRadius: 12,
+            offset: Offset(0, 5),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.system_update_rounded, color: Colors.white, size: 30),
+              SizedBox(width: 12),
+              Text(
+                (langUserPhone == "fr")
+                    ? "Mise à jour requise"
+                    : "Update Required",
+                style: GoogleFonts.poppins(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 12),
+          Text(
+            (langUserPhone == "fr")
+                ? "Une nouvelle version est disponible. Mettez à jour pour bénéficier des dernières fonctionnalités et améliorations de sécurité."
+                : "A new version is available. Update now to get the latest features and security improvements.",
+            style: GoogleFonts.poppins(
+              color: Colors.white.withOpacity(0.9),
+              fontSize: 14,
+              height: 1.5,
+            ),
+          ),
+          SizedBox(height: 16),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton.icon(
+              onPressed: onUpdate,
+              icon: Icon(Icons.download_for_offline_rounded, color: Colors.red),
+              label: Text(
+                (langUserPhone == "fr")
+                    ? "Mettre à jour maintenant"
+                    : "Update Now",
+                style: GoogleFonts.poppins(
+                    fontWeight: FontWeight.bold, color: Colors.red),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.white,
+                padding: EdgeInsets.symmetric(vertical: 14),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12)),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAvailableContactsCard({
+    required BuildContext context,
+    required int contactCount,
+    required bool isLoading,
+    required VoidCallback onRefresh,
+    required VoidCallback onSaveAll,
+    required VoidCallback onGoToContacts,
+  }) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
+      padding: const EdgeInsets.all(15),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [primaryColor, primaryColor.withOpacity(0.2)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(15),
+        boxShadow: [
+          BoxShadow(
+            color: primaryColor.withOpacity(0.3),
+            blurRadius: 15,
+            offset: Offset(0, 5),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                (langUserPhone == "fr")
+                    ? "Contacts Disponibles"
+                    : "Available Contacts",
+                style: GoogleFonts.poppins(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              IconButton(
+                onPressed: isLoading ? null : onRefresh,
+                icon: Icon(Icons.refresh_rounded,
+                    color: Colors.white.withOpacity(0.8)),
+                tooltip: (langUserPhone == "fr") ? "Actualiser" : "Refresh",
+              ),
+            ],
+          ),
+
+          Text(
+            contactCount.toString(),
+            style: GoogleFonts.poppins(
+                color: Colors.white,
+                fontSize: 64,
+                fontWeight: FontWeight.bold,
+                shadows: [
+                  Shadow(blurRadius: 10, color: Colors.black.withOpacity(0.2))
+                ]),
+          ),
+          Text(
+            (langUserPhone == "fr")
+                ? "nouveau(x) contact(s) à enregistrer"
+                : "new contact(s) to save",
+            style: GoogleFonts.poppins(
+              color: Colors.white.withOpacity(0.9),
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          SizedBox(height: 10),
+
+          // --- BOUTONS D'ACTION ---
+          Row(
+            children: [
+              // --- BOUTON PRINCIPAL "ENREGISTRER TOUS" ---
+              Expanded(
+                child: ElevatedButton.icon(
+                  onPressed: isLoading ? null : onSaveAll,
+                  icon: isLoading
+                      ? Container(
+                          // Spinner de chargement
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2.5,
+                            color: primaryColor,
+                          ),
+                        )
+                      : Icon(Icons.download_for_offline_rounded,
+                          color: primaryColor),
+                  label: Text(
+                    isLoading
+                        ? ((langUserPhone == "fr") ? "Patientez..." : "Wait...")
+                        : ((langUserPhone == "fr")
+                            ? "Enregistrer Tous"
+                            : "Save All"),
+                    style: GoogleFonts.poppins(
+                      fontWeight: FontWeight.bold,
+                      color: isLoading ? Colors.grey[600] : primaryColor,
+                    ),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    padding: EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12)),
+                  ),
+                ),
+              ),
+              SizedBox(width: 12),
+
+              // --- BOUTON SECONDAIRE "MES CONTACTS" ---
+              Expanded(
+                child: OutlinedButton(
+                  onPressed: onGoToContacts,
+                  style: OutlinedButton.styleFrom(
+                    side: BorderSide(color: Colors.white.withOpacity(0.6)),
+                    foregroundColor: Colors.white,
+                    padding: EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12)),
+                  ),
+                  child: Text(
+                    (langUserPhone == "fr") ? "Mes Contacts" : "My Contacts",
+                    style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildActionFooter({
+    required BuildContext context,
+    required String impressionCount,
+    required String viewCount,
+    required VoidCallback onShare,
+  }) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    return Container(
+      // Ajout d'une bordure supérieure pour séparer visuellement le footer du contenu
+
+      padding: const EdgeInsets.fromLTRB(12, 0, 12, 8),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          // --- PARTIE STATISTIQUES (à gauche) ---
+          Row(
+            children: [
+              _buildStatItem(
+                icon: Icons.visibility_outlined,
+                value: impressionCount.toString(),
+                label: (langUserPhone == "fr") ? "Impressions" : "Impressions",
+              ),
+              SizedBox(width: 15),
+              _buildStatItem(
+                icon: Icons.touch_app_outlined,
+                value: viewCount.toString(),
+                label: (langUserPhone == "fr") ? "Vues" : "Views",
+              ),
+            ],
+          ),
+
+          // --- PARTIE ACTION "PARTAGER" (à droite) ---
+          ElevatedButton.icon(
+            onPressed: onShare,
+            icon: Icon(Icons.share, size: 18),
+            label: Text(
+              (langUserPhone == "fr") ? "Partager" : "Share",
+              style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+            ),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: primaryColor.withOpacity(0.1),
+              foregroundColor: primaryColor,
+              elevation: 0, // Pas d'ombre pour un look plat et moderne
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+// Helper pour afficher un item de statistique (icône + valeur)
+  Widget _buildStatItem(
+      {required IconData icon, required String value, required String label}) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Icon(icon, color: Colors.grey[600], size: 20),
+        SizedBox(width: 8),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              value,
+              style: GoogleFonts.poppins(
+                fontWeight: FontWeight.bold,
+                fontSize: 18,
+              ),
+            ),
+            Text(
+              label,
+              style: GoogleFonts.poppins(
+                color: Colors.grey[600],
+                fontSize: 9,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
 }
 
 class AdvertisementDetailPage extends StatelessWidget {
   final Advertisement advertisement;
 
   AdvertisementDetailPage({required this.advertisement});
+
+  Future<void> _launchURL(String url) async {
+    final Uri uri = Uri.parse(url);
+    if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
+      print('Could not launch $url');
+    }
+  }
 
   void openWhatsAppChat() async {
     String text;
@@ -1415,144 +1655,107 @@ class AdvertisementDetailPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final Map<String, dynamic> infoMap = (advertisement.annotherInfo != "")
         ? jsonDecode(advertisement.annotherInfo)
         : {};
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: primaryColor,
+        foregroundColor: Colors.white,
         title: Text(
           (langUserPhone == "fr")
               ? 'Détails de la promotion'
-              : 'Details of the promotion',
-          style: GoogleFonts.poppins(
-            color: Colors.white,
-            fontWeight: FontWeight.w400,
-          ),
-        ),
-        leading: IconButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          icon: const Icon(
-            Icons.arrow_back_ios,
-            color: Colors.white,
-          ),
+              : 'Promotion Details',
+          style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
         ),
       ),
       body: SingleChildScrollView(
+        physics: BouncingScrollPhysics(),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // --- AFFICHE DE LA PROMOTION (AFFICHAGE COMPLET) ---
             Stack(
               children: [
-                // L'image de la promotion
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(3),
-                  child: CachedNetworkImage(
-                    imageUrl: advertisement.image,
-                    placeholder: (context, url) =>
-                        Image.asset('images/placeholder.png'),
-                    errorWidget: (context, url, error) =>
-                        Image.asset('images/error_image.png'),
-                    fit: BoxFit.cover,
+                CachedNetworkImage(
+                  imageUrl: advertisement.image,
+                  placeholder: (context, url) => AspectRatio(
+                    aspectRatio:
+                        16 / 9, // Un ratio commun pour les placeholders
+                    child: Container(color: Colors.grey[200]),
                   ),
+                  errorWidget: (context, url, error) => AspectRatio(
+                    aspectRatio: 16 / 9,
+                    child: Container(
+                        color: Colors.grey[200], child: Icon(Icons.error)),
+                  ),
+                  // `fit: BoxFit.contain` pourrait aussi être une option si vous voulez des bandes noires
+                  // mais `fit: BoxFit.cover` avec `width: double.infinity` est souvent le meilleur compromis.
+                  width: double.infinity,
+                  fit: BoxFit
+                      .fitWidth, // Affiche l'image en pleine largeur, hauteur ajustée
                 ),
-
-                // LE BADGE (Doit être un enfant direct du Stack pour être visible)
                 if (advertisement.inProgrammeRecompense)
                   Positioned(
                     top: 10,
                     right: 10,
                     child: AnimatedRewardBadge(
-                      onTap: () => _showRewardInfo(context),
-                    ),
+                        onTap: () => _showRewardInfo(context)),
                   ),
               ],
             ),
-            const SizedBox(height: 5),
-            Container(
-              margin:
-                  const EdgeInsets.only(left: 10, top: 0, right: 10, bottom: 0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Icon(Icons.visibility),
-                  Text(advertisement.nombreImpression.toString()),
-                  const SizedBox(width: 10),
-                  const Icon(Icons.touch_app),
-                  Text(advertisement.nombreDeVues.toString()),
-                  const SizedBox(width: 10),
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: primaryColor,
-                    ),
-                    onPressed: () {
-                      openWhatsAppChat();
-                    },
-                    child: Text(
-                      (langUserPhone == "fr")
-                          ? "Contacter l'annonceur"
-                          : "Contact the announcer",
-                      style: GoogleFonts.poppins(
-                        fontWeight: FontWeight.w400,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Container(
-              margin: const EdgeInsets.only(
-                  left: 10, top: 0, right: 10, bottom: 20),
-              child: Column(
-                children: [
-                  const SizedBox(height: 5),
-                  Text(
-                    advertisement.description,
-                    style: GoogleFonts.poppins(
-                      fontSize: 16,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Container(
-              margin: const EdgeInsets.only(
-                  left: 10, top: 0, right: 10, bottom: 20),
-              child: Column(
-                children: infoMap.entries.map((entry) {
-                  final key = entry.key.replaceAll('_', ' ').capitalize();
-                  final value = entry.value;
 
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 8.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          '$key :',
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors
-                                .blue, // Replace with your theme's primary color if needed
-                            fontSize: 16,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          value,
-                          style: const TextStyle(
-                            fontSize: 14,
-                          ),
-                          softWrap: true, // Wraps text within the container
-                        ),
-                        const Divider(),
-                      ],
+            // --- CONTENU TEXTUEL ---
+            Padding(
+              padding: const EdgeInsets.all(15.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // --- TITRE ---
+
+                  SizedBox(height: 15),
+
+                  // --- BARRE DE STATS ET CONTACT ---
+                  _buildContactBar(context),
+                  SizedBox(height: 25),
+
+                  // --- DESCRIPTION ---
+                  _buildSectionTitle(
+                      icon: Icons.description_outlined,
+                      title: (langUserPhone == "fr")
+                          ? "Description"
+                          : "Description"),
+                  SelectableLinkify(
+                    onOpen: (link) => _launchURL(link.url),
+                    text: advertisement.description,
+                    style: GoogleFonts.poppins(fontSize: 14, height: 1.6),
+                    // --- STYLE DES LIENS SANS SOULIGNEMENT ---
+                    linkStyle: TextStyle(
+                      color: Colors.blue,
+                      fontWeight: FontWeight.w500,
+                      decoration: TextDecoration.none, // Enlève le soulignement
                     ),
-                  );
-                }).toList(),
+                  ),
+                  SizedBox(height: 30),
+
+                  // --- INFORMATIONS SUPPLÉMENTAIRES ---
+                  if (infoMap.isNotEmpty) ...[
+                    _buildSectionTitle(
+                        icon: Icons.info_outline_rounded,
+                        title: (langUserPhone == "fr")
+                            ? "Informations supplémentaires"
+                            : "Additional Information"),
+                    ...infoMap.entries.map((entry) {
+                      final key =
+                          StringExtension(entry.key.replaceAll('_', ' '))
+                              .capitalize();
+                      final value = entry.value;
+                      return _buildInfoRow(key, value);
+                    }).toList(),
+                  ],
+                ],
               ),
             ),
           ],
@@ -1560,131 +1763,100 @@ class AdvertisementDetailPage extends StatelessWidget {
       ),
     );
   }
-}
 
-class PasDeContactAdd extends StatefulWidget {
-  PasDeContactAdd({Key? key}) : super(key: key);
+  // --- WIDGETS HELPERS ---
 
-  @override
-  State<PasDeContactAdd> createState() => _PasDeContactAddState();
-}
-
-class _PasDeContactAddState extends State<PasDeContactAdd> {
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.end,
-      children: [
-        Container(
-          padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(5),
-            gradient: const LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                Colors.indigoAccent,
-                Colors.indigo,
-              ],
-            ),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+  Widget _buildContactBar(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 0, vertical: 0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          // Stats
+          Row(
             children: [
-              const SizedBox(height: 10),
-              Text(
-                (langUserPhone == "fr")
-                    ? 'ADD DS Indisponible'
-                    : 'ADD DS Unavailable',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 25,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 10),
-              Text(
-                (langUserPhone == "fr")
-                    ? "Pour le moment, aucun des contacts correspondant à vos préférences pays n'a fait de boost. Vous pouvez faire un boost pour qu'ils puissent vous enregistrer."
-                    : "For the moment, none of the contacts corresponding to your country preferences have been boosted. You can boost so they can check you in.",
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 17,
-                ),
-              ),
-              const SizedBox(height: 10),
-              Text(
-                (langUserPhone == "fr")
-                    ? "Lorsque vous faites un boost, vous avez accès à plusieurs contacts, dans le cas contraire, vous êtes limités aux utilisateurs qui ont fait un boost."
-                    : "When you boost, you have access to several contacts, otherwise, you are limited to users who have boosted.",
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 17,
-                ),
-              ),
-              const SizedBox(height: 10),
-              Text(
-                (langUserPhone == "fr")
-                    ? "Partager votre code de parrainage pour avoir plus de filleuls et surtout, gagnez des points bonus et faites ainsi des boosts gratuitement et continuellement. Contactez-nous pour d'éventuelles questions, nous y répondrons avec plaisir."
-                    : "Share your sponsorship code to have more referrals and above all, earn bonus points and thus boost for free and continuously. Contact us for any questions, we will be happy to answer them.",
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 17,
-                ),
-              ),
-              const SizedBox(height: 10),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.orange,
-                      shape: const StadiumBorder(),
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 13,
-                        horizontal: 40,
-                      ),
-                    ),
-                    child: Text((langUserPhone == "fr") ? "PARTAGER" : "SHARE",
-                        style: GoogleFonts.poppins(
-                          fontWeight: FontWeight.w600,
-                          color: Colors.white,
-                        )),
-                    onPressed: () async {
-                      shareMessageWithImage(context, codeBonus,
-                          "$commissionBonus", "$langUserPhone");
-                    },
-                  ),
-                  ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        shape: const StadiumBorder(),
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 13,
-                          horizontal: 40,
-                        ),
-                      ),
-                      child: Text(
-                        (langUserPhone == "fr") ? "Faire un Boost" : "Boost",
-                        style: GoogleFonts.poppins(
-                          fontWeight: FontWeight.w600,
-                          color: primaryColor,
-                        ),
-                      ),
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => NewBoostContactPage()),
-                        );
-                      }),
-                ],
-              ),
+              Icon(Icons.visibility_outlined,
+                  color: Colors.grey[600], size: 20),
+              SizedBox(width: 4),
+              Text(advertisement.nombreImpression.toString(),
+                  style: GoogleFonts.poppins(
+                      fontSize: 18, fontWeight: FontWeight.w600)),
+              SizedBox(width: 12),
+              Icon(Icons.touch_app_outlined, color: Colors.grey[600], size: 20),
+              SizedBox(width: 4),
+              Text(advertisement.nombreDeVues.toString(),
+                  style: GoogleFonts.poppins(
+                      fontSize: 18, fontWeight: FontWeight.w600)),
             ],
           ),
-        ),
-      ],
+          // Bouton de contact
+          ElevatedButton.icon(
+            onPressed: openWhatsAppChat,
+            icon: FaIcon(FontAwesomeIcons.whatsapp, size: 18),
+            label: Text(
+              (langUserPhone == "fr") ? "Contacter" : "Contact",
+              style: GoogleFonts.poppins(fontWeight: FontWeight.bold),
+            ),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Color.fromRGBO(37, 211, 102, 0.5),
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10)),
+              padding: EdgeInsets.symmetric(horizontal: 18, vertical: 8),
+            ),
+          ),
+        ],
+      ),
     );
+  }
+
+  Widget _buildSectionTitle({required IconData icon, required String title}) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10.0),
+      child: Row(
+        children: [
+          Icon(icon, color: primaryColor, size: 22),
+          SizedBox(width: 10),
+          Text(title,
+              style: GoogleFonts.poppins(
+                  fontSize: 18, fontWeight: FontWeight.bold)),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInfoRow(String key, String value) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            key,
+            style: GoogleFonts.poppins(
+                fontSize: 14,
+                color: Colors.grey[600],
+                fontWeight: FontWeight.w500),
+          ),
+          SizedBox(height: 4),
+          SelectableLinkify(
+            onOpen: (link) => _launchURL(link.url),
+            text: value,
+            style:
+                GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w500),
+            linkStyle:
+                TextStyle(color: Colors.blue, decoration: TextDecoration.none),
+          ),
+          Divider(height: 12),
+        ],
+      ),
+    );
+  }
+}
+
+extension StringExtension on String {
+  String capitalize() {
+    if (this.isEmpty) return "";
+    return "${this[0].toUpperCase()}${this.substring(1)}";
   }
 }

@@ -20,7 +20,7 @@ class SociauxPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 0),
+      margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
         gradient: LinearGradient(

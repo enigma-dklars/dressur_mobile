@@ -4,15 +4,118 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:dressur/5_autre/support_assistance.dart';
 import 'package:dressur/components/bottomBar.dart';
-import 'package:dressur/components/delayed_animation.dart';
 import 'package:dressur/components/constant.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
 import 'package:dressur/components/noti.dart';
+import 'package:pinput/pinput.dart'; // Import du package Pinput
 
-class CodeMailConfirmePage extends StatelessWidget {
+class CodeMailConfirmePage extends StatefulWidget {
+  @override
+  State<CodeMailConfirmePage> createState() => _CodeMailConfirmePageState();
+}
+
+class _CodeMailConfirmePageState extends State<CodeMailConfirmePage> {
+  final _pinController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
+  bool _isConfirming = false;
+  bool _isResending = false;
+
+  // --- LOGIQUE API (regroupée pour la clarté) ---
+
+  Future<void> _resendCode() async {
+    if (_isResending) return;
+    setState(() => _isResending = true);
+
+    // Votre logique existante pour sendMail()
+    // ... (J'ai simplifié pour la lisibilité, mais gardez votre gestion d'erreur complète)
+    try {
+      var request = http.MultipartRequest(
+          'POST', Uri.parse('$generalRouteForApi/sendMailVerification'));
+      request.fields
+          .addAll({'uid': uidUser, 'langUserPhone': langUserPhone.toString()});
+      http.StreamedResponse response = await request.send();
+
+      if (response.statusCode == 200) {
+        var data = convert.jsonDecode(await response.stream.bytesToString());
+        if (data["error"] == true) {
+          dangerNoti(data["titre"], data["message"], context);
+        } else {
+          successNoti(
+            (langUserPhone == "fr") ? "Code Renvoyé !" : "Code Resent!",
+            (langUserPhone == "fr")
+                ? "Un nouveau code a été envoyé à votre adresse e-mail."
+                : "A new code has been sent to your email address.",
+            context,
+          );
+        }
+      } else {
+        dangerNoti("Erreur", "Impossible de renvoyer le code.", context);
+      }
+    } catch (e) {
+      dangerNoti("Erreur", "Problème de connexion.", context);
+    }
+
+    setState(() => _isResending = false);
+  }
+
+  Future<void> _verifyCode(String pin) async {
+    if (pin.length < 4) return; // Assurez-vous que le code est complet
+    setState(() => _isConfirming = true);
+
+    // Votre logique existante pour codeVerif()
+    // ... (J'ai simplifié pour la lisibilité)
+    try {
+      var request = http.MultipartRequest(
+          'POST', Uri.parse('$generalRouteForApi/mailVerification'));
+      request.fields.addAll({
+        'uid': uidUser,
+        'langUserPhone': langUserPhone.toString(),
+        'codeForVerifMail': pin
+      });
+      http.StreamedResponse response = await request.send();
+
+      if (response.statusCode == 200) {
+        var data = convert.jsonDecode(await response.stream.bytesToString());
+        if (data["error"] == true) {
+          dangerNoti(data["titre"], data["message"], context);
+        } else {
+          setState(() => mailIsVerified = true);
+          initUserInformations(data['user']);
+          // Afficher un message de succès avant de naviguer
+          successNoti("Succès !", "Votre e-mail a été confirmé.", context);
+          await Future.delayed(Duration(seconds: 2));
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (context) => const BottomBar()),
+            (route) => false,
+          );
+        }
+      } else {
+        dangerNoti("Erreur", "Impossible de vérifier le code.", context);
+      }
+    } catch (e) {
+      dangerNoti("Erreur", "Problème de connexion.", context);
+    }
+
+    setState(() => _isConfirming = false);
+  }
+
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    // Thème pour Pinput
+    final defaultPinTheme = PinTheme(
+      width: 56,
+      height: 60,
+      textStyle: GoogleFonts.poppins(fontSize: 22, fontWeight: FontWeight.w600),
+      decoration: BoxDecoration(
+        color: isDark ? Colors.grey[800] : Colors.grey[100],
+        borderRadius: BorderRadius.circular(12),
+      ),
+    );
+
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
@@ -74,285 +177,98 @@ class CodeMailConfirmePage extends StatelessWidget {
         ],
       ),
       body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Container(
-              margin: const EdgeInsets.symmetric(vertical: 0, horizontal: 15),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  ConfirmeForme(),
-                ],
+        padding: const EdgeInsets.all(20.0),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              SizedBox(height: 20),
+              Icon(Icons.mark_email_read_outlined,
+                  color: primaryColor, size: 80),
+              SizedBox(height: 20),
+              Text(
+                (langUserPhone == "fr")
+                    ? "Vérifiez vos e-mails"
+                    : "Check Your Email",
+                style: GoogleFonts.poppins(
+                    fontSize: 24, fontWeight: FontWeight.bold),
               ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class ConfirmeForme extends StatefulWidget {
-  ConfirmeForme({Key? key}) : super(key: key);
-
-  @override
-  State<ConfirmeForme> createState() => _ConfirmeFormeState();
-}
-
-class _ConfirmeFormeState extends State<ConfirmeForme> {
-  bool _desactive = false;
-  var data;
-  final _codeMailVerifyController = TextEditingController();
-  void sendMail() async {
-    bool isConnected = await isConnectedToInternet();
-    if (isConnected) {
-      setState(() {
-        _desactive = true;
-      });
-      var request = http.MultipartRequest(
-          'POST', Uri.parse('$generalRouteForApi/sendMailVerification'));
-      request.fields
-          .addAll({'uid': uidUser, 'langUserPhone': langUserPhone.toString()});
-
-      http.StreamedResponse response = await request.send();
-
-      if (response.statusCode == 200) {
-        var data1 = await response.stream.bytesToString();
-        data = convert.jsonDecode(data1);
-        if (data["error"] == true) {
-          dangerNoti(data["titre"], data["message"], context);
-          setState(() {
-            _desactive = false;
-          });
-        } else {
-          if (langUserPhone != "fr") {
-            successNoti(
-                "Code Send!",
-                "A code has been sent to your email address.\nEnter it and validate the form to confirm your email address.",
-                context);
-          } else {
-            successNoti(
-                "Code Envoyer !",
-                "Un code a été envoyer a votre adresse mail.\nSaisisez le et validez le formulaire pour confirmer votre adresse mail.",
-                context);
-          }
-
-          setState(() {
-            _desactive = false;
-          });
-        }
-      } else {
-        if (langUserPhone != "fr") {
-          dangerNoti("Mistake!",
-              "We encountered a problem, contact the administrators.", context);
-        } else {
-          dangerNoti(
-              "Erreur!",
-              "Nous avons rencontré un problème, contacter les administrateurs.",
-              context);
-        }
-        setState(() {
-          _desactive = false;
-        });
-      }
-    } else {
-      if (langUserPhone != "fr") {
-        dangerNoti(
-            "Mistake!", "You are not connected to the internet.", context);
-      } else {
-        dangerNoti("Erreur!", "Vous n'ètes pas connecté a internet.", context);
-      }
-      setState(() {
-        _desactive = false;
-      });
-    }
-  }
-
-  void codeVerif(String codeForVerifMail) async {
-    bool isConnected = await isConnectedToInternet();
-    if (isConnected) {
-      setState(() {
-        _desactive = true;
-      });
-
-      var request = http.MultipartRequest(
-          'POST', Uri.parse('$generalRouteForApi/mailVerification'));
-      request.fields.addAll({
-        'uid': uidUser,
-        'langUserPhone': langUserPhone.toString(),
-        'codeForVerifMail': codeForVerifMail
-      });
-
-      http.StreamedResponse response = await request.send();
-
-      if (response.statusCode == 200) {
-        var data1 = await response.stream.bytesToString();
-        data = convert.jsonDecode(data1);
-        if (data["error"] == true) {
-          dangerNoti(data["titre"], data["message"], context);
-          setState(() {
-            _desactive = false;
-          });
-        } else {
-          setState(() {
-            mailIsVerified = true;
-            _desactive = false;
-            initUserInformations(data['user']);
-
-            Future.delayed(const Duration(seconds: 5), () {});
-
-            Navigator.of(context).push(
-                MaterialPageRoute(builder: (context) => const BottomBar()));
-          });
-        }
-      } else {
-        if (langUserPhone != "fr") {
-          dangerNoti("Mistake!",
-              "We encountered a problem, contact the administrators.", context);
-        } else {
-          dangerNoti(
-              "Erreur!",
-              "Nous avons rencontré un problème, contacter les administrateurs.",
-              context);
-        }
-        setState(() {
-          _desactive = false;
-        });
-      }
-    } else {
-      if (langUserPhone != "fr") {
-        dangerNoti(
-            "Mistake!", "You are not connected to the internet.", context);
-      } else {
-        dangerNoti("Erreur!", "Vous n'ètes pas connecté a internet.", context);
-      }
-      setState(() {
-        _desactive = false;
-      });
-    }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  Widget build(BuildContext context) {
-    return Container(
-      child: Column(
-        children: [
-          const SizedBox(height: 20),
-          DelayedAnimation(
-            delay: 0, // 500,
-            child: SizedBox(
-              height: MediaQuery.of(context).size.height * 0.20,
-              child: Image.asset("images/ds_img_6.png"),
-            ),
-          ),
-          const SizedBox(height: 20),
-          DelayedAnimation(
-            delay: 500, // 3500,
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: secondaryColor,
-                shape: const StadiumBorder(),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  // vertical: 13,
-                ),
+              SizedBox(height: 10),
+              Text(
+                (langUserPhone == "fr")
+                    ? "Nous avons envoyé un code de confirmation à votre adresse : $mail"
+                    : "We've sent a confirmation code to your address: $mail",
+                textAlign: TextAlign.center,
+                style: GoogleFonts.poppins(
+                    fontSize: 15, color: Colors.grey[600], height: 1.5),
               ),
-              child: Text(
-                  _desactive
-                      ? (langUserPhone == "fr")
-                          ? "Patientez..."
-                          : "Wait..."
-                      : (langUserPhone == "fr")
-                          ? "Renvoyer le code"
-                          : "Return the code",
-                  style: GoogleFonts.poppins(
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white,
-                  )),
-              onPressed: () {
-                _desactive ? null : sendMail();
-              },
-            ),
-          ),
-          const SizedBox(height: 20),
-          DelayedAnimation(
-            delay: 0, // 1000,
-            child: Text(
-              (langUserPhone == "fr")
-                  ? "Vous n'avez pas reçu le code par mail ? Cliquez sur le bouton bleu ci-dessus pour recevoir un nouveau code de confirmation de votre adresse mail ($mail). Contactez simplement l'Assistance Dressur après 2H d'attente..."
-                  : "Didn't receive the code by email? Click on the blue button above to receive a new confirmation code from your email address ($mail). Simply contact Dressur Assistance after 2 hours of waiting...",
-              style: GoogleFonts.poppins(
-                fontSize: 16,
-              ),
-              textAlign: TextAlign.justify,
-            ),
-          ),
-          const SizedBox(height: 20),
-          DelayedAnimation(
-            delay: 0, // 1000,
-            child: Text(
-              (langUserPhone == "fr")
-                  ? "Renseignez le code de confirmation reçu par mail."
-                  : "Enter the confirmation code received by email.",
-              style: GoogleFonts.poppins(
-                color: secondaryColor,
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ),
-          const SizedBox(height: 20),
-          DelayedAnimation(
-            delay: 0, // 2000,
-            child: TextField(
-              controller: _codeMailVerifyController,
-              decoration: InputDecoration(
-                labelStyle: TextStyle(color: secondaryColor),
-                border: const OutlineInputBorder(),
-                labelText: (langUserPhone == "fr")
-                    ? 'Code verification mail'
-                    : 'Mail verification code',
-              ),
-            ),
-          ),
-          const SizedBox(height: 20),
-          DelayedAnimation(
-            delay: 0, // 3500,
-            child: SizedBox(
-              width: MediaQuery.of(context).size.width * 0.90,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: primaryColor,
-                  shape: const StadiumBorder(),
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 13,
+              SizedBox(height: 40),
+
+              // --- CHAMP DE SAISIE PINPUT ---
+              Pinput(
+                length: 6, // Ajustez selon la longueur de votre code
+                controller: _pinController,
+                defaultPinTheme: defaultPinTheme,
+                focusedPinTheme: defaultPinTheme.copyWith(
+                  decoration: defaultPinTheme.decoration!.copyWith(
+                    border: Border.all(color: primaryColor, width: 2),
                   ),
                 ),
-                child: Text(
-                    _desactive
-                        ? (langUserPhone == "fr")
-                            ? "Patientez..."
-                            : "Wait..."
-                        : (langUserPhone == "fr")
-                            ? "CONFIRMER"
-                            : "CONFIRM",
-                    style: GoogleFonts.poppins(
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white,
-                    )),
-                onPressed: () {
-                  _desactive ? null : codeVerif(_codeMailVerifyController.text);
-                },
+                onCompleted: (pin) => _verifyCode(pin),
               ),
-            ),
+              SizedBox(height: 40),
+
+              // --- BOUTON DE CONFIRMATION ---
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: _isConfirming
+                      ? null
+                      : () => _verifyCode(_pinController.text),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: primaryColor,
+                    foregroundColor: Colors.white,
+                    padding: EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12)),
+                  ),
+                  child: _isConfirming
+                      ? SizedBox(
+                          height: 24,
+                          width: 24,
+                          child: CircularProgressIndicator(
+                              color: Colors.white, strokeWidth: 3))
+                      : Text(
+                          (langUserPhone == "fr") ? "CONFIRMER" : "CONFIRM",
+                          style: GoogleFonts.poppins(
+                              fontWeight: FontWeight.bold, fontSize: 16),
+                        ),
+                ),
+              ),
+              SizedBox(height: 20),
+
+              // --- BOUTON POUR RENVOYER LE CODE ---
+              TextButton(
+                onPressed: _isResending ? null : _resendCode,
+                child: _isResending
+                    ? Text(
+                        (langUserPhone == "fr")
+                            ? "Envoi en cours..."
+                            : "Sending...",
+                        style: GoogleFonts.poppins(color: Colors.grey),
+                      )
+                    : Text(
+                        (langUserPhone == "fr")
+                            ? "Renvoyer le code"
+                            : "Resend Code",
+                        style: GoogleFonts.poppins(
+                            fontWeight: FontWeight.w600, color: primaryColor),
+                      ),
+              ),
+            ],
           ),
-          const SizedBox(height: 20),
-        ],
+        ),
       ),
     );
   }

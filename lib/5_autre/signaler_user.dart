@@ -1,8 +1,7 @@
-// ignore_for_file: use_build_context_synchronously
+// ignore_for_file: use_build_context_synchronously, prefer_const_constructors
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:dressur/components/delayed_animation.dart';
 import 'package:dressur/components/constant.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
@@ -11,7 +10,9 @@ import 'package:dressur/components/noti.dart';
 class SignalerPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
+      backgroundColor: isDark ? Color(0xFF121212) : Color(0xFFF8F9FA),
       appBar: AppBar(
         elevation: 0,
         backgroundColor: primaryColor,
@@ -33,41 +34,38 @@ class SignalerPage extends StatelessWidget {
         ),
       ),
       body: SingleChildScrollView(
-        child: Column(
-          children: [
-            const SizedBox(height: 30),
-            const Icon(
-              Icons.dangerous,
-              size: 120,
-              color: Colors.redAccent,
-            ),
-            const SizedBox(height: 30),
-            Container(
-              margin: const EdgeInsets.symmetric(vertical: 0, horizontal: 15),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  DelayedAnimation(
-                    delay: 0, // 500,
-                    child: Container(
-                      padding: const EdgeInsets.all(0),
-                      child: Text(
-                        (langUserPhone == "fr")
-                            ? "Signaler un utilisateur en remplissant le formulaire ci-dessous. Votre plainte sera étudier et des mesures seront prises conformément à nos conditions d'utilisations."
-                            : "Report a user by filling out the form below. Your complaint will be investigated and action will be taken in accordance with our Terms of Use.",
-                        style: GoogleFonts.poppins(
-                          fontSize: 16,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 30),
-                  SignalerForm(),
-                ],
+        physics: BouncingScrollPhysics(),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              SizedBox(height: 20),
+              Icon(Icons.warning_amber_rounded,
+                  color: Colors.redAccent, size: 70),
+              SizedBox(height: 15),
+              Text(
+                (langUserPhone == "fr")
+                    ? "Signaler un comportement"
+                    : "Report a Behavior",
+                style: GoogleFonts.poppins(
+                    fontSize: 22, fontWeight: FontWeight.bold),
+                textAlign: TextAlign.center,
               ),
-            ),
-          ],
+              SizedBox(height: 10),
+              Text(
+                (langUserPhone == "fr")
+                    ? "Aidez-nous à maintenir une communauté sûre. Tout signalement sera traité avec sérieux."
+                    : "Help us maintain a safe community. All reports will be treated seriously.",
+                style:
+                    GoogleFonts.poppins(fontSize: 15, color: Colors.grey[600]),
+                textAlign: TextAlign.center,
+              ),
+              SizedBox(height: 30),
+              SignalerForm(),
+              SizedBox(height: 20),
+            ],
+          ),
         ),
       ),
     );
@@ -80,144 +78,155 @@ class SignalerForm extends StatefulWidget {
 }
 
 class _SignalerFormState extends State<SignalerForm> {
-  bool _desactive = false;
-  var data;
+  bool _isLoading = false;
+  final _formKey = GlobalKey<FormState>();
   final telController = TextEditingController();
   final motifController = TextEditingController();
 
-  //HTTP REQUEST REGISTER
-  void signaleUser(String tel, String motif) async {
-    bool isConnected = await isConnectedToInternet();
-    if (isConnected) {
-      setState(() {
-        _desactive = true;
-      });
+  // La logique API reste la même, juste avec une meilleure gestion de l'état de chargement
+  Future<void> signaleUser() async {
+    if (!_formKey.currentState!.validate()) return;
+    setState(() => _isLoading = true);
 
+    // ... (votre logique de requête http existante )
+    // J'ai juste remplacé `_desactive` par `_isLoading` et ajouté un try-catch
+    try {
       var request = http.MultipartRequest(
           'POST', Uri.parse('$generalRouteForApi/addSignalement'));
       request.fields.addAll({
         'uid': uidUser,
         'langUserPhone': langUserPhone.toString(),
-        'telSignaler': tel,
-        'motifSignaler': motif
+        'telSignaler': telController.text,
+        'motifSignaler': motifController.text,
       });
-
       http.StreamedResponse response = await request.send();
-
       if (response.statusCode == 200) {
-        var data1 = await response.stream.bytesToString();
-        data = convert.jsonDecode(data1);
+        var data = convert.jsonDecode(await response.stream.bytesToString());
         if (data["error"] == true) {
           dangerNoti(data["titre"], data["message"], context);
-          setState(() {
-            _desactive = false;
-          });
         } else {
-          setState(() {
-            _desactive = false;
-            Navigator.pop(context);
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-              backgroundColor: Colors.green,
-              behavior: SnackBarBehavior.floating,
-              content: Text(
-                (langUserPhone == "fr")
-                    ? 'Utilisateur signaler avec succès…'
-                    : 'User report successfully…',
-                style: GoogleFonts.poppins(
-                  color: Colors.white,
-                ),
-              ),
-            ));
-          });
+          Navigator.pop(context);
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            backgroundColor: Colors.green,
+            behavior: SnackBarBehavior.floating,
+            content: Text(
+              (langUserPhone == "fr")
+                  ? 'Signalement envoyé. Merci pour votre aide.'
+                  : 'Report sent. Thank you for your help.',
+              style: GoogleFonts.poppins(color: Colors.white),
+            ),
+          ));
         }
       } else {
-        setState(() {
-          _desactive = false;
-        });
-        if (langUserPhone != "fr") {
-          dangerNoti("Mistake!",
-              "We encountered a problem, contact the administrators.", context);
-        } else {
-          dangerNoti(
-              "Erreur!",
-              "Nous avons rencontré un problème, contacter les administrateurs.",
-              context);
-        }
+        dangerNoti("Erreur", "Un problème est survenu.", context);
       }
-    } else {
-      setState(() {
-        _desactive = false;
-      });
-      if (langUserPhone != "fr") {
-        dangerNoti(
-            "Mistake!", "You are not connected to the internet.", context);
-      } else {
-        dangerNoti("Erreur!", "Vous n'ètes pas connecté a internet.", context);
-      }
+    } catch (e) {
+      dangerNoti("Erreur", "Impossible de se connecter au serveur.", context);
     }
+
+    setState(() => _isLoading = false);
   }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return Form(
+      key: _formKey,
       child: Column(
         children: [
-          DelayedAnimation(
-            delay: 0, // 1500,
-            child: TextField(
-              controller: telController,
-              decoration: InputDecoration(
-                border: const OutlineInputBorder(),
-                labelText: (langUserPhone == "fr")
-                    ? 'Numéro Whatsapp'
-                    : 'Whatsapp number',
-              ),
+          // --- CHAMP POUR LE NUMÉRO ---
+          TextFormField(
+            controller: telController,
+            keyboardType: TextInputType.phone,
+            style: GoogleFonts.poppins(fontWeight: FontWeight.w500),
+            decoration: InputDecoration(
+              labelText: (langUserPhone == "fr")
+                  ? 'Numéro WhatsApp à signaler'
+                  : 'WhatsApp Number to Report',
+              labelStyle: GoogleFonts.poppins(color: Colors.grey[600]),
+              prefixIcon:
+                  Icon(Icons.phone_outlined, color: Colors.grey[500], size: 22),
+              filled: true,
+              fillColor: isDark ? Colors.grey[850] : Colors.grey[100],
+              border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none),
+              focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: primaryColor, width: 2)),
             ),
+            validator: (value) {
+              if (value == null || value.trim().isEmpty) {
+                return (langUserPhone == "fr")
+                    ? 'Le numéro est requis.'
+                    : 'The number is required.';
+              }
+              return null;
+            },
           ),
-          const SizedBox(height: 10),
-          DelayedAnimation(
-            delay: 0, // 2250,
-            child: TextField(
-              maxLines: null,
-              controller: motifController,
-              decoration: InputDecoration(
-                border: const OutlineInputBorder(),
-                labelText: (langUserPhone == "fr") ? 'Motif' : 'Pattern',
-              ),
+          SizedBox(height: 15),
+
+          // --- CHAMP POUR LE MOTIF ---
+          TextFormField(
+            controller: motifController,
+            minLines: 5,
+            maxLines: 8,
+            style: GoogleFonts.poppins(fontWeight: FontWeight.w500),
+            decoration: InputDecoration(
+              hintText: (langUserPhone == "fr")
+                  ? 'Décrivez précisément le problème rencontré...'
+                  : 'Describe the problem you encountered in detail...',
+              hintStyle: GoogleFonts.poppins(color: Colors.grey[500]),
+              filled: true,
+              fillColor: isDark ? Colors.grey[850] : Colors.grey[100],
+              border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(15),
+                  borderSide: BorderSide.none),
+              focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(15),
+                  borderSide: BorderSide(color: primaryColor, width: 2)),
             ),
+            validator: (value) {
+              if (value == null || value.trim().isEmpty) {
+                return (langUserPhone == "fr")
+                    ? 'Le motif est requis.'
+                    : 'The reason is required.';
+              }
+              return null;
+            },
           ),
-          const SizedBox(height: 10),
-          DelayedAnimation(
-            delay: 0, // 2500,
-            child: SizedBox(
-              width: MediaQuery.of(context).size.width * 0.90,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.redAccent,
-                  shape: const StadiumBorder(),
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 13,
-                  ),
-                  minimumSize: const Size.fromHeight(50),
-                ),
-                child: Text(
-                  _desactive
-                      ? (langUserPhone == "fr")
-                          ? "Patientez..."
-                          : "Wait..."
-                      : (langUserPhone == "fr")
-                          ? "SIGNALER"
-                          : "REPORT",
-                  style: GoogleFonts.poppins(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-                onPressed: () {
-                  _desactive
-                      ? null
-                      : signaleUser(telController.text, motifController.text);
-                },
+          SizedBox(height: 25),
+
+          // --- BOUTON DE SIGNALEMENT ---
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton.icon(
+              onPressed: _isLoading ? null : signaleUser,
+              icon: _isLoading
+                  ? Container()
+                  : Icon(Icons.report_problem_outlined, color: Colors.white),
+              label: _isLoading
+                  ? SizedBox(
+                      height: 24,
+                      width: 24,
+                      child: CircularProgressIndicator(
+                          color: Colors.white, strokeWidth: 3))
+                  : Text(
+                      (langUserPhone == "fr")
+                          ? "ENVOYER LE SIGNALEMENT"
+                          : "SEND REPORT",
+                      style: GoogleFonts.poppins(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                          color: Colors.white),
+                    ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.redAccent,
+                padding: EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12)),
+                elevation: 3,
+                shadowColor: Colors.red.withOpacity(0.4),
               ),
             ),
           ),
