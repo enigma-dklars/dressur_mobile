@@ -1,8 +1,8 @@
 import 'dart:convert';
+import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:dressur/components/delayed_animation.dart';
 import 'package:dressur/components/constant.dart';
 import 'package:dressur/components/sql_helper.dart';
 import 'package:dressur/components/noti.dart';
@@ -30,130 +30,115 @@ class PageDepart extends StatefulWidget {
 
 class _PageDepartState extends State<PageDepart> {
   bool _enCour = false;
+  double _progress = 0.0;
 
   Future<void> synchroAvanceFunction() async {
     setState(() {
       _enCour = true;
-      if (langUserPhone != "fr") {
-        textChargementEvolution = "Finding your DS Contacts.";
-      } else {
-        textChargementEvolution = "Recherche de vos Contacts DS.";
-      }
+      _progress = 0.0; // La progression commence à 0
+      textChargementEvolution = (langUserPhone == "fr")
+          ? "Recherche de vos Contacts DS..."
+          : "Finding your DS Contacts...";
     });
 
-    final url =
-        Uri.parse('$generalRouteForApi/listContactDS/$uidUser/$langUserPhone');
-    final response = await http.get(url);
-    if (response.statusCode == 200) {
-      final jsonData = jsonDecode(response.body) as List<dynamic>;
-      if (jsonData.isNotEmpty) {
-        setState(() {
-          _enCour = true;
-          if (langUserPhone != "fr") {
-            textChargementEvolution =
-                "Removal of previous recognition of existing contacts ...";
-          } else {
-            textChargementEvolution =
-                "Suppression de la précédente reconnaissance des contacts existants ...";
-          }
-        });
+    try {
+      // C'est une bonne pratique d'envelopper les appels réseau dans un try-catch
+      final url = Uri.parse(
+          '$generalRouteForApi/listContactDS/$uidUser/$langUserPhone');
+      final response = await http.get(url);
 
-        await SQLHelper.viderLaBaseDeDonneeLocalTelUser();
+      if (response.statusCode == 200) {
+        final jsonData = jsonDecode(response.body) as List<dynamic>;
 
-        setState(() {
-          if (langUserPhone != "fr") {
-            textChargementEvolution = "Recognition of existing contacts ...";
-          } else {
-            textChargementEvolution =
-                "Reconnaissance des contacts existants ...";
-          }
-        });
-
-        List<Contact> contacts =
-            await FlutterContacts.getContacts(withProperties: true);
-
-        int countContacts = 0;
-        setState(() {
-          if (langUserPhone != "fr") {
-            textChargementEvolution =
-                "Recognition of existing contacts ...\n0 / ${contacts.length}";
-          } else {
-            textChargementEvolution =
-                "Reconnaissance des contacts existants ...\n0 / ${contacts.length}";
-          }
-        });
-
-        for (var contact in contacts) {
-          for (var phone in contact.phones) {
-            var numberTel =
-                (phone.number).replaceAll(" ", "").replaceAll("-", "");
-            if ((await SQLHelper.getOneNumsTelUser(numberTel)).isEmpty) {
-              await insertNumTelUserIntoDataBase(numberTel);
-            }
-          }
+        if (jsonData.isNotEmpty) {
+          // --- ÉTAPE 1 : Reconnaissance des contacts existants (0% -> 50% de la progression) ---
           setState(() {
-            countContacts++;
-            if (langUserPhone != "fr") {
-              textChargementEvolution =
-                  "Recognition of existing contacts ...\n$countContacts / ${contacts.length}";
-            } else {
-              textChargementEvolution =
-                  "Reconnaissance des contacts existants ...\n$countContacts / ${contacts.length}";
+            textChargementEvolution = (langUserPhone == "fr")
+                ? "Analyse de vos contacts locaux..."
+                : "Analyzing your local contacts...";
+          });
+
+          await SQLHelper.viderLaBaseDeDonneeLocalTelUser();
+          List<Contact> contacts =
+              await FlutterContacts.getContacts(withProperties: true);
+          int totalLocalContacts = contacts.length;
+
+          for (int i = 0; i < totalLocalContacts; i++) {
+            var contact = contacts[i];
+            for (var phone in contact.phones) {
+              var numberTel =
+                  (phone.number).replaceAll(" ", "").replaceAll("-", "");
+              if ((await SQLHelper.getOneNumsTelUser(numberTel)).isEmpty) {
+                await insertNumTelUserIntoDataBase(numberTel);
+              }
             }
+
+            // --- MISE À JOUR DE LA PROGRESSION (Partie 1) ---
+            setState(() {
+              // On calcule la progression sur la première moitié (0.0 à 0.5)
+              _progress = (i + 1) / totalLocalContacts * 0.5;
+              textChargementEvolution = (langUserPhone == "fr")
+                  ? "Analyse des contacts locaux... (${i + 1} / $totalLocalContacts)"
+                  : "Analyzing local contacts... (${i + 1} / $totalLocalContacts)";
+            });
+          }
+
+          // --- ÉTAPE 2 : Enregistrement des contacts DS manquants (50% -> 100% de la progression) ---
+          setState(() {
+            textChargementEvolution = (langUserPhone == "fr")
+                ? "Enregistrement des contacts DS manquants..."
+                : "Saving missing DS contacts...";
+          });
+
+          int totalDSContacts = jsonData.length;
+          for (int i = 0; i < totalDSContacts; i++) {
+            var contactData = jsonData[i];
+            if ((await SQLHelper.getOneNumsTelUser(contactData['tel']))
+                .isEmpty) {
+              final newContact = Contact()
+                ..name.first = contactData["nom"] + " #DS"
+                ..phones = [Phone(contactData["tel"])];
+              await newContact.insert();
+              await insertNumTelUserIntoDataBase(contactData["tel"]);
+            }
+
+            // --- MISE À JOUR DE LA PROGRESSION (Partie 2) ---
+            setState(() {
+              // On part de 0.5 et on ajoute la progression de la deuxième moitié
+              _progress = 0.5 + ((i + 1) / totalDSContacts * 0.5);
+              textChargementEvolution = (langUserPhone == "fr")
+                  ? "Enregistrement des contacts DS... (${i + 1} / $totalDSContacts)"
+                  : "Saving DS contacts... (${i + 1} / $totalDSContacts)";
+            });
+          }
+
+          // --- FIN ---
+          setState(() {
+            _enCour = false;
+            _progress = 1.0; // On s'assure que la barre est pleine à la fin
+            textChargementEvolution = (langUserPhone == "fr")
+                ? "Synchronisation terminée avec succès !"
+                : "Synchronization completed successfully!";
+          });
+        } else {
+          // Cas où il n'y a aucun contact DS à synchroniser
+          setState(() {
+            _enCour = false;
+            textChargementEvolution = (langUserPhone == "fr")
+                ? "Vous n'avez aucun contact DS, la synchronisation n'est pas nécessaire."
+                : "You don't have any DS contacts, synchronization is not needed.";
           });
         }
-
-        setState(() {
-          countContacts == 0;
-          if (langUserPhone != "fr") {
-            textChargementEvolution = "Missing DS contact record ...";
-          } else {
-            textChargementEvolution =
-                "Enregistrement des contacts DS manquant ...";
-          }
-        });
-
-        int contactsDSExistant = 0;
-        for (var contact in jsonData) {
-          if ((await SQLHelper.getOneNumsTelUser(contact['tel'])).isEmpty) {
-            final newContact = Contact()
-              ..name.first = contact["nom"] + " #DS"
-              ..phones = [Phone(contact["tel"])];
-            await newContact.insert();
-            await insertNumTelUserIntoDataBase(contact["tel"]);
-          }
-          setState(() {
-            contactsDSExistant++;
-            if (langUserPhone != "fr") {
-              textChargementEvolution =
-                  "Missing DS contact record ...\n$contactsDSExistant / ${jsonData.length}";
-            } else {
-              textChargementEvolution =
-                  "Enregistrement des contacts DS manquant ...\n$contactsDSExistant / ${jsonData.length}";
-            }
-          });
-        }
-
-        setState(() {
-          _enCour = false;
-          if (langUserPhone != "fr") {
-            textChargementEvolution = "Ended ...";
-          } else {
-            textChargementEvolution = "Terminé ...";
-          }
-        });
       } else {
-        setState(() {
-          _enCour = false;
-          if (langUserPhone != "fr") {
-            textChargementEvolution =
-                "You don't have any DS contacts, so an advanced synchronization cannot be done.";
-          } else {
-            textChargementEvolution =
-                "Vous n'avez aucun contact DS, une synchronisation avancée ne peut donc pas se faire.";
-          }
-        });
+        // Gérer les erreurs de l'appel API
+        throw Exception("Erreur de l'API: ${response.statusCode}");
       }
+    } catch (e) {
+      // Gérer les erreurs générales (réseau, etc.)
+      setState(() {
+        _enCour = false;
+        textChargementEvolution = "Une erreur est survenue: $e";
+      });
     }
   }
 
@@ -227,103 +212,163 @@ class _PageDepartState extends State<PageDepart> {
           ),
         ),
       ),
-      body: Align(
-        alignment: Alignment.topCenter,
-        child: SizedBox(
-          width: MediaQuery.of(context).size.width * 0.80,
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(
-              maxWidth: 1024,
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 30.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Spacer(),
+
+            // --- ICÔNE ANIMÉE ---
+            FadeIn(
+              duration: Duration(milliseconds: 500),
+              child: Icon(
+                Icons.sync_lock_rounded,
+                size: 80,
+                color: primaryColor,
+              ),
             ),
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                return Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
+            SizedBox(height: 20),
+
+            // --- TITRE ---
+            FadeInUp(
+              from: 20,
+              duration: Duration(milliseconds: 500),
+              delay: Duration(milliseconds: 200),
+              child: Text(
+                (langUserPhone == "fr")
+                    ? "Synchronisation Avancée"
+                    : "Advanced Synchronization",
+                textAlign: TextAlign.center,
+                style: GoogleFonts.poppins(
+                    fontSize: 26, fontWeight: FontWeight.bold),
+              ),
+            ),
+            SizedBox(height: 15),
+
+            // --- AVERTISSEMENTS IMPORTANTS ---
+            FadeInUp(
+              from: 20,
+              duration: Duration(milliseconds: 500),
+              delay: Duration(milliseconds: 400),
+              child: Container(
+                padding: EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.red.withOpacity(0.05),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.red.withOpacity(0.2)),
+                ),
+                child: Column(
                   children: [
-                    DelayedAnimation(
-                      delay: 800,
-                      child: Text(
-                        (langUserPhone == "fr")
-                            ? "Synchronisation avancé"
-                            : "Advanced synchronization",
-                        style: GoogleFonts.poppins(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 25,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
+                    _buildWarningRow(
+                      (langUserPhone == "fr")
+                          ? "L'opération peut être longue."
+                          : "The operation may take a long time.",
                     ),
-                    const SizedBox(height: 30),
-                    SizedBox(
-                      width: MediaQuery.of(context).size.width * 0.90,
-                      child: DelayedAnimation(
-                        delay: 800,
-                        child: Text(
-                          (langUserPhone == "fr")
-                              ? "Cette opération peut prendre plusieurs secondes ou minutes en fonction du nombre de contacts que vous avez actuellement.\nVous devez patienter tous le long du processus et surtout ne pas quitter l'application.\nCliquez sur Démarrer pour lancer l'opération."
-                              : "This operation can take several seconds or minutes depending on the number of contacts you currently have.\nYou must wait all along the process and above all do not quit the application.\nClick on Start to launch the operation.",
-                          style: GoogleFonts.poppins(
-                            fontWeight: FontWeight.w400,
-                            fontSize: 15,
-                            color: Colors.red,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 30),
-                    DelayedAnimation(
-                      delay: 1800,
-                      child: ElevatedButton.icon(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: primaryColor,
-                        ),
-                        label: _enCour
-                            ? Text(
-                                (langUserPhone == "fr")
-                                    ? 'En cours ...'
-                                    : 'In progress ...',
-                                style: GoogleFonts.poppins(
-                                  color: Colors.white,
-                                ),
-                              )
-                            : Text(
-                                (langUserPhone == "fr")
-                                    ? 'Démarrer'
-                                    : 'To start up',
-                                style: GoogleFonts.poppins(
-                                  color: Colors.white,
-                                ),
-                              ),
-                        icon: const Icon(
-                          Icons.run_circle,
-                          color: Colors.white,
-                        ),
-                        onPressed: () async {
-                          _enCour ? '' : await synchroAvanceFunction();
-                        },
-                      ),
-                    ),
-                    const SizedBox(height: 30),
-                    DelayedAnimation(
-                      delay: 1800,
-                      child: Text(
-                        textChargementEvolution,
-                        style: GoogleFonts.poppins(
-                          fontWeight: FontWeight.w400,
-                          fontSize: 16,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
+                    SizedBox(height: 10),
+                    _buildWarningRow(
+                      (langUserPhone == "fr")
+                          ? "Ne quittez pas l'application."
+                          : "Do not leave the application.",
                     ),
                   ],
-                );
-              },
+                ),
+              ),
             ),
-          ),
+            SizedBox(height: 30),
+
+            // --- BOUTON D'ACTION ---
+            FadeInUp(
+              from: 20,
+              duration: Duration(milliseconds: 500),
+              delay: Duration(milliseconds: 600),
+              child: SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  onPressed: _enCour
+                      ? null
+                      : () async {
+                          // Note: Votre fonction synchroAvanceFunction devra maintenant
+                          // mettre à jour `_progress` et `textChargementEvolution`
+                          await synchroAvanceFunction();
+                        },
+                  icon: _enCour
+                      ? Container()
+                      : Icon(Icons.play_circle_fill_rounded),
+                  label: _enCour
+                      ? SizedBox(
+                          height: 24,
+                          width: 24,
+                          child: CircularProgressIndicator(
+                              color: Colors.white, strokeWidth: 2))
+                      : Text((langUserPhone == "fr")
+                          ? "Démarrer la Synchronisation"
+                          : "Start Synchronization"),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: primaryColor,
+                    foregroundColor: Colors.white,
+                    padding: EdgeInsets.symmetric(vertical: 16),
+                    textStyle: GoogleFonts.poppins(
+                        fontSize: 16, fontWeight: FontWeight.bold),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12)),
+                  ),
+                ),
+              ),
+            ),
+            Spacer(),
+
+            // --- FEEDBACK DE PROGRESSION ---
+            if (_enCour)
+              FadeIn(
+                duration: Duration(milliseconds: 300),
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: 20.0),
+                  child: Column(
+                    children: [
+                      // Barre de progression
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: LinearProgressIndicator(
+                          value: _progress, // Doit être entre 0.0 et 1.0
+                          minHeight: 8,
+                          backgroundColor: Colors.grey[200],
+                          color: primaryColor,
+                        ),
+                      ),
+                      SizedBox(height: 10),
+                      // Texte de progression
+                      Text(
+                        textChargementEvolution,
+                        style: GoogleFonts.poppins(
+                            fontSize: 14, color: Colors.grey[600]),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+          ],
         ),
       ),
+    );
+  }
+
+  Widget _buildWarningRow(String text) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(Icons.warning_amber_rounded, color: Colors.red[700], size: 20),
+        SizedBox(width: 12),
+        Expanded(
+          child: Text(
+            text,
+            style: GoogleFonts.poppins(
+                color: Colors.red[800], fontWeight: FontWeight.w500),
+          ),
+        ),
+      ],
     );
   }
 }

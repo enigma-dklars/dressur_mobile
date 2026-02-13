@@ -1,49 +1,33 @@
-import 'dart:io';
+// ignore_for_file: use_build_context_synchronously, prefer_const_constructors
 
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:animate_do/animate_do.dart';
+
+// --- Importez vos constantes ---
 import 'package:dressur/components/constant.dart';
-import 'package:dressur/components/delayed_animation.dart';
 
 class ImportantUpdate extends StatelessWidget {
   const ImportantUpdate({Key? key}) : super(key: key);
 
-  @override
-  Widget build(BuildContext context) {
-    return const Scaffold(
-      backgroundColor: Colors.white,
-      body: PageDepart(),
-    );
-  }
-}
-
-class PageDepart extends StatefulWidget {
-  const PageDepart({Key? key}) : super(key: key);
-
-  @override
-  State<PageDepart> createState() => _PageDepartState();
-}
-
-class _PageDepartState extends State<PageDepart> {
-  Future<bool> _onWillPop() async {
+  // --- LOGIQUE DE SORTIE DE L'APP ---
+  Future<bool> _onWillPop(BuildContext context) async {
     return (await showDialog(
           context: context,
           builder: (context) => AlertDialog(
-            title: (langUserPhone == "fr")
-                ? const Text('Êtes-vous sûr?')
-                : const Text('Are you sure?'),
-            content: (langUserPhone == "fr")
-                ? const Text("Voulez-vous quitter l'application ?")
-                : const Text("Do you want to quit the application ?"),
+            title: Text((langUserPhone == "fr")
+                ? "Quitter l'application ?"
+                : 'Exit Application?'),
+            content: Text((langUserPhone == "fr")
+                ? "Une mise à jour est requise pour continuer."
+                : "An update is required to continue."),
             actions: <Widget>[
               TextButton(
-                onPressed: () =>
-                    Navigator.of(context).pop(false), //<-- SEE HERE
-                child: (langUserPhone == "fr")
-                    ? const Text('Non')
-                    : const Text('No'),
+                onPressed: () => Navigator.of(context).pop(false),
+                child: Text((langUserPhone == "fr") ? 'Rester' : 'Stay'),
               ),
               TextButton(
                 onPressed: () {
@@ -52,10 +36,8 @@ class _PageDepartState extends State<PageDepart> {
                   } else if (Platform.isIOS) {
                     exit(0);
                   }
-                }, // <-- SEE HERE
-                child: (langUserPhone == "fr")
-                    ? const Text('Oui')
-                    : const Text('Yes'),
+                },
+                child: Text((langUserPhone == "fr") ? 'Quitter' : 'Exit'),
               ),
             ],
           ),
@@ -63,93 +45,112 @@ class _PageDepartState extends State<PageDepart> {
         false;
   }
 
+  // --- LOGIQUE POUR LANCER L'URL DU STORE ---
+  Future<void> _launchStoreURL() async {
+    final Uri url = Uri.parse(dressurUrlPlaystore);
+    if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
+      // Gérer l'erreur si le store ne peut pas être ouvert
+      print('Could not launch $url');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-      onWillPop: _onWillPop,
+      onWillPop: () => _onWillPop(context),
       child: Scaffold(
-        appBar: AppBar(
-          automaticallyImplyLeading: false,
-          elevation: 0,
-          backgroundColor: Colors.white,
-        ),
-        body: SingleChildScrollView(
-          child: Container(
-            height: MediaQuery.of(context).size.height * 1,
-            color: Colors.white,
+        backgroundColor: Color(0xFF1A237E), // Un fond sombre et sérieux
+        body: SafeArea(
+          child: Padding(
+            padding:
+                const EdgeInsets.symmetric(horizontal: 24.0, vertical: 20.0),
             child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                DelayedAnimation(
-                  delay: 500,
-                  child: SizedBox(
-                    height: MediaQuery.of(context).size.height * 0.25,
-                    child: Image.asset("images/giphy_2.gif"),
-                  ),
-                ),
-                DelayedAnimation(
-                  delay: 1000,
-                  child: SizedBox(
-                    height: MediaQuery.of(context).size.height * 0.25,
-                    child: Image.asset("images/ds_img_12.png"),
-                  ),
-                ),
-                const SizedBox(
-                  height: 20,
-                ),
-                DelayedAnimation(
-                  delay: 1000,
-                  child: SizedBox(
-                    width: MediaQuery.of(context).size.width * 0.90,
-                    child: Text(
-                      (langUserPhone == "fr")
-                          ? "Une nouvelle version de Dressur est disponible.\nFaite sa mise à jour pour continuer à profiter de ses merveilleux avantages.\n\n\nCliquer sur le bouton ci-dessous pour télécharger la nouvel version."
-                          : "A new version of Dressur is available.\nUpdate to continue enjoying its wonderful benefits.\n\n\nClick the button below to download the new version.",
-                      style: GoogleFonts.poppins(
-                        fontWeight: FontWeight.w600,
-                        color: Colors.black,
+                Spacer(),
+
+                // --- ICÔNE CENTRALE ANIMÉE ---
+                Center(
+                  child: BounceInDown(
+                    // Animation d'entrée
+                    duration: Duration(milliseconds: 800),
+                    child: Container(
+                      padding: EdgeInsets.all(24),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.white.withOpacity(0.1),
                       ),
-                      textAlign: TextAlign.center,
+                      child: Icon(
+                        Icons.system_update_rounded,
+                        size: 80,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
                 ),
-                const SizedBox(
-                  height: 20,
-                ),
-                DelayedAnimation(
-                  delay: 1000, // 2500,
-                  child: SizedBox(
-                    width: MediaQuery.of(context).size.width * 0.90,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color.fromARGB(255, 6, 58, 230),
-                        shape: const StadiumBorder(),
-                        minimumSize: const Size.fromHeight(50),
-                      ),
-                      child: Text(
-                        (langUserPhone == "fr") ? "Télécharger" : "Download",
-                        style: GoogleFonts.poppins(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.white,
-                        ),
-                      ),
-                      onPressed: () async {
-                        final Uri _url = Uri.parse(dressurUrlPlaystore);
-                        if (!await launchUrl(_url,
-                            mode: LaunchMode.externalApplication)) {
-                          throw 'Could not launch $_url';
-                        }
-                      },
+                SizedBox(height: 40),
+
+                // --- TEXTES D'INFORMATION ---
+                FadeInUp(
+                  duration: Duration(milliseconds: 600),
+                  delay: Duration(milliseconds: 200),
+                  child: Text(
+                    (langUserPhone == "fr")
+                        ? "Mise à Jour Requise"
+                        : "Update Required",
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.poppins(
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
                     ),
                   ),
                 ),
-                DelayedAnimation(
-                  delay: 1000,
-                  child: Container(
-                    margin: const EdgeInsets.all(20),
+                SizedBox(height: 15),
+                FadeInUp(
+                  duration: Duration(milliseconds: 600),
+                  delay: Duration(milliseconds: 400),
+                  child: Text(
+                    (langUserPhone == "fr")
+                        ? "Une nouvelle version de Dressur est disponible avec des améliorations de sécurité et de nouvelles fonctionnalités."
+                        : "A new version of Dressur is available with security improvements and new features.",
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.poppins(
+                      fontSize: 16,
+                      color: Colors.white.withOpacity(0.8),
+                      height: 1.5,
+                    ),
                   ),
                 ),
-                const SizedBox(height: 20),
+
+                Spacer(),
+
+                // --- BOUTON DE MISE À JOUR ---
+                FadeInUp(
+                  duration: Duration(milliseconds: 600),
+                  delay: Duration(milliseconds: 600),
+                  child: ElevatedButton.icon(
+                    onPressed: _launchStoreURL,
+                    icon: Icon(Icons.download_for_offline_rounded,
+                        color: primaryColor),
+                    label: Text((langUserPhone == "fr")
+                        ? "Mettre à Jour Maintenant"
+                        : "Update Now"),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      foregroundColor: primaryColor,
+                      padding: EdgeInsets.symmetric(vertical: 16),
+                      textStyle: GoogleFonts.poppins(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                  ),
+                ),
               ],
             ),
           ),

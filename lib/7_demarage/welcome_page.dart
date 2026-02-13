@@ -106,7 +106,7 @@ class _PageDepartState extends State<PageDepart> {
           if (int.parse(versionApp.toString().replaceAll(".", "")) <
               int.parse(myDressurVersion.toString().replaceAll(".", ""))) {
             return Navigator.of(context).push(MaterialPageRoute(
-                builder: (context) => const ImportantUpdate()));
+                builder: (context) => ImportantUpdate()));
           }
         }
       }

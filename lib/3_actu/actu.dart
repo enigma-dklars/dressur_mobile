@@ -969,8 +969,9 @@ class _ActuPageState extends State<ActuPage> {
                     const SizedBox(height: 10),
                     // Affiche la carte de mise à jour si nécessaire
                     if (int.parse(versionApp.toString().replaceAll(".", "")) <
-                        int.parse(
-                            myDressurVersion.toString().replaceAll(".", "")))
+                        int.parse(myDressurVersion
+                            .toString()
+                            .replaceAll(".", ""))) ...[
                       _buildUpdateCard(
                         context: context,
                         onUpdate: () async {
@@ -981,8 +982,10 @@ class _ActuPageState extends State<ActuPage> {
                           }
                         },
                       ),
+                      const SizedBox(height: 10),
+                    ],
 
-                    if (nombreContactDispo > 0)
+                    if (nombreContactDispo > 0) ...[
                       _buildAvailableContactsCard(
                         context: context,
                         contactCount: nombreContactDispo,
@@ -1003,7 +1006,8 @@ class _ActuPageState extends State<ActuPage> {
                           );
                         },
                       ),
-                    const SizedBox(height: 10),
+                      const SizedBox(height: 10),
+                    ],
                     if (havePublicites == true)
                       FutureBuilder<List<Advertisement>>(
                         future: _futureAdvertisements,
@@ -1291,8 +1295,8 @@ class _ActuPageState extends State<ActuPage> {
   Widget _buildUpdateCard(
       {required BuildContext context, required VoidCallback onUpdate}) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-      padding: const EdgeInsets.all(20),
+      margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
+      padding: const EdgeInsets.all(15),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [Colors.red, Colors.redAccent.shade700],
