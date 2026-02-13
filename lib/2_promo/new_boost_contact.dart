@@ -666,7 +666,7 @@ class _RegisterForm2State extends State<RegisterForm2> {
           TextField(
             controller: telController,
             decoration: InputDecoration(
-              labelStyle: TextStyle(color: Colors.grey[400]),
+              labelStyle: GoogleFonts.poppins(color: Colors.grey[400]),
               labelText: 'Indicatif + Numéro du paiement',
               border: const OutlineInputBorder(),
             ),

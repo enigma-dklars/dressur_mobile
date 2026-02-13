@@ -220,12 +220,13 @@ class _ActuPageState extends State<ActuPage> {
                   side: const BorderSide(color: Colors.red),
                 ),
                 title: Row(
-                  children: const [
-                    Icon(Icons.warning_amber_rounded, color: Colors.red),
-                    SizedBox(width: 8),
+                  children: [
+                    const Icon(Icons.warning_amber_rounded, color: Colors.red),
+                    const SizedBox(width: 8),
                     Text(
                       "Avertissement important",
-                      style: TextStyle(color: Colors.red, fontSize: 16),
+                      style:
+                          GoogleFonts.poppins(color: Colors.red, fontSize: 16),
                     ),
                   ],
                 ),
@@ -246,7 +247,7 @@ class _ActuPageState extends State<ActuPage> {
                         : null,
                     child: Text(
                       countdown > 0 ? "Fermer ($countdown)" : "Fermer",
-                      style: TextStyle(color: Colors.white),
+                      style: GoogleFonts.poppins(color: Colors.white),
                     ),
                   ),
                 ],
@@ -1643,7 +1644,8 @@ class AdvertisementDetailPage extends StatelessWidget {
             Icon(Icons.stars, color: primaryColor, size: 40),
             SizedBox(height: 10),
             Text("Promotion Éligible",
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+                style: GoogleFonts.poppins(
+                    fontWeight: FontWeight.bold, fontSize: 18)),
             SizedBox(height: 10),
             Text("Partagez cette promotion pour gagner des récompenses !"),
             SizedBox(height: 20),
@@ -1732,7 +1734,7 @@ class AdvertisementDetailPage extends StatelessWidget {
                     text: advertisement.description,
                     style: GoogleFonts.poppins(fontSize: 14, height: 1.6),
                     // --- STYLE DES LIENS SANS SOULIGNEMENT ---
-                    linkStyle: TextStyle(
+                    linkStyle: GoogleFonts.poppins(
                       color: Colors.blue,
                       fontWeight: FontWeight.w500,
                       decoration: TextDecoration.none, // Enlève le soulignement
@@ -1844,8 +1846,8 @@ class AdvertisementDetailPage extends StatelessWidget {
             text: value,
             style:
                 GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w500),
-            linkStyle:
-                TextStyle(color: Colors.blue, decoration: TextDecoration.none),
+            linkStyle: GoogleFonts.poppins(
+                color: Colors.blue, decoration: TextDecoration.none),
           ),
           Divider(height: 12),
         ],

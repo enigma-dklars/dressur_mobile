@@ -396,7 +396,7 @@ class _ReceptionChatPageState extends State<ReceptionChatPage>
                           (langUserPhone == "fr")
                               ? "Aucune discussion trouvée."
                               : "No discussions found.",
-                          style: const TextStyle(fontSize: 16),
+                          style: GoogleFonts.poppins(fontSize: 16),
                         ),
                       ),
                     )
@@ -457,7 +457,7 @@ class _ReceptionChatPageState extends State<ReceptionChatPage>
                                       ),
                                       child: Text(
                                         '$unreadCount',
-                                        style: TextStyle(
+                                        style: GoogleFonts.poppins(
                                           color: Colors.white,
                                           fontSize: 12,
                                           fontWeight: FontWeight.bold,

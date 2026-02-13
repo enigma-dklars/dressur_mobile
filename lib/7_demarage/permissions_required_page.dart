@@ -22,7 +22,6 @@ class PermissionsRequiredPage extends StatelessWidget {
                 height: 120,
               ),
               const SizedBox(height: 40),
-
               Text(
                 langUserPhone == "fr"
                     ? "Autorisations requises"
@@ -35,7 +34,6 @@ class PermissionsRequiredPage extends StatelessWidget {
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 20),
-
               Text(
                 langUserPhone == "fr"
                     ? "Pour que Dressur fonctionne correctement, vous devez autoriser :\n\n"
@@ -54,24 +52,27 @@ class PermissionsRequiredPage extends StatelessWidget {
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 40),
-
               ElevatedButton.icon(
                 onPressed: () async {
                   await openAppSettings();
                 },
                 icon: const Icon(Icons.settings, color: Colors.black),
                 label: Text(
-                  langUserPhone == "fr" ? "Ouvrir les paramètres" : "Open Settings",
-                  style: const TextStyle(color: Colors.black, fontWeight: FontWeight.w600),
+                  langUserPhone == "fr"
+                      ? "Ouvrir les paramètres"
+                      : "Open Settings",
+                  style: GoogleFonts.poppins(
+                      color: Colors.black, fontWeight: FontWeight.w600),
                 ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30)),
                 ),
               ),
               const SizedBox(height: 20),
-
               Text(
                 langUserPhone == "fr"
                     ? "Après avoir accordé les autorisations,\nfermez et relancez l'application."

@@ -436,7 +436,7 @@ class _RegisterForm3State extends State<RegisterForm3> {
                         (langUserPhone == "fr")
                             ? "Erreur lors du chargement des formules de promotion réseau sociaux. Veuillez Contacter l'assistance Dressur."
                             : "Error loading social network promotion formulas. Please Contact Dressur Support.",
-                        style: const TextStyle(fontSize: 16),
+                        style: GoogleFonts.poppins(fontSize: 16),
                       ),
                     )
                   : SizedBox(
@@ -564,14 +564,14 @@ class _RegisterForm3State extends State<RegisterForm3> {
                   minLines: 1,
                   keyboardType:
                       const TextInputType.numberWithOptions(decimal: true),
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     labelText: "Prix",
                     helperText: "FCFA",
-                    border: OutlineInputBorder(),
+                    border: const OutlineInputBorder(),
                     // Définir la couleur du texte lorsque le champ est désactivé
-                    labelStyle: TextStyle(color: primaryColor),
+                    labelStyle: GoogleFonts.poppins(color: primaryColor),
                   ),
-                  style: const TextStyle(color: primaryColor),
+                  style: GoogleFonts.poppins(color: primaryColor),
                   enabled: false,
                 ),
               ),
@@ -613,7 +613,7 @@ class _RegisterForm3State extends State<RegisterForm3> {
           TextField(
             controller: telController,
             decoration: InputDecoration(
-              labelStyle: TextStyle(color: Colors.grey[400]),
+              labelStyle: GoogleFonts.poppins(color: Colors.grey[400]),
               labelText: 'Indicatif + Numéro du paiement',
               border: const OutlineInputBorder(),
             ),

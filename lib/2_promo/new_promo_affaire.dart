@@ -161,7 +161,6 @@ class _ProduitsServicesState extends State<ProduitsServices> {
   bool _publishOnDressurStatus = false;
   final int _dressurStatusPricePer7Days = 5000;
 
-
   // --- CALCULS DES MONTANTS ---
   double get _rewardProgramAmount {
     if (!_participateInReward) return 0.0;
@@ -428,7 +427,7 @@ class _ProduitsServicesState extends State<ProduitsServices> {
   Widget _buildNumberInput(String label, TextEditingController controller) {
     return Row(
       children: [
-        Expanded(child: Text(label, style: TextStyle(fontSize: 13))),
+        Expanded(child: Text(label, style: GoogleFonts.poppins(fontSize: 13))),
         SizedBox(
           width: 100,
           child: TextField(
@@ -451,7 +450,7 @@ class _ProduitsServicesState extends State<ProduitsServices> {
           borderRadius: BorderRadius.circular(8),
           border: Border.all(color: color.withOpacity(0.3))),
       child: Text(text,
-          style: TextStyle(
+          style: GoogleFonts.poppins(
               color: color, fontWeight: FontWeight.bold, fontSize: 13),
           textAlign: TextAlign.center),
     );
@@ -478,12 +477,12 @@ class _ProduitsServicesState extends State<ProduitsServices> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text("TOTAL ESTIMÉ",
-                  style: TextStyle(
+                  style: GoogleFonts.poppins(
                     fontWeight: FontWeight.bold,
                     fontSize: 18,
                   )),
               Text("${_totalWithMaxCommission.toStringAsFixed(0)} FCFA",
-                  style: TextStyle(
+                  style: GoogleFonts.poppins(
                     fontWeight: FontWeight.bold,
                     fontSize: 18,
                     color: primaryColor,
@@ -493,7 +492,7 @@ class _ProduitsServicesState extends State<ProduitsServices> {
           const SizedBox(height: 5),
           Text(
               "Note: La commission Fedapay varie entre 1.8% et 4% selon le moyen de paiement.",
-              style: TextStyle(
+              style: GoogleFonts.poppins(
                   fontSize: 10,
                   color: Colors.grey[600],
                   fontStyle: FontStyle.italic),
@@ -511,11 +510,11 @@ class _ProduitsServicesState extends State<ProduitsServices> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(label,
-              style: TextStyle(
+              style: GoogleFonts.poppins(
                   fontSize: isSmall ? 11 : 13,
                   fontWeight: isBold ? FontWeight.bold : FontWeight.normal)),
           Text("${amount.toStringAsFixed(0)} F",
-              style: TextStyle(
+              style: GoogleFonts.poppins(
                   fontSize: isSmall ? 11 : 13,
                   fontWeight: isBold ? FontWeight.bold : FontWeight.normal)),
         ],
@@ -586,7 +585,7 @@ class _ProduitsServicesState extends State<ProduitsServices> {
                     fontSize: 14, fontWeight: FontWeight.w500)),
             subtitle: Text(
                 "Attirez plus de vues en récompensant les utilisateurs qui le publieront sur leur statut WhatsApp. Dressur se charge de la mise en application et de la vérification.",
-                style: TextStyle(fontSize: 11)),
+                style: GoogleFonts.poppins(fontSize: 11)),
             value: _participateInReward,
             activeColor: primaryColor,
             onChanged: (val) => setState(() => _participateInReward = val),
@@ -627,7 +626,7 @@ class _ProduitsServicesState extends State<ProduitsServices> {
             ),
             subtitle: Text(
               "Bénéficiez d’une visibilité maximale sur le statut WhatsApp de Dressur pendant toute la durée de votre promotion.",
-              style: TextStyle(fontSize: 11),
+              style: GoogleFonts.poppins(fontSize: 11),
             ),
             value: _publishOnDressurStatus,
             activeColor: primaryColor,
@@ -706,11 +705,11 @@ class _ProduitsServicesState extends State<ProduitsServices> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(label,
-              style: TextStyle(
+              style: GoogleFonts.poppins(
                   fontSize: isSmall ? 11 : 13,
                   color: isSmall ? Colors.grey : null)),
           Text("${amount.toStringAsFixed(0)} F",
-              style: TextStyle(
+              style: GoogleFonts.poppins(
                   fontSize: isSmall ? 11 : 13,
                   fontWeight: isSmall ? FontWeight.normal : FontWeight.w500)),
         ],
@@ -848,7 +847,7 @@ class _DemandesEmploiState extends State<DemandesEmploi> {
           TextField(
             controller: titre_demande_poste_rechercher_controller,
             decoration: InputDecoration(
-              labelStyle: TextStyle(color: Colors.grey[400]),
+              labelStyle: GoogleFonts.poppins(color: Colors.grey[400]),
               labelText: (langUserPhone == "fr")
                   ? 'Titre de la demande ou poste recherché'
                   : 'Title of application or position sought',
@@ -861,7 +860,7 @@ class _DemandesEmploiState extends State<DemandesEmploi> {
             minLines: 1,
             maxLines: 5,
             decoration: InputDecoration(
-              labelStyle: TextStyle(color: Colors.grey[400]),
+              labelStyle: GoogleFonts.poppins(color: Colors.grey[400]),
               labelText: (langUserPhone == "fr")
                   ? 'Description du profil du demandeur'
                   : "Description of the applicant's profile",
@@ -874,7 +873,7 @@ class _DemandesEmploiState extends State<DemandesEmploi> {
             minLines: 1,
             maxLines: 3,
             decoration: InputDecoration(
-              labelStyle: TextStyle(color: Colors.grey[400]),
+              labelStyle: GoogleFonts.poppins(color: Colors.grey[400]),
               labelText: (langUserPhone == "fr")
                   ? 'Compétences et qualification (listes)'
                   : 'Skills and qualification (lists)',
@@ -887,7 +886,7 @@ class _DemandesEmploiState extends State<DemandesEmploi> {
             minLines: 1,
             maxLines: 2,
             decoration: InputDecoration(
-              labelStyle: TextStyle(color: Colors.grey[400]),
+              labelStyle: GoogleFonts.poppins(color: Colors.grey[400]),
               labelText: (langUserPhone == "fr")
                   ? "Niveau d'experience (Nombres d'année d'expérience)"
                   : 'Level of experience (Number of years of experience)',
@@ -900,7 +899,7 @@ class _DemandesEmploiState extends State<DemandesEmploi> {
             minLines: 1,
             maxLines: 2,
             decoration: InputDecoration(
-              labelStyle: TextStyle(color: Colors.grey[400]),
+              labelStyle: GoogleFonts.poppins(color: Colors.grey[400]),
               labelText: (langUserPhone == "fr")
                   ? "Secteur d'activté rechercher"
                   : 'Sector of activity search',
@@ -913,7 +912,7 @@ class _DemandesEmploiState extends State<DemandesEmploi> {
             minLines: 1,
             maxLines: 3,
             decoration: InputDecoration(
-              labelStyle: TextStyle(color: Colors.grey[400]),
+              labelStyle: GoogleFonts.poppins(color: Colors.grey[400]),
               labelText: (langUserPhone == "fr")
                   ? "Type de contrat rechercher"
                   : 'Type of contract search',
@@ -926,7 +925,7 @@ class _DemandesEmploiState extends State<DemandesEmploi> {
             minLines: 1,
             maxLines: 3,
             decoration: InputDecoration(
-              labelStyle: TextStyle(color: Colors.grey[400]),
+              labelStyle: GoogleFonts.poppins(color: Colors.grey[400]),
               labelText: (langUserPhone == "fr")
                   ? "Localisation souhaité"
                   : 'Desired location',
@@ -939,7 +938,7 @@ class _DemandesEmploiState extends State<DemandesEmploi> {
             minLines: 1,
             maxLines: 1,
             decoration: InputDecoration(
-              labelStyle: TextStyle(color: Colors.grey[400]),
+              labelStyle: GoogleFonts.poppins(color: Colors.grey[400]),
               labelText: (langUserPhone == "fr")
                   ? "Salaire souhaité"
                   : 'Desired salary',
@@ -952,7 +951,7 @@ class _DemandesEmploiState extends State<DemandesEmploi> {
             minLines: 1,
             maxLines: 3,
             decoration: InputDecoration(
-              labelStyle: TextStyle(color: Colors.grey[400]),
+              labelStyle: GoogleFonts.poppins(color: Colors.grey[400]),
               labelText: (langUserPhone == "fr")
                   ? "Langues parlées"
                   : 'Languages spoken',
@@ -965,7 +964,7 @@ class _DemandesEmploiState extends State<DemandesEmploi> {
             minLines: 1,
             maxLines: 1,
             decoration: InputDecoration(
-              labelStyle: TextStyle(color: Colors.grey[400]),
+              labelStyle: GoogleFonts.poppins(color: Colors.grey[400]),
               labelText: (langUserPhone == "fr")
                   ? "Lien vers votre portfolio ou cv"
                   : 'Link to your portfolio or CV',
@@ -978,7 +977,7 @@ class _DemandesEmploiState extends State<DemandesEmploi> {
             minLines: 1,
             maxLines: 2,
             decoration: InputDecoration(
-              labelStyle: TextStyle(color: Colors.grey[400]),
+              labelStyle: GoogleFonts.poppins(color: Colors.grey[400]),
               labelText: (langUserPhone == "fr")
                   ? "Coordonnées du demandeur"
                   : 'Applicant contact details',
@@ -1174,7 +1173,7 @@ class _OffresEmploiState extends State<OffresEmploi> {
             minLines: 1,
             maxLines: 1,
             decoration: InputDecoration(
-              labelStyle: TextStyle(color: Colors.grey[400]),
+              labelStyle: GoogleFonts.poppins(color: Colors.grey[400]),
               labelText:
                   (langUserPhone == "fr") ? "Titre du poste" : 'Job title',
               border: const OutlineInputBorder(),
@@ -1186,7 +1185,7 @@ class _OffresEmploiState extends State<OffresEmploi> {
             minLines: 1,
             maxLines: 5,
             decoration: InputDecoration(
-              labelStyle: TextStyle(color: Colors.grey[400]),
+              labelStyle: GoogleFonts.poppins(color: Colors.grey[400]),
               labelText: (langUserPhone == "fr")
                   ? "Description du poste"
                   : 'Job Description',
@@ -1199,7 +1198,7 @@ class _OffresEmploiState extends State<OffresEmploi> {
             minLines: 1,
             maxLines: 5,
             decoration: InputDecoration(
-              labelStyle: TextStyle(color: Colors.grey[400]),
+              labelStyle: GoogleFonts.poppins(color: Colors.grey[400]),
               labelText: (langUserPhone == "fr")
                   ? "Compétences requises"
                   : 'Required skills',
@@ -1212,7 +1211,7 @@ class _OffresEmploiState extends State<OffresEmploi> {
             minLines: 1,
             maxLines: 3,
             decoration: InputDecoration(
-              labelStyle: TextStyle(color: Colors.grey[400]),
+              labelStyle: GoogleFonts.poppins(color: Colors.grey[400]),
               labelText: (langUserPhone == "fr")
                   ? "Type de contrat"
                   : 'Type of contract',
@@ -1225,7 +1224,7 @@ class _OffresEmploiState extends State<OffresEmploi> {
             minLines: 1,
             maxLines: 2,
             decoration: InputDecoration(
-              labelStyle: TextStyle(color: Colors.grey[400]),
+              labelStyle: GoogleFonts.poppins(color: Colors.grey[400]),
               labelText:
                   (langUserPhone == "fr") ? "Lieu de travail" : 'Workplace',
               border: const OutlineInputBorder(),
@@ -1237,7 +1236,7 @@ class _OffresEmploiState extends State<OffresEmploi> {
             minLines: 1,
             maxLines: 2,
             decoration: InputDecoration(
-              labelStyle: TextStyle(color: Colors.grey[400]),
+              labelStyle: GoogleFonts.poppins(color: Colors.grey[400]),
               labelText: (langUserPhone == "fr") ? "Salaire" : 'Salary',
               border: const OutlineInputBorder(),
             ),
@@ -1248,7 +1247,7 @@ class _OffresEmploiState extends State<OffresEmploi> {
             minLines: 1,
             maxLines: 2,
             decoration: InputDecoration(
-              labelStyle: TextStyle(color: Colors.grey[400]),
+              labelStyle: GoogleFonts.poppins(color: Colors.grey[400]),
               labelText: (langUserPhone == "fr")
                   ? "Niveau d'expériences"
                   : 'Level of experience',
@@ -1261,7 +1260,7 @@ class _OffresEmploiState extends State<OffresEmploi> {
             minLines: 1,
             maxLines: 3,
             decoration: InputDecoration(
-              labelStyle: TextStyle(color: Colors.grey[400]),
+              labelStyle: GoogleFonts.poppins(color: Colors.grey[400]),
               labelText: (langUserPhone == "fr")
                   ? "Horaire de travail"
                   : 'Work schedule',
@@ -1274,7 +1273,7 @@ class _OffresEmploiState extends State<OffresEmploi> {
             minLines: 1,
             maxLines: 4,
             decoration: InputDecoration(
-              labelStyle: TextStyle(color: Colors.grey[400]),
+              labelStyle: GoogleFonts.poppins(color: Colors.grey[400]),
               labelText: (langUserPhone == "fr") ? "Avantages" : 'Benefits',
               border: const OutlineInputBorder(),
             ),
@@ -1285,7 +1284,7 @@ class _OffresEmploiState extends State<OffresEmploi> {
             minLines: 1,
             maxLines: 2,
             decoration: InputDecoration(
-              labelStyle: TextStyle(color: Colors.grey[400]),
+              labelStyle: GoogleFonts.poppins(color: Colors.grey[400]),
               labelText: (langUserPhone == "fr")
                   ? "Durée du contrat si ce n'est pas CDI"
                   : 'Duration of the contract if it is not permanent',
@@ -1298,7 +1297,7 @@ class _OffresEmploiState extends State<OffresEmploi> {
             minLines: 1,
             maxLines: 3,
             decoration: InputDecoration(
-              labelStyle: TextStyle(color: Colors.grey[400]),
+              labelStyle: GoogleFonts.poppins(color: Colors.grey[400]),
               labelText: (langUserPhone == "fr")
                   ? "Contact de l'emploiyeur"
                   : 'Employer contact',
@@ -1311,7 +1310,7 @@ class _OffresEmploiState extends State<OffresEmploi> {
             minLines: 1,
             maxLines: 2,
             decoration: InputDecoration(
-              labelStyle: TextStyle(color: Colors.grey[400]),
+              labelStyle: GoogleFonts.poppins(color: Colors.grey[400]),
               labelText: (langUserPhone == "fr")
                   ? "Date limite de la candidature"
                   : 'Application deadline',
@@ -1324,7 +1323,7 @@ class _OffresEmploiState extends State<OffresEmploi> {
             minLines: 1,
             maxLines: 2,
             decoration: InputDecoration(
-              labelStyle: TextStyle(color: Colors.grey[400]),
+              labelStyle: GoogleFonts.poppins(color: Colors.grey[400]),
               labelText: (langUserPhone == "fr")
                   ? "Lien vers plus d'information (optionel)"
                   : 'Link to more information (optional)',

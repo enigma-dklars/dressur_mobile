@@ -697,7 +697,7 @@ class _ProgrammeRecompensePageState extends State<ProgrammeRecompensePage> {
             radius: 12,
             backgroundColor: primaryColor,
             child: Text(number,
-                style: TextStyle(
+                style: GoogleFonts.poppins(
                     color: Colors.white,
                     fontSize: 12,
                     fontWeight: FontWeight.bold)),
@@ -791,7 +791,7 @@ class _ProgrammeRecompensePageState extends State<ProgrammeRecompensePage> {
                 radius: 12,
                 backgroundColor: primaryColor,
                 child: Text(number,
-                    style: TextStyle(
+                    style: GoogleFonts.poppins(
                         color: Colors.white,
                         fontSize: 12,
                         fontWeight: FontWeight.bold)),

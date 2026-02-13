@@ -277,7 +277,7 @@ class _ConfigurationRetraitPageState extends State<ConfigurationRetraitPage> {
         ),
         contentPadding: EdgeInsets.symmetric(vertical: 16, horizontal: 12),
       ),
-      style: TextStyle(color: theme.textTheme.bodyLarge?.color),
+      style: GoogleFonts.poppins(color: theme.textTheme.bodyLarge?.color),
       dropdownColor: theme.cardColor,
     );
   }
@@ -379,7 +379,8 @@ class _ConfigurationRetraitPageState extends State<ConfigurationRetraitPage> {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text("• ", style: TextStyle(color: Colors.grey[700], fontSize: 14)),
+        Text("• ",
+            style: GoogleFonts.poppins(color: Colors.grey[700], fontSize: 14)),
         Expanded(
           child: Text(
             text,

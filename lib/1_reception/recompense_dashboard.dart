@@ -959,7 +959,7 @@ class _ProgrammeRecompenseDashboardState
                       child: CircularProgressIndicator(
                           color: Colors.white, strokeWidth: 2))
                   : Text("Soumettre les preuves",
-                      style: TextStyle(
+                      style: GoogleFonts.poppins(
                           color: Colors.white, fontWeight: FontWeight.bold)),
             ),
           ),
@@ -979,7 +979,8 @@ class _ProgrammeRecompenseDashboardState
                 radius: 10,
                 backgroundColor: primaryColor,
                 child: Text(number,
-                    style: TextStyle(color: Colors.white, fontSize: 10))),
+                    style: GoogleFonts.poppins(
+                        color: Colors.white, fontSize: 10))),
             const SizedBox(width: 8),
             Text(title,
                 style: GoogleFonts.poppins(
@@ -988,7 +989,7 @@ class _ProgrammeRecompenseDashboardState
         ),
         const SizedBox(height: 5),
         Text(instructions,
-            style: TextStyle(fontSize: 11, color: Colors.grey[600])),
+            style: GoogleFonts.poppins(fontSize: 11, color: Colors.grey[600])),
         const SizedBox(height: 10),
         InkWell(
           onTap: onTap,
@@ -1009,7 +1010,8 @@ class _ProgrammeRecompenseDashboardState
                       Icon(Icons.add_a_photo, color: primaryColor, size: 30),
                       const SizedBox(height: 5),
                       Text("Cliquez pour choisir",
-                          style: TextStyle(fontSize: 12, color: Colors.grey)),
+                          style: GoogleFonts.poppins(
+                              fontSize: 12, color: Colors.grey)),
                     ],
                   )
                 : Stack(

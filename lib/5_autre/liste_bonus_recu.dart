@@ -114,7 +114,7 @@ class _ListeBonusPageState extends State<ListeBonusPage> {
     return Center(
       child: Text(
         (langUserPhone == "fr") ? "Aucun Bonus Reçu." : "No Bonus Received.",
-        style: const TextStyle(fontSize: 16),
+        style: GoogleFonts.poppins(fontSize: 16),
       ),
     );
   }
@@ -172,7 +172,7 @@ class _ListeBonusPageState extends State<ListeBonusPage> {
             const SizedBox(height: 5),
             Text(
               listeBonus.date,
-              style: const TextStyle(
+              style: GoogleFonts.poppins(
                 fontSize: 12,
                 color: Colors.white,
               ),

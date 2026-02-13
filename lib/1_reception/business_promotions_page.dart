@@ -444,7 +444,7 @@ class _BusinessPromotionsPageState extends State<BusinessPromotionsPage> {
                                               .replaceAll('\n', ' '),
                                           maxLines: 4,
                                           overflow: TextOverflow.ellipsis,
-                                          style: const TextStyle(
+                                          style: GoogleFonts.poppins(
                                             fontWeight: FontWeight.w400,
                                             fontSize: 16,
                                           ),
@@ -649,7 +649,7 @@ class AdvertisementDetailPage extends StatelessWidget {
                       children: [
                         Text(
                           '$key :',
-                          style: const TextStyle(
+                          style: GoogleFonts.poppins(
                             fontWeight: FontWeight.bold,
                             color: Colors
                                 .blue, // Replace with your theme's primary color if needed
@@ -659,7 +659,7 @@ class AdvertisementDetailPage extends StatelessWidget {
                         const SizedBox(height: 4),
                         Text(
                           value,
-                          style: const TextStyle(
+                          style: GoogleFonts.poppins(
                             fontSize: 14,
                           ),
                           softWrap: true, // Wraps text within the container

@@ -206,7 +206,7 @@ class _CampagneMailListePageState extends State<CampagneMailListePage> {
                     (langUserPhone == "fr")
                         ? "Aucune campagne email trouvé."
                         : "No email campaigns found.",
-                    style: const TextStyle(fontSize: 16),
+                    style: GoogleFonts.poppins(fontSize: 16),
                   ),
                 )
               : ListView.builder(
@@ -247,7 +247,7 @@ class _CampagneMailListePageState extends State<CampagneMailListePage> {
                               ),
                               child: Text(
                                 campagneMail.status,
-                                style: const TextStyle(
+                                style: GoogleFonts.poppins(
                                   fontSize: 14,
                                   fontWeight: FontWeight.bold,
                                   color: Colors.white,
@@ -267,7 +267,7 @@ class _CampagneMailListePageState extends State<CampagneMailListePage> {
                             ].contains(campagneMail.status)) ...[
                               Text(
                                 campagneMail.sujet,
-                                style: const TextStyle(
+                                style: GoogleFonts.poppins(
                                   fontSize: 14,
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -277,7 +277,7 @@ class _CampagneMailListePageState extends State<CampagneMailListePage> {
                               const SizedBox(height: 5),
                               Text(
                                 campagneMail.contentmail,
-                                style: const TextStyle(
+                                style: GoogleFonts.poppins(
                                   fontSize: 14,
                                 ),
                                 maxLines: 3,
@@ -288,7 +288,7 @@ class _CampagneMailListePageState extends State<CampagneMailListePage> {
                                 (langUserPhone == "fr")
                                     ? "Motif : ${campagneMail.motif}"
                                     : "Pattern : ${campagneMail.motif}",
-                                style: const TextStyle(
+                                style: GoogleFonts.poppins(
                                   color: Colors.red,
                                   fontWeight: FontWeight.w500,
                                   fontSize: 16,
@@ -299,7 +299,7 @@ class _CampagneMailListePageState extends State<CampagneMailListePage> {
                                 (langUserPhone == "fr")
                                     ? "Tenez compte du motif de refus pour soumettre une nouvelle demande. Merci..."
                                     : "Take the reason for refusal into account when submitting a new request. THANKS...",
-                                style: const TextStyle(
+                                style: GoogleFonts.poppins(
                                   color: Colors.green,
                                   fontWeight: FontWeight.w500,
                                   fontSize: 16,
@@ -727,7 +727,7 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
               controller: telController,
               decoration: InputDecoration(
                 border: OutlineInputBorder(),
-                labelStyle: TextStyle(color: Colors.grey[400]),
+                labelStyle: GoogleFonts.poppins(color: Colors.grey[400]),
                 labelText: 'Indicatif + Numéro du paiement',
               ),
             ),

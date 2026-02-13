@@ -282,7 +282,7 @@ class WelcomePage extends StatelessWidget {
               style: GoogleFonts.poppins(color: Colors.grey[500], fontSize: 12),
             ),
           ),
-          Text("•", style: TextStyle(color: Colors.grey[400])),
+          Text("•", style: GoogleFonts.poppins(color: Colors.grey[400])),
           TextButton(
             onPressed: () => _launchURL(dressurPolitiqueConfidentialite),
             child: Text(

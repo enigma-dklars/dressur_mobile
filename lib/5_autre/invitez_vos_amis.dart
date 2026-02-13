@@ -570,7 +570,7 @@ class _FormParrainState extends State<FormParrain> {
                 });
               },
               decoration: InputDecoration(
-                labelStyle: TextStyle(color: Colors.grey[400]),
+                labelStyle: GoogleFonts.poppins(color: Colors.grey[400]),
                 border: const OutlineInputBorder(),
                 suffixIcon: IconButton(
                   icon: const Icon(

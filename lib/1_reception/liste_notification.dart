@@ -134,7 +134,7 @@ class _ListeNotificationState extends State<ListeNotification> {
           (langUserPhone == "fr")
               ? "Aucune notification reçue"
               : "No notifications received",
-          style: const TextStyle(fontSize: 16),
+          style: GoogleFonts.poppins(fontSize: 16),
         ),
       ),
     );

@@ -219,7 +219,7 @@ class _RegisterFormState extends State<RegisterForm> {
                   // --- AJOUTS POUR LE MODE SOMBRE ---
                   dialogBackgroundColor: Theme.of(context)
                       .scaffoldBackgroundColor, // Le fond du dialogue prend la couleur du Scaffold
-                  dialogTextStyle: TextStyle(
+                  dialogTextStyle: GoogleFonts.poppins(
                       color: Theme.of(context)
                           .textTheme
                           .bodyLarge
@@ -228,7 +228,7 @@ class _RegisterFormState extends State<RegisterForm> {
                     prefixIconColor: Theme.of(context)
                         .iconTheme
                         .color, // Couleur de l'icône de recherche
-                    labelStyle: TextStyle(
+                    labelStyle: GoogleFonts.poppins(
                         color: Theme.of(context)
                             .textTheme
                             .bodyLarge
@@ -356,7 +356,7 @@ class _RegisterFormState extends State<RegisterForm> {
                       text: (langUserPhone == "fr")
                           ? "Conditions d'utilisation"
                           : "Terms of Use",
-                      style: TextStyle(
+                      style: GoogleFonts.poppins(
                           color: Colors.blue,
                           decoration: TextDecoration.underline),
                       recognizer: TapGestureRecognizer()
@@ -369,7 +369,7 @@ class _RegisterFormState extends State<RegisterForm> {
                       text: (langUserPhone == "fr")
                           ? "Politique de confidentialité"
                           : "Privacy Policy",
-                      style: TextStyle(
+                      style: GoogleFonts.poppins(
                           color: Colors.blue,
                           decoration: TextDecoration.underline),
                       recognizer: TapGestureRecognizer()

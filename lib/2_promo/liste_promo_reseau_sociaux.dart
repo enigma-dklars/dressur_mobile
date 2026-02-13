@@ -452,7 +452,7 @@ class _PromotionReseauSociauxListePageState
               textAlign: TextAlign.end,
               style: GoogleFonts.poppins(
                   fontWeight: FontWeight.w600, color: Colors.blue),
-              linkStyle: TextStyle(decoration: TextDecoration.none),
+              linkStyle: GoogleFonts.poppins(decoration: TextDecoration.none),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),

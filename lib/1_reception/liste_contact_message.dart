@@ -170,7 +170,7 @@ class _ContactForMessagePageState extends State<ContactForMessagePage> {
                         (langUserPhone == "fr")
                             ? "Aucun contact trouvé."
                             : "No contacts found.",
-                        style: const TextStyle(fontSize: 16),
+                        style: GoogleFonts.poppins(fontSize: 16),
                       ),
                     )
                   : Expanded(
@@ -197,7 +197,7 @@ class _ContactForMessagePageState extends State<ContactForMessagePage> {
                             },
                             title: Text(
                               contact.nom,
-                              style: const TextStyle(
+                              style: GoogleFonts.poppins(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -210,7 +210,7 @@ class _ContactForMessagePageState extends State<ContactForMessagePage> {
                                   : (langUserPhone == "fr")
                                       ? "Écris-moi sur Dressur"
                                       : "Write to me on Dressur",
-                              style: const TextStyle(
+                              style: GoogleFonts.poppins(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w300,
                               ),
@@ -238,7 +238,7 @@ class _ContactForMessagePageState extends State<ContactForMessagePage> {
                                   const SizedBox(height: 4),
                                   Text(
                                     contact.pays,
-                                    style: const TextStyle(
+                                    style: GoogleFonts.poppins(
                                       fontSize: 10,
                                     ),
                                   ),

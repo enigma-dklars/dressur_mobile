@@ -1518,7 +1518,7 @@ Future<void> _showNotificationWithActions() async {
         children: <Widget>[
           const Text(
             'Active Notifications',
-            style: TextStyle(fontWeight: FontWeight.bold),
+            style: GoogleFonts.poppins(fontWeight: FontWeight.bold),
           ),
           const Divider(color: Colors.black),
           if (activeNotifications!.isEmpty)
@@ -1692,7 +1692,7 @@ Future<void> _showNotificationWithActions() async {
           children: <Widget>[
             const Text(
               'Notifications Channels',
-              style: TextStyle(fontWeight: FontWeight.bold),
+              style: GoogleFonts.poppins(fontWeight: FontWeight.bold),
             ),
             const Divider(color: Colors.black),
             if (channels?.isEmpty ?? true)

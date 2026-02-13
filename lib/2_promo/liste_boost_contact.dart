@@ -125,7 +125,7 @@ class _ListeBoostContactPageState extends State<ListeBoostContactPage> {
             const SizedBox(height: 5),
             Text(
               boost.dateDebutFormule,
-              style: const TextStyle(fontSize: 12),
+              style: GoogleFonts.poppins(fontSize: 12),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
@@ -250,7 +250,7 @@ class _ListeBoostContactPageState extends State<ListeBoostContactPage> {
                     (langUserPhone == "fr")
                         ? "Aucun boost contact trouvé."
                         : "No contact boost found.",
-                    style: const TextStyle(fontSize: 16),
+                    style: GoogleFonts.poppins(fontSize: 16),
                   ),
                 )
               : ListView.builder(

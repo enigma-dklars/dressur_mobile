@@ -542,7 +542,7 @@ class _PromotionListPageState extends State<PromotionListPage> {
                     (langUserPhone == "fr")
                         ? "Aucune promotion affaire trouvée."
                         : "No deal promotions found.",
-                    style: const TextStyle(fontSize: 16),
+                    style: GoogleFonts.poppins(fontSize: 16),
                   ),
                 )
               : ListView.builder(
@@ -661,7 +661,7 @@ class PromotionDetailPage extends StatelessWidget {
                     onOpen: (link) => _launchURL(link.url),
                     text: promotion.description,
                     style: GoogleFonts.poppins(fontSize: 14, height: 1.6),
-                    linkStyle: TextStyle(
+                    linkStyle: GoogleFonts.poppins(
                         color: Colors.blue, decoration: TextDecoration.none),
                   ),
                   SizedBox(height: 30),
@@ -791,8 +791,8 @@ class PromotionDetailPage extends StatelessWidget {
             text: value,
             style:
                 GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w500),
-            linkStyle:
-                TextStyle(color: Colors.blue, decoration: TextDecoration.none),
+            linkStyle: GoogleFonts.poppins(
+                color: Colors.blue, decoration: TextDecoration.none),
           ),
           Divider(height: 12),
         ],
@@ -1075,7 +1075,7 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
           borderRadius: BorderRadius.circular(8),
           border: Border.all(color: color.withOpacity(0.3))),
       child: Text(text,
-          style: TextStyle(
+          style: GoogleFonts.poppins(
               color: color, fontWeight: FontWeight.bold, fontSize: 12),
           textAlign: TextAlign.center),
     );
@@ -1089,11 +1089,11 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(label,
-              style: TextStyle(
+              style: GoogleFonts.poppins(
                   fontSize: isSmall ? 11 : 13,
                   fontWeight: isBold ? FontWeight.bold : FontWeight.normal)),
           Text("${amount.toStringAsFixed(0)} F",
-              style: TextStyle(
+              style: GoogleFonts.poppins(
                   fontSize: isSmall ? 11 : 13,
                   fontWeight: isBold ? FontWeight.bold : FontWeight.normal)),
         ],
@@ -1144,8 +1144,8 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
               title: Text("Ajouter au programme",
                   style: GoogleFonts.poppins(
                       fontSize: 14, fontWeight: FontWeight.w500)),
-              subtitle: const Text("Récompensez les partages statut WhatsApp.",
-                  style: TextStyle(fontSize: 11)),
+              subtitle: Text("Récompensez les partages statut WhatsApp.",
+                  style: GoogleFonts.poppins(fontSize: 11)),
               value: _participateInReward,
               activeColor: primaryColor,
               onChanged: (val) => setState(() => _participateInReward = val),
@@ -1157,9 +1157,9 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
                   children: [
                     Row(
                       children: [
-                        const Expanded(
+                        Expanded(
                             child: Text("Objectif de vues (min. 2500)",
-                                style: TextStyle(fontSize: 13))),
+                                style: GoogleFonts.poppins(fontSize: 13))),
                         SizedBox(
                             width: 100,
                             child: TextField(
@@ -1188,9 +1188,9 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
               title: Text("Publier sur le statut Dressur",
                   style: GoogleFonts.poppins(
                       fontSize: 14, fontWeight: FontWeight.w500)),
-              subtitle: const Text(
+              subtitle: Text(
                   "Visibilité maximale sur notre statut officiel.",
-                  style: TextStyle(fontSize: 11)),
+                  style: GoogleFonts.poppins(fontSize: 11)),
               value: _publishOnDressurStatus,
               activeColor: primaryColor,
               onChanged: (val) => setState(() => _publishOnDressurStatus = val),
