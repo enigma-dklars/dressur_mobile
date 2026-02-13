@@ -1,5 +1,6 @@
 // ignore_for_file: use_build_context_synchronously, prefer_const_constructors
 
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -13,6 +14,7 @@ import 'package:dressur/components/constant.dart';
 import 'package:dressur/components/noti.dart';
 import 'package:dressur/components/bottomBar.dart';
 import 'package:dressur/5_autre/support_assistance.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class InscriptionPage extends StatelessWidget {
   @override
@@ -87,6 +89,9 @@ class _RegisterFormState extends State<RegisterForm> {
   bool _isConfirmPasswordObscured = true;
   String _selectedCountryCode = "+33";
 
+  bool _agreedToTerms = false;
+  bool _hasSubmittedOnce = false;
+
   final _telController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -102,6 +107,23 @@ class _RegisterFormState extends State<RegisterForm> {
   }
 
   Future<void> _register() async {
+    setState(() => _hasSubmittedOnce = true);
+
+    final isFormValid = _formKey.currentState!.validate();
+
+    if (!isFormValid || !_agreedToTerms) {
+      // On peut ajouter un petit feedback pour l'utilisateur si on le souhaite
+      if (!_agreedToTerms) {
+        warningNoti(
+            (langUserPhone == "fr") ? "Attention !!!" : "Warning !!!",
+            (langUserPhone == "fr")
+                ? "Veuillez accepter les conditions pour continuer."
+                : "Please accept the terms to continue.",
+            context);
+      }
+      return;
+    }
+
     if (!_formKey.currentState!.validate()) return;
 
     setState(() => _isLoading = true);
@@ -152,8 +174,23 @@ class _RegisterFormState extends State<RegisterForm> {
     }
   }
 
+  Future<void> _launchURL(String url) async {
+    if (!await launchUrl(Uri.parse(url),
+        mode: LaunchMode.externalApplication)) {
+      print('Could not launch $url');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    // Détermine la couleur du texte des conditions en fonction de l'état
+    final termsTextColor = (_hasSubmittedOnce && !_agreedToTerms)
+        ? Colors.red // Rouge si erreur
+        : Theme.of(context)
+            .textTheme
+            .bodySmall
+            ?.color; // Couleur par défaut sinon
+
     return Form(
       key: _formKey,
       child: Column(
@@ -293,8 +330,62 @@ class _RegisterFormState extends State<RegisterForm> {
               },
             ),
           ),
-          SizedBox(height: 40),
-
+          SizedBox(height: 25),
+          FadeInUp(
+            duration: Duration(milliseconds: 500),
+            delay: Duration(milliseconds: 800),
+            child: CheckboxListTile(
+              value: _agreedToTerms,
+              onChanged: (bool? value) {
+                setState(() {
+                  _agreedToTerms = value ?? false;
+                });
+              },
+              title: RichText(
+                text: TextSpan(
+                  style: GoogleFonts.poppins(
+                    fontSize: 13,
+                    color: termsTextColor, // Utilise la couleur dynamique
+                  ),
+                  children: [
+                    TextSpan(
+                        text: (langUserPhone == "fr")
+                            ? "J'ai lu et j'accepte les "
+                            : "I have read and agree to the "),
+                    TextSpan(
+                      text: (langUserPhone == "fr")
+                          ? "Conditions d'utilisation"
+                          : "Terms of Use",
+                      style: TextStyle(
+                          color: Colors.blue,
+                          decoration: TextDecoration.underline),
+                      recognizer: TapGestureRecognizer()
+                        ..onTap = () => _launchURL(dressurConditionUtilisation),
+                    ),
+                    TextSpan(
+                        text:
+                            (langUserPhone == "fr") ? " et la " : " and the "),
+                    TextSpan(
+                      text: (langUserPhone == "fr")
+                          ? "Politique de confidentialité"
+                          : "Privacy Policy",
+                      style: TextStyle(
+                          color: Colors.blue,
+                          decoration: TextDecoration.underline),
+                      recognizer: TapGestureRecognizer()
+                        ..onTap =
+                            () => _launchURL(dressurPolitiqueConfidentialite),
+                    ),
+                    TextSpan(text: "."),
+                  ],
+                ),
+              ),
+              controlAffinity: ListTileControlAffinity
+                  .leading, // Met la case à cocher à gauche
+              contentPadding: EdgeInsets.zero,
+            ),
+          ),
+          SizedBox(height: 25),
           // --- BOUTON D'INSCRIPTION ---
           FadeInUp(
             duration: Duration(milliseconds: 500),
