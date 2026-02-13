@@ -19,7 +19,7 @@ class PresentationPage extends StatefulWidget {
 class _PresentationPageState extends State<PresentationPage> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
-  final int _totalPages = 8;
+  final int _totalPages = 6;
 
   // On empêche le retour en arrière depuis cette page
   Future<bool> _onWillPop() async => false;
@@ -68,8 +68,6 @@ class _PresentationPageState extends State<PresentationPage> {
             'presentation_2_fr.png',
             'presentation_3_fr.png',
             'presentation_4_fr.png',
-            'presentation_5_fr.png',
-            'presentation_6_fr.png',
             'presentation_7_fr.png',
             'presentation_8_fr.png',
           ]
@@ -78,8 +76,6 @@ class _PresentationPageState extends State<PresentationPage> {
             'presentation_2_en.png',
             'presentation_3_en.png',
             'presentation_4_en.png',
-            'presentation_5_en.png',
-            'presentation_6_en.png',
             'presentation_7_en.png',
             'presentation_8_en.png',
           ];

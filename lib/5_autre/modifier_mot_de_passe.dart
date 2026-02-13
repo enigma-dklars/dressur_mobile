@@ -92,7 +92,7 @@ class _PasswordChangeFormState extends State<PasswordChangeForm> {
     setState(() => _isLoading = true);
 
     // ... (votre logique de requête http existante pour `registerIn` )
-    // J'ai juste remplacé `_desactive` par `_isLoading` et ajouté un try-catch
+    // J'ai juste remplacé `_isSendingMail` par `_isLoading` et ajouté un try-catch
     try {
       var request = http.MultipartRequest(
           'POST', Uri.parse('$generalRouteForApi/updateUserPassword'));
@@ -135,7 +135,63 @@ class _PasswordChangeFormState extends State<PasswordChangeForm> {
 
   Future<void> _sendPasswordResetMail() async {
     setState(() => _isSendingMail = true);
-    // ... (votre logique de requête http existante pour `sendMail` )
+
+    bool isConnected = await isConnectedToInternet();
+    if (isConnected) {
+      setState(() {
+        _isSendingMail = true;
+      });
+
+      var request = http.MultipartRequest('POST',
+          Uri.parse('$generalRouteForApi/sendMailPassForgotWithConnecte'));
+      request.fields
+          .addAll({'uid': uidUser, 'langUserPhone': langUserPhone.toString()});
+
+      http.StreamedResponse response = await request.send();
+
+      if (response.statusCode == 200) {
+        var data1 = await response.stream.bytesToString();
+        var data = convert.jsonDecode(data1);
+        if (data["error"] == true) {
+          dangerNoti(data["titre"], data["message"], context);
+          setState(() {
+            _isSendingMail = false;
+          });
+        } else {
+          setState(() {
+            _isSendingMail = false;
+          });
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => LoginPage()),
+          );
+        }
+      } else {
+        if (langUserPhone != "fr") {
+          dangerNoti("Mistake!",
+              "We encountered a problem, contact the administrators.", context);
+        } else {
+          dangerNoti(
+              "Erreur!",
+              "Nous avons rencontré un problème, contacter les administrateurs.",
+              context);
+        }
+        setState(() {
+          _isSendingMail = false;
+        });
+      }
+    } else {
+      if (langUserPhone != "fr") {
+        dangerNoti(
+            "Mistake!", "You are not connected to the internet.", context);
+      } else {
+        dangerNoti("Erreur!", "Vous n'ètes pas connecté a internet.", context);
+      }
+      setState(() {
+        _isSendingMail = false;
+      });
+    }
+
     setState(() => _isSendingMail = false);
   }
 
