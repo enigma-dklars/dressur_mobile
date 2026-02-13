@@ -1,9 +1,15 @@
+// ignore_for_file: prefer_const_constructors, use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:smooth_page_indicator/smooth_page_indicator.dart';
+import 'package:animate_do/animate_do.dart';
+
+// --- Importez vos pages et constantes ---
 import 'package:dressur/6_login_register/connexion.dart';
 import 'package:dressur/6_login_register/inscription.dart';
 import 'package:dressur/components/constant.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class PresentationPage extends StatefulWidget {
   @override
@@ -13,287 +19,284 @@ class PresentationPage extends StatefulWidget {
 class _PresentationPageState extends State<PresentationPage> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
-  int _totalPages = 8; // Nombre total de pages
+  final int _totalPages = 8;
 
-  Future<bool> _onWillPop() async {
-    return false;
-  }
+  // On empêche le retour en arrière depuis cette page
+  Future<bool> _onWillPop() async => false;
 
-  @override
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: _onWillPop,
       child: Scaffold(
-        backgroundColor: Colors.black,
-        body: Column(
-          children: [
-            Expanded(
-              child: Stack(
-                // ← Nouveau Stack
-                children: [
-                  PageView.builder(
-                    controller: _pageController,
-                    onPageChanged: (int page) {
-                      setState(() {
-                        _currentPage = page;
-                      });
-                    },
-                    itemCount: _totalPages,
-                    itemBuilder: (BuildContext context, int index) {
-                      return buildPage(index);
-                    },
-                  ),
-
-                  // Bouton "Passer" en haut à droite
-                  Align(
-                    alignment: Alignment.topRight,
-                    child: Padding(
-                      padding: const EdgeInsets.only(
-                          top: 50.0, right: 20.0), // ajuste selon ton goût
-                      child: TextButton(
-                        onPressed: () {
-                          // Aller directement à la page suivante (celle avec les boutons Connexion/Inscription)
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => AutrePage()),
-                          );
-                        },
-                        child: Text(
-                          langUserPhone == "fr" ? "Passer" : "Skip",
-                          style: GoogleFonts.poppins(
-                            color: Colors
-                                .white, // garde le blanc pour rester discret
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+        // Fond dégradé pour un look plus premium
+        body: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [Color(0xFF1A237E), Colors.black], // Bleu nuit vers noir
             ),
-            buildIndicator(),
-            const SizedBox(height: 16.0),
-            Padding(
-              padding: const EdgeInsets.only(right: 16.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  buildButton(),
-                ],
+          ),
+          child: Stack(
+            children: [
+              // Le PageView avec les images
+              PageView.builder(
+                controller: _pageController,
+                onPageChanged: (int page) =>
+                    setState(() => _currentPage = page),
+                itemCount: _totalPages,
+                itemBuilder: (context, index) => _buildPageContent(index),
               ),
-            ),
-            const SizedBox(height: 16.0),
-          ],
+              // Le bouton "Passer"
+              _buildSkipButton(),
+              // Les contrôles en bas (indicateur + bouton)
+              _buildBottomControls(),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  Widget buildPage(int index) {
-    // Liste de textes et d'images pour chaque page
-    List<String> imagesFr = [
-      'presentation_1_fr.png',
-      'presentation_2_fr.png',
-      'presentation_3_fr.png',
-      'presentation_4_fr.png',
-      'presentation_5_fr.png',
-      'presentation_6_fr.png',
-      'presentation_7_fr.png',
-      'presentation_8_fr.png',
-    ];
-    List<String> imagesEn = [
-      'presentation_1_en.png',
-      'presentation_2_en.png',
-      'presentation_3_en.png',
-      'presentation_4_en.png',
-      'presentation_5_en.png',
-      'presentation_6_en.png',
-      'presentation_7_en.png',
-      'presentation_8_en.png',
-    ];
+  // --- WIDGETS DE CONSTRUCTION ---
+
+  Widget _buildPageContent(int index) {
+    final images = (langUserPhone == "fr")
+        ? [
+            'presentation_1_fr.png',
+            'presentation_2_fr.png',
+            'presentation_3_fr.png',
+            'presentation_4_fr.png',
+            'presentation_5_fr.png',
+            'presentation_6_fr.png',
+            'presentation_7_fr.png',
+            'presentation_8_fr.png',
+          ]
+        : [
+            'presentation_1_en.png',
+            'presentation_2_en.png',
+            'presentation_3_en.png',
+            'presentation_4_en.png',
+            'presentation_5_en.png',
+            'presentation_6_en.png',
+            'presentation_7_en.png',
+            'presentation_8_en.png',
+          ];
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(2, 16, 2, 16),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          if (langUserPhone != "fr")
-            Image.asset('images/${imagesEn[index]}')
-          else
-            Image.asset('images/${imagesFr[index]}'),
-          const SizedBox(height: 16.0),
-          // Text(
-          //   texts[index],
-          //   style: const TextStyle(fontSize: 20.0),
-          //   textAlign: TextAlign.center,
-          // ),
-        ],
+      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+      child: Center(
+        child: FadeInUp(
+          // Animation d'apparition
+          duration: Duration(milliseconds: 500),
+          child: Image.asset('images/${images[index]}'),
+        ),
       ),
     );
   }
 
-  Widget buildIndicator() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: List.generate(
-        _totalPages,
-        (index) => buildIndicatorItem(index),
+  Widget _buildSkipButton() {
+    return Align(
+      alignment: Alignment.topRight,
+      child: Padding(
+        padding: const EdgeInsets.only(top: 50.0, right: 20.0),
+        child: TextButton(
+          onPressed: () => Navigator.pushReplacement(
+              context, MaterialPageRoute(builder: (context) => WelcomePage())),
+          child: Text(
+            langUserPhone == "fr" ? "Passer" : "Skip",
+            style: GoogleFonts.poppins(color: Colors.white70, fontSize: 16),
+          ),
+        ),
       ),
     );
   }
 
-  Widget buildIndicatorItem(int index) {
-    Color color = _currentPage == index ? Colors.blue : Colors.blue.shade200;
-    double size = _currentPage == index ? 12.0 : 8.0;
-
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 4.0),
-      width: size,
-      height: size,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: color,
-      ),
-    );
-  }
-
-  Widget buildButton() {
+  Widget _buildBottomControls() {
     bool isLastPage = _currentPage == _totalPages - 1;
 
-    if (isLastPage) {
-      return ElevatedButton(
-        onPressed: () {
-          // Naviguer vers une autre page
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => AutrePage(),
+    return Align(
+      alignment: Alignment.bottomCenter,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 30.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            // Indicateur de page animé
+            SmoothPageIndicator(
+              controller: _pageController,
+              count: _totalPages,
+              effect: WormEffect(
+                dotHeight: 10,
+                dotWidth: 10,
+                activeDotColor: primaryColor,
+                dotColor: Colors.white24,
+              ),
             ),
-          );
-        },
-        child: Text((langUserPhone == "fr") ? 'Démarrer' : "To start up"),
-      );
-    } else {
-      return ElevatedButton(
-        onPressed: () {
-          _pageController.nextPage(
-            duration: const Duration(milliseconds: 500),
-            curve: Curves.ease,
-          );
-        },
-        child: Text((langUserPhone == "fr") ? 'Suivant' : 'Next'),
-      );
-    }
+            // Bouton "Suivant" ou "Démarrer"
+            ElevatedButton(
+              onPressed: () {
+                if (isLastPage) {
+                  Navigator.pushReplacement(context,
+                      MaterialPageRoute(builder: (context) => WelcomePage()));
+                } else {
+                  _pageController.nextPage(
+                      duration: Duration(milliseconds: 400),
+                      curve: Curves.easeInOut);
+                }
+              },
+              child: Text(isLastPage
+                  ? (langUserPhone == "fr" ? 'Démarrer' : "Get Started")
+                  : (langUserPhone == "fr" ? 'Suivant' : 'Next')),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: primaryColor,
+                foregroundColor: Colors.white,
+                shape: StadiumBorder(),
+                padding: EdgeInsets.symmetric(horizontal: 30, vertical: 12),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
 
-class AutrePage extends StatelessWidget {
+class WelcomePage extends StatelessWidget {
+  Future<void> _launchURL(String url) async {
+    if (!await launchUrl(Uri.parse(url),
+        mode: LaunchMode.externalApplication)) {
+      print('Could not launch $url');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(' '),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Image.asset(
-                'images/welcome.png'), // Remplacez "other_image.png" par le chemin de votre image
-            const SizedBox(height: 16.0),
-            Text(
-              (langUserPhone == "fr")
-                  ? 'Avez-vous un compte ?'
-                  : 'Do you have an account?',
-              style: const TextStyle(fontSize: 20.0),
-            ),
-            const SizedBox(height: 16.0),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                ElevatedButton(
-                  onPressed: () {
-                    // Naviguer vers la page d'inscription
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => InscriptionPage()),
-                    );
-                  },
-                  child: Text(
-                    (langUserPhone == "fr") ? 'Inscription' : 'Registration',
-                  ),
-                ),
-                const SizedBox(width: 16.0),
-                ElevatedButton(
-                  onPressed: () {
-                    // Naviguer vers la page de connexion
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => LoginPage()),
-                    );
-                  },
-                  child: Text(
-                    (langUserPhone == "fr") ? 'Connexion' : 'Login',
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 20),
-            Container(
-              margin: const EdgeInsets.all(10),
-              child: Column(
-                children: [
-                  GestureDetector(
-                    onTap: () async {
-                      final Uri _url = Uri.parse(dressurConditionUtilisation);
-                      if (!await launchUrl(_url,
-                          mode: LaunchMode.externalApplication)) {
-                        throw 'Could not launch $_url';
-                      }
-                    },
-                    child: Text(
-                      (langUserPhone == "fr")
-                          ? "Conditions d'utilisation"
-                          : "Terms of use",
-                      style: GoogleFonts.poppins(
-                        color: secondaryColor,
-                        fontSize: 13,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  GestureDetector(
-                    onTap: () async {
-                      final Uri _url =
-                          Uri.parse(dressurPolitiqueConfidentialite);
-                      if (!await launchUrl(_url,
-                          mode: LaunchMode.externalApplication)) {
-                        throw 'Could not launch $_url';
-                      }
-                    },
-                    child: Text(
-                      (langUserPhone == "fr")
-                          ? 'Politiques de confidentialité'
-                          : "Privacy policies",
-                      style: GoogleFonts.poppins(
-                        color: secondaryColor,
-                        fontSize: 13,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                ],
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Spacer(),
+              // Image avec animation
+              FadeInDown(
+                duration: Duration(milliseconds: 800),
+                child: Image.asset('images/welcome.png', height: 250),
               ),
-            ),
-          ],
+              SizedBox(height: 30),
+              // Titre
+              FadeInUp(
+                duration: Duration(milliseconds: 800),
+                delay: Duration(milliseconds: 200),
+                child: Text(
+                  (langUserPhone == "fr")
+                      ? 'Bienvenue sur Dressur'
+                      : 'Welcome to Dressur',
+                  style: GoogleFonts.poppins(
+                      fontSize: 26, fontWeight: FontWeight.bold),
+                ),
+              ),
+              SizedBox(height: 10),
+              // Sous-titre
+              FadeInUp(
+                duration: Duration(milliseconds: 800),
+                delay: Duration(milliseconds: 400),
+                child: Text(
+                  (langUserPhone == "fr")
+                      ? 'Connectez-vous ou créez un compte pour commencer.'
+                      : 'Log in or create an account to get started.',
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.poppins(
+                      fontSize: 16, color: Colors.grey[600]),
+                ),
+              ),
+              SizedBox(height: 40),
+              // Boutons
+              FadeInUp(
+                duration: Duration(milliseconds: 800),
+                delay: Duration(milliseconds: 600),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => LoginPage())),
+                        child: Text(
+                            (langUserPhone == "fr") ? 'Connexion' : 'Login'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: primaryColor,
+                          foregroundColor: Colors.white,
+                          padding: EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12)),
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: 15),
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => InscriptionPage())),
+                        child: Text((langUserPhone == "fr")
+                            ? 'Inscription'
+                            : 'Sign Up'),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: primaryColor,
+                          side: BorderSide(color: primaryColor),
+                          padding: EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12)),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Spacer(),
+              // Liens légaux
+              _buildLegalLinks(),
+              SizedBox(height: 20),
+            ],
+          ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildLegalLinks() {
+    return FadeInUp(
+      duration: Duration(milliseconds: 800),
+      delay: Duration(milliseconds: 800),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          TextButton(
+            onPressed: () => _launchURL(dressurConditionUtilisation),
+            child: Text(
+              (langUserPhone == "fr")
+                  ? "Conditions d'utilisation"
+                  : "Terms of Use",
+              style: GoogleFonts.poppins(color: Colors.grey[500], fontSize: 12),
+            ),
+          ),
+          Text("•", style: TextStyle(color: Colors.grey[400])),
+          TextButton(
+            onPressed: () => _launchURL(dressurPolitiqueConfidentialite),
+            child: Text(
+              (langUserPhone == "fr")
+                  ? 'Politique de confidentialité'
+                  : "Privacy Policy",
+              style: GoogleFonts.poppins(color: Colors.grey[500], fontSize: 12),
+            ),
+          ),
+        ],
       ),
     );
   }

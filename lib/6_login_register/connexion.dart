@@ -1,10 +1,14 @@
-// ignore_for_file: use_build_context_synchronously
+// ignore_for_file: use_build_context_synchronously, prefer_const_constructors
 
 import 'package:flutter/material.dart';
-import 'package:dressur/6_login_register/mot_de_passe_oublier.dart';
-import 'package:dressur/components/constant.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:animate_do/animate_do.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
+
+// --- Importez vos pages et constantes ---
+import 'package:dressur/6_login_register/mot_de_passe_oublier.dart';
+import 'package:dressur/components/constant.dart';
 import 'package:dressur/components/noti.dart';
 import 'package:dressur/components/bottomBar.dart';
 import 'package:dressur/5_autre/support_assistance.dart';
@@ -12,47 +16,58 @@ import 'package:dressur/5_autre/support_assistance.dart';
 class LoginPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
+      backgroundColor: isDark ? Color(0xFF121212) : Colors.white,
       appBar: AppBar(
         elevation: 0,
-        backgroundColor: primaryColor,
-        leading: IconButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          icon: const Icon(
-            Icons.arrow_back_ios,
-            color: Colors.white,
-          ),
-        ),
+        backgroundColor: Colors.transparent,
+        foregroundColor: isDark ? Colors.white : Colors.black,
         actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 20.0),
-            child: Row(
-              children: [
-                GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => SupportPage()),
-                    );
-                  },
-                  child: const Icon(
-                    Icons.help,
-                    size: 30.0,
-                    color: Colors.white,
-                  ),
-                )
-              ],
-            ),
+          IconButton(
+            onPressed: () => Navigator.push(context,
+                MaterialPageRoute(builder: (context) => SupportPage())),
+            icon: Icon(Icons.help_outline_rounded),
           ),
         ],
       ),
       body: SingleChildScrollView(
-        child: Column(
-          children: [
-            LoginForm(),
-          ],
+        physics: BouncingScrollPhysics(),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(height: 20),
+              // --- EN-TÊTE ---
+              FadeInDown(
+                duration: Duration(milliseconds: 500),
+                child: Text(
+                  (langUserPhone == "fr")
+                      ? "Ravi de vous revoir !"
+                      : "Welcome Back!",
+                  style: GoogleFonts.poppins(
+                      fontSize: 32, fontWeight: FontWeight.bold),
+                ),
+              ),
+              SizedBox(height: 10),
+              FadeInDown(
+                duration: Duration(milliseconds: 500),
+                delay: Duration(milliseconds: 200),
+                child: Text(
+                  (langUserPhone == "fr")
+                      ? "Connectez-vous pour continuer votre aventure."
+                      : "Log in to continue your adventure.",
+                  style: GoogleFonts.poppins(
+                      fontSize: 16, color: Colors.grey[600]),
+                ),
+              ),
+              SizedBox(height: 50),
+
+              // --- FORMULAIRE ---
+              LoginForm(),
+            ],
+          ),
         ),
       ),
     );
@@ -65,284 +80,186 @@ class LoginForm extends StatefulWidget {
 }
 
 class _LoginFormState extends State<LoginForm> {
-  bool _desactive = false;
-  bool isPasswordObscured = true;
-  var data;
-  final emailController = TextEditingController(text: mailConnexion);
-  final passwordController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
+  bool _isLoading = false;
+  bool _isPasswordObscured = true;
+  final _emailController = TextEditingController(text: mailConnexion);
+  final _passwordController = TextEditingController();
 
-  //HTTP REQUEST
-  void loginIn(String email, String pass) async {
-    bool isConnected = await isConnectedToInternet();
-    if (isConnected) {
-      setState(() {
-        _desactive = true;
-      });
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _login() async {
+    // Valide le formulaire avant de continuer
+    if (!_formKey.currentState!.validate()) return;
+
+    setState(() => _isLoading = true);
+    try {
+      bool isConnected = await isConnectedToInternet();
+      if (!isConnected) {
+        throw Exception((langUserPhone == "fr")
+            ? "Pas de connexion internet."
+            : "No internet connection.");
+      }
 
       var request = http.MultipartRequest(
           'POST', Uri.parse('$generalRouteForApi/connect'));
       request.fields.addAll({
-        'mail': email,
-        'password': pass,
+        'mail': _emailController.text,
+        'password': _passwordController.text,
         'langUserPhone': langUserPhone.toString()
       });
 
       http.StreamedResponse response = await request.send();
+      var responseBody = await response.stream.bytesToString();
+      var data = convert.jsonDecode(responseBody);
 
-      if (response.statusCode == 200) {
-        var data1 = await response.stream.bytesToString();
-        data = convert.jsonDecode(data1);
-        if (data["error"] == true) {
-          dangerNoti(data["titre"], data["message"], context);
-          setState(() {
-            _desactive = false;
-          });
-        } else {
-          setState(() {
-            initUserInformations(data["user"]);
-            _desactive = false;
-          });
-
-          Navigator.of(context)
-              .push(MaterialPageRoute(builder: (context) => const BottomBar()));
-        }
+      if (response.statusCode == 200 && data["error"] == false) {
+        initUserInformations(data["user"]);
+        Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (context) => const BottomBar()));
       } else {
-        if (langUserPhone != "fr") {
-          dangerNoti("Mistake!",
-              "We encountered a problem, contact the administrators.", context);
-        } else {
-          dangerNoti(
-              "Erreur!",
-              "Nous avons rencontré un problème, contacter les administrateurs.",
-              context);
-        }
-        setState(() {
-          _desactive = false;
-        });
+        throw Exception(data["message"] ?? "Une erreur est survenue.");
       }
-    } else {
-      if (langUserPhone != "fr") {
-        dangerNoti(
-            "Mistake!", "You are not connected to the internet.", context);
-      } else {
-        dangerNoti("Erreur!", "Vous n'ètes pas connecté a internet.", context);
+    } catch (e) {
+      dangerNoti((langUserPhone == "fr") ? "Erreur" : "Error",
+          e.toString().replaceAll("Exception: ", ""), context);
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
       }
-      setState(() {
-        _desactive = false;
-      });
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Stack(
+    return Form(
+      key: _formKey,
+      child: Column(
         children: [
-          Container(
-            height: MediaQuery.of(context).size.height / 3.5,
-            width: MediaQuery.of(context).size.width,
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [
-                  primaryColor,
-                  Color(0xFF6380fb),
-                ],
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
+          // --- CHAMP E-MAIL ---
+          FadeInUp(
+            duration: Duration(milliseconds: 500),
+            delay: Duration(milliseconds: 400),
+            child: TextFormField(
+              controller: _emailController,
+              keyboardType: TextInputType.emailAddress,
+              decoration: _buildInputDecoration(
+                label: "E-mail",
+                icon: Icons.alternate_email_rounded,
               ),
-              borderRadius: BorderRadius.vertical(
-                bottom:
-                    Radius.elliptical(MediaQuery.of(context).size.width, 105.0),
+              validator: (value) {
+                if (value == null || value.isEmpty || !value.contains('@')) {
+                  return (langUserPhone == "fr")
+                      ? 'Veuillez entrer un email valide.'
+                      : 'Please enter a valid email.';
+                }
+                return null;
+              },
+            ),
+          ),
+          SizedBox(height: 20),
+
+          // --- CHAMP MOT DE PASSE ---
+          FadeInUp(
+            duration: Duration(milliseconds: 500),
+            delay: Duration(milliseconds: 600),
+            child: TextFormField(
+              controller: _passwordController,
+              obscureText: _isPasswordObscured,
+              decoration: _buildInputDecoration(
+                label: (langUserPhone == "fr") ? 'Mot de passe' : 'Password',
+                icon: Icons.lock_outline_rounded,
+                suffixIcon: IconButton(
+                  icon: Icon(_isPasswordObscured
+                      ? Icons.visibility_off_outlined
+                      : Icons.visibility_outlined),
+                  onPressed: () => setState(
+                      () => _isPasswordObscured = !_isPasswordObscured),
+                ),
+              ),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return (langUserPhone == "fr")
+                      ? 'Le mot de passe est requis.'
+                      : 'Password is required.';
+                }
+                return null;
+              },
+            ),
+          ),
+          SizedBox(height: 15),
+
+          // --- LIEN MOT DE PASSE OUBLIÉ ---
+          FadeInUp(
+            duration: Duration(milliseconds: 500),
+            delay: Duration(milliseconds: 700),
+            child: Align(
+              alignment: Alignment.centerRight,
+              child: TextButton(
+                onPressed: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => RecuperationPage())),
+                child: Text(
+                  (langUserPhone == "fr")
+                      ? "Mot de passe oublié ?"
+                      : "Forgot password?",
+                  style: GoogleFonts.poppins(
+                      color: primaryColor, fontWeight: FontWeight.w600),
+                ),
               ),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.only(top: 40),
-            child: Column(
-              children: [
-                Center(
-                    child: Text(
-                  (langUserPhone == "fr") ? "Connexion" : "Login",
-                  style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 30,
-                      fontWeight: FontWeight.bold),
-                )),
-                const SizedBox(height: 5),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
-                  child: Center(
-                      child: Text(
-                    (langUserPhone == "fr")
-                        ? "Renseigner votre adresse email et mot de passe pour accéder à votre compte."
-                        : "Enter your email address and password to access your account.",
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 16.0,
-                      fontWeight: FontWeight.w500,
-                    ),
-                    textAlign: TextAlign.center,
-                  )),
+          SizedBox(height: 30),
+
+          // --- BOUTON DE CONNEXION ---
+          FadeInUp(
+            duration: Duration(milliseconds: 500),
+            delay: Duration(milliseconds: 800),
+            child: SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: _isLoading ? null : _login,
+                child: _isLoading
+                    ? SizedBox(
+                        width: 24,
+                        height: 24,
+                        child: CircularProgressIndicator(
+                            color: Colors.white, strokeWidth: 2))
+                    : Text((langUserPhone == "fr") ? "Se Connecter" : "Log In"),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: primaryColor,
+                  foregroundColor: Colors.white,
+                  padding: EdgeInsets.symmetric(vertical: 16),
+                  textStyle: GoogleFonts.poppins(
+                      fontSize: 16, fontWeight: FontWeight.bold),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12)),
                 ),
-                const SizedBox(height: 10),
-                Container(
-                  margin: const EdgeInsets.symmetric(
-                      vertical: 15.0, horizontal: 15.0),
-                  child: Material(
-                    borderRadius: BorderRadius.circular(10),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 30.0, horizontal: 15.0),
-                      width: MediaQuery.of(context).size.width,
-                      decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(10)),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            "E-mail",
-                            style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 18.0,
-                                fontWeight: FontWeight.w500),
-                          ),
-                          const SizedBox(height: 5),
-                          Container(
-                            decoration: BoxDecoration(
-                                border: Border.all(
-                                    width: 1.0, color: Colors.black38),
-                                borderRadius: BorderRadius.circular(10)),
-                            child: TextFormField(
-                              style: const TextStyle(
-                                color: Colors.black,
-                                fontSize: 20,
-                              ),
-                              controller: emailController,
-                              decoration: const InputDecoration(
-                                  border: InputBorder.none,
-                                  prefixIcon: Icon(
-                                    Icons.mail_outline,
-                                    color: primaryColor,
-                                  )),
-                            ),
-                          ),
-                          const SizedBox(height: 15),
-                          Text(
-                            (langUserPhone == "fr")
-                                ? 'Mot de passe'
-                                : 'Password',
-                            style: const TextStyle(
-                                color: Colors.black,
-                                fontSize: 18.0,
-                                fontWeight: FontWeight.w500),
-                          ),
-                          const SizedBox(height: 5),
-                          Container(
-                            decoration: BoxDecoration(
-                              border: Border.all(
-                                width: 1.0,
-                                color: Colors.black38,
-                              ),
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: TextFormField(
-                              style: const TextStyle(
-                                color: Colors.black,
-                                fontSize: 20,
-                              ),
-                              controller: passwordController,
-                              decoration: InputDecoration(
-                                border: InputBorder.none,
-                                prefixIcon: const Icon(
-                                  Icons.password,
-                                  color: primaryColor,
-                                ),
-                                suffixIcon: IconButton(
-                                  icon: Icon(
-                                    isPasswordObscured
-                                        ? Icons.visibility
-                                        : Icons.visibility_off,
-                                    color: primaryColor,
-                                  ),
-                                  onPressed: () {
-                                    setState(() {
-                                      isPasswordObscured = !isPasswordObscured;
-                                    });
-                                  },
-                                ),
-                              ),
-                              obscureText: isPasswordObscured,
-                            ),
-                          ),
-                          const SizedBox(height: 10.0),
-                          GestureDetector(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => RecuperationPage()),
-                              );
-                            },
-                            child: Container(
-                              alignment: Alignment.bottomRight,
-                              child: Text(
-                                (langUserPhone == "fr")
-                                    ? "Mot de passe oublié ?"
-                                    : "Forgot your password ?",
-                                style: const TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 16.0,
-                                  fontWeight: FontWeight.w500,
-                                  decoration: TextDecoration
-                                      .underline, // Ajoutez un soulignement pour indiquer que c'est cliquable
-                                ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 15),
-                          SizedBox(
-                            width: MediaQuery.of(context).size.width * 0.90,
-                            child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: primaryColor,
-                                shape: const StadiumBorder(),
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 13,
-                                ),
-                                minimumSize: const Size.fromHeight(50),
-                              ),
-                              child: Text(
-                                _desactive
-                                    ? (langUserPhone == "fr")
-                                        ? "Patientez..."
-                                        : "Wait..."
-                                    : (langUserPhone == "fr")
-                                        ? "CONNEXION"
-                                        : "LOGIN",
-                                style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold),
-                              ),
-                              onPressed: () {
-                                _desactive
-                                    ? null
-                                    : loginIn(emailController.text,
-                                        passwordController.text);
-                              },
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 40),
-              ],
+              ),
             ),
-          )
+          ),
         ],
+      ),
+    );
+  }
+
+  // Helper pour construire la décoration des champs de texte
+  InputDecoration _buildInputDecoration(
+      {required String label, required IconData icon, Widget? suffixIcon}) {
+    return InputDecoration(
+      labelText: label,
+      prefixIcon: Icon(icon, color: primaryColor),
+      suffixIcon: suffixIcon,
+      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(color: primaryColor, width: 2),
       ),
     );
   }

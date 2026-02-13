@@ -1,59 +1,74 @@
-// ignore_for_file: use_build_context_synchronously
+// ignore_for_file: use_build_context_synchronously, prefer_const_constructors
 
-import 'package:country_code_picker/country_code_picker.dart';
-import 'package:dressur/components/bottomBar.dart';
 import 'package:flutter/material.dart';
-import 'package:dressur/components/constant.dart';
 import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:animate_do/animate_do.dart';
+import 'package:country_code_picker/country_code_picker.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
+
+// --- Importez vos pages et constantes ---
+import 'package:dressur/components/constant.dart';
 import 'package:dressur/components/noti.dart';
+import 'package:dressur/components/bottomBar.dart';
 import 'package:dressur/5_autre/support_assistance.dart';
 
 class InscriptionPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
+      backgroundColor: isDark ? Color(0xFF121212) : Colors.white,
       appBar: AppBar(
         elevation: 0,
-        backgroundColor: primaryColor,
-        leading: IconButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          icon: const Icon(
-            Icons.arrow_back_ios,
-            color: Colors.white,
-          ),
-        ),
+        backgroundColor: Colors.transparent,
+        foregroundColor: isDark ? Colors.white : Colors.black,
         actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 20.0),
-            child: Row(
-              children: [
-                GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => SupportPage()),
-                    );
-                  },
-                  child: const Icon(
-                    Icons.help,
-                    size: 30.0,
-                    color: Colors.white,
-                  ),
-                )
-              ],
-            ),
+          IconButton(
+            onPressed: () => Navigator.push(context,
+                MaterialPageRoute(builder: (context) => SupportPage())),
+            icon: Icon(Icons.help_outline_rounded),
           ),
         ],
       ),
       body: SingleChildScrollView(
-        child: Column(
-          children: [
-            RegisterForm(),
-          ],
+        physics: BouncingScrollPhysics(),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(height: 20),
+              // --- EN-TÊTE ---
+              FadeInDown(
+                duration: Duration(milliseconds: 500),
+                child: Text(
+                  (langUserPhone == "fr")
+                      ? "Créer un compte"
+                      : "Create Account",
+                  style: GoogleFonts.poppins(
+                      fontSize: 32, fontWeight: FontWeight.bold),
+                ),
+              ),
+              SizedBox(height: 10),
+              FadeInDown(
+                duration: Duration(milliseconds: 500),
+                delay: Duration(milliseconds: 200),
+                child: Text(
+                  (langUserPhone == "fr")
+                      ? "Rejoignez la communauté Dressur dès aujourd'hui."
+                      : "Join the Dressur community today.",
+                  style: GoogleFonts.poppins(
+                      fontSize: 16, color: Colors.grey[600]),
+                ),
+              ),
+              SizedBox(height: 50),
+
+              // --- FORMULAIRE ---
+              RegisterForm(),
+            ],
+          ),
         ),
       ),
     );
@@ -66,428 +81,268 @@ class RegisterForm extends StatefulWidget {
 }
 
 class _RegisterFormState extends State<RegisterForm> {
-  String selectedCountryCode = "+33"; // Indicatif par défaut (France)
-  bool _desactive = false;
-  bool isPasswordObscured = true;
-  bool isVerificationPasswordObscured = true;
-  var data;
-  final pseudoController = TextEditingController();
-  final telController = TextEditingController();
-  final emailController = TextEditingController();
-  final passwordController = TextEditingController();
-  final passwordVerifController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
+  bool _isLoading = false;
+  bool _isPasswordObscured = true;
+  bool _isConfirmPasswordObscured = true;
+  String _selectedCountryCode = "+33";
 
-  //HTTP REQUEST REGISTER
-  void registerIn(String pseudo, String tel, String mail, String password,
-      String passwordVerif) async {
-    // Concaténation du numéro complet
-    String fullPhoneNumber = selectedCountryCode + telController.text.trim();
+  final _telController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _passwordVerifController = TextEditingController();
 
-    // Optionnel : nettoyer les espaces ou caractères indésirables
-    fullPhoneNumber = fullPhoneNumber.replaceAll(
-        RegExp(r'\D'), ''); // enlève tout sauf chiffres
+  @override
+  void dispose() {
+    _telController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    _passwordVerifController.dispose();
+    super.dispose();
+  }
 
-    bool isConnected = await isConnectedToInternet();
-    if (isConnected) {
-      setState(() {
-        _desactive = true;
-      });
+  Future<void> _register() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    setState(() => _isLoading = true);
+    try {
+      bool isConnected = await isConnectedToInternet();
+      if (!isConnected) {
+        throw Exception((langUserPhone == "fr")
+            ? "Pas de connexion internet."
+            : "No internet connection.");
+      }
+
+      String fullPhoneNumber =
+          _selectedCountryCode + _telController.text.trim();
+      fullPhoneNumber = fullPhoneNumber.replaceAll(RegExp(r'\D'), '');
 
       var request = http.MultipartRequest(
           'POST', Uri.parse('$generalRouteForApi/inscriptionDS'));
       request.fields.addAll({
         'langUserPhone': langUserPhone.toString(),
-        'tel': "+$fullPhoneNumber", // ← Numéro complet envoyé ici
-        'mail': mail,
-        'password': password,
-        'confirmPassword': passwordVerif,
+        'tel': "+$fullPhoneNumber",
+        'mail': _emailController.text.trim(),
+        'password': _passwordController.text,
+        'confirmPassword': _passwordVerifController.text,
       });
 
       http.StreamedResponse response = await request.send();
+      var responseBody = await response.stream.bytesToString();
+      var data = convert.jsonDecode(responseBody);
 
-      if (response.statusCode == 200) {
-        var data1 = await response.stream.bytesToString();
-        data = convert.jsonDecode(data1);
-        if (data["error"] == true) {
-          dangerNoti(data["titre"], data["message"], context);
-          setState(() {
-            _desactive = false;
-          });
-        } else {
-          setState(() {
-            _desactive = false;
-            modeReconnaissanceContactArrierePlan = true;
-            initUserInformations(data['user']);
-          });
-          Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(builder: (context) => const BottomBar()),
-            (route) => false,
-          );
-        }
-      } else {
-        dangerNoti(
-          langUserPhone == "fr" ? "Erreur!" : "Error!",
-          langUserPhone == "fr"
-              ? "Problème de connexion au serveur."
-              : "Connection problem with the server.",
-          context,
+      if (response.statusCode == 200 && data["error"] == false) {
+        modeReconnaissanceContactArrierePlan = true;
+        initUserInformations(data['user']);
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (context) => const BottomBar()),
+          (route) => false,
         );
-        setState(() {
-          _desactive = false;
-        });
+      } else {
+        throw Exception(data["message"] ??
+            "Une erreur est survenue lors de l'inscription.");
       }
-    } else {
-      dangerNoti(
-        langUserPhone == "fr" ? "Erreur!" : "Error!",
-        langUserPhone == "fr"
-            ? "Vous n'êtes pas connecté à internet."
-            : "You are not connected to the internet.",
-        context,
-      );
-      setState(() {
-        _desactive = false;
-      });
+    } catch (e) {
+      dangerNoti((langUserPhone == "fr") ? "Erreur" : "Error",
+          e.toString().replaceAll("Exception: ", ""), context);
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Stack(
+    return Form(
+      key: _formKey,
+      child: Column(
         children: [
-          Container(
-            height: MediaQuery.of(context).size.height / 3.5,
-            width: MediaQuery.of(context).size.width,
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [
-                  primaryColor,
-                  Color(0xFF6380fb),
-                ],
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
+          // --- CHAMP TÉLÉPHONE ---
+          FadeInUp(
+            duration: Duration(milliseconds: 500),
+            delay: Duration(milliseconds: 400),
+            child: TextFormField(
+              controller: _telController,
+              keyboardType: TextInputType.phone,
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              decoration: _buildInputDecoration(
+                label: (langUserPhone == "fr")
+                    ? 'Numéro WhatsApp'
+                    : 'WhatsApp Number',
+                prefix: CountryCodePicker(
+                  onChanged: (country) => setState(
+                      () => _selectedCountryCode = country.dialCode ?? "+33"),
+                  initialSelection: 'FR',
+                  favorite: ['+33', '+229', '+228', '+225'],
+                  showCountryOnly: false,
+                  showOnlyCountryWhenClosed: false,
+                  alignLeft: false,
+
+                  // --- AJOUTS POUR LE MODE SOMBRE ---
+                  dialogBackgroundColor: Theme.of(context)
+                      .scaffoldBackgroundColor, // Le fond du dialogue prend la couleur du Scaffold
+                  dialogTextStyle: TextStyle(
+                      color: Theme.of(context)
+                          .textTheme
+                          .bodyLarge
+                          ?.color), // Le texte prend la couleur du texte principal
+                  searchDecoration: InputDecoration(
+                    prefixIconColor: Theme.of(context)
+                        .iconTheme
+                        .color, // Couleur de l'icône de recherche
+                    labelStyle: TextStyle(
+                        color: Theme.of(context)
+                            .textTheme
+                            .bodyLarge
+                            ?.color), // Couleur du label de recherche
+                  ),
+                  // --- FIN DES AJOUTS ---
+                ),
               ),
-              borderRadius: BorderRadius.vertical(
-                bottom:
-                    Radius.elliptical(MediaQuery.of(context).size.width, 105.0),
+              validator: (value) {
+                if (value == null || value.trim().isEmpty) {
+                  return (langUserPhone == "fr")
+                      ? 'Le numéro est requis.'
+                      : 'Phone number is required.';
+                }
+                return null;
+              },
+            ),
+          ),
+          SizedBox(height: 20),
+
+          // --- CHAMP E-MAIL ---
+          FadeInUp(
+            duration: Duration(milliseconds: 500),
+            delay: Duration(milliseconds: 500),
+            child: TextFormField(
+              controller: _emailController,
+              keyboardType: TextInputType.emailAddress,
+              decoration: _buildInputDecoration(
+                  label: "E-mail", icon: Icons.alternate_email_rounded),
+              validator: (value) {
+                if (value == null || value.isEmpty || !value.contains('@')) {
+                  return (langUserPhone == "fr")
+                      ? 'Veuillez entrer un email valide.'
+                      : 'Please enter a valid email.';
+                }
+                return null;
+              },
+            ),
+          ),
+          SizedBox(height: 20),
+
+          // --- CHAMP MOT DE PASSE ---
+          FadeInUp(
+            duration: Duration(milliseconds: 500),
+            delay: Duration(milliseconds: 600),
+            child: TextFormField(
+              controller: _passwordController,
+              obscureText: _isPasswordObscured,
+              decoration: _buildInputDecoration(
+                label: (langUserPhone == "fr") ? 'Mot de passe' : 'Password',
+                icon: Icons.lock_outline_rounded,
+                suffixIcon: IconButton(
+                  icon: Icon(_isPasswordObscured
+                      ? Icons.visibility_off_outlined
+                      : Icons.visibility_outlined),
+                  onPressed: () => setState(
+                      () => _isPasswordObscured = !_isPasswordObscured),
+                ),
+              ),
+              validator: (value) {
+                if (value == null || value.length < 6) {
+                  return (langUserPhone == "fr")
+                      ? '6 caractères minimum.'
+                      : 'Minimum 6 characters.';
+                }
+                return null;
+              },
+            ),
+          ),
+          SizedBox(height: 20),
+
+          // --- CHAMP CONFIRMATION MOT DE PASSE ---
+          FadeInUp(
+            duration: Duration(milliseconds: 500),
+            delay: Duration(milliseconds: 700),
+            child: TextFormField(
+              controller: _passwordVerifController,
+              obscureText: _isConfirmPasswordObscured,
+              decoration: _buildInputDecoration(
+                label: (langUserPhone == "fr")
+                    ? 'Confirmer le mot de passe'
+                    : 'Confirm Password',
+                icon: Icons.lock_outline_rounded,
+                suffixIcon: IconButton(
+                  icon: Icon(_isConfirmPasswordObscured
+                      ? Icons.visibility_off_outlined
+                      : Icons.visibility_outlined),
+                  onPressed: () => setState(() =>
+                      _isConfirmPasswordObscured = !_isConfirmPasswordObscured),
+                ),
+              ),
+              validator: (value) {
+                if (value != _passwordController.text) {
+                  return (langUserPhone == "fr")
+                      ? 'Les mots de passe ne correspondent pas.'
+                      : 'Passwords do not match.';
+                }
+                return null;
+              },
+            ),
+          ),
+          SizedBox(height: 40),
+
+          // --- BOUTON D'INSCRIPTION ---
+          FadeInUp(
+            duration: Duration(milliseconds: 500),
+            delay: Duration(milliseconds: 800),
+            child: SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: _isLoading ? null : _register,
+                child: _isLoading
+                    ? SizedBox(
+                        width: 24,
+                        height: 24,
+                        child: CircularProgressIndicator(
+                            color: Colors.white, strokeWidth: 2))
+                    : Text((langUserPhone == "fr") ? "S'inscrire" : "Sign Up"),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: primaryColor,
+                  foregroundColor: Colors.white,
+                  padding: EdgeInsets.symmetric(vertical: 16),
+                  textStyle: GoogleFonts.poppins(
+                      fontSize: 16, fontWeight: FontWeight.bold),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12)),
+                ),
               ),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.only(top: 40),
-            child: Column(
-              children: [
-                Center(
-                    child: Text(
-                  (langUserPhone == "fr") ? "Inscription" : "Registration",
-                  style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 30,
-                      fontWeight: FontWeight.bold),
-                )),
-                const SizedBox(height: 5),
-                Center(
-                    child: Text(
-                  (langUserPhone == "fr")
-                      ? "Entrer vos informations primordiales"
-                      : "Enter your essential information",
-                  style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 16.0,
-                      fontWeight: FontWeight.w500),
-                )),
-                const SizedBox(height: 10),
-                Container(
-                  margin: const EdgeInsets.symmetric(
-                      vertical: 15.0, horizontal: 15.0),
-                  child: Material(
-                    borderRadius: BorderRadius.circular(10),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 30.0, horizontal: 15.0),
-                      width: MediaQuery.of(context).size.width,
-                      decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(10)),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // const Text(
-                          //   'Pseudo',
-                          //   style: TextStyle(
-                          //       color: Colors.black,
-                          //       fontSize: 18.0,
-                          //       fontWeight: FontWeight.w500),
-                          // ),
-                          // const SizedBox(height: 5),
-                          // Container(
-                          //   decoration: BoxDecoration(
-                          //       border: Border.all(
-                          //           width: 1.0, color: Colors.black38),
-                          //       borderRadius: BorderRadius.circular(10)),
-                          //   child: TextFormField(
-                          //     style: const TextStyle(
-                          //       color: Colors.black,
-                          //       fontSize: 20,
-                          //     ),
-                          //     controller: pseudoController,
-                          //     decoration: const InputDecoration(
-                          //         border: InputBorder.none,
-                          //         prefixIcon: Icon(
-                          //           Icons.person_outline,
-                          //           color: primaryColor,
-                          //         )),
-                          //   ),
-                          // ),
-                          // const SizedBox(height: 15),
-                          Text(
-                            (langUserPhone == "fr")
-                                ? 'Numéro WhatsApp'
-                                : 'WhatsApp Number',
-                            style: const TextStyle(
-                                color: Colors.black,
-                                fontSize: 18.0,
-                                fontWeight: FontWeight.w500),
-                          ),
-                          const SizedBox(height: 5),
-
-                          Container(
-                            decoration: BoxDecoration(
-                              border:
-                                  Border.all(width: 1.0, color: Colors.black38),
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: Row(
-                              children: [
-                                // Sélecteur d'indicatif pays
-                                CountryCodePicker(
-                                  onChanged: (countryCode) {
-                                    setState(() {
-                                      selectedCountryCode =
-                                          countryCode.dialCode ?? "+33";
-                                    });
-                                  },
-                                  initialSelection:
-                                      'FR', // Change selon localisation par défaut
-                                  favorite: [
-                                    '+33',
-                                    '+229',
-                                    '+228',
-                                    '+225'
-                                  ], // France, USA, Cameroun, Côte d'Ivoire
-                                  showCountryOnly: false,
-                                  showOnlyCountryWhenClosed: false,
-                                  alignLeft: false,
-                                  padding: const EdgeInsets.all(8),
-                                  textStyle: const TextStyle(
-                                      fontSize: 18, color: Colors.black),
-                                  flagWidth: 30,
-                                ),
-
-                                // Ligne de séparation
-                                Container(
-                                  width: 1,
-                                  height: 40,
-                                  color: Colors.black38,
-                                ),
-
-                                // Champ pour le numéro
-                                Expanded(
-                                  child: TextFormField(
-                                    controller: telController,
-                                    keyboardType: TextInputType.phone,
-                                    style: const TextStyle(
-                                        color: Colors.black, fontSize: 20),
-                                    decoration: const InputDecoration(
-                                      border: InputBorder.none,
-                                      contentPadding: EdgeInsets.symmetric(
-                                          horizontal: 12, vertical: 16),
-                                      hintText: "-- -- -- -- --",
-                                      hintStyle:
-                                          TextStyle(color: Colors.black38),
-                                    ),
-                                    inputFormatters: [
-                                      FilteringTextInputFormatter.digitsOnly,
-                                      LengthLimitingTextInputFormatter(15),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 15),
-                          const Text(
-                            "E-mail",
-                            style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 18.0,
-                                fontWeight: FontWeight.w500),
-                          ),
-                          const SizedBox(height: 5),
-                          Container(
-                            decoration: BoxDecoration(
-                                border: Border.all(
-                                    width: 1.0, color: Colors.black38),
-                                borderRadius: BorderRadius.circular(10)),
-                            child: TextFormField(
-                              style: const TextStyle(
-                                color: Colors.black,
-                                fontSize: 20,
-                              ),
-                              controller: emailController,
-                              decoration: const InputDecoration(
-                                  border: InputBorder.none,
-                                  prefixIcon: Icon(
-                                    Icons.mail_outline,
-                                    color: primaryColor,
-                                  )),
-                            ),
-                          ),
-                          const SizedBox(height: 15),
-                          Text(
-                            (langUserPhone == "fr")
-                                ? 'Mot de passe'
-                                : 'Password',
-                            style: const TextStyle(
-                                color: Colors.black,
-                                fontSize: 18.0,
-                                fontWeight: FontWeight.w500),
-                          ),
-                          const SizedBox(height: 5),
-                          Container(
-                            decoration: BoxDecoration(
-                              border: Border.all(
-                                width: 1.0,
-                                color: Colors.black38,
-                              ),
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: TextFormField(
-                              style: const TextStyle(
-                                color: Colors.black,
-                                fontSize: 20,
-                              ),
-                              controller: passwordController,
-                              decoration: InputDecoration(
-                                border: InputBorder.none,
-                                prefixIcon: const Icon(
-                                  Icons.password,
-                                  color: primaryColor,
-                                ),
-                                suffixIcon: IconButton(
-                                  icon: Icon(
-                                    isPasswordObscured
-                                        ? Icons.visibility
-                                        : Icons.visibility_off,
-                                    color: primaryColor,
-                                  ),
-                                  onPressed: () {
-                                    setState(() {
-                                      isPasswordObscured = !isPasswordObscured;
-                                    });
-                                  },
-                                ),
-                              ),
-                              obscureText: isPasswordObscured,
-                            ),
-                          ),
-                          const SizedBox(height: 15),
-                          Text(
-                            (langUserPhone == "fr")
-                                ? 'Confirmer le mot de passe'
-                                : 'Confirm password',
-                            style: const TextStyle(
-                                color: Colors.black,
-                                fontSize: 18.0,
-                                fontWeight: FontWeight.w500),
-                          ),
-                          const SizedBox(height: 5),
-                          Container(
-                            decoration: BoxDecoration(
-                              border: Border.all(
-                                width: 1.0,
-                                color: Colors.black38,
-                              ),
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: TextFormField(
-                              style: const TextStyle(
-                                color: Colors.black,
-                                fontSize: 20,
-                              ),
-                              controller: passwordVerifController,
-                              decoration: InputDecoration(
-                                border: InputBorder.none,
-                                prefixIcon: const Icon(
-                                  Icons.password,
-                                  color: primaryColor,
-                                ),
-                                suffixIcon: IconButton(
-                                  icon: Icon(
-                                    isVerificationPasswordObscured
-                                        ? Icons.visibility
-                                        : Icons.visibility_off,
-                                    color: primaryColor,
-                                  ),
-                                  onPressed: () {
-                                    setState(() {
-                                      isVerificationPasswordObscured =
-                                          !isVerificationPasswordObscured;
-                                    });
-                                  },
-                                ),
-                              ),
-                              obscureText: isVerificationPasswordObscured,
-                            ),
-                          ),
-                          const SizedBox(height: 15),
-                          SizedBox(
-                            width: MediaQuery.of(context).size.width * 0.90,
-                            child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: primaryColor,
-                                shape: const StadiumBorder(),
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 13,
-                                ),
-                                minimumSize: const Size.fromHeight(50),
-                              ),
-                              child: Text(
-                                _desactive
-                                    ? (langUserPhone == "fr")
-                                        ? "Patientez..."
-                                        : "Wait..."
-                                    : (langUserPhone == "fr")
-                                        ? "INSCRIPTION"
-                                        : "REGISTRATION",
-                                style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold),
-                              ),
-                              onPressed: () {
-                                _desactive
-                                    ? null
-                                    : registerIn(
-                                        pseudoController.text,
-                                        telController.text,
-                                        emailController.text,
-                                        passwordController.text,
-                                        passwordVerifController.text,
-                                      );
-                              },
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 40),
-              ],
-            ),
-          )
+          SizedBox(height: 20),
         ],
+      ),
+    );
+  }
+
+  // Helper pour construire la décoration des champs de texte
+  InputDecoration _buildInputDecoration(
+      {required String label,
+      IconData? icon,
+      Widget? prefix,
+      Widget? suffixIcon}) {
+    return InputDecoration(
+      labelText: label,
+      prefixIcon: icon != null ? Icon(icon, color: primaryColor) : null,
+      prefix: prefix,
+      suffixIcon: suffixIcon,
+      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(color: primaryColor, width: 2),
       ),
     );
   }
