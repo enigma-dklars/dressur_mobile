@@ -1,5 +1,7 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
 
+import 'dart:developer';
+
 import 'package:dressur/components/constant.dart';
 import 'package:dressur/components/noti.dart';
 import 'package:flutter/material.dart';
@@ -29,11 +31,11 @@ class _ConfigurationRetraitPageState extends State<ConfigurationRetraitPage> {
 
   // Liste des réseaux disponibles
   final List<ReseauPaiement> _reseauxDisponibles = [
-    ReseauPaiement(id: 'mtn_benin', nom: 'MTN Mobile Money (Bénin)'),
-    ReseauPaiement(id: 'moov_benin', nom: 'Moov Money (Bénin)'),
+    ReseauPaiement(id: 'mtn_open', nom: 'MTN Mobile Money (Bénin)'),
+    ReseauPaiement(id: 'moov', nom: 'Moov Money (Bénin)'),
     ReseauPaiement(id: 'mtn_ci', nom: 'MTN Mobile Money (Côte d’Ivoire)'),
-    ReseauPaiement(id: 'moov_togo', nom: 'Moov Money (Togo)'),
-    ReseauPaiement(id: 'tmoney_togo', nom: 'Togocom T-Money (Togo)'),
+    ReseauPaiement(id: 'moov_tg', nom: 'Moov Money (Togo)'),
+    ReseauPaiement(id: 'togocel', nom: 'T-Money (Togo)')
   ];
 
   ReseauPaiement? _reseauSelectionne;
@@ -51,8 +53,6 @@ class _ConfigurationRetraitPageState extends State<ConfigurationRetraitPage> {
     _numeroController.dispose();
     super.dispose();
   }
-
-  // --- LOGIQUE API ---
 
   Future<void> _fetchConfiguration() async {
     setState(() => _isLoading = true);
@@ -72,13 +72,18 @@ class _ConfigurationRetraitPageState extends State<ConfigurationRetraitPage> {
 
         if (data['error'] == false) {
           _numeroController.text =
-              data['numeroRetrait'].replaceAll('+', '') ?? '';
+              (data['numeroRetrait'] ?? '').toString().replaceAll('+', '');
+
           String? reseauId = data['reseauRetrait'];
+
           if (reseauId != null) {
-            _reseauSelectionne = _reseauxDisponibles.firstWhere(
-              (r) => r.id == reseauId,
-              // orElse: () => null,
-            );
+            final match = _reseauxDisponibles.where((r) => r.id == reseauId);
+
+            if (match.isNotEmpty) {
+              _reseauSelectionne = match.first;
+            } else {
+              _reseauSelectionne = null;
+            }
           }
         } else {
           print("Aucune configuration trouvée ou erreur serveur.");
