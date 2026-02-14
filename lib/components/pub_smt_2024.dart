@@ -46,7 +46,7 @@ Widget SpecialPub(BuildContext context) {
             "Découvrez nos autres applications",
             style: GoogleFonts.poppins(
               fontSize: 18,
-              fontWeight: FontWeight.w600,
+              fontWeight: FontWeight.w400,
               color: isDark ? Colors.white.withOpacity(0.9) : Colors.black87,
             ),
           ),
@@ -54,17 +54,17 @@ Widget SpecialPub(BuildContext context) {
 
         // --- LISTE HORIZONTALE ---
         SizedBox(
-          height: 180, // Hauteur légèrement augmentée pour plus d'aisance
+          height: 170, // Hauteur légèrement augmentée pour plus d'aisance
           child: ListView.separated(
             physics: BouncingScrollPhysics(), // Effet de rebond plus moderne
             scrollDirection: Axis.horizontal,
             itemCount: apps.length,
-            separatorBuilder: (context, index) => const SizedBox(width: 15),
+            separatorBuilder: (context, index) => const SizedBox(width: 10),
             itemBuilder: (context, index) {
               final app = apps[index];
 
               return Container(
-                width: 290,
+                width: 300,
                 decoration: BoxDecoration(
                   borderRadius:
                       BorderRadius.circular(15), // Coins plus arrondis
@@ -111,13 +111,12 @@ Widget SpecialPub(BuildContext context) {
 
                       // --- CONTENU SUPERPOSÉ ---
                       Positioned(
-                        bottom: 16,
-                        left: 16,
-                        right: 16,
+                        bottom: 10,
+                        left: 10,
+                        right: 10,
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            // --- NOM DE L'APP ---
                             Expanded(
                               child: Text(
                                 app["name"]!,
@@ -125,7 +124,7 @@ Widget SpecialPub(BuildContext context) {
                                   // Utilisation de Poppins
                                   color: Colors.white,
                                   fontSize: 20,
-                                  fontWeight: FontWeight.bold,
+                                  fontWeight: FontWeight.w400,
                                   shadows: [
                                     Shadow(
                                       blurRadius: 8,
@@ -140,8 +139,8 @@ Widget SpecialPub(BuildContext context) {
                             // --- BOUTON D'INSTALLATION AMÉLIORÉ ---
                             Container(
                               padding: const EdgeInsets.symmetric(
-                                horizontal: 14,
-                                vertical: 8,
+                                horizontal: 15,
+                                vertical: 5,
                               ),
                               decoration: BoxDecoration(
                                 color: Colors
@@ -151,14 +150,14 @@ Widget SpecialPub(BuildContext context) {
                               child: Row(
                                 children: [
                                   FaIcon(FontAwesomeIcons.googlePlay,
-                                      color: primaryColor, size: 16),
+                                      color: primaryColor, size: 14),
                                   SizedBox(width: 8),
                                   Text(
                                     "Installer",
                                     style: GoogleFonts.poppins(
                                       color:
                                           primaryColor, // Texte avec la couleur primaire
-                                      fontWeight: FontWeight.bold,
+                                      fontWeight: FontWeight.w600,
                                       fontSize: 14,
                                     ),
                                   ),

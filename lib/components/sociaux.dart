@@ -21,102 +21,140 @@ class SociauxPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding: const EdgeInsets.all(15),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [primaryColor, primaryColor.withOpacity(0.9)],
+          colors: [
+            primaryColor,
+            primaryColor.withOpacity(0.85),
+          ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(15),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          // --- PARTIE TEXTE (à gauche) ---
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // --- NOUVEAU TITRE : L'APPEL À L'ACTION DIRECT ---
-                Text(
-                  (langUserPhone == "fr") ? "Abonnez-vous !" : "Follow us!",
-                  style: GoogleFonts.poppins(
-                    color: Colors.white,
-                    fontSize: 16, // Légèrement plus grand pour plus d'impact
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                SizedBox(height: 3),
-
-                // --- NOUVEAU SOUS-TITRE : LA RAISON (LE "POURQUOI") ---
-                Text(
-                  (langUserPhone == "fr")
-                      ? "Pour ne rien manquer de nos offres."
-                      : "To never miss our offers.",
-                  style: GoogleFonts.poppins(
-                    color: Colors.white.withOpacity(0.85),
-                    fontSize: 12,
-                  ),
-                ),
-              ],
-            ),
+        boxShadow: [
+          BoxShadow(
+            color: primaryColor.withOpacity(0.3),
+            blurRadius: 15,
+            offset: const Offset(0, 8),
           ),
-          SizedBox(width: 16),
-
-          // --- PARTIE ICÔNES (à droite) ---
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
           Row(
             children: [
-              _buildSocialIconButton(
-                icon: FontAwesomeIcons.tiktok,
-                onTap: () => _launchURL(tiktokDS),
+              // 🔹 Partie Texte
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      (langUserPhone == "fr")
+                          ? "Abonnez-vous et partagez!"
+                          : "Subscribe and share!",
+                      style: GoogleFonts.poppins(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      (langUserPhone == "fr")
+                          ? "Ne manquez aucune offre et faites-en profiter vos proches."
+                          : "Don't miss any offers and share them with your loved ones.",
+                      style: GoogleFonts.poppins(
+                        color: Colors.white.withOpacity(0.85),
+                        fontSize: 14,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-              SizedBox(width: 14), // Espacement ajusté
-              _buildSocialIconButton(
-                icon: FontAwesomeIcons.facebook,
-                onTap: () => _launchURL(facebookDS),
-              ),
-              SizedBox(width: 14),
-              _buildSocialIconButton(
-                icon: FontAwesomeIcons.instagram,
-                onTap: () => _launchURL(instagramDS),
-              ),
-              SizedBox(width: 14),
-              _buildSocialIconButton(
-                icon: FontAwesomeIcons.whatsapp,
-                onTap: () => _launchURL(chaineWhatsApp),
+
+              // 🔹 Icônes sociales modernisées
+              Column(
+                children: [
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      _socialIcon(
+                        FontAwesomeIcons.tiktok,
+                        () => _launchURL(tiktokDS),
+                      ),
+                      _socialIcon(
+                        FontAwesomeIcons.facebook,
+                        () => _launchURL(facebookDS),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      _socialIcon(
+                        FontAwesomeIcons.instagram,
+                        () => _launchURL(instagramDS),
+                      ),
+                      _socialIcon(
+                        FontAwesomeIcons.whatsapp,
+                        () => _launchURL(chaineWhatsApp),
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ],
+          ),
+
+          const SizedBox(height: 10),
+
+          // 🔹 Bouton plus visible
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.white,
+                foregroundColor: primaryColor,
+                shape: const StadiumBorder(),
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                elevation: 0,
+              ),
+              icon: const Icon(Icons.share),
+              label: Text(
+                (langUserPhone == "fr") ? 'PARTAGER DRESSUR' : 'SHARE DRESSUR',
+                style: GoogleFonts.poppins(
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              onPressed: () async {
+                shareMessageWithImage(context, "$langUserPhone");
+              },
+            ),
           ),
         ],
       ),
     );
   }
 
-  // Widget pour un bouton d'icône de réseau social
-  Widget _buildSocialIconButton({
-    required IconData icon,
-    required VoidCallback onTap,
-  }) {
-    // Utilisation de Tooltip pour afficher le nom du réseau au survol (utile sur le web)
-    return Tooltip(
-      message: icon == FontAwesomeIcons.tiktok
-          ? 'TikTok'
-          : icon == FontAwesomeIcons.facebook
-              ? 'Facebook'
-              : icon == FontAwesomeIcons.instagram
-                  ? 'Instagram'
-                  : 'WhatsApp',
+  Widget _socialIcon(IconData icon, VoidCallback onTap) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 6),
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(20),
-        child: Padding(
-          padding: const EdgeInsets.all(
-              4.0), // Petite zone de clic autour de l'icône
-          child: FaIcon(
+        borderRadius: BorderRadius.circular(50),
+        child: Container(
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.15),
+            shape: BoxShape.circle,
+          ),
+          child: Icon(
             icon,
+            size: 18,
             color: Colors.white,
-            size: 24, // Icônes légèrement plus grandes
           ),
         ),
       ),
