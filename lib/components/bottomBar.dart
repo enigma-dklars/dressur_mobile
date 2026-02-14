@@ -68,7 +68,6 @@ class _BottomBarState extends State<BottomBar> with WidgetsBindingObserver {
     WidgetsBinding.instance.addObserver(this);
     if (modeReconnaissanceContactArrierePlan == true) {
       synchroAvanceFunction();
-      print("qqqqqqqqqqqqqqqqqqqqqqqqq");
       setState(() {
         modeReconnaissanceContactArrierePlan = false;
       });
@@ -106,13 +105,11 @@ class _BottomBarState extends State<BottomBar> with WidgetsBindingObserver {
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
     if (state == AppLifecycleState.resumed) {
-      showNotificationTimeOutAfter(
-          "Cc $name_complete ...", "Dressur est revenue au premier plan.", 300);
+      // showNotificationTimeOutAfter("Cc $name_complete ...", "Dressur est revenue au premier plan.", 300);
       actualise(false);
       saveContactDsIfNotExiste();
     } else if (state == AppLifecycleState.paused) {
-      showNotificationTimeOutAfter(
-          "Cc $name_complete ...", "Dressur est passée à l'arrière-plan.", 300);
+      // showNotificationTimeOutAfter("Cc $name_complete ...", "Dressur est passée à l'arrière-plan.", 300);
     }
   }
 
