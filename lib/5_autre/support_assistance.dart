@@ -23,8 +23,9 @@ class SupportPage extends StatelessWidget {
         title: Text(
           (langUserPhone == "fr") ? "Support" : "Support",
           style: GoogleFonts.poppins(
-            fontWeight: FontWeight.w400,
             color: Colors.white,
+            fontWeight: FontWeight.w400,
+            fontSize: 18,
           ),
         ),
       ),

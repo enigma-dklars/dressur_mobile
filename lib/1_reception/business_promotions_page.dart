@@ -364,7 +364,10 @@ class _BusinessPromotionsPageState extends State<BusinessPromotionsPage> {
               ? "Promotions Affaires"
               : "Business Promotions",
           style: GoogleFonts.poppins(
-              color: Colors.white, fontWeight: FontWeight.w500),
+            color: Colors.white,
+            fontWeight: FontWeight.w400,
+            fontSize: 18,
+          ),
         ),
         leading: IconButton(
           icon: Icon(Icons.arrow_back_ios, color: Colors.white),
@@ -604,6 +607,7 @@ class AdvertisementDetailPage extends StatelessWidget {
           style: GoogleFonts.poppins(
             color: Colors.white,
             fontWeight: FontWeight.w400,
+            fontSize: 18,
           ),
         ),
         leading: IconButton(

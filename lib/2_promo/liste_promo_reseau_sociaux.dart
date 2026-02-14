@@ -121,8 +121,9 @@ class _PromotionReseauSociauxListePageState
               ? "Liste Promotion Réseau Sociaux"
               : "Social Network Promotion List",
           style: GoogleFonts.poppins(
-            fontWeight: FontWeight.w600,
             color: Colors.white,
+            fontWeight: FontWeight.w400,
+            fontSize: 18,
           ),
         ),
         leading: IconButton(

@@ -29,8 +29,9 @@ class ProfilPage extends StatelessWidget {
         title: Text(
           (langUserPhone == "fr") ? "Mon Profil" : "My profile",
           style: GoogleFonts.poppins(
-            fontWeight: FontWeight.w400,
             color: Colors.white,
+            fontWeight: FontWeight.w400,
+            fontSize: 18,
           ),
         ),
         actions: [

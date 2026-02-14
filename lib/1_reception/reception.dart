@@ -71,9 +71,10 @@ class _ReceptionPageState extends State<ReceptionPage> {
           title: Text(
             (langUserPhone == "fr") ? "Boîte de Réception" : "Inbox",
             style: GoogleFonts.poppins(
-              fontWeight: FontWeight.w400,
-              color: Colors.white,
-            ),
+            color: Colors.white,
+            fontWeight: FontWeight.w400,
+            fontSize: 18,
+          ),
           ),
           actions: [
             PopupMenuButton<dynamic>(

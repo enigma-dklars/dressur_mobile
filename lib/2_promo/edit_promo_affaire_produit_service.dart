@@ -176,11 +176,15 @@ class _ModificationProduitServicesPageState
     return Scaffold(
       appBar: AppBar(
         title: Text(
-            langUserPhone == "fr"
-                ? 'Modification Promotion Affaire'
-                : 'Change Promotion Deal',
-            style: GoogleFonts.poppins(
-                fontWeight: FontWeight.w400, color: Colors.white)),
+          langUserPhone == "fr"
+              ? 'Modification Promotion Affaire'
+              : 'Change Promotion Deal',
+          style: GoogleFonts.poppins(
+            color: Colors.white,
+            fontWeight: FontWeight.w400,
+            fontSize: 18,
+          ),
+        ),
         leading: IconButton(
             onPressed: () => Navigator.pop(context),
             icon: Icon(Icons.arrow_back_ios, color: Colors.white)),

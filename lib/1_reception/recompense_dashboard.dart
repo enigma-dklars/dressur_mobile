@@ -122,12 +122,11 @@ class _ProgrammeRecompenseDashboardState
       appBar: AppBar(
         backgroundColor: primaryColor,
         elevation: 0,
-        centerTitle: true,
         title: Text(
           "Mon Programme",
           style: GoogleFonts.poppins(
             color: Colors.white,
-            fontWeight: FontWeight.w600,
+            fontWeight: FontWeight.w400,
             fontSize: 18,
           ),
         ),

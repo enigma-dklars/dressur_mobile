@@ -37,8 +37,9 @@ class _PromotionFormPageState extends State<PromotionFormPage> {
               ? 'Nouvelle Promotion Affaire'
               : 'New Business Promotion',
           style: GoogleFonts.poppins(
-            fontWeight: FontWeight.w400,
             color: Colors.white,
+            fontWeight: FontWeight.w400,
+            fontSize: 18,
           ),
         ),
         leading: IconButton(

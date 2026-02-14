@@ -83,6 +83,7 @@ class _AdministrationPageState extends State<AdministrationPage> {
           style: GoogleFonts.poppins(
             color: Colors.white,
             fontWeight: FontWeight.w400,
+            fontSize: 18,
           ),
         ),
       ),

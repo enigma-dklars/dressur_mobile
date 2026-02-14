@@ -234,8 +234,9 @@ class _ReceptionChatPageState extends State<ReceptionChatPage>
           title: Text(
             (langUserPhone == "fr") ? "Boîte de Réception" : "Inbox",
             style: GoogleFonts.poppins(
-              fontWeight: FontWeight.w400,
               color: Colors.white,
+              fontWeight: FontWeight.w400,
+              fontSize: 18,
             ),
           ),
           actions: [

@@ -160,6 +160,7 @@ class _SettingPageState extends State<SettingPage> {
             style: GoogleFonts.poppins(
               color: Colors.white,
               fontWeight: FontWeight.w400,
+              fontSize: 18,
             ),
           ),
           actions: [

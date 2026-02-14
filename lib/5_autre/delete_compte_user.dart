@@ -36,6 +36,7 @@ class DeletecomptePage extends StatelessWidget {
           style: GoogleFonts.poppins(
             color: Colors.white,
             fontWeight: FontWeight.w400,
+            fontSize: 18,
           ),
         ),
       ),

@@ -30,8 +30,9 @@ class _PromotionReseauSociauxFormPageState
               ? "Nouvelle Promotion Réseau Sociaux"
               : "New Social Network Promotion",
           style: GoogleFonts.poppins(
-            fontWeight: FontWeight.w400,
             color: Colors.white,
+            fontWeight: FontWeight.w400,
+            fontSize: 18,
           ),
         ),
         leading: IconButton(

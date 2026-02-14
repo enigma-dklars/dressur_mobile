@@ -490,7 +490,10 @@ class _PromotionListPageState extends State<PromotionListPage> {
               ? 'Liste Promotion Affaire'
               : 'Business Promotion List',
           style: GoogleFonts.poppins(
-              fontWeight: FontWeight.w400, color: Colors.white),
+            color: Colors.white,
+            fontWeight: FontWeight.w400,
+            fontSize: 18,
+          ),
         ),
         leading: IconButton(
           onPressed: () {
@@ -580,7 +583,11 @@ class PromotionDetailPage extends StatelessWidget {
         foregroundColor: Colors.white,
         title: Text(
           (langUserPhone == "fr") ? 'Détails' : 'Details',
-          style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+          style: GoogleFonts.poppins(
+            color: Colors.white,
+            fontWeight: FontWeight.w400,
+            fontSize: 18,
+          ),
         ),
         leading: IconButton(
           onPressed: () {
@@ -1104,9 +1111,14 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Relancer la Promotion',
-            style: GoogleFonts.poppins(
-                fontWeight: FontWeight.w400, color: Colors.white)),
+        title: Text(
+          'Relancer la Promotion',
+          style: GoogleFonts.poppins(
+            color: Colors.white,
+            fontWeight: FontWeight.w400,
+            fontSize: 18,
+          ),
+        ),
         leading: IconButton(
             onPressed: () => Navigator.pop(context),
             icon: const Icon(Icons.arrow_back_ios, color: Colors.white)),
@@ -1187,8 +1199,7 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
               title: Text("Publier sur le statut Dressur",
                   style: GoogleFonts.poppins(
                       fontSize: 14, fontWeight: FontWeight.w500)),
-              subtitle: Text(
-                  "Visibilité maximale sur notre statut officiel.",
+              subtitle: Text("Visibilité maximale sur notre statut officiel.",
                   style: GoogleFonts.poppins(fontSize: 11)),
               value: _publishOnDressurStatus,
               activeColor: primaryColor,

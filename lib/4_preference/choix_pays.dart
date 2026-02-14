@@ -173,8 +173,9 @@ class _ChoixDesPaysState extends State<ChoixDesPays> {
         title: Text(
           (langUserPhone == "fr") ? 'Choix des Pays' : 'Choice of Countries',
           style: GoogleFonts.poppins(
-            fontWeight: FontWeight.w400,
             color: Colors.white,
+            fontWeight: FontWeight.w400,
+            fontSize: 18,
           ),
         ),
         leading: IconButton(

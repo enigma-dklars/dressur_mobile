@@ -28,8 +28,9 @@ class _NewBoostContactPageState extends State<NewBoostContactPage> {
               ? "Nouveau Boost Contact"
               : "New Boost Contact",
           style: GoogleFonts.poppins(
-            fontWeight: FontWeight.w400,
             color: Colors.white,
+            fontWeight: FontWeight.w400,
+            fontSize: 18,
           ),
         ),
         leading: IconButton(

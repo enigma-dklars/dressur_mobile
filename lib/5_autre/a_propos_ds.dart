@@ -31,8 +31,9 @@ class AproposPage extends StatelessWidget {
         title: Text(
           (langUserPhone == "fr") ? "À Propos de Dressur" : "About Dressur",
           style: GoogleFonts.poppins(
-            fontWeight: FontWeight.w400,
             color: Colors.white,
+            fontWeight: FontWeight.w400,
+            fontSize: 18,
           ),
         ),
         leading: IconButton(

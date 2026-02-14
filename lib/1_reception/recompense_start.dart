@@ -88,12 +88,11 @@ class _ProgrammeRecompensePageState extends State<ProgrammeRecompensePage> {
       appBar: AppBar(
         backgroundColor: primaryColor,
         elevation: 0,
-        centerTitle: true,
         title: Text(
           "Programme des récompenses",
           style: GoogleFonts.poppins(
-            fontWeight: FontWeight.w600,
             color: Colors.white,
+            fontWeight: FontWeight.w400,
             fontSize: 18,
           ),
         ),

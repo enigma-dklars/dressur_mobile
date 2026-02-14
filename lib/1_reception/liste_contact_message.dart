@@ -128,6 +128,7 @@ class _ContactForMessagePageState extends State<ContactForMessagePage> {
           style: GoogleFonts.poppins(
             color: Colors.white,
             fontWeight: FontWeight.w400,
+            fontSize: 18,
           ),
         ),
         leading: IconButton(

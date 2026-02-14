@@ -128,12 +128,11 @@ class _HistoriqueCompletPageState extends State<HistoriqueCompletPage> {
         appBar: AppBar(
           backgroundColor: primaryColor,
           elevation: 0,
-          centerTitle: true,
           title: Text(
             "Historique complet",
             style: GoogleFonts.poppins(
               color: Colors.white,
-              fontWeight: FontWeight.w600,
+              fontWeight: FontWeight.w400,
               fontSize: 18,
             ),
           ),

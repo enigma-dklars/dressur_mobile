@@ -2,9 +2,7 @@
 
 import 'dart:io';
 import 'dart:async';
-import 'package:dressur/2_promo/liste_campagne_mail.dart';
 import 'package:dressur/2_promo/liste_promo_reseau_sociaux.dart';
-import 'package:dressur/2_promo/new_campagne_mail.dart';
 import 'package:dressur/2_promo/new_promo_reseau_sociaux.dart';
 import 'package:dressur/components/noti.dart';
 import 'package:dressur/components/padding_and_divider.dart';
@@ -79,8 +77,9 @@ class _BoostPageState extends State<BoostPage> {
           title: Text(
             (langUserPhone == "fr") ? "Promotions" : "Promotions",
             style: GoogleFonts.poppins(
-              fontWeight: FontWeight.w400,
               color: Colors.white,
+              fontWeight: FontWeight.w400,
+              fontSize: 18,
             ),
           ),
           actions: [

@@ -867,6 +867,7 @@ class _ActuPageState extends State<ActuPage> {
             style: GoogleFonts.poppins(
               color: Colors.white,
               fontWeight: FontWeight.w400,
+              fontSize: 18,
             ),
           ),
           actions: [
@@ -1674,7 +1675,11 @@ class AdvertisementDetailPage extends StatelessWidget {
           (langUserPhone == "fr")
               ? 'Détails de la promotion'
               : 'Promotion Details',
-          style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+          style: GoogleFonts.poppins(
+            color: Colors.white,
+            fontWeight: FontWeight.w400,
+            fontSize: 18,
+          ),
         ),
       ),
       body: SingleChildScrollView(

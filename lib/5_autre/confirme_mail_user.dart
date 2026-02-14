@@ -130,8 +130,9 @@ class _CodeMailConfirmePageState extends State<CodeMailConfirmePage> {
               ? "Confirmation du Mail"
               : "Email Confirmation",
           style: GoogleFonts.poppins(
-            fontWeight: FontWeight.w600,
             color: Colors.white,
+            fontWeight: FontWeight.w400,
+            fontSize: 18,
           ),
         ),
         actions: [
