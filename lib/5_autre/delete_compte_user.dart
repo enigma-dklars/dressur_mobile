@@ -89,7 +89,6 @@ class _DeletecompteFormState extends State<DeletecompteForm> {
   final confirmController = TextEditingController();
   bool _canDelete = false;
 
-  // La logique API reste la même, juste avec une meilleure gestion de l'état de chargement
   Future<void> deletecompteUser() async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -112,7 +111,6 @@ class _DeletecompteFormState extends State<DeletecompteForm> {
 
     setState(() => _isLoading = true);
 
-    // ... (votre logique de requête http existante )
     try {
       var request = http.MultipartRequest(
           'POST', Uri.parse('$generalRouteForApi/deleteCompteDS'));

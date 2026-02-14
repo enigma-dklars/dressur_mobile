@@ -338,10 +338,6 @@ class _HistoriqueCompletPageState extends State<HistoriqueCompletPage> {
     );
   }
 
-  // Note: J'ai conservé les fonctions _showStatusDetailsBottomSheet et autres
-  // telles qu'elles étaient dans votre code original pour ne pas changer l'interface.
-  // ... (Le reste du code suit la même structure que votre fichier original)
-
   void _showStatusDetailsBottomSheet(
       BuildContext context, HistoriqueRecompense item) {
     setState(() {

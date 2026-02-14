@@ -27,7 +27,6 @@ class SettingPage extends StatefulWidget {
 }
 
 class _SettingPageState extends State<SettingPage> {
-  // La logique _onWillPop reste inchangée.
   Future<bool> _onWillPop() async {
     // ... (votre code _onWillPop existant)
     return (await showDialog(
@@ -70,7 +69,53 @@ class _SettingPageState extends State<SettingPage> {
     );
 
     if (response.isTapConfirmButton) {
-      // ... (votre logique de suppression de contacts)
+      if (contactsEnregistrer.isNotEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          behavior: SnackBarBehavior.floating,
+          duration: const Duration(minutes: 1),
+          content: Text(
+            (langUserPhone == "fr")
+                ? "Dressur vas parcourir vos contacts un a un et supprimer les contacts DS.\n\nPatientez tous le long du processus.\n\nCe processus peut durée plusieurs minutes."
+                : "Dressur will go through your contacts one by one and delete DS contacts.\n\nWait all the way through the process.\n\nThis process may take several minutes.",
+          ),
+        ));
+        List<Contact> contacts =
+            await FlutterContacts.getContacts(withProperties: true);
+        var nombreContact = contacts.length;
+        for (var contact in contacts) {
+          for (var phone in contact.phones) {
+            var numberTel =
+                (phone.number).replaceAll(" ", "").replaceAll("-", "");
+            if (contactsEnregistrer.contains(numberTel)) {
+              await contact.delete();
+            }
+          }
+          nombreContact--;
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            behavior: SnackBarBehavior.floating,
+            content: Text((langUserPhone == "fr")
+                ? "$nombreContact contact(s) restant à parcourir."
+                : "$nombreContact contact(s) remaining to be scanned."),
+          ));
+        }
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          behavior: SnackBarBehavior.floating,
+          content: Text(
+            (langUserPhone == "fr")
+                ? "${contactsEnregistrer.length} contact(s) DS supprimer."
+                : "${contactsEnregistrer.length} DS contact(s) delete.",
+          ),
+        ));
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          behavior: SnackBarBehavior.floating,
+          content: Text(
+            (langUserPhone == "fr")
+                ? "Vous n'avez aucun contact DS actuellement. Faite un boost pour en avoir."
+                : "You don't currently have any DS Contacts. Boost to get some.",
+          ),
+        ));
+      }
     }
   }
 

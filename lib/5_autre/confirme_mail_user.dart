@@ -27,8 +27,6 @@ class _CodeMailConfirmePageState extends State<CodeMailConfirmePage> {
     if (_isResending) return;
     setState(() => _isResending = true);
 
-    // Votre logique existante pour sendMail()
-    // ... (J'ai simplifié pour la lisibilité, mais gardez votre gestion d'erreur complète)
     try {
       var request = http.MultipartRequest(
           'POST', Uri.parse('$generalRouteForApi/sendMailVerification'));
@@ -63,8 +61,6 @@ class _CodeMailConfirmePageState extends State<CodeMailConfirmePage> {
     if (pin.length < 4) return; // Assurez-vous que le code est complet
     setState(() => _isConfirming = true);
 
-    // Votre logique existante pour codeVerif()
-    // ... (J'ai simplifié pour la lisibilité)
     try {
       var request = http.MultipartRequest(
           'POST', Uri.parse('$generalRouteForApi/mailVerification'));

@@ -104,7 +104,6 @@ class _RegisterFormState extends State<RegisterForm> {
   bool _isLoading = false;
   final _formKey = GlobalKey<FormState>();
 
-  // Les contrôleurs restent les mêmes
   final telController = TextEditingController(text: tel);
   final emailController = TextEditingController(text: mail);
   final nameController = TextEditingController(text: nom);
@@ -115,13 +114,10 @@ class _RegisterFormState extends State<RegisterForm> {
   final facebookController = TextEditingController(text: facebook);
   final youtubeController = TextEditingController(text: youtube);
 
-  // La logique API reste la même, juste le nom de la variable de chargement a changé
   Future<void> _updateProfile() async {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _isLoading = true);
 
-    // ... (votre logique de requête http existante, en utilisant _isLoading )
-    // J'ai juste remplacé `_desactive` par `_isLoading` et ajouté un try-catch
     try {
       var request = http.MultipartRequest(
           'POST', Uri.parse('$generalRouteForApi/updateUserInfo'));

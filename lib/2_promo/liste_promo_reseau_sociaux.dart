@@ -463,7 +463,6 @@ class _PromotionReseauSociauxListePageState
   }
 
   Map<String, dynamic> _getStatusInfo(String status) {
-    // ... (votre logique de statut)
     if (["Completed", "Terminé", "In progress", "En cours"].contains(status)) {
       return {'label': status, 'color': Colors.green};
     } else if (["On hold", "En attente"].contains(status)) {

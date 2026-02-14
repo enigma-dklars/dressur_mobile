@@ -135,7 +135,6 @@ class AproposPage extends StatelessWidget {
     );
   }
 
-  // Les widgets helpers restent les mêmes
   Widget _buildSection({
     required IconData icon,
     required String title,

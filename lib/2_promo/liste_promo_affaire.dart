@@ -801,7 +801,6 @@ class PromotionDetailPage extends StatelessWidget {
   }
 
   Widget _buildStatusLabel(String status) {
-    // ... (votre logique de couleur)
     Color backgroundColor = Colors.grey;
     if ([
       "Completed",

@@ -83,13 +83,10 @@ class _SignalerFormState extends State<SignalerForm> {
   final telController = TextEditingController();
   final motifController = TextEditingController();
 
-  // La logique API reste la même, juste avec une meilleure gestion de l'état de chargement
   Future<void> signaleUser() async {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _isLoading = true);
 
-    // ... (votre logique de requête http existante )
-    // J'ai juste remplacé `_desactive` par `_isLoading` et ajouté un try-catch
     try {
       var request = http.MultipartRequest(
           'POST', Uri.parse('$generalRouteForApi/addSignalement'));

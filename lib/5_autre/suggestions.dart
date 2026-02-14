@@ -92,13 +92,10 @@ class _SuggestionsFormState extends State<SuggestionsForm> {
   final _formKey = GlobalKey<FormState>();
   final motifController = TextEditingController();
 
-  // La logique API reste la même, juste avec une meilleure gestion de l'état de chargement
   Future<void> addSuggestion() async {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _isLoading = true);
 
-    // ... (votre logique de requête http existante )
-    // J'ai juste remplacé `_desactive` par `_isLoading` et ajouté un try-catch
     try {
       var request = http.MultipartRequest(
           'POST', Uri.parse('$generalRouteForApi/addSuggestion'));

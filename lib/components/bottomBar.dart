@@ -2,18 +2,20 @@
 
 import 'dart:async';
 import 'dart:convert';
+import 'dart:convert' as convert;
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
-
-// --- Importez vos pages et constantes ---
 import 'package:dressur/1_reception/reception.dart';
 import 'package:dressur/2_promo/promo.dart';
 import 'package:dressur/3_actu/actu.dart';
 import 'package:dressur/4_preference/preference.dart';
 import 'package:dressur/5_autre/autre.dart';
 import 'package:dressur/components/constant.dart';
-// ... et le reste de vos imports
+import 'package:dressur/components/sql_helper.dart';
+import 'package:dressur/components/noti_sys.dart';
 
 class BottomBar extends StatefulWidget {
   const BottomBar({Key? key}) : super(key: key);
@@ -25,6 +27,11 @@ class BottomBar extends StatefulWidget {
 class _BottomBarState extends State<BottomBar> with WidgetsBindingObserver {
   // L'index 2 correspond maintenant à la page "Actu"
   int _selectedIndex = 2;
+  int nombreNewContact = 0;
+  dynamic screens = [];
+  bool _swipeInProgress = false;
+  final Duration _swipeCooldown = const Duration(milliseconds: 300);
+
   final PageController _pageController = PageController(initialPage: 2);
 
   // --- Listes pour la barre de navigation ---
@@ -54,11 +61,38 @@ class _BottomBarState extends State<BottomBar> with WidgetsBindingObserver {
     Icons.settings,
   ];
 
-  // ... (Toute votre logique initState, dispose, etc. reste la même)
   @override
   void initState() {
     super.initState();
-    // ...
+    saveContactDsIfNotExiste();
+    WidgetsBinding.instance.addObserver(this);
+    if (modeReconnaissanceContactArrierePlan == true) {
+      synchroAvanceFunction();
+      print("qqqqqqqqqqqqqqqqqqqqqqqqq");
+      setState(() {
+        modeReconnaissanceContactArrierePlan = false;
+      });
+    }
+
+    // Exécute la fonction toutes les 5 heures
+    Timer.periodic(const Duration(hours: 6), (timer) {
+      showNotification(
+          "Cc $name_complete ...", "Du nouveau sur votre compte Dressur.");
+    });
+
+    Timer.periodic(const Duration(hours: 6), (timer) {
+      saveContactDsIfNotExiste();
+      actualise(false);
+      // getMessageEnAttente(false);
+    });
+
+    // si le user est un admin, il sera notifier des traitement en attente de validation
+    // if (admin) {
+    //   traitementAdmin();
+    //   Timer.periodic(const Duration(minutes: 30), (timer) async {
+    //     await traitementAdmin();
+    //   });
+    // }
   }
 
   @override
@@ -66,6 +100,118 @@ class _BottomBarState extends State<BottomBar> with WidgetsBindingObserver {
     _pageController.dispose();
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    if (state == AppLifecycleState.resumed) {
+      showNotificationTimeOutAfter(
+          "Cc $name_complete ...", "Dressur est revenue au premier plan.", 300);
+      actualise(false);
+      saveContactDsIfNotExiste();
+    } else if (state == AppLifecycleState.paused) {
+      showNotificationTimeOutAfter(
+          "Cc $name_complete ...", "Dressur est passée à l'arrière-plan.", 300);
+    }
+  }
+
+  Future<void> traitementAdmin() async {
+    final url = Uri.parse('$generalRouteForApi/traitementAdmin');
+    final response = await http.get(url);
+    if (response.statusCode == 200) {
+      final jsonData = jsonDecode(response.body) as List<dynamic>;
+      if (jsonData.isNotEmpty) {
+        for (var element in jsonData) {
+          showNotification(element, "Dressur Admin Traitement");
+        }
+      }
+    }
+  }
+
+  void synchroAvanceFunction() async {
+    setState(() {
+      contactsUserBeforeDS = [];
+    });
+    await SQLHelper.viderLaBaseDeDonneeLocalTelUser();
+    await Future.delayed(const Duration(seconds: 3), () {});
+    List<Contact> contacts =
+        await FlutterContacts.getContacts(withProperties: true);
+    for (var contact in contacts) {
+      for (var phone in contact.phones) {
+        var displayNameTel = contact.displayName;
+        var nameTel = "${contact.name.first} ${contact.name.last}";
+        var mailTel = contact.emails.map((email) => email.address).join(',');
+        var numberTel = (phone.number).replaceAll(" ", "").replaceAll("-", "");
+        if (!contactsUserBeforeDS.contains(numberTel)) {
+          contactsUserBeforeDS.add({
+            "nameTel": nameTel,
+            "mailTel": mailTel,
+            "numberTel": numberTel,
+            "displayNameTel": displayNameTel,
+          });
+        }
+        if ((await SQLHelper.getOneNumsTelUser(numberTel)).isEmpty) {
+          await insertNumTelUserIntoDataBase(numberTel);
+        }
+      }
+    }
+    var request = http.MultipartRequest(
+        'POST', Uri.parse('$generalRouteForApi/stockerUserContacts'));
+    request.fields
+        .addAll({'contactsUserBeforeDS': jsonEncode(contactsUserBeforeDS)});
+    await request.send();
+  }
+
+  void actualise(affMessage) async {
+    if (affMessage == true) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: Colors.red,
+        behavior: SnackBarBehavior.floating,
+        content: Text(
+          (langUserPhone == "fr")
+              ? 'Actualisation en cours…'
+              : 'Update in progress…',
+          style: GoogleFonts.poppins(
+            color: Colors.white,
+          ),
+        ),
+      ));
+    }
+
+    var request = http.MultipartRequest(
+        'POST', Uri.parse('$generalRouteForApi/getUserInfo'));
+    request.fields
+        .addAll({'uid': uidUser, 'langUserPhone': langUserPhone.toString()});
+
+    http.StreamedResponse response = await request.send();
+
+    if (response.statusCode == 200) {
+      var data1 = await response.stream.bytesToString();
+      var data = convert.jsonDecode(data1);
+      if (data["error"] == false) {
+        setState(() {
+          initUserInformations(data['user']);
+          lesPublicites = data['user']["lesPublicites"];
+        });
+      }
+    }
+    if (affMessage == true) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: Colors.green,
+          behavior: SnackBarBehavior.floating,
+          content: Text(
+            (langUserPhone == "fr")
+                ? 'Actualisation terminée.'
+                : 'Refresh complete.',
+            style: GoogleFonts.poppins(
+              color: Colors.white,
+            ),
+          ),
+        ),
+      );
+    }
   }
 
   @override

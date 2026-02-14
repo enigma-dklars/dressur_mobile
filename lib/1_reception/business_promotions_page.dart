@@ -383,8 +383,26 @@ class _BusinessPromotionsPageState extends State<BusinessPromotionsPage> {
               child: Text('Erreur: ${snapshot.error}'),
             );
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(
-              child: null,
+            return Center(
+              child: Padding(
+                padding: EdgeInsetsGeometry.fromLTRB(20, 0, 20, 0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.history_outlined,
+                        size: 50, color: Colors.grey[300]),
+                    const SizedBox(height: 10),
+                    Text(
+                      "Aucune promotion d’affaires disponible pour le programme de récompenses selon vos préférences de pays.",
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.poppins(
+                        fontSize: 14,
+                        color: Colors.grey,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             );
           } else {
             return ListView.builder(

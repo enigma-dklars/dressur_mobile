@@ -86,13 +86,10 @@ class _PasswordChangeFormState extends State<PasswordChangeForm> {
   final passwordController = TextEditingController();
   final passwordVerifController = TextEditingController();
 
-  // La logique API reste la même, juste avec une meilleure gestion des états de chargement
   Future<void> _changePassword() async {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _isLoading = true);
 
-    // ... (votre logique de requête http existante pour `registerIn` )
-    // J'ai juste remplacé `_isSendingMail` par `_isLoading` et ajouté un try-catch
     try {
       var request = http.MultipartRequest(
           'POST', Uri.parse('$generalRouteForApi/updateUserPassword'));
