@@ -957,7 +957,7 @@ class _ActuPageState extends State<ActuPage> {
                 child: ListView(
                   controller: _scrollController,
                   children: [
-                    const SizedBox(height: 10),
+                    // const SizedBox(height: 10),
                     // Affiche la checklist des actions requises
                     _buildActionChecklist(
                       context: context,
@@ -1228,43 +1228,48 @@ class _ActuPageState extends State<ActuPage> {
     // Ne rien afficher si la liste est vide
     if (actions.isEmpty) return SizedBox.shrink();
 
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: isDark ? Color(0xFF1E1E1E) : Colors.white,
-        borderRadius: BorderRadius.circular(15),
-        border:
-            Border.all(color: isDark ? Colors.grey[800]! : Colors.grey[200]!),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            (langUserPhone == "fr")
-                ? "Pour commencer, vous devez :"
-                : "To get started, you need to:",
-            style: GoogleFonts.poppins(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-              color: isDark ? Colors.white : Colors.black87,
-            ),
+    return Column(
+      children: [
+        const SizedBox(height: 15),
+        Container(
+          margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: isDark ? Color(0xFF1E1E1E) : Colors.white,
+            borderRadius: BorderRadius.circular(15),
+            border: Border.all(
+                color: isDark ? Colors.grey[800]! : Colors.grey[200]!),
           ),
-          SizedBox(height: 10),
-          // Affiche les actions avec des séparateurs
-          ...List.generate(actions.length, (index) {
-            return Column(
-              children: [
-                if (index > 0)
-                  Divider(
-                      color: isDark ? Colors.grey[800] : Colors.grey[200],
-                      height: 1),
-                actions[index],
-              ],
-            );
-          }),
-        ],
-      ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                (langUserPhone == "fr")
+                    ? "Pour commencer, vous devez :"
+                    : "To get started, you need to:",
+                style: GoogleFonts.poppins(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: isDark ? Colors.white : Colors.black87,
+                ),
+              ),
+              SizedBox(height: 10),
+              // Affiche les actions avec des séparateurs
+              ...List.generate(actions.length, (index) {
+                return Column(
+                  children: [
+                    if (index > 0)
+                      Divider(
+                          color: isDark ? Colors.grey[800] : Colors.grey[200],
+                          height: 1),
+                    actions[index],
+                  ],
+                );
+              }),
+            ],
+          ),
+        )
+      ],
     );
   }
 
