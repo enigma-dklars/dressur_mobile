@@ -991,6 +991,7 @@ class _ActuPageState extends State<ActuPage> {
                     ],
 
                     if (nombreContactDispo > 0) ...[
+                      const SizedBox(height: 5),
                       _buildAvailableContactsCard(
                         context: context,
                         contactCount: nombreContactDispo,
