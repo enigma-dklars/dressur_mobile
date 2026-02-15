@@ -218,7 +218,11 @@ class _RecuperationFormState extends State<RecuperationForm> {
       labelText: label,
       prefixIcon: Padding(
         padding: const EdgeInsets.only(left: 20, right: 13, top: 14),
-        child: FaIcon(icon, color: primaryColor),
+        child: FaIcon(
+          icon,
+          color: primaryColor,
+          size: 18,
+        ),
       ),
       border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
       focusedBorder: OutlineInputBorder(

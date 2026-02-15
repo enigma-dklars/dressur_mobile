@@ -204,7 +204,7 @@ class _RegisterFormState extends State<RegisterForm> {
               controller: _telController,
               keyboardType: TextInputType.phone,
               inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              decoration: _buildInputDecoration(
+              decoration: _buildInputDecorationNumeroWhatsApp(
                 label: (langUserPhone == "fr")
                     ? 'Numéro WhatsApp'
                     : 'WhatsApp Number',
@@ -216,8 +216,8 @@ class _RegisterFormState extends State<RegisterForm> {
                   showCountryOnly: false,
                   showOnlyCountryWhenClosed: false,
                   alignLeft: false,
-
-                  // --- AJOUTS POUR LE MODE SOMBRE ---
+                  padding: EdgeInsetsGeometry.all(0),
+                  margin: EdgeInsetsGeometry.all(10),
                   dialogBackgroundColor: Theme.of(context)
                       .scaffoldBackgroundColor, // Le fond du dialogue prend la couleur du Scaffold
                   dialogTextStyle: GoogleFonts.poppins(
@@ -282,9 +282,12 @@ class _RegisterFormState extends State<RegisterForm> {
                 label: (langUserPhone == "fr") ? 'Mot de passe' : 'Password',
                 icon: FontAwesomeIcons.lock,
                 suffixIcon: IconButton(
-                  icon: FaIcon(_isPasswordObscured
-                      ? FontAwesomeIcons.eyeSlash
-                      : FontAwesomeIcons.eye),
+                  icon: FaIcon(
+                    _isPasswordObscured
+                        ? FontAwesomeIcons.eyeSlash
+                        : FontAwesomeIcons.eye,
+                    size: 18,
+                  ),
                   onPressed: () => setState(
                       () => _isPasswordObscured = !_isPasswordObscured),
                 ),
@@ -314,9 +317,12 @@ class _RegisterFormState extends State<RegisterForm> {
                     : 'Confirm Password',
                 icon: FontAwesomeIcons.lock,
                 suffixIcon: IconButton(
-                  icon: FaIcon(_isConfirmPasswordObscured
-                      ? FontAwesomeIcons.eyeSlash
-                      : FontAwesomeIcons.eye),
+                  icon: FaIcon(
+                    _isConfirmPasswordObscured
+                        ? FontAwesomeIcons.eyeSlash
+                        : FontAwesomeIcons.eye,
+                    size: 18,
+                  ),
                   onPressed: () => setState(() =>
                       _isConfirmPasswordObscured = !_isConfirmPasswordObscured),
                 ),
@@ -345,7 +351,7 @@ class _RegisterFormState extends State<RegisterForm> {
               title: RichText(
                 text: TextSpan(
                   style: GoogleFonts.poppins(
-                    fontSize: 13,
+                    fontSize: 10,
                     color: termsTextColor, // Utilise la couleur dynamique
                   ),
                   children: [
@@ -420,7 +426,20 @@ class _RegisterFormState extends State<RegisterForm> {
     );
   }
 
-  // Helper pour construire la décoration des champs de texte
+  InputDecoration _buildInputDecorationNumeroWhatsApp(
+      {required String label, Widget? prefix, Widget? suffixIcon}) {
+    return InputDecoration(
+      labelText: label,
+      prefix: prefix,
+      suffixIcon: suffixIcon,
+      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(color: primaryColor, width: 2),
+      ),
+    );
+  }
+
   InputDecoration _buildInputDecoration(
       {required String label,
       IconData? icon,
@@ -428,7 +447,16 @@ class _RegisterFormState extends State<RegisterForm> {
       Widget? suffixIcon}) {
     return InputDecoration(
       labelText: label,
-      prefixIcon: icon != null ? FaIcon(icon, color: primaryColor) : null,
+      prefixIcon: Padding(
+        padding: const EdgeInsets.only(left: 20, right: 13, top: 14),
+        child: icon != null
+            ? FaIcon(
+                icon,
+                color: primaryColor,
+                size: 18,
+              )
+            : null,
+      ),
       prefix: prefix,
       suffixIcon: suffixIcon,
       border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),

@@ -176,9 +176,12 @@ class _LoginFormState extends State<LoginForm> {
                 label: (langUserPhone == "fr") ? 'Mot de passe' : 'Password',
                 icon: FontAwesomeIcons.lock,
                 suffixIcon: IconButton(
-                  icon: FaIcon(_isPasswordObscured
-                      ? FontAwesomeIcons.eyeSlash
-                      : FontAwesomeIcons.eye),
+                  icon: FaIcon(
+                    _isPasswordObscured
+                        ? FontAwesomeIcons.eyeSlash
+                        : FontAwesomeIcons.eye,
+                    size: 18,
+                  ),
                   onPressed: () => setState(
                       () => _isPasswordObscured = !_isPasswordObscured),
                 ),
@@ -257,7 +260,11 @@ class _LoginFormState extends State<LoginForm> {
       labelText: label,
       prefixIcon: Padding(
         padding: const EdgeInsets.only(left: 20, right: 13, top: 14),
-        child: FaIcon(icon, color: primaryColor),
+        child: FaIcon(
+          icon,
+          color: primaryColor,
+          size: 18,
+        ),
       ),
       suffixIcon: suffixIcon,
       border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
