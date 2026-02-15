@@ -8,6 +8,7 @@ import 'package:dressur/components/noti.dart';
 import 'package:dressur/components/noti_sys.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:dressur/5_autre/support_assistance.dart';
@@ -259,7 +260,7 @@ class _PromotionListPageState extends State<PromotionListPage> {
           fit: BoxFit.cover,
           placeholder: (context, url) => Container(color: Colors.grey[200]),
           errorWidget: (context, url, error) =>
-              Center(child: Icon(Icons.error)),
+              Center(child: FaIcon(FontAwesomeIcons.circleExclamation)),
         ),
         // Dégradé pour la lisibilité des badges
         Container(
@@ -286,14 +287,14 @@ class _PromotionListPageState extends State<PromotionListPage> {
               _buildTypePromoAffaire(promotion.typePromotionAffaire),
               if (promotion.inProgrammeRecompense)
                 _buildSpecialBadge(
-                  icon: Icons.stars,
+                  icon: FontAwesomeIcons.star,
                   text: "Programme Récompense",
                   gradient: LinearGradient(
                       colors: [Colors.orange[700]!, Colors.orange[400]!]),
                 ),
               if (promotion.publishOnDressurStatus)
                 _buildSpecialBadge(
-                  icon: Icons.verified_user,
+                  icon: FontAwesomeIcons.solidCircleCheck,
                   text: "Statut Dressur",
                   gradient: LinearGradient(
                       colors: [primaryColor, primaryColor.withOpacity(0.7)]),
@@ -320,11 +321,11 @@ class _PromotionListPageState extends State<PromotionListPage> {
         SizedBox(height: 12),
         Row(
           children: [
-            _buildStatItem(Icons.visibility_outlined,
-                promotion.nombreImpression, "Impressions"),
+            _buildStatItem(FontAwesomeIcons.eye, promotion.nombreImpression,
+                "Impressions"),
             SizedBox(width: 20),
             _buildStatItem(
-                Icons.touch_app_outlined, promotion.nombreDeVues, "Vues"),
+                FontAwesomeIcons.handPointer, promotion.nombreDeVues, "Vues"),
           ],
         ),
       ],
@@ -350,7 +351,7 @@ class _PromotionListPageState extends State<PromotionListPage> {
         children: [
           Row(
             children: [
-              Icon(Icons.warning_amber_rounded,
+              FaIcon(FontAwesomeIcons.triangleExclamation,
                   color: Colors.red[700], size: 20),
               SizedBox(width: 8),
               Text(
@@ -403,7 +404,7 @@ class _PromotionListPageState extends State<PromotionListPage> {
                 MaterialPageRoute(
                     builder: (context) =>
                         PaymentPayantPage(promotion: promotion))),
-            icon: Icon(Icons.payment, size: 16),
+            icon: FaIcon(FontAwesomeIcons.moneyCheckDollar, size: 16),
             label: Text((langUserPhone == "fr") ? 'Payer' : 'Pay'),
             style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.orange,
@@ -419,7 +420,7 @@ class _PromotionListPageState extends State<PromotionListPage> {
                 MaterialPageRoute(
                     builder: (context) =>
                         ModificationProduitServicesPage(promotion: promotion))),
-            icon: Icon(Icons.edit, size: 16),
+            icon: FaIcon(FontAwesomeIcons.pen, size: 16),
             label: Text((langUserPhone == "fr") ? 'Modifier' : 'Edit'),
             style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.green,
@@ -454,7 +455,7 @@ class _PromotionListPageState extends State<PromotionListPage> {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, color: Colors.white, size: 10),
+          FaIcon(icon, color: Colors.white, size: 10),
           SizedBox(width: 4),
           Text(text,
               style: GoogleFonts.poppins(
@@ -469,7 +470,7 @@ class _PromotionListPageState extends State<PromotionListPage> {
   Widget _buildStatItem(IconData icon, String value, String label) {
     return Row(
       children: [
-        Icon(icon, color: Colors.grey[600], size: 18),
+        FaIcon(icon, color: Colors.grey[600], size: 18),
         SizedBox(width: 6),
         Text(value,
             style:
@@ -499,7 +500,7 @@ class _PromotionListPageState extends State<PromotionListPage> {
           onPressed: () {
             Navigator.pop(context);
           },
-          icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
+          icon: const FaIcon(FontAwesomeIcons.chevronLeft, color: Colors.white),
         ),
         backgroundColor: primaryColor,
         actions: [
@@ -524,7 +525,11 @@ class _PromotionListPageState extends State<PromotionListPage> {
             ],
             offset: const Offset(0, 60),
             color: primaryColor,
-            icon: const Icon(Icons.menu, color: Colors.white),
+            icon: const FaIcon(
+              FontAwesomeIcons.bars,
+              color: Colors.white,
+              size: 20,
+            ),
             elevation: 2,
             onSelected: (value) {
               if (value == 1) {
@@ -593,8 +598,8 @@ class PromotionDetailPage extends StatelessWidget {
           onPressed: () {
             Navigator.pop(context);
           },
-          icon: const Icon(
-            Icons.arrow_back_ios,
+          icon: const FaIcon(
+            FontAwesomeIcons.chevronLeft,
             color: Colors.white,
           ),
         ),
@@ -612,8 +617,9 @@ class PromotionDetailPage extends StatelessWidget {
               placeholder: (context, url) => AspectRatio(
                   aspectRatio: 16 / 9,
                   child: Container(color: Colors.grey[200])),
-              errorWidget: (context, url, error) =>
-                  AspectRatio(aspectRatio: 16 / 9, child: Icon(Icons.error)),
+              errorWidget: (context, url, error) => AspectRatio(
+                  aspectRatio: 16 / 9,
+                  child: FaIcon(FontAwesomeIcons.circleExclamation)),
             ),
 
             // --- BANDEAU D'ACTION "PAYER" ---
@@ -632,7 +638,7 @@ class PromotionDetailPage extends StatelessWidget {
 
                   // Section Détails
                   _buildSectionTitle(
-                      icon: Icons.calendar_today_outlined,
+                      icon: FontAwesomeIcons.calendar,
                       title: (langUserPhone == "fr")
                           ? "Détails de la promotion"
                           : "Promotion Details"),
@@ -649,7 +655,7 @@ class PromotionDetailPage extends StatelessWidget {
 
                   // Section Statistiques
                   _buildSectionTitle(
-                      icon: Icons.bar_chart_outlined,
+                      icon: FontAwesomeIcons.chartSimple,
                       title: (langUserPhone == "fr")
                           ? "Statistiques"
                           : "Statistics"),
@@ -660,7 +666,7 @@ class PromotionDetailPage extends StatelessWidget {
 
                   // Section Description
                   _buildSectionTitle(
-                      icon: Icons.description_outlined,
+                      icon: FontAwesomeIcons.solidFileLines,
                       title: (langUserPhone == "fr")
                           ? "Description"
                           : "Description"),
@@ -676,7 +682,7 @@ class PromotionDetailPage extends StatelessWidget {
                   // Section Infos Supplémentaires
                   if (infoMap.isNotEmpty) ...[
                     _buildSectionTitle(
-                        icon: Icons.info_outline_rounded,
+                        icon: FontAwesomeIcons.circleInfo,
                         title: (langUserPhone == "fr")
                             ? "Informations supplémentaires"
                             : "Additional Information"),
@@ -753,7 +759,7 @@ class PromotionDetailPage extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 12.0),
       child: Row(
         children: [
-          Icon(icon, color: primaryColor, size: 20),
+          FaIcon(icon, color: primaryColor, size: 20),
           SizedBox(width: 10),
           Text(title,
               style: GoogleFonts.poppins(
@@ -1061,7 +1067,7 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
   Widget _buildOptionHeader(IconData icon, String title, bool isActive) {
     return Row(
       children: [
-        Icon(icon, color: isActive ? primaryColor : Colors.grey, size: 20),
+        FaIcon(icon, color: isActive ? primaryColor : Colors.grey, size: 20),
         const SizedBox(width: 10),
         Text(title,
             style: GoogleFonts.poppins(
@@ -1121,7 +1127,8 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
         ),
         leading: IconButton(
             onPressed: () => Navigator.pop(context),
-            icon: const Icon(Icons.arrow_back_ios, color: Colors.white)),
+            icon: const FaIcon(FontAwesomeIcons.chevronLeft,
+                color: Colors.white)),
         backgroundColor: primaryColor,
       ),
       body: SingleChildScrollView(
@@ -1149,8 +1156,8 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
             const SizedBox(height: 20),
 
             // --- SECTION PROGRAMME DE RÉCOMPENSE ---
-            _buildOptionHeader(
-                Icons.stars, "Programme de Récompense", _participateInReward),
+            _buildOptionHeader(FontAwesomeIcons.star, "Programme de Récompense",
+                _participateInReward),
             SwitchListTile(
               title: Text("Ajouter au programme",
                   style: GoogleFonts.poppins(
@@ -1193,8 +1200,8 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
             const SizedBox(height: 15),
 
             // --- SECTION STATUT DRESSUR ---
-            _buildOptionHeader(
-                Icons.verified_user, "Statut Dressur", _publishOnDressurStatus),
+            _buildOptionHeader(FontAwesomeIcons.solidCircleCheck,
+                "Statut Dressur", _publishOnDressurStatus),
             SwitchListTile(
               title: Text("Publier sur le statut Dressur",
                   style: GoogleFonts.poppins(

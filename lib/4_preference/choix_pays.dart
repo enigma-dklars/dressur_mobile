@@ -3,6 +3,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:dressur/components/constant.dart';
@@ -182,8 +183,8 @@ class _ChoixDesPaysState extends State<ChoixDesPays> {
           onPressed: () {
             Navigator.pop(context);
           },
-          icon: const Icon(
-            Icons.arrow_back_ios,
+          icon: const FaIcon(
+            FontAwesomeIcons.chevronLeft,
             color: Colors.white,
           ),
         ),
@@ -200,7 +201,10 @@ class _ChoixDesPaysState extends State<ChoixDesPays> {
                 labelText: (langUserPhone == "fr")
                     ? 'Rechercher un pays ...'
                     : 'Find a country with ...',
-                prefixIcon: const Icon(Icons.search),
+                prefixIcon: Padding(
+                  padding: const EdgeInsets.only(left: 20, right: 13, top: 14),
+                  child: FaIcon(FontAwesomeIcons.magnifyingGlass),
+                ),
                 border: const OutlineInputBorder(),
               ),
             ),
@@ -252,7 +256,11 @@ class _ChoixDesPaysState extends State<ChoixDesPays> {
               ? 'Rechercher un pays...'
               : 'Search for a country...',
           hintStyle: GoogleFonts.poppins(color: Colors.grey[500]),
-          prefixIcon: Icon(Icons.search, color: Colors.grey[500], size: 22),
+          prefixIcon: Padding(
+            padding: const EdgeInsets.only(left: 20, right: 13, top: 14),
+            child: FaIcon(FontAwesomeIcons.magnifyingGlass,
+                color: Colors.grey[500], size: 22),
+          ),
           filled: true,
           fillColor: Theme.of(context).brightness == Brightness.dark
               ? Colors.grey[850]
@@ -296,7 +304,8 @@ class _ChoixDesPaysState extends State<ChoixDesPays> {
                 ),
               ),
               child: isSelected
-                  ? Icon(Icons.check, color: Colors.white, size: 18)
+                  ? FaIcon(FontAwesomeIcons.check,
+                      color: Colors.white, size: 18)
                   : null,
             ),
             SizedBox(width: 16),

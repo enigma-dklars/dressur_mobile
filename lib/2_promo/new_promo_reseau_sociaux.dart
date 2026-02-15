@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:dressur/components/noti_sys.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:dressur/components/constant.dart';
 import 'package:http/http.dart' as http;
@@ -39,8 +40,8 @@ class _PromotionReseauSociauxFormPageState
           onPressed: () {
             Navigator.pop(context);
           },
-          icon: const Icon(
-            Icons.arrow_back_ios,
+          icon: const FaIcon(
+            FontAwesomeIcons.chevronLeft,
             color: Colors.white,
           ),
         ),
@@ -441,7 +442,7 @@ class _RegisterForm3State extends State<RegisterForm3> {
                       ),
                     )
                   : SizedBox(
-                      height: 70,
+                      height: 60,
                       child: Scrollbar(
                         controller: _scrollController,
                         thumbVisibility: true,
@@ -450,58 +451,51 @@ class _RegisterForm3State extends State<RegisterForm3> {
                         child: SingleChildScrollView(
                           controller:
                               _scrollController, // Attach the ScrollController here
-                          padding: const EdgeInsets.fromLTRB(0, 0, 0, 25),
                           scrollDirection: Axis.horizontal,
-                          child: Padding(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 0.0),
-                            child: Row(
-                              spacing: 10,
-                              children: List.generate(
-                                listSocialNetworks.length,
-                                (index) => Padding(
-                                  padding: const EdgeInsets.only(right: 0),
-                                  child: ActionChip(
-                                    label: Row(
-                                      children: [
-                                        Icon(selectedSocialNetwork ==
-                                                listSocialNetworks[index]
-                                                    ['titre']
-                                            ? Icons.check_circle
-                                            : Icons.radio_button_unchecked),
-                                        const SizedBox(width: 10),
-                                        Text(
-                                          listSocialNetworks[index]['titre'],
-                                          style: GoogleFonts.poppins(
-                                            fontSize: 15,
-                                            fontWeight: FontWeight.w400,
-                                          ),
-                                        ),
-                                      ],
+                          child: Row(
+                            spacing: 10,
+                            children: List.generate(
+                              listSocialNetworks.length,
+                              (index) => ActionChip(
+                                label: Row(
+                                  children: [
+                                    FaIcon(
+                                      selectedSocialNetwork ==
+                                              listSocialNetworks[index]['titre']
+                                          ? FontAwesomeIcons.solidCircleCheck
+                                          : FontAwesomeIcons.circle,
+                                      size: 15,
                                     ),
-                                    onPressed: () {
-                                      setState(() {
-                                        idFormulePromoReseau = 0;
-                                        description = (langUserPhone == "fr")
-                                            ? "Veuillez choisir un réseau social puis un service."
-                                            : "Please choose a social network then a service.";
-                                        _message = description;
-                                        selectedSocialNetwork =
-                                            listSocialNetworks[index]['titre'];
-                                        listServices =
-                                            (listSocialNetworks[index]
-                                                        ['lesFormulesFils']
-                                                    as List<dynamic>)
-                                                .map((item) => item
-                                                    as Map<String, dynamic>)
-                                                .toList();
-                                        initialService = listServices.isNotEmpty
-                                            ? listServices.first['id']
-                                            : null;
-                                      });
-                                    },
-                                  ),
+                                    const SizedBox(width: 10),
+                                    Text(
+                                      listSocialNetworks[index]['titre'],
+                                      style: GoogleFonts.poppins(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w400,
+                                      ),
+                                    ),
+                                  ],
                                 ),
+                                onPressed: () {
+                                  setState(() {
+                                    idFormulePromoReseau = 0;
+                                    description = (langUserPhone == "fr")
+                                        ? "Veuillez choisir un réseau social puis un service."
+                                        : "Please choose a social network then a service.";
+                                    _message = description;
+                                    selectedSocialNetwork =
+                                        listSocialNetworks[index]['titre'];
+                                    listServices = (listSocialNetworks[index]
+                                                ['lesFormulesFils']
+                                            as List<dynamic>)
+                                        .map((item) =>
+                                            item as Map<String, dynamic>)
+                                        .toList();
+                                    initialService = listServices.isNotEmpty
+                                        ? listServices.first['id']
+                                        : null;
+                                  });
+                                },
                               ),
                             ),
                           ),

@@ -647,7 +647,7 @@ void showConfNumeroWhatsapp(BuildContext context) {
           SizedBox(height: 25),
 
           // --- Icône et Titre ---
-          Icon(FontAwesomeIcons.whatsapp, color: Color(0xFF25D366), size: 50),
+          FaIcon(FontAwesomeIcons.whatsapp, color: Color(0xFF25D366), size: 50),
           SizedBox(height: 16),
           Text(
             (langUserPhone == "fr")
@@ -675,7 +675,7 @@ void showConfNumeroWhatsapp(BuildContext context) {
 
           // --- Étapes claires ---
           _buildStep(
-            icon: Icons.looks_one_outlined,
+            icon: FontAwesomeIcons.one,
             title: (langUserPhone == "fr")
                 ? "Cliquez sur le bouton"
                 : "Click the button",
@@ -685,7 +685,7 @@ void showConfNumeroWhatsapp(BuildContext context) {
           ),
           SizedBox(height: 20),
           _buildStep(
-            icon: Icons.looks_two_outlined,
+            icon: FontAwesomeIcons.two,
             title: (langUserPhone == "fr")
                 ? "Envoyez le message"
                 : "Send the message",
@@ -695,13 +695,14 @@ void showConfNumeroWhatsapp(BuildContext context) {
           ),
           SizedBox(height: 20),
           _buildStep(
-            icon: Icons.looks_3_outlined,
+            icon: FontAwesomeIcons.three,
             title:
                 (langUserPhone == "fr") ? "Patientez" : "Wait for confirmation",
             subtitle: (langUserPhone == "fr")
                 ? "Notre équipe traitera votre demande rapidement. Vous serez notifié."
                 : "Our team will process your request quickly. You will be notified.",
           ),
+
           SizedBox(height: 40),
 
           // --- Bouton d'action principal ---
@@ -722,7 +723,7 @@ void showConfNumeroWhatsapp(BuildContext context) {
                   );
                 }
               },
-              icon: Icon(FontAwesomeIcons.whatsapp, color: Colors.white),
+              icon: FaIcon(FontAwesomeIcons.whatsapp, color: Colors.white),
               label: Text(
                 (langUserPhone == "fr")
                     ? "Contacter le Support"
@@ -752,7 +753,7 @@ Widget _buildStep(
   return Row(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      Icon(icon, color: primaryColor, size: 28),
+      FaIcon(icon, color: primaryColor, size: 28),
       SizedBox(width: 16),
       Expanded(
         child: Column(

@@ -4,6 +4,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:dressur/5_autre/support_assistance.dart';
 import 'package:dressur/components/constant.dart';
@@ -87,8 +88,8 @@ class _ListeNotificationState extends State<ListeNotification> {
           onPressed: () {
             Navigator.pop(context);
           },
-          icon: const Icon(
-            Icons.arrow_back_ios,
+          icon: const FaIcon(
+            FontAwesomeIcons.chevronLeft,
             color: Colors.white,
           ),
         ),
@@ -112,9 +113,10 @@ class _ListeNotificationState extends State<ListeNotification> {
             ],
             offset: const Offset(0, 60),
             color: primaryColor,
-            icon: const Icon(
-              Icons.menu,
+            icon: const FaIcon(
+              FontAwesomeIcons.bars,
               color: Colors.white,
+              size: 20,
             ),
             elevation: 2,
             onSelected: (value) {

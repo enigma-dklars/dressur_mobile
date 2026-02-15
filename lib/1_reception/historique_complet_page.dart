@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dressur/components/noti.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
 import 'package:google_fonts/google_fonts.dart';
@@ -137,7 +138,8 @@ class _HistoriqueCompletPageState extends State<HistoriqueCompletPage> {
             ),
           ),
           leading: IconButton(
-            icon: Icon(Icons.arrow_back_ios, color: Colors.white, size: 20),
+            icon: FaIcon(FontAwesomeIcons.chevronLeft,
+                color: Colors.white, size: 20),
             onPressed: () => Navigator.pop(context),
           ),
         ),
@@ -162,7 +164,7 @@ class _HistoriqueCompletPageState extends State<HistoriqueCompletPage> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.history_outlined,
+                      FaIcon(FontAwesomeIcons.clock,
                           size: 50, color: Colors.grey[300]),
                       const SizedBox(height: 10),
                       Text(
@@ -225,7 +227,8 @@ class _HistoriqueCompletPageState extends State<HistoriqueCompletPage> {
                         fit: BoxFit.cover,
                         placeholder: (context, url) =>
                             Container(color: Colors.grey[200]),
-                        errorWidget: (context, url, error) => Icon(Icons.error),
+                        errorWidget: (context, url, error) =>
+                            FaIcon(FontAwesomeIcons.circleExclamation),
                       ),
                     ),
                     Positioned(
@@ -238,7 +241,7 @@ class _HistoriqueCompletPageState extends State<HistoriqueCompletPage> {
                           shape: BoxShape.circle,
                           border: Border.all(color: Colors.white, width: 1.5),
                         ),
-                        child: Icon(
+                        child: FaIcon(
                           statusConfig["icon"],
                           color: Colors.white,
                           size: 10,
@@ -278,7 +281,7 @@ class _HistoriqueCompletPageState extends State<HistoriqueCompletPage> {
                           ),
                         ),
                         const SizedBox(width: 8),
-                        const Icon(Icons.visibility_outlined,
+                        const FaIcon(FontAwesomeIcons.eye,
                             size: 12, color: Colors.grey),
                         const SizedBox(width: 4),
                         Text(item.views,
@@ -311,7 +314,7 @@ class _HistoriqueCompletPageState extends State<HistoriqueCompletPage> {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(
+                        FaIcon(
                           statusConfig["icon"],
                           size: 12,
                           color: statusConfig["color"],
@@ -414,7 +417,7 @@ class _HistoriqueCompletPageState extends State<HistoriqueCompletPage> {
     switch (item.status) {
       case "en_attente":
         return _statusInfo(
-          Icons.hourglass_empty,
+          FontAwesomeIcons.hourglassEmpty,
           Colors.orange,
           "En attente d'approbation",
           "Vous avez soumis vos preuves de participation. Notre équipe examine actuellement votre demande.\n\nSi vous ne l'avez pas encore fait, veuillez envoyer la capture vidéo comme dernière preuve par WhatsApp au numéro d'assistance de Dressur.",
@@ -423,7 +426,7 @@ class _HistoriqueCompletPageState extends State<HistoriqueCompletPage> {
         return Column(
           children: [
             _statusInfo(
-              Icons.timer_off,
+              FontAwesomeIcons.clock,
               Colors.green,
               "Temps écoulé - Soumission requise",
               "Le temps de participation est terminé. Vous devez maintenant soumettre vos preuves (les deux captures d'écran) via le formulaire ci-dessous.\n\nNote : La capture vidéo doit être envoyée séparément par WhatsApp.",
@@ -434,21 +437,21 @@ class _HistoriqueCompletPageState extends State<HistoriqueCompletPage> {
         );
       case "echouer":
         return _statusInfo(
-          Icons.error_outline,
+          FontAwesomeIcons.circleExclamation,
           Colors.red,
           "Participation échouée",
           "Malheureusement, vous n'avez pas soumis vos preuves de participation dans les délais impartis. Il est désormais trop tard pour le faire pour cette promotion.",
         );
       case "refuser":
         return _statusInfo(
-          Icons.block,
+          FontAwesomeIcons.slash,
           Colors.red,
           "Preuves refusées",
           "Les preuves que vous avez fournies n'ont pas été jugées recevables par notre équipe de modération. En conséquence, la récompense ne peut pas être accordée.",
         );
       case "approuver":
         return _statusInfo(
-          Icons.verified,
+          FontAwesomeIcons.solidCircleCheck,
           Colors.green,
           "Félicitations ! Approuvé",
           "Vos preuves de participation ont été vérifiées et validées. La récompense a été créditée sur votre solde Dressur.",
@@ -457,7 +460,7 @@ class _HistoriqueCompletPageState extends State<HistoriqueCompletPage> {
         return Column(
           children: [
             _statusInfo(
-              Icons.sync,
+              FontAwesomeIcons.arrowsRotate,
               Colors.blue,
               "Participation en cours",
               "Le temps de soumission n'est pas encore arrivé. Cependant, si vous estimez avoir déjà atteint votre objectif, vous pouvez soumettre vos preuves dès maintenant.",
@@ -478,7 +481,7 @@ class _HistoriqueCompletPageState extends State<HistoriqueCompletPage> {
       children: [
         Row(
           children: [
-            Icon(icon, color: color, size: 28),
+            FaIcon(icon, color: color, size: 28),
             const SizedBox(width: 12),
             Expanded(
               child: Text(
@@ -601,7 +604,8 @@ class _HistoriqueCompletPageState extends State<HistoriqueCompletPage> {
                 ? Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.add_a_photo, color: primaryColor, size: 30),
+                      FaIcon(FontAwesomeIcons.camera,
+                          color: primaryColor, size: 30),
                       const SizedBox(height: 5),
                       Text("Cliquez pour choisir",
                           style: GoogleFonts.poppins(
@@ -679,12 +683,11 @@ class _HistoriqueCompletPageState extends State<HistoriqueCompletPage> {
       width: double.infinity,
       child: OutlinedButton.icon(
         onPressed: () async {
-          final whatsappUrl = "https://wa.me/229XXXXXXXX";
-          if (await canLaunchUrl(Uri.parse(whatsappUrl))) {
-            await launchUrl(Uri.parse(whatsappUrl));
+          if (await canLaunchUrl(Uri.parse(whatsappDSURL))) {
+            await launchUrl(Uri.parse(whatsappDSURL));
           }
         },
-        icon: Icon(Icons.chat, size: 18),
+        icon: FaIcon(FontAwesomeIcons.solidComment, size: 18),
         label: Text("Envoyer la vidéo sur WhatsApp"),
         style: OutlinedButton.styleFrom(
           foregroundColor: Colors.green,
@@ -702,31 +705,43 @@ class _HistoriqueCompletPageState extends State<HistoriqueCompletPage> {
       case "en_attente":
         return {
           "label": "Attente validation",
-          "icon": Icons.access_time,
+          "icon": FontAwesomeIcons.clock,
           "color": Colors.orange
         };
       case "terminer":
         return {
           "label": "Preuves requises",
-          "icon": Icons.check_circle,
+          "icon": FontAwesomeIcons.solidCircleCheck,
           "color": Colors.green
         };
       case "echouer":
-        return {"label": "Échoué", "icon": Icons.cancel, "color": Colors.red};
+        return {
+          "label": "Échoué",
+          "icon": FontAwesomeIcons.xmark,
+          "color": Colors.red
+        };
       case "refuser":
-        return {"label": "Refusé", "icon": Icons.cancel, "color": Colors.red};
+        return {
+          "label": "Refusé",
+          "icon": FontAwesomeIcons.xmark,
+          "color": Colors.red
+        };
       case "approuver":
         return {
           "label": "Approuvé",
-          "icon": Icons.verified,
+          "icon": FontAwesomeIcons.solidCircleCheck,
           "color": Colors.green
         };
       case "en_cours":
-        return {"label": "En cours", "icon": Icons.sync, "color": Colors.blue};
+        return {
+          "label": "En cours",
+          "icon": FontAwesomeIcons.arrowsRotate,
+          "color": Colors.blue
+        };
       default:
         return {
           "label": "Inconnu",
-          "icon": Icons.help_outline,
+          "icon": FontAwesomeIcons.circleQuestion,
           "color": Colors.grey
         };
     }

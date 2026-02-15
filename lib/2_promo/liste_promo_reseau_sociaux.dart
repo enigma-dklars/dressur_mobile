@@ -130,8 +130,8 @@ class _PromotionReseauSociauxListePageState
           onPressed: () {
             Navigator.pop(context);
           },
-          icon: const Icon(
-            Icons.arrow_back_ios,
+          icon: const FaIcon(
+            FontAwesomeIcons.chevronLeft,
             color: Colors.white,
           ),
         ),
@@ -172,9 +172,9 @@ class _PromotionReseauSociauxListePageState
             ],
             offset: const Offset(0, 60),
             color: primaryColor,
-            icon: const Icon(
-              Icons.menu,
-              color: Colors.white,
+            icon: const FaIcon(
+              FontAwesomeIcons.bars,
+              color: Colors.white,size: 20,
             ),
             elevation: 2,
             onSelected: (value) {
@@ -311,9 +311,9 @@ class _PromotionReseauSociauxListePageState
                           ),
                         ),
                         SizedBox(width: 8),
-                        Icon(
-                          Icons
-                              .arrow_forward_ios_rounded, // Flèche pour indiquer une action
+                        FaIcon(
+                          FontAwesomeIcons
+                              .chevronRight, // Flèche pour indiquer une action
                           size: 12,
                           color: primaryColor,
                         )
@@ -365,38 +365,47 @@ class _PromotionReseauSociauxListePageState
               SizedBox(height: 20),
               _buildSectionTitle("Détails de la Commande"),
               _buildDetailRow(
-                  icon: Icons.inventory_2_outlined,
-                  label: "Quantité Demandée",
-                  value: promo.qteDemander),
+                icon: FontAwesomeIcons.boxOpen,
+                label: "Quantité Demandée",
+                value: promo.qteDemander,
+              ),
               _buildDetailRow(
-                  icon: Icons.monetization_on_outlined,
-                  label: "Prix Fixé",
-                  value: promo.prixFixer),
+                icon: FontAwesomeIcons.moneyBillTrendUp,
+                label: "Prix Fixé",
+                value: promo.prixFixer,
+              ),
               SizedBox(height: 15),
               _buildSectionTitle("Suivi de la Campagne"),
               _buildDetailRow(
-                  icon: Icons.flag_outlined,
-                  label: "Compteur au Début",
-                  value: promo.compteurDebut),
+                icon: FontAwesomeIcons.flag,
+                label: "Compteur au Début",
+                value: promo.compteurDebut,
+              ),
               _buildDetailRow(
-                  icon: Icons.hourglass_bottom_rounded,
-                  label: "Compteur Restant",
-                  value: promo.compteurRestant),
+                icon: FontAwesomeIcons.hourglass,
+                label: "Compteur Restant",
+                value: promo.compteurRestant,
+              ),
               SizedBox(height: 15),
               _buildSectionTitle("Informations Techniques"),
               _buildDetailRow(
-                  icon: Icons.tag, label: "Référence", value: promo.reference),
+                icon: FontAwesomeIcons.tag,
+                label: "Référence",
+                value: promo.reference,
+              ),
               _buildUrlItem(promo.url),
               SizedBox(height: 15),
               _buildSectionTitle("Historique"),
               _buildDetailRow(
-                  icon: Icons.calendar_today_outlined,
-                  label: "Créé le",
-                  value: promo.createdAt),
+                icon: FontAwesomeIcons.calendar,
+                label: "Créé le",
+                value: promo.createdAt,
+              ),
               _buildDetailRow(
-                  icon: Icons.edit_calendar_outlined,
-                  label: "Modifié le",
-                  value: promo.updatedAt),
+                icon: FontAwesomeIcons.penToSquare,
+                label: "Modifié le",
+                value: promo.updatedAt,
+              ),
             ],
           ),
         );
@@ -421,7 +430,7 @@ class _PromotionReseauSociauxListePageState
       padding: const EdgeInsets.symmetric(vertical: 6.0),
       child: Row(
         children: [
-          Icon(icon, color: Colors.grey[500], size: 18),
+          FaIcon(icon, color: Colors.grey[500], size: 18),
           SizedBox(width: 12),
           Text("$label:", style: GoogleFonts.poppins(color: Colors.grey[600])),
           SizedBox(width: 8),
@@ -442,7 +451,7 @@ class _PromotionReseauSociauxListePageState
       padding: const EdgeInsets.symmetric(vertical: 6.0),
       child: Row(
         children: [
-          Icon(Icons.link, color: Colors.grey[500], size: 18),
+          FaIcon(FontAwesomeIcons.link, color: Colors.grey[500], size: 18),
           SizedBox(width: 12),
           Text("URL:", style: GoogleFonts.poppins(color: Colors.grey[600])),
           SizedBox(width: 8),

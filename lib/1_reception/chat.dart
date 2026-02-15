@@ -3,6 +3,7 @@ import 'package:dressur/components/constant.dart';
 import 'package:dressur/components/noti.dart';
 import 'package:dressur/components/sql_helper.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'dart:convert' as convert;
@@ -138,8 +139,8 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
           onPressed: () {
             Navigator.pop(context);
           },
-          icon: const Icon(
-            Icons.arrow_back_ios,
+          icon: const FaIcon(
+            FontAwesomeIcons.chevronLeft,
             color: Colors.white,
           ),
         ),
@@ -153,7 +154,7 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.info),
+            icon: const FaIcon(FontAwesomeIcons.circleInfo),
             color: Colors.white,
             onPressed: () {
               setState(() {
@@ -249,8 +250,8 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
                   backgroundColor: primaryColor,
                   tooltip: (langUserPhone == "fr") ? "Envoyer" : "Send",
                   onPressed: _sendMessage,
-                  child: const Icon(
-                    Icons.send,
+                  child: const FaIcon(
+                    FontAwesomeIcons.paperPlane,
                     color: Colors.white,
                   ),
                 ),

@@ -1,6 +1,7 @@
 // ignore_for_file: use_build_context_synchronously, prefer_const_constructors
 
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:http/http.dart' as http;
@@ -27,7 +28,7 @@ class LoginPage extends StatelessWidget {
           IconButton(
             onPressed: () => Navigator.push(context,
                 MaterialPageRoute(builder: (context) => SupportPage())),
-            icon: Icon(Icons.help_outline_rounded),
+            icon: FaIcon(FontAwesomeIcons.circleQuestion),
           ),
         ],
       ),
@@ -150,7 +151,7 @@ class _LoginFormState extends State<LoginForm> {
               keyboardType: TextInputType.emailAddress,
               decoration: _buildInputDecoration(
                 label: "E-mail",
-                icon: Icons.alternate_email_rounded,
+                icon: FontAwesomeIcons.at,
               ),
               validator: (value) {
                 if (value == null || value.isEmpty || !value.contains('@')) {
@@ -173,11 +174,11 @@ class _LoginFormState extends State<LoginForm> {
               obscureText: _isPasswordObscured,
               decoration: _buildInputDecoration(
                 label: (langUserPhone == "fr") ? 'Mot de passe' : 'Password',
-                icon: Icons.lock_outline_rounded,
+                icon: FontAwesomeIcons.lock,
                 suffixIcon: IconButton(
-                  icon: Icon(_isPasswordObscured
-                      ? Icons.visibility_off_outlined
-                      : Icons.visibility_outlined),
+                  icon: FaIcon(_isPasswordObscured
+                      ? FontAwesomeIcons.eyeSlash
+                      : FontAwesomeIcons.eye),
                   onPressed: () => setState(
                       () => _isPasswordObscured = !_isPasswordObscured),
                 ),
@@ -254,7 +255,10 @@ class _LoginFormState extends State<LoginForm> {
       {required String label, required IconData icon, Widget? suffixIcon}) {
     return InputDecoration(
       labelText: label,
-      prefixIcon: Icon(icon, color: primaryColor),
+      prefixIcon: Padding(
+        padding: const EdgeInsets.only(left: 20, right: 13, top: 14),
+        child: FaIcon(icon, color: primaryColor),
+      ),
       suffixIcon: suffixIcon,
       border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
       focusedBorder: OutlineInputBorder(

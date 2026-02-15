@@ -1,5 +1,6 @@
 import 'package:dressur/components/constant.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
@@ -96,8 +97,8 @@ class _ListeBonusPageState extends State<ListeBonusPage> {
         onPressed: () {
           Navigator.pop(context);
         },
-        icon: const Icon(
-          Icons.arrow_back_ios,
+        icon: const FaIcon(
+          FontAwesomeIcons.chevronLeft,
           color: Colors.white,
         ),
       ),

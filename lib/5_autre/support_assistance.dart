@@ -15,8 +15,8 @@ class SupportPage extends StatelessWidget {
           onPressed: () {
             Navigator.pop(context);
           },
-          icon: const Icon(
-            Icons.arrow_back_ios,
+          icon: const FaIcon(
+            FontAwesomeIcons.chevronLeft,
             color: Colors.white,
           ),
         ),
@@ -38,7 +38,7 @@ class SupportPage extends StatelessWidget {
             SizedBox(height: 20),
 
             // --- EN-TÊTE VISUELLE ---
-            Icon(Icons.support_agent_rounded, color: primaryColor, size: 70),
+            FaIcon(FontAwesomeIcons.headset, color: primaryColor, size: 70),
             SizedBox(height: 15),
             Text(
               (langUserPhone == "fr") ? "Besoin d'aide ?" : "Need help?",
@@ -87,7 +87,7 @@ class SupportPage extends StatelessWidget {
             SizedBox(height: 15),
             _buildContactChannel(
               context,
-              icon: Icons.mail_outline_rounded,
+              icon: FontAwesomeIcons.solidEnvelope,
               channelName: "E-mail",
               description: (langUserPhone == "fr")
                   ? "Pour les demandes détaillées"
@@ -158,7 +158,7 @@ class SupportPage extends StatelessWidget {
         ),
         child: Row(
           children: [
-            Icon(icon, color: color, size: 28),
+            FaIcon(icon, color: color, size: 28),
             SizedBox(width: 16),
             Expanded(
               child: Column(
@@ -178,7 +178,7 @@ class SupportPage extends StatelessWidget {
                 ],
               ),
             ),
-            Icon(Icons.arrow_forward_ios_rounded,
+            FaIcon(FontAwesomeIcons.chevronRight,
                 size: 16, color: Colors.grey[400]),
           ],
         ),

@@ -3,6 +3,7 @@
 import 'package:art_sweetalert/art_sweetalert.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:dressur/6_login_register/connexion.dart';
 import 'package:dressur/components/constant.dart';
@@ -24,8 +25,8 @@ class DeletecomptePage extends StatelessWidget {
           onPressed: () {
             Navigator.pop(context);
           },
-          icon: const Icon(
-            Icons.arrow_back_ios,
+          icon: const FaIcon(
+            FontAwesomeIcons.chevronLeft,
             color: Colors.white,
           ),
         ),
@@ -48,7 +49,8 @@ class DeletecomptePage extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               SizedBox(height: 20),
-              Icon(Icons.warning_amber_rounded, color: Colors.red, size: 70),
+              FaIcon(FontAwesomeIcons.triangleExclamation,
+                  color: Colors.red, size: 70),
               SizedBox(height: 15),
               Text(
                 (langUserPhone == "fr")
@@ -193,20 +195,24 @@ class _DeletecompteFormState extends State<DeletecompteForm> {
         children: [
           // --- EXPLICATION DES CONSÉQUENCES ---
           _buildConsequenceItem(
-              Icons.data_usage_rounded,
-              (langUserPhone == "fr")
-                  ? "Perte de toutes vos données"
-                  : "Loss of all your data"),
+            FontAwesomeIcons.database,
+            (langUserPhone == "fr")
+                ? "Perte de toutes vos données"
+                : "Loss of all your data",
+          ),
           _buildConsequenceItem(
-              Icons.history_toggle_off_rounded,
-              (langUserPhone == "fr")
-                  ? "Perte de vos historiques"
-                  : "Loss of your histories"),
+            FontAwesomeIcons.clockRotateLeft,
+            (langUserPhone == "fr")
+                ? "Perte de vos historiques"
+                : "Loss of your histories",
+          ),
           _buildConsequenceItem(
-              Icons.no_accounts_rounded,
-              (langUserPhone == "fr")
-                  ? "Action irréversible"
-                  : "Irreversible action"),
+            FontAwesomeIcons.userSlash,
+            (langUserPhone == "fr")
+                ? "Action irréversible"
+                : "Irreversible action",
+          ),
+
           SizedBox(height: 30),
 
           // --- CHAMP POUR LE MOTIF ---
@@ -263,7 +269,7 @@ class _DeletecompteFormState extends State<DeletecompteForm> {
               onPressed: _canDelete && !_isLoading ? deletecompteUser : null,
               icon: _isLoading
                   ? Container()
-                  : Icon(Icons.delete_forever, color: Colors.white),
+                  : FaIcon(FontAwesomeIcons.trash, color: Colors.white),
               label: _isLoading
                   ? SizedBox(
                       height: 24,
@@ -298,7 +304,7 @@ class _DeletecompteFormState extends State<DeletecompteForm> {
       padding: const EdgeInsets.only(bottom: 10.0),
       child: Row(
         children: [
-          Icon(icon, color: Colors.grey[600], size: 20),
+          FaIcon(icon, color: Colors.grey[600], size: 20),
           SizedBox(width: 12),
           Expanded(
               child: Text(text,

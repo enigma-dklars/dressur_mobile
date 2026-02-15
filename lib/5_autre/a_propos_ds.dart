@@ -1,6 +1,7 @@
 // ignore_for_file: use_build_context_synchronously, prefer_const_constructors
 
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:dressur/components/constant.dart';
@@ -40,9 +41,10 @@ class AproposPage extends StatelessWidget {
           onPressed: () {
             Navigator.pop(context);
           },
-          icon: const Icon(
-            Icons.arrow_back_ios,
+          icon: const FaIcon(
+            FontAwesomeIcons.chevronLeft,
             color: Colors.white,
+            size: 20,
           ),
         ),
       ),
@@ -67,7 +69,7 @@ class AproposPage extends StatelessWidget {
               SizedBox(height: 30),
 
               _buildSection(
-                icon: Icons.rocket_launch_outlined,
+                icon: FontAwesomeIcons.rocket,
                 title:
                     (langUserPhone == "fr") ? "Notre Mission" : "Our Mission",
                 content: (langUserPhone == "fr")
@@ -78,7 +80,7 @@ class AproposPage extends StatelessWidget {
 
               // --- ENRICHISSEMENT DU CONTENU ---
               _buildSection(
-                icon: Icons.star_outline_rounded,
+                icon: FontAwesomeIcons.star,
                 title: (langUserPhone == "fr")
                     ? "Ce que vous pouvez faire"
                     : "What You Can Do",
@@ -148,7 +150,7 @@ class AproposPage extends StatelessWidget {
       children: [
         Row(
           children: [
-            Icon(icon, color: primaryColor, size: 24),
+            FaIcon(icon, color: primaryColor, size: 24),
             SizedBox(width: 12),
             Text(
               title,
@@ -186,7 +188,7 @@ class AproposPage extends StatelessWidget {
         children: [
           Padding(
             padding: const EdgeInsets.only(top: 6.0),
-            child: Icon(Icons.check_circle_outline_rounded,
+            child: FaIcon(FontAwesomeIcons.circleCheck,
                 color: Colors.green, size: 16),
           ),
           SizedBox(width: 10),
@@ -215,7 +217,7 @@ class AproposPage extends StatelessWidget {
               style: GoogleFonts.poppins(
                   fontSize: 15, fontWeight: FontWeight.w500),
             ),
-            Icon(Icons.arrow_forward_ios_rounded,
+            FaIcon(FontAwesomeIcons.chevronRight,
                 size: 16, color: Colors.grey[400]),
           ],
         ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:dressur/components/constant.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class ProfileMenuReseau extends StatelessWidget {
   const ProfileMenuReseau({
@@ -26,8 +27,8 @@ class ProfileMenuReseau extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(text),
-            const Icon(
-              Icons.arrow_right,
+            const FaIcon(
+              FontAwesomeIcons.arrowRight,
             ),
           ],
         ),

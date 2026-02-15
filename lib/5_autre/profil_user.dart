@@ -21,8 +21,8 @@ class ProfilPage extends StatelessWidget {
           onPressed: () {
             Navigator.pop(context);
           },
-          icon: const Icon(
-            Icons.arrow_back_ios,
+          icon: const FaIcon(
+            FontAwesomeIcons.chevronLeft,
             color: Colors.white,
           ),
         ),
@@ -49,8 +49,8 @@ class ProfilPage extends StatelessWidget {
                       ),
                     );
                   },
-                  child: const Icon(
-                    Icons.info,
+                  child: const FaIcon(
+                    FontAwesomeIcons.circleInfo,
                     size: 30.0,
                     color: Colors.white,
                   ),
@@ -67,7 +67,7 @@ class ProfilPage extends StatelessWidget {
           child: Column(
             children: [
               // --- EN-TÊTE VISUELLE ---
-              Icon(Icons.person_pin_circle_outlined,
+              FaIcon(FontAwesomeIcons.locationDot,
                   size: 60, color: primaryColor),
               SizedBox(height: 10),
               Text(
@@ -179,17 +179,17 @@ class _RegisterFormState extends State<RegisterForm> {
               label: (langUserPhone == "fr")
                   ? 'Nom & Prénom(s)'
                   : "Last & First Name",
-              icon: Icons.person_outline_rounded),
+              icon: FontAwesomeIcons.user),
           SizedBox(height: 12),
           _buildTextField(
               controller: pseudoController,
               label: 'Pseudo',
-              icon: Icons.alternate_email_rounded),
+              icon: FontAwesomeIcons.at),
           SizedBox(height: 12),
           _buildTextField(
               controller: emailController,
               label: 'E-mail',
-              icon: Icons.mail_outline_rounded,
+              icon: FontAwesomeIcons.solidEnvelope,
               keyboardType: TextInputType.emailAddress),
           SizedBox(height: 12),
           if (telIsVerified == false) ...[
@@ -198,7 +198,7 @@ class _RegisterFormState extends State<RegisterForm> {
                 label: (langUserPhone == "fr")
                     ? 'Numéro WhatsApp'
                     : 'WhatsApp Number',
-                icon: Icons.phone_outlined,
+                icon: FontAwesomeIcons.phone,
                 keyboardType: TextInputType.phone),
             SizedBox(height: 12),
           ],
@@ -236,7 +236,7 @@ class _RegisterFormState extends State<RegisterForm> {
               label: (langUserPhone == "fr")
                   ? 'Parlez un peu de vous...'
                   : 'Tell us a bit about yourself...',
-              icon: Icons.edit_note_rounded,
+              icon: FontAwesomeIcons.penToSquare,
               maxLines: 4),
           SizedBox(height: 30),
 
@@ -247,7 +247,7 @@ class _RegisterFormState extends State<RegisterForm> {
               onPressed: _isLoading ? null : _updateProfile,
               icon: _isLoading
                   ? Container()
-                  : Icon(Icons.save, color: Colors.white),
+                  : FaIcon(FontAwesomeIcons.floppyDisk, color: Colors.white),
               label: _isLoading
                   ? SizedBox(
                       height: 24,
@@ -303,7 +303,10 @@ class _RegisterFormState extends State<RegisterForm> {
       decoration: InputDecoration(
         labelText: label,
         labelStyle: GoogleFonts.poppins(color: Colors.grey[600]),
-        prefixIcon: Icon(icon, color: Colors.grey[500], size: 20),
+        prefixIcon: Padding(
+          padding: const EdgeInsets.only(left: 20, right: 13, top: 14),
+          child: FaIcon(icon, color: Colors.grey[500], size: 20),
+        ),
         filled: true,
         fillColor: isDark ? Colors.grey[850] : Colors.grey[100],
         border: OutlineInputBorder(

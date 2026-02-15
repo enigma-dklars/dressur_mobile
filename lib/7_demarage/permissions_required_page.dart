@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:dressur/components/constant.dart';
@@ -56,7 +57,7 @@ class PermissionsRequiredPage extends StatelessWidget {
                 onPressed: () async {
                   await openAppSettings();
                 },
-                icon: const Icon(Icons.settings, color: Colors.black),
+                icon: const FaIcon(FontAwesomeIcons.gear, color: Colors.black),
                 label: Text(
                   langUserPhone == "fr"
                       ? "Ouvrir les paramètres"

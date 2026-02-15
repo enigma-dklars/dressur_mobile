@@ -1,6 +1,7 @@
 // ignore_for_file: use_build_context_synchronously, prefer_const_constructors
 
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:dressur/components/constant.dart';
 import 'package:http/http.dart' as http;
@@ -20,8 +21,8 @@ class SuggestionsPage extends StatelessWidget {
           onPressed: () {
             Navigator.pop(context);
           },
-          icon: const Icon(
-            Icons.arrow_back_ios,
+          icon: const FaIcon(
+            FontAwesomeIcons.chevronLeft,
             color: Colors.white,
           ),
         ),
@@ -48,8 +49,8 @@ class SuggestionsPage extends StatelessWidget {
                   shape: BoxShape.circle,
                   color: Colors.amber.withOpacity(0.15),
                 ),
-                child: Icon(
-                  Icons.lightbulb_outline_rounded,
+                child: FaIcon(
+                  FontAwesomeIcons.lightbulb,
                   size: 60,
                   color: Colors.amber[700],
                 ),
@@ -180,7 +181,8 @@ class _SuggestionsFormState extends State<SuggestionsForm> {
               onPressed: _isLoading ? null : addSuggestion,
               icon: _isLoading
                   ? Container()
-                  : Icon(Icons.send_rounded, color: Colors.white),
+                  : FaIcon(FontAwesomeIcons.paperPlane
+, color: Colors.white),
               label: _isLoading
                   ? SizedBox(
                       height: 24,

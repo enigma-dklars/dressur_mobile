@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dressur/components/noti.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
@@ -74,7 +75,8 @@ class _AnimatedRewardBadgeState extends State<AnimatedRewardBadge>
                   ),
                 ],
               ),
-              child: const Icon(Icons.stars, color: Colors.white, size: 20),
+              child: const FaIcon(FontAwesomeIcons.star,
+                  color: Colors.white, size: 20),
             ),
           ),
         );
@@ -237,7 +239,7 @@ class _BusinessPromotionsPageState extends State<BusinessPromotionsPage> {
               color: primaryColor.withOpacity(0.1),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Icon(icon, color: primaryColor, size: 20),
+            child: FaIcon(icon, color: primaryColor, size: 20),
           ),
           SizedBox(width: 15),
           Column(
@@ -294,7 +296,7 @@ class _BusinessPromotionsPageState extends State<BusinessPromotionsPage> {
             SizedBox(height: 25),
 
             // Icône et Titre
-            Icon(Icons.stars, color: primaryColor, size: 50),
+            FaIcon(FontAwesomeIcons.star, color: primaryColor, size: 50),
             SizedBox(height: 15),
             Text(
               "Promotion Éligible !",
@@ -317,11 +319,12 @@ class _BusinessPromotionsPageState extends State<BusinessPromotionsPage> {
             SizedBox(height: 30),
 
             // Détails fictifs
-            _infoRow(context, Icons.visibility, "Objectif",
+            _infoRow(context, FontAwesomeIcons.eye, "Objectif",
                 "Atteindre min. 250 vues"),
-            _infoRow(context, Icons.account_balance_wallet, "Gain estimé",
+            _infoRow(context, FontAwesomeIcons.wallet, "Gain estimé",
                 "Jusqu'à 2 500 FCFA"),
-            _infoRow(context, Icons.timer, "Délai", "20 heures de visibilité"),
+            _infoRow(context, FontAwesomeIcons.stopwatch, "Délai",
+                "20 heures de visibilité"),
 
             SizedBox(height: 30),
 
@@ -370,7 +373,7 @@ class _BusinessPromotionsPageState extends State<BusinessPromotionsPage> {
           ),
         ),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios, color: Colors.white),
+          icon: FaIcon(FontAwesomeIcons.chevronLeft, color: Colors.white),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -392,7 +395,7 @@ class _BusinessPromotionsPageState extends State<BusinessPromotionsPage> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.history_outlined,
+                    FaIcon(FontAwesomeIcons.clock,
                         size: 50, color: Colors.grey[300]),
                     const SizedBox(height: 10),
                     Text(
@@ -489,7 +492,7 @@ class _BusinessPromotionsPageState extends State<BusinessPromotionsPage> {
                                         _showRewardInfo(context, advertisement),
                                     child: Row(
                                       children: [
-                                        Icon(Icons.info),
+                                        FaIcon(FontAwesomeIcons.circleInfo),
                                         const SizedBox(width: 5),
                                         Text(
                                           (langUserPhone == "fr"
@@ -522,7 +525,8 @@ class _BusinessPromotionsPageState extends State<BusinessPromotionsPage> {
                                                   color: primaryColor,
                                                 ),
                                               )
-                                            : Icon(Icons.share),
+                                            : FaIcon(
+                                                FontAwesomeIcons.shareNodes),
                                         const SizedBox(width: 5),
                                         Text(
                                           isThisItemSharing
@@ -614,8 +618,8 @@ class AdvertisementDetailPage extends StatelessWidget {
           onPressed: () {
             Navigator.pop(context);
           },
-          icon: const Icon(
-            Icons.arrow_back_ios,
+          icon: const FaIcon(
+            FontAwesomeIcons.chevronLeft,
             color: Colors.white,
           ),
         ),

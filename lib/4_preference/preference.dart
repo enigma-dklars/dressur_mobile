@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:dressur/components/padding_and_divider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:dressur/4_preference/choix_pays.dart';
 import 'package:dressur/1_reception/liste_notification.dart';
@@ -105,15 +106,16 @@ class _PreferencePageState extends State<PreferencePage> {
           title: Text(
             (langUserPhone == "fr") ? "Préférences" : "Preferences",
             style: GoogleFonts.poppins(
-            color: Colors.white,
-            fontWeight: FontWeight.w400,
-            fontSize: 18,
-          ),
+              color: Colors.white,
+              fontWeight: FontWeight.w400,
+              fontSize: 18,
+            ),
           ),
           actions: [
             IconButton(
-              icon: const Icon(
-                Icons.notifications,
+              icon: const FaIcon(
+                FontAwesomeIcons.solidBell,
+                size: 20,
                 color: Colors.white,
               ),
               onPressed: () {
@@ -152,9 +154,10 @@ class _PreferencePageState extends State<PreferencePage> {
               ],
               offset: const Offset(0, 60),
               color: primaryColor,
-              icon: const Icon(
-                Icons.menu,
+              icon: const FaIcon(
+                FontAwesomeIcons.bars,
                 color: Colors.white,
+                size: 20,
               ),
               elevation: 2,
               onSelected: (value) {
@@ -235,7 +238,8 @@ class _PreferencePageState extends State<PreferencePage> {
                 // --- EN-TÊTE ---
                 Row(
                   children: [
-                    Icon(Icons.public_rounded, color: primaryColor, size: 28),
+                    FaIcon(FontAwesomeIcons.globe,
+                        color: primaryColor, size: 28),
                     SizedBox(width: 12),
                     Text(
                       (langUserPhone == "fr")
@@ -305,7 +309,7 @@ class _PreferencePageState extends State<PreferencePage> {
                   alignment: Alignment.centerRight,
                   child: ElevatedButton.icon(
                     onPressed: onEdit,
-                    icon: Icon(Icons.edit, size: 18),
+                    icon: FaIcon(FontAwesomeIcons.pen, size: 18),
                     label: Text(
                       (langUserPhone == "fr") ? 'Modifier' : 'Edit',
                       style: GoogleFonts.poppins(fontWeight: FontWeight.w600),

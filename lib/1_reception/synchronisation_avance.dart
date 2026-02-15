@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:dressur/components/constant.dart';
@@ -207,8 +208,8 @@ class _PageDepartState extends State<PageDepart> {
           onPressed: () {
             Navigator.pop(context);
           },
-          icon: const Icon(
-            Icons.arrow_back_ios,
+          icon: const FaIcon(
+            FontAwesomeIcons.chevronLeft,
             color: Colors.white,
           ),
         ),
@@ -224,8 +225,8 @@ class _PageDepartState extends State<PageDepart> {
             // --- ICÔNE ANIMÉE ---
             FadeIn(
               duration: Duration(milliseconds: 500),
-              child: Icon(
-                Icons.sync_lock_rounded,
+              child: FaIcon(
+                FontAwesomeIcons.lock,
                 size: 80,
                 color: primaryColor,
               ),
@@ -296,7 +297,7 @@ class _PageDepartState extends State<PageDepart> {
                         },
                   icon: _enCour
                       ? Container()
-                      : Icon(Icons.play_circle_fill_rounded),
+                      : FaIcon(FontAwesomeIcons.solidCirclePlay),
                   label: _enCour
                       ? SizedBox(
                           height: 24,
@@ -360,7 +361,8 @@ class _PageDepartState extends State<PageDepart> {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(Icons.warning_amber_rounded, color: Colors.red[700], size: 20),
+        FaIcon(FontAwesomeIcons.triangleExclamation,
+            color: Colors.red[700], size: 20),
         SizedBox(width: 12),
         Expanded(
           child: Text(

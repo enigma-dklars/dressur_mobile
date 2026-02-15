@@ -157,8 +157,8 @@ class _ContactPageState extends State<ContactPage> {
           onPressed: () {
             Navigator.pop(context);
           },
-          icon: const Icon(
-            Icons.arrow_back_ios,
+          icon: const FaIcon(
+            FontAwesomeIcons.chevronLeft,
             color: Colors.white,
           ),
         ),
@@ -215,9 +215,10 @@ class _ContactPageState extends State<ContactPage> {
             ],
             offset: const Offset(0, 60),
             color: primaryColor,
-            icon: const Icon(
-              Icons.menu,
+            icon: const FaIcon(
+              FontAwesomeIcons.bars,
               color: Colors.white,
+              size: 20,
             ),
             elevation: 2,
             onSelected: (value) {
@@ -268,14 +269,28 @@ class _ContactPageState extends State<ContactPage> {
               ? "Rechercher par nom, pseudo..."
               : "Search by name, pseudo...",
           hintStyle: GoogleFonts.poppins(color: Colors.grey[500]),
-          prefixIcon: Icon(Icons.search, color: Colors.grey[500], size: 22),
+
+          // Utilisez `prefix` au lieu de `prefixIcon`
+          prefixIcon: Padding(
+            padding: const EdgeInsets.only(left: 20, right: 13, top: 14),
+            child: FaIcon(
+              FontAwesomeIcons.magnifyingGlass,
+              color: Colors.grey[500],
+              size:
+                  20, // J'ai légèrement réduit la taille pour un meilleur alignement vertical
+            ),
+          ),
+
           filled: true,
           fillColor: Theme.of(context).brightness == Brightness.dark
               ? Colors.grey[850]
               : Colors.white,
           border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(15),
-              borderSide: BorderSide.none),
+            borderRadius: BorderRadius.circular(15),
+            borderSide: BorderSide.none,
+          ),
+
+          // Le contentPadding horizontal est maintenant géré par le Padding du widget `prefix`
           contentPadding: EdgeInsets.symmetric(vertical: 14),
         ),
       ),
@@ -333,8 +348,8 @@ class _ContactPageState extends State<ContactPage> {
                   ),
                 ),
                 IconButton(
-                  icon:
-                      Icon(Icons.info_outline_rounded, color: Colors.grey[400]),
+                  icon: FaIcon(FontAwesomeIcons.circleInfo,
+                      color: Colors.grey[400]),
                   onPressed: () {
                     uidAutreUser = contact.id;
                     addUserOnAutreProfilPage = "non";
@@ -350,13 +365,13 @@ class _ContactPageState extends State<ContactPage> {
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 _buildActionButton(
-                    icon: Icons.phone_outlined,
+                    icon: FontAwesomeIcons.phone,
                     onTap: () => launchPhoneCall(contact.tel)),
                 _buildActionButton(
-                    icon: Icons.sms_outlined,
+                    icon: FontAwesomeIcons.solidMessage,
                     onTap: () => launchSMS(contact.tel)),
                 _buildActionButton(
-                    icon: Icons.mail_outline_rounded,
+                    icon: FontAwesomeIcons.solidEnvelope,
                     onTap: () => launchEmail(contact.mail)),
                 _buildActionButton(
                     icon: FontAwesomeIcons.whatsapp,
@@ -373,7 +388,7 @@ class _ContactPageState extends State<ContactPage> {
       {required IconData icon, required VoidCallback onTap}) {
     return IconButton(
       onPressed: onTap,
-      icon: Icon(icon, color: primaryColor, size: 22),
+      icon: FaIcon(icon, color: primaryColor, size: 22),
       splashRadius: 24,
     );
   }
@@ -383,7 +398,8 @@ class _ContactPageState extends State<ContactPage> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.search_off, size: 60, color: Colors.grey[400]),
+          FaIcon(FontAwesomeIcons.magnifyingGlass,
+              size: 60, color: Colors.grey[400]),
           SizedBox(height: 15),
           Text(
             _searchController.text.isEmpty

@@ -3,6 +3,7 @@
 import 'package:dressur/1_reception/recompense_dashboard.dart';
 import 'package:dressur/components/noti.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:dressur/components/constant.dart';
 import 'package:http/http.dart' as http;
@@ -97,7 +98,8 @@ class _ProgrammeRecompensePageState extends State<ProgrammeRecompensePage> {
           ),
         ),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios, color: Colors.white, size: 20),
+          icon: FaIcon(FontAwesomeIcons.chevronLeft,
+              color: Colors.white, size: 20),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -135,7 +137,7 @@ class _ProgrammeRecompensePageState extends State<ProgrammeRecompensePage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Icon(Icons.stars, size: 48, color: Colors.white),
+                FaIcon(FontAwesomeIcons.star, size: 48, color: Colors.white),
                 SizedBox(height: 16),
                 Text(
                   "Gagnez des récompenses avec Dressur",
@@ -173,9 +175,9 @@ class _ProgrammeRecompensePageState extends State<ProgrammeRecompensePage> {
 
                 // 2. Réseau concerné
                 _sectionTitle(context, "Réseau concerné"),
-                _bulletItem(context, Icons.check_circle,
+                _bulletItem(context, FontAwesomeIcons.solidCircleCheck,
                     "WhatsApp – Statut uniquement", Colors.green),
-                _bulletItem(context, Icons.cancel,
+                _bulletItem(context, FontAwesomeIcons.xmark,
                     "Autres réseaux non pris en charge", Colors.red),
 
                 _divider(context),
@@ -214,16 +216,17 @@ class _ProgrammeRecompensePageState extends State<ProgrammeRecompensePage> {
 
                 // 5. Règles essentielles
                 _sectionTitle(context, "Règles essentielles"),
-                _bulletItem(context, Icons.info_outline,
+                _bulletItem(context, FontAwesomeIcons.circleInfo,
                     "Le partage doit être effectué uniquement depuis Dressur."),
-                _bulletItem(context, Icons.timer_outlined,
+                _bulletItem(context, FontAwesomeIcons.stopwatch,
                     "Le statut doit rester visible au moins 20 heures."),
-                _bulletItem(context, Icons.edit_off_outlined,
+                _bulletItem(context, FontAwesomeIcons.slash,
                     "Toute modification du contenu annule automatiquement la récompense."),
-                _bulletItem(context, Icons.verified_user_outlined,
+                _bulletItem(context, FontAwesomeIcons.solidCircleCheck,
                     "Les preuves doivent être authentiques, complètes et personnelles."),
-                _bulletItem(context, Icons.people_outline,
+                _bulletItem(context, FontAwesomeIcons.users,
                     "Seuls les premiers utilisateurs ayant fourni des preuves valides sont récompensés."),
+
                 SizedBox(height: 8),
                 _infoText(context,
                     "👉 Cliquer sur « Participer » vaut acceptation totale de ces règles."),
@@ -232,11 +235,11 @@ class _ProgrammeRecompensePageState extends State<ProgrammeRecompensePage> {
 
                 // 6. Délais importants
                 _sectionTitle(context, "Délais importants"),
-                _bulletItem(context, Icons.hourglass_top,
+                _bulletItem(context, FontAwesomeIcons.hourglassHalf,
                     "Délai minimum : 20 heures après le partage"),
-                _bulletItem(context, Icons.hourglass_bottom,
+                _bulletItem(context, FontAwesomeIcons.hourglass,
                     "Délai maximum : avant 24 heures (expiration WhatsApp)"),
-                _bulletItem(context, Icons.replay,
+                _bulletItem(context, FontAwesomeIcons.arrowsRotate,
                     "En cas de preuve incomplète, une reprise peut être demandée dans la limite du délai"),
 
                 _divider(context),
@@ -260,10 +263,11 @@ class _ProgrammeRecompensePageState extends State<ProgrammeRecompensePage> {
 
                 // 8. Validation et quota
                 _sectionTitle(context, "Validation et quota"),
-                _bulletItem(context, Icons.analytics_outlined,
+                _bulletItem(context, FontAwesomeIcons.chartSimple,
                     "Les preuves sont analysées par le système et/ou l’équipe Dressur."),
-                _bulletItem(context, Icons.fact_check_outlined,
+                _bulletItem(context, FontAwesomeIcons.clipboardCheck,
                     "La validation dépend de la conformité et du quota disponible."),
+
                 _infoText(context,
                     "📌 Atteindre un seuil de vues ne garantit pas automatiquement le paiement."),
 
@@ -271,20 +275,20 @@ class _ProgrammeRecompensePageState extends State<ProgrammeRecompensePage> {
 
                 // 9. Récompense et solde
                 _sectionTitle(context, "Récompense et solde"),
-                _bulletItem(context, Icons.account_balance_wallet_outlined,
+                _bulletItem(context, FontAwesomeIcons.wallet,
                     "Ajoutée à votre solde Programme des récompenses"),
-                _bulletItem(context, Icons.history,
+                _bulletItem(context, FontAwesomeIcons.clockRotateLeft,
                     "Enregistrée dans votre historique avec la promotion"),
 
                 _divider(context),
 
                 // 10. Retrait des gains
                 _sectionTitle(context, "Retrait des gains"),
-                _bulletItem(context, Icons.payments_outlined,
+                _bulletItem(context, FontAwesomeIcons.moneyBillTrendUp,
                     "Montant minimum : 1 000 FCFA"),
-                _bulletItem(context, Icons.phone_android,
+                _bulletItem(context, FontAwesomeIcons.mobileScreen,
                     "Méthodes : Mobile Money (MTN, Moov, Orange, etc.)"),
-                _bulletItem(context, Icons.security,
+                _bulletItem(context, FontAwesomeIcons.shield,
                     "Soumis aux contrôles de sécurité habituels."),
 
                 _divider(context),
@@ -292,12 +296,13 @@ class _ProgrammeRecompensePageState extends State<ProgrammeRecompensePage> {
                 // 11. Politique anti-fraude
                 _sectionTitle(context, "Politique anti-fraude"),
                 _paragraph(context, "Toute tentative de fraude entraîne :"),
-                _bulletItem(context, Icons.block,
+                _bulletItem(context, FontAwesomeIcons.slash,
                     "Annulation immédiate des gains", Colors.red),
-                _bulletItem(context, Icons.person_off,
+                _bulletItem(context, FontAwesomeIcons.userSlash,
                     "Suspension ou suppression du compte", Colors.red),
-                _bulletItem(context, Icons.gavel,
+                _bulletItem(context, FontAwesomeIcons.gavel,
                     "Interdiction définitive de participation", Colors.red),
+
                 _paragraph(context,
                     "Dressur se réserve le droit de refuser toute preuve jugée douteuse."),
 
@@ -314,16 +319,14 @@ class _ProgrammeRecompensePageState extends State<ProgrammeRecompensePage> {
                   "Les retraits des gains du Programme des récompenses se font automatiquement "
                   "lorsque votre solde atteint ou dépasse 1 000 FCFA.",
                 ),
-
                 _bulletItem(
                   context,
-                  Icons.autorenew,
+                  FontAwesomeIcons.arrowsRotate,
                   "Les retraits sont déclenchés automatiquement dès que le seuil minimum est atteint.",
                 ),
-
                 _bulletItem(
                   context,
-                  Icons.phone_android,
+                  FontAwesomeIcons.mobileScreen,
                   "Les paiements sont envoyés vers les réseaux Mobile Money suivants :",
                 ),
 
@@ -366,7 +369,7 @@ class _ProgrammeRecompensePageState extends State<ProgrammeRecompensePage> {
 
                 _bulletItem(
                   context,
-                  Icons.edit,
+                  FontAwesomeIcons.pen,
                   "Vous pouvez modifier votre réseau et votre numéro de paiement à tout moment.",
                 ),
 
@@ -433,8 +436,8 @@ class _ProgrammeRecompensePageState extends State<ProgrammeRecompensePage> {
                           color: Colors.green.withOpacity(0.1),
                           shape: BoxShape.circle,
                         ),
-                        child: Icon(
-                          Icons.verified,
+                        child: FaIcon(
+                          FontAwesomeIcons.solidCircleCheck,
                           size: 80,
                           color: Colors.green,
                         ),
@@ -525,8 +528,8 @@ class _ProgrammeRecompensePageState extends State<ProgrammeRecompensePage> {
                                 child: Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    Icon(
-                                      Icons.chat,
+                                    FaIcon(
+                                      FontAwesomeIcons.solidComment,
                                       color: Color(0xFF25D366),
                                       size: 20,
                                     ),
@@ -568,11 +571,13 @@ class _ProgrammeRecompensePageState extends State<ProgrammeRecompensePage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _bulletItem(context, Icons.check, "MTN Mobile Money Bénin"),
-          _bulletItem(context, Icons.check, "MOOV Money Bénin"),
-          _bulletItem(context, Icons.check, "MTN Mobile Money Côte d’Ivoire"),
-          _bulletItem(context, Icons.check, "MOOV Togo"),
-          _bulletItem(context, Icons.check, "TOGOCEL T-Money"),
+          _bulletItem(
+              context, FontAwesomeIcons.check, "MTN Mobile Money Bénin"),
+          _bulletItem(context, FontAwesomeIcons.check, "MOOV Money Bénin"),
+          _bulletItem(context, FontAwesomeIcons.check,
+              "MTN Mobile Money Côte d’Ivoire"),
+          _bulletItem(context, FontAwesomeIcons.check, "MOOV Togo"),
+          _bulletItem(context, FontAwesomeIcons.check, "TOGOCEL T-Money"),
         ],
       ),
     );
@@ -589,7 +594,8 @@ class _ProgrammeRecompensePageState extends State<ProgrammeRecompensePage> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.check_circle, size: 80, color: Colors.green),
+          FaIcon(FontAwesomeIcons.solidCircleCheck,
+              size: 80, color: Colors.green),
           SizedBox(height: 24),
           Text(
             "Inscription confirmée",
@@ -672,7 +678,7 @@ class _ProgrammeRecompensePageState extends State<ProgrammeRecompensePage> {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon,
+          FaIcon(icon,
               size: 18, color: iconColor ?? primaryColor.withOpacity(0.7)),
           SizedBox(width: 10),
           Expanded(
@@ -726,7 +732,7 @@ class _ProgrammeRecompensePageState extends State<ProgrammeRecompensePage> {
         children: [
           Row(
             children: [
-              Icon(Icons.visibility_outlined, color: color, size: 20),
+              FaIcon(FontAwesomeIcons.eye, color: color, size: 20),
               SizedBox(width: 12),
               Text(
                 views,
@@ -826,7 +832,8 @@ class _ProgrammeRecompensePageState extends State<ProgrammeRecompensePage> {
       ),
       child: Row(
         children: [
-          Icon(Icons.warning_amber_rounded, color: Colors.red, size: 20),
+          FaIcon(FontAwesomeIcons.triangleExclamation,
+              color: Colors.red, size: 20),
           SizedBox(width: 10),
           Expanded(
             child: Text(text,

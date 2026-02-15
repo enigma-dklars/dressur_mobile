@@ -3,6 +3,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:convert' as convert;
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -46,19 +47,19 @@ class _BottomBarState extends State<BottomBar> with WidgetsBindingObserver {
 
   // Icônes pour chaque onglet, y compris "Actu"
   final List<IconData> _iconList = [
-    Icons.home_outlined,
-    Icons.query_stats_outlined,
-    Icons.dynamic_feed_outlined, // Icône pour "Actu"
-    Icons.favorite_border_outlined,
-    Icons.settings_outlined,
+    FontAwesomeIcons.inbox,
+    FontAwesomeIcons.briefcase,
+    FontAwesomeIcons.newspaper,
+    FontAwesomeIcons.heart,
+    FontAwesomeIcons.gear,
   ];
 
   final List<IconData> _iconListSelected = [
-    Icons.home,
-    Icons.query_stats,
-    Icons.dynamic_feed, // Icône sélectionnée pour "Actu"
-    Icons.favorite,
-    Icons.settings,
+    FontAwesomeIcons.inbox,
+    FontAwesomeIcons.briefcase,
+    FontAwesomeIcons.newspaper,
+    FontAwesomeIcons.solidHeart,
+    FontAwesomeIcons.gear,
   ];
 
   @override
@@ -237,9 +238,9 @@ class _BottomBarState extends State<BottomBar> with WidgetsBindingObserver {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               // L'icône
-              Icon(
+              FaIcon(
                 _iconList[index],
-                size: isActive ? 28 : 24, // L'icône active est plus grande
+                size: isActive ? 24 : 18, // L'icône active est plus grande
                 color: color,
               ),
               SizedBox(height: 4),
@@ -282,7 +283,7 @@ class _BottomBarState extends State<BottomBar> with WidgetsBindingObserver {
       mainAxisSize: MainAxisSize.min,
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Icon(
+        FaIcon(
           isActive ? _iconListSelected[index] : _iconList[index],
           size: 24,
           color: isActive ? primaryColor : Colors.grey[600],
@@ -304,26 +305,25 @@ class _BottomBarState extends State<BottomBar> with WidgetsBindingObserver {
   // Bouton spécial pour l'onglet central "Actu"
   Widget _buildCenterButton(bool isActive) {
     return Container(
-      width: 60,
-      height: 60,
-      margin: EdgeInsets.only(bottom: 15), // Remonte le bouton
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: primaryColor,
-        boxShadow: [
-          BoxShadow(
-            color: primaryColor.withOpacity(0.4),
-            blurRadius: 8,
-            offset: Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Icon(
-        isActive ? Icons.dynamic_feed : Icons.dynamic_feed_outlined,
-        color: Colors.white,
-        size: 30,
-      ),
-    );
+        width: 60,
+        height: 60,
+        margin: EdgeInsets.only(bottom: 15), // Remonte le bouton
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: primaryColor,
+          boxShadow: [
+            BoxShadow(
+              color: primaryColor.withOpacity(0.4),
+              blurRadius: 8,
+              offset: Offset(0, 4),
+            ),
+          ],
+        ),
+        child: FaIcon(
+          FontAwesomeIcons.rss,
+          color: isActive ? Colors.white : Colors.white.withOpacity(0.5),
+          size: 30,
+        ));
   }
 
   // Helper pour obtenir le label en fonction de la langue

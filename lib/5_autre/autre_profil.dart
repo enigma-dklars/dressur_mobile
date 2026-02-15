@@ -253,8 +253,8 @@ class _AutreProfilPageState extends State<AutreProfilPage> {
                                                   color: primaryColor,
                                                   shape: BoxShape.circle,
                                                 ),
-                                                child: Icon(
-                                                  Icons.arrow_back_ios,
+                                                child: FaIcon(
+                                                  FontAwesomeIcons.chevronLeft,
                                                   color: Colors.white,
                                                 ),
                                               ),
@@ -289,7 +289,7 @@ class _AutreProfilPageState extends State<AutreProfilPage> {
                                         spacing: 10,
                                         children: [
                                           _buildActionIcon(
-                                            icon: Icons.phone_outlined,
+                                            icon: FontAwesomeIcons.phone,
                                             tooltip: (langUserPhone == "fr")
                                                 ? "Appeler"
                                                 : "Call",
@@ -297,12 +297,13 @@ class _AutreProfilPageState extends State<AutreProfilPage> {
                                                 launchPhoneCall(autre_tel),
                                           ),
                                           _buildActionIcon(
-                                            icon: Icons.sms_outlined,
+                                            icon: FontAwesomeIcons.solidMessage,
                                             tooltip: "SMS",
                                             onTap: () => launchSMS(autre_tel),
                                           ),
                                           _buildActionIcon(
-                                            icon: Icons.mail_outline_rounded,
+                                            icon:
+                                                FontAwesomeIcons.solidEnvelope,
                                             tooltip: "Email",
                                             onTap: () =>
                                                 launchEmail(autre_mail),
@@ -396,7 +397,7 @@ class _AutreProfilPageState extends State<AutreProfilPage> {
               ),
             ],
           ),
-          child: Icon(
+          child: FaIcon(
             icon,
             size:
                 24, // Taille d'icône légèrement plus grande pour un meilleur impact

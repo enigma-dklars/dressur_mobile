@@ -9,6 +9,7 @@ import 'package:dressur/components/padding_and_divider.dart';
 import 'package:dressur/components/pub_smt_2024.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:dressur/2_promo/liste_promo_affaire.dart';
 import 'package:dressur/2_promo/liste_boost_contact.dart';
@@ -84,7 +85,10 @@ class _BoostPageState extends State<BoostPage> {
           ),
           actions: [
             IconButton(
-              icon: const Icon(Icons.notifications),
+              icon: const FaIcon(
+                FontAwesomeIcons.solidBell,
+                size: 20,
+              ),
               color: Colors.white,
               onPressed: () {
                 Navigator.push(
@@ -122,9 +126,10 @@ class _BoostPageState extends State<BoostPage> {
               ],
               offset: const Offset(0, 60),
               color: primaryColor,
-              icon: const Icon(
-                Icons.menu,
+              icon: const FaIcon(
+                FontAwesomeIcons.bars,
                 color: Colors.white,
+                size: 20,
               ),
               elevation: 2,
               onSelected: (value) {
@@ -144,7 +149,7 @@ class _BoostPageState extends State<BoostPage> {
               SizedBox(height: 10),
               _buildServiceCard(
                 context: context,
-                icon: Icons.contact_phone_rounded,
+                icon: FontAwesomeIcons.addressBook,
                 title: "Boost Contact",
                 description: (langUserPhone == "fr")
                     ? "Rendez visible le ($tel) aux contacts correspondant à vos préférences pays."
@@ -165,7 +170,7 @@ class _BoostPageState extends State<BoostPage> {
               SizedBox(height: 10),
               _buildServiceCard(
                 context: context,
-                icon: Icons.storefront_rounded,
+                icon: FontAwesomeIcons.store,
                 title: (langUserPhone == "fr")
                     ? "Promotion Affaire"
                     : "Business Promotion",
@@ -190,7 +195,7 @@ class _BoostPageState extends State<BoostPage> {
               if (mailIsMaxxFire == false) ...[
                 _buildServiceCard(
                   context: context,
-                  icon: Icons.trending_up_rounded,
+                  icon: FontAwesomeIcons.chartLine,
                   title: (langUserPhone == "fr")
                       ? "Promotion Réseau Sociaux"
                       : "Social Network Promotion",
@@ -266,7 +271,7 @@ class _BoostPageState extends State<BoostPage> {
                   color: primaryColor.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: Icon(icon, color: primaryColor, size: 28),
+                child: FaIcon(icon, color: primaryColor, size: 28),
               ),
               SizedBox(width: 15),
               Expanded(

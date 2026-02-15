@@ -1,6 +1,7 @@
 // ignore_for_file: use_build_context_synchronously, prefer_const_constructors
 
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:dressur/6_login_register/connexion.dart';
 import 'package:dressur/components/constant.dart';
@@ -21,8 +22,8 @@ class ModifierMdpPage extends StatelessWidget {
           onPressed: () {
             Navigator.pop(context);
           },
-          icon: const Icon(
-            Icons.arrow_back_ios,
+          icon: const FaIcon(
+            FontAwesomeIcons.chevronLeft,
             color: Colors.white,
           ),
         ),
@@ -40,7 +41,7 @@ class ModifierMdpPage extends StatelessWidget {
         child: Column(
           children: [
             SizedBox(height: 20),
-            Icon(Icons.lock_reset_rounded, color: primaryColor, size: 70),
+            FaIcon(FontAwesomeIcons.lock, color: primaryColor, size: 70),
             SizedBox(height: 15),
             Text(
               (langUserPhone == "fr")
@@ -297,12 +298,14 @@ class _PasswordChangeFormState extends State<PasswordChangeForm> {
       decoration: InputDecoration(
         labelText: label,
         labelStyle: GoogleFonts.poppins(color: Colors.grey[600]),
-        prefixIcon: Icon(Icons.lock_outline, color: Colors.grey[500], size: 22),
+        prefixIcon: Padding(
+          padding: const EdgeInsets.only(left: 20, right: 13, top: 14),
+          child:
+              FaIcon(FontAwesomeIcons.lock, color: Colors.grey[500], size: 22),
+        ),
         suffixIcon: IconButton(
-          icon: Icon(
-              isVisible
-                  ? Icons.visibility_off_outlined
-                  : Icons.visibility_outlined,
+          icon: FaIcon(
+              isVisible ? FontAwesomeIcons.eyeSlash : FontAwesomeIcons.eye,
               color: Colors.grey[500]),
           onPressed: onToggleVisibility,
         ),

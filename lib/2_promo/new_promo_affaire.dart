@@ -2,6 +2,7 @@
 
 import 'dart:convert';
 import 'dart:convert' as convert;
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'dart:io';
 import 'dart:async';
@@ -46,8 +47,8 @@ class _PromotionFormPageState extends State<PromotionFormPage> {
           onPressed: () {
             Navigator.pop(context);
           },
-          icon: const Icon(
-            Icons.arrow_back_ios,
+          icon: const FaIcon(
+            FontAwesomeIcons.chevronLeft,
             color: Colors.white,
           ),
         ),
@@ -578,8 +579,8 @@ class _ProduitsServicesState extends State<ProduitsServices> {
           const SizedBox(height: 10),
 
           // --- SECTION PROGRAMME DE RÉCOMPENSE ---
-          _buildOptionHeader(
-              Icons.stars, "Programme de Récompense", _participateInReward),
+          _buildOptionHeader(FontAwesomeIcons.star, "Programme de Récompense",
+              _participateInReward),
           SwitchListTile(
             title: Text("Ajouter votre promotion au programme",
                 style: GoogleFonts.poppins(
@@ -615,7 +616,7 @@ class _ProduitsServicesState extends State<ProduitsServices> {
 
           // --- SECTION STATUT DRESSUR ---
           _buildOptionHeader(
-            Icons.verified_user,
+            FontAwesomeIcons.solidCircleCheck,
             "Statut Dressur",
             _publishOnDressurStatus,
           ),
@@ -688,7 +689,7 @@ class _ProduitsServicesState extends State<ProduitsServices> {
   Widget _buildOptionHeader(IconData icon, String title, bool isActive) {
     return Row(
       children: [
-        Icon(icon, color: isActive ? primaryColor : Colors.grey, size: 20),
+        FaIcon(icon, color: isActive ? primaryColor : Colors.grey, size: 20),
         SizedBox(width: 10),
         Text(title,
             style: GoogleFonts.poppins(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class ProfileMenuReseauBlanc extends StatelessWidget {
@@ -34,8 +35,8 @@ class ProfileMenuReseauBlanc extends StatelessWidget {
                 fontWeight: FontWeight.w500,
               ),
             ),
-            const Icon(
-              Icons.arrow_right,
+            const FaIcon(
+              FontAwesomeIcons.arrowRight,
               color: Colors.white,
             ),
           ],

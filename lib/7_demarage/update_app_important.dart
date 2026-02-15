@@ -3,6 +3,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:animate_do/animate_do.dart';
@@ -81,8 +82,8 @@ class ImportantUpdate extends StatelessWidget {
                         shape: BoxShape.circle,
                         color: Colors.white.withOpacity(0.1),
                       ),
-                      child: Icon(
-                        Icons.system_update_rounded,
+                      child: FaIcon(
+                        FontAwesomeIcons.arrowDown,
                         size: 80,
                         color: Colors.white,
                       ),
@@ -132,8 +133,8 @@ class ImportantUpdate extends StatelessWidget {
                   delay: Duration(milliseconds: 600),
                   child: ElevatedButton.icon(
                     onPressed: _launchStoreURL,
-                    icon: Icon(Icons.download_for_offline_rounded,
-                        color: primaryColor),
+                    icon:
+                        FaIcon(FontAwesomeIcons.download, color: primaryColor),
                     label: Text((langUserPhone == "fr")
                         ? "Mettre à Jour Maintenant"
                         : "Update Now"),

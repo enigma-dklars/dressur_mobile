@@ -17,6 +17,7 @@ import 'package:dressur/5_autre/support_assistance.dart';
 import 'package:art_sweetalert/art_sweetalert.dart';
 import 'package:dressur/components/constant.dart';
 import 'package:dressur/components/sql_helper.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class SettingPage extends StatefulWidget {
@@ -165,8 +166,9 @@ class _SettingPageState extends State<SettingPage> {
           ),
           actions: [
             IconButton(
-              icon: const Icon(
-                Icons.notifications,
+              icon: const FaIcon(
+                FontAwesomeIcons.solidBell,
+                size: 20,
                 color: Colors.white,
               ),
               onPressed: () {
@@ -187,22 +189,22 @@ class _SettingPageState extends State<SettingPage> {
             children: [
               // --- SECTION STATISTIQUES ---
               Padding(
-                padding: const EdgeInsets.all(15.0),
+                padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
                 child: Row(
                   children: [
                     _buildStatCard(
                       context,
-                      icon: Icons.visibility_outlined,
+                      icon: FontAwesomeIcons.eye,
                       value: totalImpressionsText,
                       label: (langUserPhone == "fr")
                           ? "Impressions"
                           : "Impressions",
                       hasIncreased: totalImpressions > 0,
                     ),
-                    SizedBox(width: 15),
+                    SizedBox(width: 10),
                     _buildStatCard(
                       context,
-                      icon: Icons.touch_app_outlined,
+                      icon: FontAwesomeIcons.handPointer,
                       value: totalVuesText,
                       label: (langUserPhone == "fr") ? "Vues" : "Views",
                       hasIncreased: totalVues > 0,
@@ -216,12 +218,12 @@ class _SettingPageState extends State<SettingPage> {
                   (langUserPhone == "fr") ? "Mon Compte" : "My Account"),
               _buildMenuContainer(isDark, [
                 _buildMenuRow(
-                    Icons.person_outline_rounded,
+                    FontAwesomeIcons.user,
                     (langUserPhone == "fr") ? "Profil" : "Profile",
                     () => Navigator.push(context,
                         MaterialPageRoute(builder: (context) => ProfilPage()))),
                 _buildMenuRow(
-                    Icons.lock_outline_rounded,
+                    FontAwesomeIcons.lock,
                     (langUserPhone == "fr")
                         ? "Modifier le mot de passe"
                         : "Change Password",
@@ -237,7 +239,7 @@ class _SettingPageState extends State<SettingPage> {
                   : "Support & Feedback"),
               _buildMenuContainer(isDark, [
                 _buildMenuRow(
-                    Icons.headset_mic_outlined,
+                    FontAwesomeIcons.headset,
                     (langUserPhone == "fr")
                         ? "Support Technique"
                         : "Technical Support",
@@ -246,14 +248,14 @@ class _SettingPageState extends State<SettingPage> {
                         MaterialPageRoute(
                             builder: (context) => SupportPage()))),
                 _buildMenuRow(
-                    Icons.lightbulb_outline_rounded,
+                    FontAwesomeIcons.lightbulb,
                     "Suggestions",
                     () => Navigator.push(
                         context,
                         MaterialPageRoute(
                             builder: (context) => SuggestionsPage()))),
                 _buildMenuRow(
-                    Icons.warning_amber_rounded,
+                    FontAwesomeIcons.triangleExclamation,
                     (langUserPhone == "fr")
                         ? "Signaler un utilisateur"
                         : "Report a User",
@@ -269,36 +271,38 @@ class _SettingPageState extends State<SettingPage> {
                   : "Advanced Actions"),
               _buildMenuContainer(isDark, [
                 _buildMenuRow(
-                    Icons.delete_sweep_outlined,
-                    (langUserPhone == "fr")
-                        ? "Supprimer les contacts DS"
-                        : "Delete DS Contacts",
-                    _handleDeleteDSContacts,
-                    color: Colors.orange[700]),
+                  FontAwesomeIcons.broom,
+                  (langUserPhone == "fr")
+                      ? "Supprimer les contacts DS"
+                      : "Delete DS Contacts",
+                  _handleDeleteDSContacts,
+                  color: Colors.orange[700],
+                ),
                 _buildMenuRow(
-                    Icons.delete_forever_outlined,
-                    (langUserPhone == "fr")
-                        ? "Supprimer mon compte"
-                        : "Delete My Account",
-                    () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => DeletecomptePage())),
-                    color: Colors.red),
+                  FontAwesomeIcons.trash,
+                  (langUserPhone == "fr")
+                      ? "Supprimer mon compte"
+                      : "Delete My Account",
+                  () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => DeletecomptePage())),
+                  color: Colors.red,
+                ),
               ]),
 
               // --- SECTION APPLICATION ---
               _buildSectionTitle("Application"),
               _buildMenuContainer(isDark, [
                 _buildMenuRow(
-                    Icons.info_outline_rounded,
+                    FontAwesomeIcons.circleInfo,
                     (langUserPhone == "fr") ? "À Propos" : "About Us",
                     () => Navigator.push(
                         context,
                         MaterialPageRoute(
                             builder: (context) => AproposPage()))),
                 _buildMenuRow(
-                    Icons.logout_rounded,
+                    FontAwesomeIcons.rightFromBracket,
                     (langUserPhone == "fr") ? "Se déconnecter" : "Sign Out",
                     _handleLogout),
               ]),
@@ -307,7 +311,7 @@ class _SettingPageState extends State<SettingPage> {
                 _buildSectionTitle("Administration"),
                 _buildMenuContainer(isDark, [
                   _buildMenuRow(
-                      Icons.admin_panel_settings_outlined,
+                      FontAwesomeIcons.userShield,
                       "Panneau Administrateur",
                       () => Navigator.push(
                           context,
@@ -341,18 +345,13 @@ class _SettingPageState extends State<SettingPage> {
         ),
         child: Column(
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(icon, color: primaryColor, size: 20),
-                SizedBox(width: 8),
-                Text(label,
-                    style: GoogleFonts.poppins(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                        color: isDark ? Colors.grey[300] : Colors.grey[700])),
-              ],
-            ),
+            FaIcon(icon, color: primaryColor, size: 24),
+            SizedBox(height: 10),
+            Text(label,
+                style: GoogleFonts.poppins(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: isDark ? Colors.grey[300] : Colors.grey[700])),
             SizedBox(height: 8),
             Text(value,
                 style: GoogleFonts.poppins(
@@ -382,7 +381,7 @@ class _SettingPageState extends State<SettingPage> {
 
   Widget _buildMenuContainer(bool isDark, List<Widget> children) {
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: 15),
+      margin: EdgeInsets.symmetric(horizontal: 10),
       decoration: BoxDecoration(
         color: isDark ? Color(0xFF1E1E1E) : Colors.white,
         borderRadius: BorderRadius.circular(18),
@@ -400,7 +399,7 @@ class _SettingPageState extends State<SettingPage> {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         child: Row(
           children: [
-            Icon(icon, color: color ?? primaryColor, size: 24),
+            FaIcon(icon, color: color ?? primaryColor, size: 18),
             SizedBox(width: 16),
             Expanded(
                 child: Text(text,
@@ -409,7 +408,7 @@ class _SettingPageState extends State<SettingPage> {
                         fontWeight: FontWeight.w500,
                         color: color))),
             if (color == null)
-              Icon(Icons.arrow_forward_ios_rounded,
+              FaIcon(FontAwesomeIcons.chevronRight,
                   size: 16, color: Colors.grey[400]),
           ],
         ),

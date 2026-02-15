@@ -8,6 +8,7 @@ import 'package:dressur/components/pub_smt_2024.dart';
 import 'package:dressur/components/sociaux.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:dressur/5_autre/support_assistance.dart';
 import 'package:dressur/1_reception/liste_notification.dart';
@@ -71,10 +72,10 @@ class _ReceptionPageState extends State<ReceptionPage> {
           title: Text(
             (langUserPhone == "fr") ? "Boîte de Réception" : "Inbox",
             style: GoogleFonts.poppins(
-            color: Colors.white,
-            fontWeight: FontWeight.w400,
-            fontSize: 18,
-          ),
+              color: Colors.white,
+              fontWeight: FontWeight.w400,
+              fontSize: 18,
+            ),
           ),
           actions: [
             PopupMenuButton<dynamic>(
@@ -96,9 +97,10 @@ class _ReceptionPageState extends State<ReceptionPage> {
               ],
               offset: const Offset(0, 60),
               color: primaryColor,
-              icon: const Icon(
-                Icons.menu,
+              icon: const FaIcon(
+                FontAwesomeIcons.bars,
                 color: Colors.white,
+                size: 20,
               ),
               elevation: 2,
               onSelected: (value) {
@@ -120,7 +122,7 @@ class _ReceptionPageState extends State<ReceptionPage> {
               const SizedBox(height: 10),
               _buildNavigationItem(
                 context: context,
-                icon: Icons.emoji_events_rounded,
+                icon: FontAwesomeIcons.trophy,
                 title: "Récompenses",
                 subtitle: (langUserPhone == "fr")
                     ? "Gagnez et suivez vos récompenses"
@@ -139,7 +141,7 @@ class _ReceptionPageState extends State<ReceptionPage> {
               const SizedBox(height: 10),
               _buildNavigationItem(
                 context: context,
-                icon: Icons.contacts_rounded,
+                icon: FontAwesomeIcons.solidAddressBook,
                 title: "Contacts",
                 subtitle: (langUserPhone == "fr")
                     ? "Gérez vos contacts ajoutés et scannés"
@@ -154,7 +156,7 @@ class _ReceptionPageState extends State<ReceptionPage> {
               const SizedBox(height: 10),
               _buildNavigationItem(
                 context: context,
-                icon: Icons.notifications_rounded,
+                icon: FontAwesomeIcons.solidBell,
                 title: "Notifications",
                 subtitle: (langUserPhone == "fr")
                     ? "Cadeaux, astuces, recommandations..."
@@ -216,7 +218,7 @@ class _ReceptionPageState extends State<ReceptionPage> {
                 color: primaryColor.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(14),
               ),
-              child: Icon(icon, color: primaryColor, size: 26),
+              child: FaIcon(icon, color: primaryColor, size: 26),
             ),
             SizedBox(width: 16),
 
@@ -249,8 +251,8 @@ class _ReceptionPageState extends State<ReceptionPage> {
             SizedBox(width: 8),
 
             // --- Flèche de navigation ---
-            Icon(
-              Icons.arrow_forward_ios_rounded,
+            FaIcon(
+              FontAwesomeIcons.chevronRight,
               color: isDark ? Colors.grey[600] : Colors.grey[400],
               size: 18,
             ),

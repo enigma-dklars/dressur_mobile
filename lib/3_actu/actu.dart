@@ -113,8 +113,8 @@ class _AnimatedRewardBadgeState extends State<AnimatedRewardBadge>
                   ),
                 ],
               ),
-              child: const Icon(
-                Icons.stars,
+              child: const FaIcon(
+                FontAwesomeIcons.star,
                 color: Colors.white,
                 size: 20,
               ),
@@ -200,7 +200,7 @@ class _ActuPageState extends State<ActuPage> {
 
     showDialog(
       context: context,
-      barrierDismissible: false, // ❌ clic extérieur désactivé
+      barrierDismissible: false,
       builder: (context) {
         return StatefulBuilder(
           builder: (context, setState) {
@@ -214,14 +214,14 @@ class _ActuPageState extends State<ActuPage> {
             return WillPopScope(
               onWillPop: () async => false, // ❌ bouton retour désactivé
               child: AlertDialog(
-                // backgroundColor: Colors.white,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(10),
                   side: const BorderSide(color: Colors.red),
                 ),
                 title: Row(
                   children: [
-                    const Icon(Icons.warning_amber_rounded, color: Colors.red),
+                    const FaIcon(FontAwesomeIcons.triangleExclamation,
+                        color: Colors.red),
                     const SizedBox(width: 8),
                     Text(
                       "Avertissement important",
@@ -594,7 +594,8 @@ class _ActuPageState extends State<ActuPage> {
             SizedBox(height: 25),
 
             // --- EN-TÊTE : LE CONSTAT ---
-            Icon(Icons.search_off_rounded, color: primaryColor, size: 50),
+            FaIcon(FontAwesomeIcons.magnifyingGlass,
+                color: primaryColor, size: 50),
             SizedBox(height: 16),
             Text(
               (langUserPhone == "fr")
@@ -629,7 +630,7 @@ class _ActuPageState extends State<ActuPage> {
             // --- CARTE D'ACTION 1 : FAIRE UN BOOST ---
             _buildActionCard(
               context: context,
-              icon: Icons.rocket_launch_outlined,
+              icon: FontAwesomeIcons.rocket,
               title:
                   (langUserPhone == "fr") ? "Faire un Boost" : "Make a Boost",
               subtitle: (langUserPhone == "fr")
@@ -681,7 +682,7 @@ class _ActuPageState extends State<ActuPage> {
         children: [
           Row(
             children: [
-              Icon(icon, color: buttonColor, size: 24),
+              FaIcon(icon, color: buttonColor, size: 24),
               SizedBox(width: 12),
               Text(title,
                   style: GoogleFonts.poppins(
@@ -745,7 +746,7 @@ class _ActuPageState extends State<ActuPage> {
             SizedBox(height: 25),
 
             // Icône et Titre
-            Icon(Icons.stars, color: primaryColor, size: 50),
+            FaIcon(FontAwesomeIcons.star, color: primaryColor, size: 50),
             SizedBox(height: 15),
             Text(
               "Promotion Éligible !",
@@ -768,11 +769,12 @@ class _ActuPageState extends State<ActuPage> {
             SizedBox(height: 30),
 
             // Détails fictifs
-            _infoRow(context, Icons.visibility, "Objectif",
+            _infoRow(context, FontAwesomeIcons.eye, "Objectif",
                 "Atteindre min. 250 vues"),
-            _infoRow(context, Icons.account_balance_wallet, "Gain estimé",
+            _infoRow(context, FontAwesomeIcons.wallet, "Gain estimé",
                 "Jusqu'à 2 500 FCFA"),
-            _infoRow(context, Icons.timer, "Délai", "20 heures de visibilité"),
+            _infoRow(context, FontAwesomeIcons.stopwatch, "Délai",
+                "20 heures de visibilité"),
 
             SizedBox(height: 30),
 
@@ -817,7 +819,7 @@ class _ActuPageState extends State<ActuPage> {
               color: primaryColor.withOpacity(0.1),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Icon(icon, color: primaryColor, size: 20),
+            child: FaIcon(icon, color: primaryColor, size: 20),
           ),
           SizedBox(width: 15),
           Column(
@@ -872,8 +874,9 @@ class _ActuPageState extends State<ActuPage> {
           ),
           actions: [
             IconButton(
-              icon: const Icon(
-                Icons.notifications,
+              icon: const FaIcon(
+                FontAwesomeIcons.solidBell,
+                size: 20,
                 color: Colors.white,
               ),
               onPressed: () {
@@ -929,9 +932,10 @@ class _ActuPageState extends State<ActuPage> {
               ],
               offset: const Offset(0, 60),
               color: primaryColor,
-              icon: const Icon(
-                Icons.menu,
+              icon: const FaIcon(
+                FontAwesomeIcons.bars,
                 color: Colors.white,
+                size: 20,
               ),
               elevation: 2,
               onSelected: (value) {
@@ -1181,7 +1185,7 @@ class _ActuPageState extends State<ActuPage> {
     if (showTel) {
       actions.add(_buildActionItem(
         context,
-        icon: Icons.phone_android_rounded,
+        icon: FontAwesomeIcons.mobileScreen,
         text: (langUserPhone == "fr")
             ? "Confirmer le numéro WhatsApp"
             : "Confirm WhatsApp Number",
@@ -1191,7 +1195,7 @@ class _ActuPageState extends State<ActuPage> {
     if (showMail) {
       actions.add(_buildActionItem(
         context,
-        icon: Icons.mail_outline_rounded,
+        icon: FontAwesomeIcons.solidEnvelope,
         text: (langUserPhone == "fr")
             ? "Confirmer l'adresse e-mail"
             : "Confirm E-mail Address",
@@ -1202,7 +1206,7 @@ class _ActuPageState extends State<ActuPage> {
     if (showProfile) {
       actions.add(_buildActionItem(
         context,
-        icon: Icons.person_outline_rounded,
+        icon: FontAwesomeIcons.user,
         text: (langUserPhone == "fr")
             ? "Compléter votre profil"
             : "Complete Your Profile",
@@ -1213,7 +1217,7 @@ class _ActuPageState extends State<ActuPage> {
     if (showBoost) {
       actions.add(_buildActionItem(
         context,
-        icon: Icons.rocket_launch_outlined,
+        icon: FontAwesomeIcons.rocket,
         text: (langUserPhone == "fr")
             ? "Activer le Boost Contact"
             : "Activate Boost Contact",
@@ -1275,7 +1279,7 @@ class _ActuPageState extends State<ActuPage> {
         padding: const EdgeInsets.symmetric(vertical: 12.0),
         child: Row(
           children: [
-            Icon(icon, color: Colors.redAccent, size: 24),
+            FaIcon(icon, color: Colors.redAccent, size: 24),
             SizedBox(width: 16),
             Expanded(
               child: Text(
@@ -1284,7 +1288,7 @@ class _ActuPageState extends State<ActuPage> {
                     fontSize: 15, fontWeight: FontWeight.w500),
               ),
             ),
-            Icon(Icons.arrow_forward_ios_rounded,
+            FaIcon(FontAwesomeIcons.chevronRight,
                 size: 16, color: Colors.grey[400]),
           ],
         ),
@@ -1318,7 +1322,7 @@ class _ActuPageState extends State<ActuPage> {
         children: [
           Row(
             children: [
-              Icon(Icons.system_update_rounded, color: Colors.white, size: 30),
+              FaIcon(FontAwesomeIcons.arrowDown, color: Colors.white, size: 30),
               SizedBox(width: 12),
               Text(
                 (langUserPhone == "fr")
@@ -1348,7 +1352,7 @@ class _ActuPageState extends State<ActuPage> {
             width: double.infinity,
             child: ElevatedButton.icon(
               onPressed: onUpdate,
-              icon: Icon(Icons.download_for_offline_rounded, color: Colors.red),
+              icon: FaIcon(FontAwesomeIcons.download, color: Colors.red),
               label: Text(
                 (langUserPhone == "fr")
                     ? "Mettre à jour maintenant"
@@ -1412,7 +1416,7 @@ class _ActuPageState extends State<ActuPage> {
               ),
               IconButton(
                 onPressed: isLoading ? null : onRefresh,
-                icon: Icon(Icons.refresh_rounded,
+                icon: FaIcon(FontAwesomeIcons.arrowsRotate,
                     color: Colors.white.withOpacity(0.8)),
                 tooltip: (langUserPhone == "fr") ? "Actualiser" : "Refresh",
               ),
@@ -1458,8 +1462,7 @@ class _ActuPageState extends State<ActuPage> {
                             color: primaryColor,
                           ),
                         )
-                      : Icon(Icons.download_for_offline_rounded,
-                          color: primaryColor),
+                      : FaIcon(FontAwesomeIcons.download, color: primaryColor),
                   label: Text(
                     isLoading
                         ? ((langUserPhone == "fr") ? "Patientez..." : "Wait...")
@@ -1526,13 +1529,13 @@ class _ActuPageState extends State<ActuPage> {
           Row(
             children: [
               _buildStatItem(
-                icon: Icons.visibility_outlined,
+                icon: FontAwesomeIcons.eye,
                 value: impressionCount.toString(),
                 label: (langUserPhone == "fr") ? "Impressions" : "Impressions",
               ),
               SizedBox(width: 15),
               _buildStatItem(
-                icon: Icons.touch_app_outlined,
+                icon: FontAwesomeIcons.handPointer,
                 value: viewCount.toString(),
                 label: (langUserPhone == "fr") ? "Vues" : "Views",
               ),
@@ -1542,7 +1545,7 @@ class _ActuPageState extends State<ActuPage> {
           // --- PARTIE ACTION "PARTAGER" (à droite) ---
           ElevatedButton.icon(
             onPressed: onShare,
-            icon: Icon(Icons.share, size: 18),
+            icon: FaIcon(FontAwesomeIcons.shareNodes, size: 18),
             label: Text(
               (langUserPhone == "fr") ? "Partager" : "Share",
               style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
@@ -1568,7 +1571,7 @@ class _ActuPageState extends State<ActuPage> {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Icon(icon, color: Colors.grey[600], size: 20),
+        FaIcon(icon, color: Colors.grey[600], size: 20),
         SizedBox(width: 8),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -1646,7 +1649,7 @@ class AdvertisementDetailPage extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.stars, color: primaryColor, size: 40),
+            FaIcon(FontAwesomeIcons.star, color: primaryColor, size: 40),
             SizedBox(height: 10),
             Text("Promotion Éligible",
                 style: GoogleFonts.poppins(
@@ -1700,7 +1703,8 @@ class AdvertisementDetailPage extends StatelessWidget {
                   errorWidget: (context, url, error) => AspectRatio(
                     aspectRatio: 16 / 9,
                     child: Container(
-                        color: Colors.grey[200], child: Icon(Icons.error)),
+                        color: Colors.grey[200],
+                        child: FaIcon(FontAwesomeIcons.circleExclamation)),
                   ),
                   // `fit: BoxFit.contain` pourrait aussi être une option si vous voulez des bandes noires
                   // mais `fit: BoxFit.cover` avec `width: double.infinity` est souvent le meilleur compromis.
@@ -1734,7 +1738,7 @@ class AdvertisementDetailPage extends StatelessWidget {
 
                   // --- DESCRIPTION ---
                   _buildSectionTitle(
-                      icon: Icons.description_outlined,
+                      icon: FontAwesomeIcons.solidFileLines,
                       title: (langUserPhone == "fr")
                           ? "Description"
                           : "Description"),
@@ -1754,7 +1758,7 @@ class AdvertisementDetailPage extends StatelessWidget {
                   // --- INFORMATIONS SUPPLÉMENTAIRES ---
                   if (infoMap.isNotEmpty) ...[
                     _buildSectionTitle(
-                        icon: Icons.info_outline_rounded,
+                        icon: FontAwesomeIcons.circleInfo,
                         title: (langUserPhone == "fr")
                             ? "Informations supplémentaires"
                             : "Additional Information"),
@@ -1786,14 +1790,14 @@ class AdvertisementDetailPage extends StatelessWidget {
           // Stats
           Row(
             children: [
-              Icon(Icons.visibility_outlined,
-                  color: Colors.grey[600], size: 20),
+              FaIcon(FontAwesomeIcons.eye, color: Colors.grey[600], size: 20),
               SizedBox(width: 4),
               Text(advertisement.nombreImpression.toString(),
                   style: GoogleFonts.poppins(
                       fontSize: 18, fontWeight: FontWeight.w600)),
               SizedBox(width: 12),
-              Icon(Icons.touch_app_outlined, color: Colors.grey[600], size: 20),
+              FaIcon(FontAwesomeIcons.handPointer,
+                  color: Colors.grey[600], size: 20),
               SizedBox(width: 4),
               Text(advertisement.nombreDeVues.toString(),
                   style: GoogleFonts.poppins(
@@ -1826,7 +1830,7 @@ class AdvertisementDetailPage extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 10.0),
       child: Row(
         children: [
-          Icon(icon, color: primaryColor, size: 22),
+          FaIcon(icon, color: primaryColor, size: 22),
           SizedBox(width: 10),
           Text(title,
               style: GoogleFonts.poppins(

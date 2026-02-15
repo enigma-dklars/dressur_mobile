@@ -122,7 +122,7 @@ class SociauxPage extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(vertical: 10),
                 elevation: 0,
               ),
-              icon: const Icon(Icons.share),
+              icon: const FaIcon(FontAwesomeIcons.shareNodes),
               label: Text(
                 (langUserPhone == "fr") ? 'PARTAGER DRESSUR' : 'SHARE DRESSUR',
                 style: GoogleFonts.poppins(
@@ -151,7 +151,7 @@ class SociauxPage extends StatelessWidget {
             color: Colors.white.withOpacity(0.15),
             shape: BoxShape.circle,
           ),
-          child: Icon(
+          child: FaIcon(
             icon,
             size: 18,
             color: Colors.white,

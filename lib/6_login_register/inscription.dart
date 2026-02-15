@@ -3,6 +3,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:country_code_picker/country_code_picker.dart';
@@ -30,7 +31,7 @@ class InscriptionPage extends StatelessWidget {
           IconButton(
             onPressed: () => Navigator.push(context,
                 MaterialPageRoute(builder: (context) => SupportPage())),
-            icon: Icon(Icons.help_outline_rounded),
+            icon: FaIcon(FontAwesomeIcons.circleQuestion),
           ),
         ],
       ),
@@ -257,7 +258,7 @@ class _RegisterFormState extends State<RegisterForm> {
               controller: _emailController,
               keyboardType: TextInputType.emailAddress,
               decoration: _buildInputDecoration(
-                  label: "E-mail", icon: Icons.alternate_email_rounded),
+                  label: "E-mail", icon: FontAwesomeIcons.at),
               validator: (value) {
                 if (value == null || value.isEmpty || !value.contains('@')) {
                   return (langUserPhone == "fr")
@@ -279,11 +280,11 @@ class _RegisterFormState extends State<RegisterForm> {
               obscureText: _isPasswordObscured,
               decoration: _buildInputDecoration(
                 label: (langUserPhone == "fr") ? 'Mot de passe' : 'Password',
-                icon: Icons.lock_outline_rounded,
+                icon: FontAwesomeIcons.lock,
                 suffixIcon: IconButton(
-                  icon: Icon(_isPasswordObscured
-                      ? Icons.visibility_off_outlined
-                      : Icons.visibility_outlined),
+                  icon: FaIcon(_isPasswordObscured
+                      ? FontAwesomeIcons.eyeSlash
+                      : FontAwesomeIcons.eye),
                   onPressed: () => setState(
                       () => _isPasswordObscured = !_isPasswordObscured),
                 ),
@@ -311,11 +312,11 @@ class _RegisterFormState extends State<RegisterForm> {
                 label: (langUserPhone == "fr")
                     ? 'Confirmer le mot de passe'
                     : 'Confirm Password',
-                icon: Icons.lock_outline_rounded,
+                icon: FontAwesomeIcons.lock,
                 suffixIcon: IconButton(
-                  icon: Icon(_isConfirmPasswordObscured
-                      ? Icons.visibility_off_outlined
-                      : Icons.visibility_outlined),
+                  icon: FaIcon(_isConfirmPasswordObscured
+                      ? FontAwesomeIcons.eyeSlash
+                      : FontAwesomeIcons.eye),
                   onPressed: () => setState(() =>
                       _isConfirmPasswordObscured = !_isConfirmPasswordObscured),
                 ),
@@ -427,7 +428,7 @@ class _RegisterFormState extends State<RegisterForm> {
       Widget? suffixIcon}) {
     return InputDecoration(
       labelText: label,
-      prefixIcon: icon != null ? Icon(icon, color: primaryColor) : null,
+      prefixIcon: icon != null ? FaIcon(icon, color: primaryColor) : null,
       prefix: prefix,
       suffixIcon: suffixIcon,
       border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),

@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:dressur/1_reception/chat.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:dressur/components/constant.dart';
 import 'package:http/http.dart' as http;
@@ -135,8 +136,8 @@ class _ContactForMessagePageState extends State<ContactForMessagePage> {
           onPressed: () {
             Navigator.pop(context);
           },
-          icon: const Icon(
-            Icons.arrow_back_ios,
+          icon: const FaIcon(
+            FontAwesomeIcons.chevronLeft,
             color: Colors.white,
           ),
         ),
@@ -156,7 +157,7 @@ class _ContactForMessagePageState extends State<ContactForMessagePage> {
                 labelText: (langUserPhone == "fr")
                     ? "Rechercher ..."
                     : "To research ...",
-                prefixIcon: const Icon(Icons.search),
+                prefixIcon: const FaIcon(FontAwesomeIcons.magnifyingGlass),
                 border: const OutlineInputBorder(),
               ),
             ),

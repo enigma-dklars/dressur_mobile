@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:dressur/components/constant.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class ProfileMenuWeb extends StatelessWidget {
   const ProfileMenuWeb({
@@ -31,8 +32,8 @@ class ProfileMenuWeb extends StatelessWidget {
             Myicon,
             const SizedBox(width: 20),
             Expanded(child: Text(text)),
-            const Icon(
-              Icons.info,
+            const FaIcon(
+              FontAwesomeIcons.circleInfo,
               color: secondaryColor,
             ),
           ],

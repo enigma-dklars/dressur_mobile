@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dressur/2_promo/liste_promo_affaire.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'dart:io';
 import 'dart:async';
@@ -187,7 +188,7 @@ class _ModificationProduitServicesPageState
         ),
         leading: IconButton(
             onPressed: () => Navigator.pop(context),
-            icon: Icon(Icons.arrow_back_ios, color: Colors.white)),
+            icon: FaIcon(FontAwesomeIcons.chevronLeft, color: Colors.white)),
         backgroundColor: primaryColor,
       ),
       body: SingleChildScrollView(

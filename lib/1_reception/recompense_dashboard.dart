@@ -7,6 +7,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dressur/1_reception/configuration_retrait_page.dart';
 import 'package:dressur/1_reception/historique_complet_page.dart';
 import 'package:dressur/components/noti.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
 import 'package:dressur/1_reception/business_promotions_page.dart';
@@ -131,7 +132,8 @@ class _ProgrammeRecompenseDashboardState
           ),
         ),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios, color: Colors.white, size: 20),
+          icon: FaIcon(FontAwesomeIcons.chevronLeft,
+              color: Colors.white, size: 20),
           onPressed: () => Navigator.pop(context),
         ),
         actions: [],
@@ -165,10 +167,10 @@ class _ProgrammeRecompenseDashboardState
                   Row(
                     children: [
                       _statItem(context, "Vues Totales", "$vuesTotales",
-                          Icons.visibility, Colors.blue, theme),
+                          FontAwesomeIcons.eye, Colors.blue, theme),
                       SizedBox(width: 15),
                       _statItem(context, "Gains Totales", "$gainsTotales F",
-                          Icons.account_balance_wallet, Colors.green, theme),
+                          FontAwesomeIcons.wallet, Colors.green, theme),
                     ],
                   ),
 
@@ -280,7 +282,7 @@ class _ProgrammeRecompenseDashboardState
         ),
         child: Row(
           children: [
-            Icon(Icons.info_outline, color: primaryColor),
+            FaIcon(FontAwesomeIcons.circleInfo, color: primaryColor),
             SizedBox(width: 10),
             Expanded(
               child: Column(
@@ -305,7 +307,8 @@ class _ProgrammeRecompenseDashboardState
                 ],
               ),
             ),
-            Icon(Icons.arrow_forward_ios, size: 14, color: primaryColor),
+            FaIcon(FontAwesomeIcons.chevronRight,
+                size: 14, color: primaryColor),
           ],
         ),
       ),
@@ -329,7 +332,7 @@ class _ProgrammeRecompenseDashboardState
         ),
         child: Row(
           children: [
-            Icon(Icons.business_center_outlined, color: primaryColor),
+            FaIcon(FontAwesomeIcons.briefcase, color: primaryColor),
             SizedBox(width: 10),
             Expanded(
               child: Column(
@@ -354,7 +357,8 @@ class _ProgrammeRecompenseDashboardState
                 ],
               ),
             ),
-            Icon(Icons.arrow_forward_ios, size: 14, color: primaryColor),
+            FaIcon(FontAwesomeIcons.chevronRight,
+                size: 14, color: primaryColor),
           ],
         ),
       ),
@@ -396,7 +400,8 @@ class _ProgrammeRecompenseDashboardState
                 ),
                 child: Row(
                   children: [
-                    Icon(Icons.sync, color: Colors.white, size: 13),
+                    FaIcon(FontAwesomeIcons.arrowsRotate,
+                        color: Colors.white, size: 13),
                     SizedBox(width: 4),
                     Text(
                       "Automatique",
@@ -451,7 +456,7 @@ class _ProgrammeRecompenseDashboardState
                         MaterialPageRoute(
                             builder: (context) => ConfigurationRetraitPage()));
                   },
-                  icon: Icon(Icons.settings_outlined, size: 18),
+                  icon: FaIcon(FontAwesomeIcons.gear, size: 18),
                   label: Text(
                     "Configuration",
                     style: GoogleFonts.poppins(
@@ -476,7 +481,8 @@ class _ProgrammeRecompenseDashboardState
                   onPressed: () {
                     // TODO: historique des retraits
                   },
-                  icon: Icon(Icons.history, size: 18, color: Colors.white),
+                  icon: FaIcon(FontAwesomeIcons.clockRotateLeft,
+                      size: 18, color: Colors.white),
                   label: Text(
                     "Historique",
                     style: GoogleFonts.poppins(
@@ -515,7 +521,7 @@ class _ProgrammeRecompenseDashboardState
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Icon(icon, color: color, size: 24),
+            FaIcon(icon, color: color, size: 24),
             SizedBox(height: 12),
             Text(
               value,
@@ -616,15 +622,15 @@ class _ProgrammeRecompenseDashboardState
                           shape: BoxShape.circle,
                           border: Border.all(color: Colors.white, width: 1.5),
                         ),
-                        child: Icon(
+                        child: FaIcon(
                           (item.status == "approuver")
-                              ? Icons.check_circle
+                              ? FontAwesomeIcons.solidCircleCheck
                               : (item.status == "echouer" ||
                                       item.status == "refuser")
-                                  ? Icons.cancel
+                                  ? FontAwesomeIcons.xmark
                                   : (item.status == "en_attente")
-                                      ? Icons.access_time
-                                      : Icons.help_outline,
+                                      ? FontAwesomeIcons.clock
+                                      : FontAwesomeIcons.circleQuestion,
                           color: Colors.white,
                           size: 10,
                         ),
@@ -665,7 +671,7 @@ class _ProgrammeRecompenseDashboardState
                           ),
                         ),
                         const SizedBox(width: 8),
-                        const Icon(Icons.visibility_outlined,
+                        const FaIcon(FontAwesomeIcons.eye,
                             size: 12, color: Colors.grey),
                         const SizedBox(width: 4),
                         Text(item.views,
@@ -709,7 +715,7 @@ class _ProgrammeRecompenseDashboardState
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(
+                        FaIcon(
                           statusConfig["icon"],
                           size: 12,
                           color: statusConfig["color"],
@@ -812,7 +818,7 @@ class _ProgrammeRecompenseDashboardState
     switch (item.status) {
       case "en_attente":
         return _statusInfo(
-          Icons.hourglass_empty,
+          FontAwesomeIcons.hourglassEmpty,
           Colors.orange,
           "En attente d'approbation",
           "Vous avez soumis vos preuves de participation. Notre équipe examine actuellement votre demande.\n\nSi vous ne l'avez pas encore fait, veuillez envoyer la capture vidéo comme dernière preuve par WhatsApp au numéro d'assistance de Dressur.",
@@ -821,7 +827,7 @@ class _ProgrammeRecompenseDashboardState
         return Column(
           children: [
             _statusInfo(
-              Icons.timer_off,
+              FontAwesomeIcons.clock,
               Colors.green,
               "Temps écoulé - Soumission requise",
               "Le temps de participation est terminé. Vous devez maintenant soumettre vos preuves (les deux captures d'écran) via le formulaire ci-dessous.\n\nNote : La capture vidéo doit être envoyée séparément par WhatsApp.",
@@ -832,21 +838,21 @@ class _ProgrammeRecompenseDashboardState
         );
       case "echouer":
         return _statusInfo(
-          Icons.error_outline,
+          FontAwesomeIcons.circleExclamation,
           Colors.red,
           "Participation échouée",
           "Malheureusement, vous n'avez pas soumis vos preuves de participation dans les délais impartis. Il est désormais trop tard pour le faire pour cette promotion.",
         );
       case "refuser":
         return _statusInfo(
-          Icons.block,
+          FontAwesomeIcons.slash,
           Colors.red,
           "Preuves refusées",
           "Les preuves que vous avez fournies n'ont pas été jugées recevables par notre équipe de modération. En conséquence, la récompense ne peut pas être accordée.",
         );
       case "approuver":
         return _statusInfo(
-          Icons.verified,
+          FontAwesomeIcons.solidCircleCheck,
           Colors.green,
           "Félicitations ! Approuvé",
           "Vos preuves de participation ont été vérifiées et validées. La récompense a été créditée sur votre solde Dressur.",
@@ -855,7 +861,7 @@ class _ProgrammeRecompenseDashboardState
         return Column(
           children: [
             _statusInfo(
-              Icons.sync,
+              FontAwesomeIcons.arrowsRotate,
               Colors.blue,
               "Participation en cours",
               "Le temps de soumission n'est pas encore arrivé. Cependant, si vous estimez avoir déjà atteint votre objectif, vous pouvez soumettre vos preuves dès maintenant.",
@@ -876,7 +882,7 @@ class _ProgrammeRecompenseDashboardState
       children: [
         Row(
           children: [
-            Icon(icon, color: color, size: 28),
+            FaIcon(icon, color: color, size: 28),
             const SizedBox(width: 12),
             Expanded(
               child: Text(
@@ -1006,7 +1012,8 @@ class _ProgrammeRecompenseDashboardState
                 ? Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.add_a_photo, color: primaryColor, size: 30),
+                      FaIcon(FontAwesomeIcons.camera,
+                          color: primaryColor, size: 30),
                       const SizedBox(height: 5),
                       Text("Cliquez pour choisir",
                           style: GoogleFonts.poppins(
@@ -1021,7 +1028,7 @@ class _ProgrammeRecompenseDashboardState
                         child: CircleAvatar(
                             radius: 12,
                             backgroundColor: Colors.black54,
-                            child: Icon(Icons.edit,
+                            child: FaIcon(FontAwesomeIcons.pen,
                                 size: 14, color: Colors.white)),
                       )
                     ],
@@ -1107,7 +1114,7 @@ class _ProgrammeRecompenseDashboardState
             await launchUrl(Uri.parse(whatsappUrl));
           }
         },
-        icon: Icon(Icons.chat, size: 18),
+        icon: FaIcon(FontAwesomeIcons.solidComment, size: 18),
         label: Text("Envoyer la vidéo sur WhatsApp"),
         style: OutlinedButton.styleFrom(
           foregroundColor: Colors.green,
@@ -1125,43 +1132,43 @@ class _ProgrammeRecompenseDashboardState
       case "en_attente":
         return {
           "label": "Attente validation",
-          "icon": Icons.access_time,
+          "icon": FontAwesomeIcons.clock,
           "color": Colors.orange,
         };
       case "terminer":
         return {
           "label": "Preuves requises",
-          "icon": Icons.check_circle,
+          "icon": FontAwesomeIcons.solidCircleCheck,
           "color": Colors.green,
         };
       case "echouer":
         return {
           "label": "Échoué",
-          "icon": Icons.cancel,
+          "icon": FontAwesomeIcons.xmark,
           "color": Colors.red,
         };
       case "refuser":
         return {
           "label": "Refusé",
-          "icon": Icons.cancel,
+          "icon": FontAwesomeIcons.xmark,
           "color": Colors.red,
         };
       case "approuver":
         return {
           "label": "Approuvé",
-          "icon": Icons.verified,
+          "icon": FontAwesomeIcons.solidCircleCheck,
           "color": Colors.green,
         };
       case "en_cours":
         return {
           "label": "En cours",
-          "icon": Icons.sync,
+          "icon": FontAwesomeIcons.arrowsRotate,
           "color": Colors.blue,
         };
       default:
         return {
           "label": "Inconnu",
-          "icon": Icons.help_outline,
+          "icon": FontAwesomeIcons.circleQuestion,
           "color": Colors.grey,
         };
     }

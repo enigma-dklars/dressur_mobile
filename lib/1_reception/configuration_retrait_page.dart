@@ -3,6 +3,7 @@
 import 'package:dressur/components/constant.dart';
 import 'package:dressur/components/noti.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
@@ -164,7 +165,8 @@ class _ConfigurationRetraitPageState extends State<ConfigurationRetraitPage> {
           ),
         ),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios, color: Colors.white, size: 20),
+          icon: FaIcon(FontAwesomeIcons.chevronLeft,
+              color: Colors.white, size: 20),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -219,7 +221,7 @@ class _ConfigurationRetraitPageState extends State<ConfigurationRetraitPage> {
       ),
       child: Row(
         children: [
-          Icon(Icons.info_outline, color: primaryColor, size: 28),
+          FaIcon(FontAwesomeIcons.circleInfo, color: primaryColor, size: 28),
           SizedBox(width: 15),
           Expanded(
             child: Text(
@@ -269,8 +271,10 @@ class _ConfigurationRetraitPageState extends State<ConfigurationRetraitPage> {
       },
       decoration: InputDecoration(
         hintText: 'Choisissez un réseau',
-        prefixIcon:
-            Icon(Icons.account_balance_wallet_outlined, color: primaryColor),
+        prefixIcon: Padding(
+          padding: const EdgeInsets.only(left: 20, right: 13, top: 14),
+          child: FaIcon(FontAwesomeIcons.wallet, color: primaryColor, size: 20),
+        ),
         filled: true,
         fillColor: theme.dividerColor.withOpacity(0.05),
         border: OutlineInputBorder(
@@ -291,9 +295,14 @@ class _ConfigurationRetraitPageState extends State<ConfigurationRetraitPage> {
       style: GoogleFonts.poppins(fontWeight: FontWeight.w500),
       decoration: InputDecoration(
         hintText: 'Ex: 2290199000000',
-        prefixIcon: Icon(Icons.phone_android_outlined, color: primaryColor),
+        // Utilisez `prefix` au lieu de `prefixIcon`
+        prefixIcon: Padding(
+          padding: const EdgeInsets.only(left: 20, right: 13, top: 14),
+          child: FaIcon(FontAwesomeIcons.mobileScreen,
+              color: primaryColor, size: 20), // Ajustez la taille au besoin
+        ),
         filled: true,
-        fillColor: theme.dividerColor.withOpacity(0.05),
+        fillColor: Theme.of(context).dividerColor.withOpacity(0.05),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide.none,
@@ -340,8 +349,8 @@ class _ConfigurationRetraitPageState extends State<ConfigurationRetraitPage> {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(Icons.warning_amber_rounded,
-                  color: Colors.orange[700], size: 22),
+              FaIcon(FontAwesomeIcons.triangleExclamation,
+                  color: Colors.orange[700], size: 18),
               SizedBox(width: 12),
               Expanded(
                 child: Text(
@@ -403,7 +412,9 @@ class _ConfigurationRetraitPageState extends State<ConfigurationRetraitPage> {
       height: 55,
       child: ElevatedButton.icon(
         onPressed: _isSaving ? null : _saveConfiguration,
-        icon: _isSaving ? Container() : Icon(Icons.save, color: Colors.white),
+        icon: _isSaving
+            ? Container()
+            : FaIcon(FontAwesomeIcons.floppyDisk, color: Colors.white),
         label: _isSaving
             ? SizedBox(
                 width: 25,

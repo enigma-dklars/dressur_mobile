@@ -1,6 +1,7 @@
 // ignore_for_file: prefer_const_constructors, use_build_context_synchronously
 
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:dressur/5_autre/support_assistance.dart';
 import 'package:dressur/components/bottomBar.dart';
@@ -120,8 +121,8 @@ class _CodeMailConfirmePageState extends State<CodeMailConfirmePage> {
           onPressed: () {
             Navigator.pop(context);
           },
-          icon: const Icon(
-            Icons.arrow_back_ios,
+          icon: const FaIcon(
+            FontAwesomeIcons.chevronLeft,
             color: Colors.white,
           ),
         ),
@@ -181,7 +182,7 @@ class _CodeMailConfirmePageState extends State<CodeMailConfirmePage> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               SizedBox(height: 20),
-              Icon(Icons.mark_email_read_outlined,
+              FaIcon(FontAwesomeIcons.envelopeOpen,
                   color: primaryColor, size: 80),
               SizedBox(height: 20),
               Text(

@@ -9,6 +9,7 @@ import 'package:dressur/components/noti.dart';
 import 'package:dressur/components/padding_and_divider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:dressur/5_autre/support_assistance.dart';
 import 'package:dressur/1_reception/liste_notification.dart';
@@ -244,12 +245,12 @@ class _ReceptionChatPageState extends State<ReceptionChatPage>
               icon: _desactive
                   ? RotationTransition(
                       turns: Tween(begin: 0.0, end: 1.0).animate(_controller),
-                      child: const Icon(
-                        Icons.refresh,
+                      child: const FaIcon(
+                        FontAwesomeIcons.arrowsRotate,
                         color: Colors.white,
                       ),
                     )
-                  : const Icon(Icons.refresh),
+                  : const FaIcon(FontAwesomeIcons.arrowsRotate),
               color: Colors.white,
               onPressed: () {
                 _desactive ? null : getMessageEnAttente(true);
@@ -282,9 +283,10 @@ class _ReceptionChatPageState extends State<ReceptionChatPage>
               ],
               offset: const Offset(0, 60),
               color: primaryColor,
-              icon: const Icon(
-                Icons.menu,
+              icon: const FaIcon(
+                FontAwesomeIcons.bars,
                 color: Colors.white,
+                size: 20,
               ),
               elevation: 2,
               onSelected: (value) {
@@ -316,8 +318,8 @@ class _ReceptionChatPageState extends State<ReceptionChatPage>
                       const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                   child: ListTile(
                     leading: const CircleAvatar(
-                      child: Icon(
-                        Icons.contacts,
+                      child: FaIcon(
+                        FontAwesomeIcons.solidAddressBook,
                         color: Colors.white,
                       ),
                       backgroundColor: primaryColor,
@@ -341,7 +343,7 @@ class _ReceptionChatPageState extends State<ReceptionChatPage>
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    trailing: const Icon(Icons.chevron_right),
+                    trailing: const FaIcon(FontAwesomeIcons.chevronRight),
                   ),
                 ),
               ),
@@ -359,8 +361,9 @@ class _ReceptionChatPageState extends State<ReceptionChatPage>
                       const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                   child: ListTile(
                     leading: const CircleAvatar(
-                      child: Icon(
-                        Icons.notifications,
+                      child: FaIcon(
+                        FontAwesomeIcons.solidBell,
+                        size: 20,
                         color: Colors.white,
                       ),
                       backgroundColor: primaryColor,
@@ -384,7 +387,7 @@ class _ReceptionChatPageState extends State<ReceptionChatPage>
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    trailing: const Icon(Icons.chevron_right),
+                    trailing: const FaIcon(FontAwesomeIcons.chevronRight),
                   ),
                 ),
               ),
@@ -432,8 +435,8 @@ class _ReceptionChatPageState extends State<ReceptionChatPage>
                                 horizontal: 10, vertical: 5),
                             child: ListTile(
                               leading: CircleAvatar(
-                                child: Icon(
-                                  Icons.person,
+                                child: FaIcon(
+                                  FontAwesomeIcons.solidUser,
                                   color: Colors.white,
                                 ),
                                 backgroundColor: primaryColor,
@@ -476,7 +479,7 @@ class _ReceptionChatPageState extends State<ReceptionChatPage>
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                               ),
-                              trailing: Icon(Icons.chevron_right),
+                              trailing: FaIcon(FontAwesomeIcons.chevronRight),
                             ),
                           ),
                         );
@@ -496,8 +499,8 @@ class _ReceptionChatPageState extends State<ReceptionChatPage>
               MaterialPageRoute(builder: (context) => ContactForMessagePage()),
             );
           },
-          child: const Icon(
-            Icons.chat,
+          child: const FaIcon(
+            FontAwesomeIcons.solidComment,
             color: Colors.white,
           ),
         ),

@@ -1,6 +1,7 @@
 // ignore_for_file: use_build_context_synchronously, prefer_const_constructors
 
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:dressur/components/constant.dart';
 import 'package:http/http.dart' as http;
@@ -20,8 +21,8 @@ class SignalerPage extends StatelessWidget {
           onPressed: () {
             Navigator.pop(context);
           },
-          icon: const Icon(
-            Icons.arrow_back_ios,
+          icon: const FaIcon(
+            FontAwesomeIcons.chevronLeft,
             color: Colors.white,
           ),
         ),
@@ -42,7 +43,7 @@ class SignalerPage extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               SizedBox(height: 20),
-              Icon(Icons.warning_amber_rounded,
+              FaIcon(FontAwesomeIcons.triangleExclamation,
                   color: Colors.redAccent, size: 70),
               SizedBox(height: 15),
               Text(
@@ -142,8 +143,11 @@ class _SignalerFormState extends State<SignalerForm> {
                   ? 'Numéro WhatsApp à signaler'
                   : 'WhatsApp Number to Report',
               labelStyle: GoogleFonts.poppins(color: Colors.grey[600]),
-              prefixIcon:
-                  Icon(Icons.phone_outlined, color: Colors.grey[500], size: 22),
+              prefixIcon: Padding(
+                padding: const EdgeInsets.only(left: 20, right: 13, top: 14),
+                child: FaIcon(FontAwesomeIcons.phone,
+                    color: Colors.grey[500], size: 22),
+              ),
               filled: true,
               fillColor: isDark ? Colors.grey[850] : Colors.grey[100],
               border: OutlineInputBorder(
@@ -202,7 +206,8 @@ class _SignalerFormState extends State<SignalerForm> {
               onPressed: _isLoading ? null : signaleUser,
               icon: _isLoading
                   ? Container()
-                  : Icon(Icons.report_problem_outlined, color: Colors.white),
+                  : FaIcon(FontAwesomeIcons.triangleExclamation,
+                      color: Colors.white),
               label: _isLoading
                   ? SizedBox(
                       height: 24,
