@@ -2,6 +2,7 @@
 
 import 'dart:io';
 import 'package:dressur/5_autre/suggestions.dart';
+import 'package:dressur/components/sociaux.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
@@ -307,6 +308,9 @@ class _SettingPageState extends State<SettingPage> {
                     _handleLogout),
               ]),
 
+              _buildSectionTitle("Abonnement et Partage"),
+              SociauxPage(),
+
               if (admin) ...[
                 _buildSectionTitle("Administration"),
                 _buildMenuContainer(isDark, [
@@ -341,7 +345,7 @@ class _SettingPageState extends State<SettingPage> {
         padding: EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: isDark ? Color(0xFF1E1E1E) : Colors.white,
-          borderRadius: BorderRadius.circular(18),
+          borderRadius: BorderRadius.circular(15),
         ),
         child: Column(
           children: [
@@ -384,7 +388,7 @@ class _SettingPageState extends State<SettingPage> {
       margin: EdgeInsets.symmetric(horizontal: 10),
       decoration: BoxDecoration(
         color: isDark ? Color(0xFF1E1E1E) : Colors.white,
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(15),
       ),
       child: Column(children: children),
     );
@@ -394,7 +398,7 @@ class _SettingPageState extends State<SettingPage> {
       {Color? color}) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(18),
+      borderRadius: BorderRadius.circular(15),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         child: Row(
