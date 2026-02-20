@@ -79,7 +79,6 @@ class _CodeMailConfirmePageState extends State<CodeMailConfirmePage> {
         } else {
           setState(() => mailIsVerified = true);
           initUserInformations(data['user']);
-          // Afficher un message de succès avant de naviguer
           successNoti("Succès !", "Votre e-mail a été confirmé.", context);
           await Future.delayed(Duration(seconds: 2));
           Navigator.pushAndRemoveUntil(

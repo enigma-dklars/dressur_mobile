@@ -619,128 +619,87 @@ void showConfNumeroWhatsapp(BuildContext context) {
 
   showModalBottomSheet(
     context: context,
-    isScrollControlled: true,
-    // Applique les coins arrondis standards des modales modernes
-    shape: RoundedRectangleBorder(
+    shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
     ),
-    backgroundColor: isDark ? Color(0xFF1E1E1E) : Colors.white,
-    builder: (_) => Container(
-      padding: EdgeInsets.only(
-        top: 12,
-        left: 20,
-        right: 20,
-        bottom: MediaQuery.of(context).viewInsets.bottom + 30,
-      ),
+    backgroundColor: isDark ? const Color(0xFF1E1E1E) : Colors.white,
+    builder: (_) => Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 25),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // --- Poignée de glissement (standard UX) ---
+
+          /// Poignée UX
           Container(
             width: 40,
             height: 5,
             decoration: BoxDecoration(
-              color: Colors.grey[300],
+              color: Colors.grey[400],
               borderRadius: BorderRadius.circular(10),
             ),
           ),
-          SizedBox(height: 25),
 
-          // --- Icône et Titre ---
-          FaIcon(FontAwesomeIcons.whatsapp, color: Color(0xFF25D366), size: 50),
-          SizedBox(height: 16),
+          const SizedBox(height: 25),
+
+          /// Icône
+          Icon(
+            Icons.settings_outlined,
+            size: 55,
+            color: Colors.orange,
+          ),
+
+          const SizedBox(height: 18),
+
+          /// Titre
           Text(
-            (langUserPhone == "fr")
-                ? "Confirmer votre numéro"
-                : "Confirm Your Number",
+            "Configuration et Confirmation du Compte",
             textAlign: TextAlign.center,
             style: GoogleFonts.poppins(
-              fontSize: 22,
+              fontSize: 20,
               fontWeight: FontWeight.bold,
               color: isDark ? Colors.white : Colors.black87,
             ),
           ),
-          SizedBox(height: 10),
+
+          const SizedBox(height: 15),
+
+          /// Message principal
           Text(
-            (langUserPhone == "fr")
-                ? "C'est simple et rapide. Suivez les étapes ci-dessous."
-                : "It's quick and easy. Follow the steps below.",
+            "Vous n’avez pas encore terminé la configuration et la confirmation de votre compte.\n\n"
+            "Veuillez fermer cette fenêtre et consulter la page Actu. "
+            "Sur la page Actu, vous verrez clairement les étapes à suivre pour finaliser la configuration et la confirmation de votre compte.\n\n"
+            "Une fois ces étapes complétées, vous pourrez revenir ici et utiliser cette fonctionnalité sans problème.",
             textAlign: TextAlign.center,
             style: GoogleFonts.poppins(
-              fontSize: 15,
+              fontSize: 14.5,
+              height: 1.6,
               color: Colors.grey[600],
             ),
           ),
-          SizedBox(height: 30),
 
-          // --- Étapes claires ---
-          _buildStep(
-            icon: FontAwesomeIcons.one,
-            title: (langUserPhone == "fr")
-                ? "Cliquez sur le bouton"
-                : "Click the button",
-            subtitle: (langUserPhone == "fr")
-                ? "Appuyez sur \"Contacter le Support\" ci-dessous."
-                : "Press \"Contact Support\" below.",
-          ),
-          SizedBox(height: 20),
-          _buildStep(
-            icon: FontAwesomeIcons.two,
-            title: (langUserPhone == "fr")
-                ? "Envoyez le message"
-                : "Send the message",
-            subtitle: (langUserPhone == "fr")
-                ? "Un message pré-rempli \"WhatsApp Confirmation\" sera prêt. Envoyez-le sans le modifier."
-                : "A pre-filled message \"WhatsApp Confirmation\" will be ready. Send it without modification.",
-          ),
-          SizedBox(height: 20),
-          _buildStep(
-            icon: FontAwesomeIcons.three,
-            title:
-                (langUserPhone == "fr") ? "Patientez" : "Wait for confirmation",
-            subtitle: (langUserPhone == "fr")
-                ? "Notre équipe traitera votre demande rapidement. Vous serez notifié."
-                : "Our team will process your request quickly. You will be notified.",
-          ),
+          const SizedBox(height: 30),
 
-          SizedBox(height: 40),
-
-          // --- Bouton d'action principal ---
+          /// Bouton fermer
           SizedBox(
             width: double.infinity,
-            child: ElevatedButton.icon(
-              onPressed: () async {
-                final Uri _url =
-                    Uri.parse("$whatsappDSURL&text=WhatsApp Confirmation");
-                if (!await launchUrl(_url,
-                    mode: LaunchMode.externalApplication)) {
-                  // Gérer l'erreur si WhatsApp ne peut pas être ouvert
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                        content: Text((langUserPhone == "fr")
-                            ? "Impossible d'ouvrir WhatsApp."
-                            : "Could not open WhatsApp.")),
-                  );
-                }
-              },
-              icon: FaIcon(FontAwesomeIcons.whatsapp, color: Colors.white),
-              label: Text(
-                (langUserPhone == "fr")
-                    ? "Contacter le Support"
-                    : "Contact Support",
-                style: GoogleFonts.poppins(
-                    fontWeight: FontWeight.bold, fontSize: 16),
-              ),
+            child: ElevatedButton(
+              onPressed: () => Navigator.pop(context),
               style: ElevatedButton.styleFrom(
-                backgroundColor:
-                    Color(0xFF25D366), // Couleur officielle de WhatsApp
-                foregroundColor: Colors.white,
-                padding: EdgeInsets.symmetric(vertical: 16),
+                padding: const EdgeInsets.symmetric(vertical: 14),
                 shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(15)),
+                  borderRadius: BorderRadius.circular(15),
+                ),
+              ),
+              child: Text(
+                "Compris",
+                style: GoogleFonts.poppins(
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
           ),
+
+          const SizedBox(height: 10),
         ],
       ),
     ),

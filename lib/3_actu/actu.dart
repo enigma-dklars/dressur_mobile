@@ -957,8 +957,6 @@ class _ActuPageState extends State<ActuPage> {
                 child: ListView(
                   controller: _scrollController,
                   children: [
-                    // const SizedBox(height: 10),
-                    // Affiche la checklist des actions requises
                     _buildActionChecklist(
                       context: context,
                       showTel: !telIsVerified && mailIsVerified,
