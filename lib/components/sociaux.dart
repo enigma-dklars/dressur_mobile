@@ -82,10 +82,12 @@ class SociauxPage extends StatelessWidget {
                     children: [
                       _socialIcon(
                         FontAwesomeIcons.tiktok,
+                        18,
                         () => _launchURL(tiktokDS),
                       ),
                       _socialIcon(
                         FontAwesomeIcons.facebook,
+                        18,
                         () => _launchURL(facebookDS),
                       ),
                     ],
@@ -96,10 +98,12 @@ class SociauxPage extends StatelessWidget {
                     children: [
                       _socialIcon(
                         FontAwesomeIcons.instagram,
+                        20,
                         () => _launchURL(instagramDS),
                       ),
                       _socialIcon(
                         FontAwesomeIcons.whatsapp,
+                        20,
                         () => _launchURL(chaineWhatsApp),
                       ),
                     ],
@@ -139,7 +143,7 @@ class SociauxPage extends StatelessWidget {
     );
   }
 
-  Widget _socialIcon(IconData icon, VoidCallback onTap) {
+  Widget _socialIcon(IconData icon, double sizeIcon, VoidCallback onTap) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 6),
       child: InkWell(
@@ -153,7 +157,7 @@ class SociauxPage extends StatelessWidget {
           ),
           child: FaIcon(
             icon,
-            size: 18,
+            size: sizeIcon,
             color: Colors.white,
           ),
         ),
