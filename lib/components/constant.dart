@@ -3,6 +3,8 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'package:animate_do/animate_do.dart';
+import 'package:dressur/3_actu/actu.dart';
 import 'package:dressur/components/111_generaleApiDomaine.dart';
 import 'package:dressur/components/noti_sys.dart';
 import 'package:flutter/material.dart';
@@ -619,124 +621,109 @@ void showConfNumeroWhatsapp(BuildContext context) {
 
   showModalBottomSheet(
     context: context,
+    isScrollControlled:
+        true, // Permet au modal de prendre toute la hauteur si nécessaire
     shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
     ),
     backgroundColor: isDark ? const Color(0xFF1E1E1E) : Colors.white,
-    builder: (_) => Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 25),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-
-          /// Poignée UX
-          Container(
-            width: 40,
-            height: 5,
-            decoration: BoxDecoration(
-              color: Colors.grey[400],
-              borderRadius: BorderRadius.circular(10),
+    builder: (_) => FadeInUp(
+      duration: const Duration(milliseconds: 400),
+      child: SafeArea(
+        // Ajout de SafeArea pour éviter les débordements en bas
+        child: SingleChildScrollView(
+          // Ajout de SingleChildScrollView pour éviter l'overflow
+          child: Padding(
+            padding: EdgeInsets.only(
+              left: 20,
+              right: 20,
+              top: 25,
+              bottom: MediaQuery.of(context).viewInsets.bottom +
+                  25, // Ajustement pour le clavier
             ),
-          ),
-
-          const SizedBox(height: 25),
-
-          /// Icône
-          Icon(
-            Icons.settings_outlined,
-            size: 55,
-            color: Colors.orange,
-          ),
-
-          const SizedBox(height: 18),
-
-          /// Titre
-          Text(
-            "Configuration et Confirmation du Compte",
-            textAlign: TextAlign.center,
-            style: GoogleFonts.poppins(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: isDark ? Colors.white : Colors.black87,
-            ),
-          ),
-
-          const SizedBox(height: 15),
-
-          /// Message principal
-          Text(
-            "Vous n’avez pas encore terminé la configuration et la confirmation de votre compte.\n\n"
-            "Veuillez fermer cette fenêtre et consulter la page Actu. "
-            "Sur la page Actu, vous verrez clairement les étapes à suivre pour finaliser la configuration et la confirmation de votre compte.\n\n"
-            "Une fois ces étapes complétées, vous pourrez revenir ici et utiliser cette fonctionnalité sans problème.",
-            textAlign: TextAlign.center,
-            style: GoogleFonts.poppins(
-              fontSize: 14.5,
-              height: 1.6,
-              color: Colors.grey[600],
-            ),
-          ),
-
-          const SizedBox(height: 30),
-
-          /// Bouton fermer
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              onPressed: () => Navigator.pop(context),
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 14),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                /// Poignée UX
+                Container(
+                  width: 40,
+                  height: 5,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[400],
+                    borderRadius: BorderRadius.circular(10),
+                  ),
                 ),
-              ),
-              child: Text(
-                "Compris",
-                style: GoogleFonts.poppins(
-                  fontWeight: FontWeight.bold,
+
+                const SizedBox(height: 25),
+
+                /// Icône
+                Icon(
+                  Icons.settings_outlined,
+                  size: 55,
+                  color: primaryColor, // Utilisation de la couleur accent
                 ),
-              ),
+
+                const SizedBox(height: 18),
+
+                /// Titre
+                Text(
+                  "Configuration et Confirmation du Compte",
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.poppins(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: isDark ? Colors.white : Colors.black87,
+                  ),
+                ),
+
+                const SizedBox(height: 15),
+
+                /// Message principal
+                Text(
+                  "Vous n’avez pas encore terminé la configuration et la confirmation de votre compte.\n\n"
+                  "Veuillez fermer cette fenêtre et consulter la page Actu. "
+                  "Sur la page Actu, vous verrez clairement les étapes à suivre pour finaliser la configuration et la confirmation de votre compte.\n\n"
+                  "Une fois ces étapes complétées, vous pourrez revenir ici et utiliser cette fonctionnalité sans problème.",
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.poppins(
+                    fontSize: 14.5,
+                    height: 1.6,
+                    color: isDark ? Colors.grey[400] : Colors.grey[600],
+                  ),
+                ),
+
+                const SizedBox(height: 30),
+
+                SizedBox(
+                  width: double.infinity,
+                  height: 55,
+                  child: ElevatedButton(
+                    onPressed: () => Navigator.pop(context),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: primaryColor,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                    ),
+                    child: Text(
+                      "J'ai compris",
+                      style: GoogleFonts.poppins(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(height: 10),
+              ],
             ),
           ),
-
-          const SizedBox(height: 10),
-        ],
+        ),
       ),
     ),
   );
 }
 
-// Helper pour construire une étape
-Widget _buildStep(
-    {required IconData icon, required String title, required String subtitle}) {
-  return Row(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      FaIcon(icon, color: primaryColor, size: 28),
-      SizedBox(width: 16),
-      Expanded(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              title,
-              style: GoogleFonts.poppins(
-                  fontSize: 16, fontWeight: FontWeight.w600),
-            ),
-            SizedBox(height: 4),
-            Text(
-              subtitle,
-              style: GoogleFonts.poppins(
-                  color: Colors.grey[600], fontSize: 14, height: 1.4),
-            ),
-          ],
-        ),
-      ),
-    ],
-  );
-}
-
-// --- FIN DU BLOC AMÉLIORÉ ---
 Future<void> saveContactDsIfNotExiste() async {
   int nombreNewContact = 0;
   nombreNewContact = 0;
