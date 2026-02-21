@@ -1186,9 +1186,9 @@ class _ActuPageState extends State<ActuPage> {
         context,
         icon: FontAwesomeIcons.mobileScreen,
         text: (langUserPhone == "fr")
-            ? "Confirmer le numéro WhatsApp"
-            : "Confirm WhatsApp Number",
-        onTap: () => showConfNumeroWhatsapp(context),
+            ? "Confirmer le numéro WhatsApp ($tel)"
+            : "Confirm WhatsApp Number ($tel)",
+        onTap: () => showWhatsappConfirmation(context),
       ));
     }
     if (showMail) {

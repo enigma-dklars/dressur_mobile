@@ -683,8 +683,9 @@ class _HistoriqueCompletPageState extends State<HistoriqueCompletPage> {
       width: double.infinity,
       child: OutlinedButton.icon(
         onPressed: () async {
-          if (await canLaunchUrl(Uri.parse(whatsappDSURL))) {
-            await launchUrl(Uri.parse(whatsappDSURL));
+          final Uri _url = Uri.parse(whatsappDSURL);
+          if (!await launchUrl(_url, mode: LaunchMode.externalApplication)) {
+            // Gérer l'erreur
           }
         },
         icon: FaIcon(FontAwesomeIcons.solidComment, size: 18),

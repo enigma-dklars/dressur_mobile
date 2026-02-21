@@ -1108,10 +1108,8 @@ class _ProgrammeRecompenseDashboardState
       width: double.infinity,
       child: OutlinedButton.icon(
         onPressed: () async {
-          final whatsappUrl =
-              "https://wa.me/229XXXXXXXX"; // Remplacer par le vrai numéro
-          if (await canLaunchUrl(Uri.parse(whatsappUrl))) {
-            await launchUrl(Uri.parse(whatsappUrl));
+          final Uri _url = Uri.parse(whatsappDSURL);
+          if (!await launchUrl(_url, mode: LaunchMode.externalApplication)) {
           }
         },
         icon: FaIcon(FontAwesomeIcons.solidComment, size: 18),

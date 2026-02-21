@@ -18,7 +18,7 @@ import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:http/http.dart' as http;
 
-const versionApp = '1.1.2';
+const versionApp = '1.1.3';
 const oldDatabaseName = 'onze_dressur.db';
 const nowDataBaseName = 'douze_dressur.db';
 bool modeReconnaissanceContactArrierePlan = false;
@@ -38,6 +38,8 @@ const instagramBLT = "https://www.instagram.com/bluelife.tech";
 const instagramELTCS = "https://www.instagram.com/eliticscore";
 const youtubeBLT = "https://www.youtube.com/@bluelife-tech";
 const whatsappDSURL = "whatsapp://send?phone=22964044294";
+const whatsappDSURLConfirmation =
+    "whatsapp://send?phone=22964044294&text=WhatsApp%20Confirmation";
 const dressurConditionUtilisation =
     "https://www.bluelife.tech/realisations/dressur/condition";
 const dressurPolitiqueConfidentialite =
@@ -99,7 +101,7 @@ var modeMotDePasseOublier = false;
 var mailConnexion = "";
 var textChargementEvolution = "Chargement ...";
 var addUserOnAutreProfilPage = "oui";
-var myDressurVersion = '1.1.2';
+var myDressurVersion = '1.1.3';
 var lesPublicites;
 var uidAutreUser;
 var uidUser;
@@ -214,7 +216,7 @@ void insertDressurContact() async {
       ..isStarred = true
       ..name.first = "Dressur Assistance ✅"
       ..phones = [Phone("+22964044294")]
-      ..emails = [Email("dressur@gmail.com")]
+      ..emails = [Email("dressur.ds@gmail.com")]
       ..websites = [
         Website(whatsappDSURL),
         Website(facebookDS),
@@ -613,7 +615,120 @@ Future<String> expandShortUrl(String shortUrl) async {
   }
 }
 
-// --- DÉBUT DU BLOC AMÉLIORÉ ---
+void showWhatsappConfirmation(BuildContext context) {
+  final theme = Theme.of(context);
+  final isDark = theme.brightness == Brightness.dark;
+
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+    ),
+    backgroundColor: isDark ? const Color(0xFF1E1E1E) : Colors.white,
+    builder: (_) => SafeArea(
+      child: SingleChildScrollView(
+        child: Padding(
+          padding: EdgeInsets.only(
+            left: 20,
+            right: 20,
+            top: 25,
+            bottom: MediaQuery.of(context).viewInsets.bottom + 25,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              /// Poignée UX
+              Container(
+                width: 40,
+                height: 5,
+                decoration: BoxDecoration(
+                  color: Colors.grey[400],
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+
+              const SizedBox(height: 25),
+
+              /// Icône WhatsApp (FontAwesome)
+              FaIcon(
+                FontAwesomeIcons.whatsapp,
+                size: 55,
+                color: Colors.green,
+              ),
+
+              const SizedBox(height: 18),
+
+              /// Titre
+              Text(
+                "Confirmation du numéro WhatsApp",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: isDark ? Colors.white : Colors.black87,
+                ),
+              ),
+
+              const SizedBox(height: 15),
+
+              /// Message
+              Text(
+                "Assurez-vous de nous envoyer \"WhatsApp Confirmation\" "
+                "avec le numéro utilisé pour créer votre compte Dressur.\n\n"
+                "Cliquez sur Demander ci-dessous pour envoyer votre demande.\n\n"
+                "Les demandes sont traitées le plus tôt possible.",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 14.5,
+                  height: 1.6,
+                  color: isDark ? Colors.grey[400] : Colors.grey[600],
+                ),
+              ),
+
+              const SizedBox(height: 30),
+
+              /// Bouton Demander
+              SizedBox(
+                width: double.infinity,
+                height: 55,
+                child: ElevatedButton(
+                  onPressed: () async {
+                    final Uri _url = Uri.parse(whatsappDSURLConfirmation);
+                    if (!await launchUrl(_url,
+                        mode: LaunchMode.externalApplication)) {
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                  ),
+                  child: const Text(
+                    "Demander",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 10),
+
+              /// Bouton Fermer
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text("Fermer"),
+              ),
+            ],
+          ),
+        ),
+      ),
+    ),
+  );
+}
 
 void showConfNumeroWhatsapp(BuildContext context) {
   final theme = Theme.of(context);
