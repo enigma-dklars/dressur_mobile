@@ -31,19 +31,15 @@ const instagramDS =
     "https://www.instagram.com/bluelife.tech?igsh=Mjcyc2tpMmw4dXhu";
 const chaineWhatsApp = "https://whatsapp.com/channel/0029Vag8B6cCBtxMRvCqaA3t";
 const facebookBLT = "https://www.facebook.com/bluelife.tech";
-const facebookELTCS = "https://www.facebook.com/eliticscore";
 const tiktokBLT = "https://www.tiktok.com/@bluelife.tech";
-const tiktokELTCS = "https://www.tiktok.com/@eliticscore1";
-const instagramBLT = "https://www.instagram.com/bluelife.tech";
-const instagramELTCS = "https://www.instagram.com/eliticscore";
 const youtubeBLT = "https://www.youtube.com/@bluelife-tech";
 const whatsappDSURL = "whatsapp://send?phone=22964044294";
 const whatsappDSURLConfirmation =
     "whatsapp://send?phone=22964044294&text=WhatsApp%20Confirmation";
 const dressurConditionUtilisation =
-    "https://www.bluelife.tech/realisations/dressur/condition";
+    "https://dressur.site/conditions-utilisation";
 const dressurPolitiqueConfidentialite =
-    "https://www.bluelife.tech/realisations/dressur/politique";
+    "https://dressur.site/politique-confidentialite";
 const dressurUrlPlaystore =
     "https://play.google.com/store/apps/details?id=com.dressur.ds";
 
@@ -222,11 +218,7 @@ void insertDressurContact() async {
         Website(facebookDS),
         Website(facebookBLT),
         Website(tiktokBLT),
-        Website(instagramBLT),
         Website(youtubeBLT),
-        Website(facebookELTCS),
-        Website(tiktokELTCS),
-        Website(instagramELTCS),
       ];
     await newContact.insert();
     await insertNumTelUserIntoDataBase("+22964044294");
@@ -696,8 +688,7 @@ void showWhatsappConfirmation(BuildContext context) {
                   onPressed: () async {
                     final Uri _url = Uri.parse(whatsappDSURLConfirmation);
                     if (!await launchUrl(_url,
-                        mode: LaunchMode.externalApplication)) {
-                    }
+                        mode: LaunchMode.externalApplication)) {}
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.green,
