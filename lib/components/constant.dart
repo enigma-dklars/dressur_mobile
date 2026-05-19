@@ -80,7 +80,6 @@ List<dynamic> contactsEnregistrer = [];
 String? langUserPhone = "en";
 String preferencePaysText = "";
 String preferenceCentreInteretLoisirText = "";
-int commissionBonus = 200;
 int nombreContacts = 0;
 int nombreContactDispo = 0;
 bool mailIsMaxxFire = false;
@@ -160,7 +159,6 @@ Future<void> initUserInformations(userInfos) async {
   createdAt = userInfos["createdAt"];
   siParrain = userInfos["siParrain"];
   nombreFilleuls = userInfos["nombreFilleuls"];
-  commissionBonus = userInfos["commissionBonus"];
   admin = userInfos["admin"];
   permissionAdd = userInfos["permissionAdd"];
   messageErreurPermissionAdd = userInfos["messageErreurPermissionAdd"];
