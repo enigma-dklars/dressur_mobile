@@ -79,7 +79,6 @@ List<dynamic> contactsUserBeforeDS = [];
 List<dynamic> contactsEnregistrer = [];
 String? langUserPhone = "en";
 String preferencePaysText = "";
-String preferenceCentreInteretLoisirText = "";
 int nombreContacts = 0;
 int nombreContactDispo = 0;
 bool mailIsMaxxFire = false;
