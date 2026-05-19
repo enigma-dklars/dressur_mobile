@@ -108,8 +108,6 @@ var mail;
 var pays;
 var tel;
 var apropos;
-var soldeBonus;
-var codeBonus;
 var createdAt;
 var nombreFilleuls;
 var messageErreurPermissionAdd;
@@ -159,8 +157,6 @@ Future<void> initUserInformations(userInfos) async {
   youtube = userInfos["youtube"];
   mailIsVerified = userInfos["mailIsVerified"];
   telIsVerified = userInfos["telIsVerified"];
-  soldeBonus = userInfos["soldeBonus"];
-  codeBonus = userInfos["codeBonus"];
   createdAt = userInfos["createdAt"];
   siParrain = userInfos["siParrain"];
   nombreFilleuls = userInfos["nombreFilleuls"];
