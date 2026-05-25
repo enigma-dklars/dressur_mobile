@@ -155,6 +155,7 @@ class Advertisement {
     required this.inProgrammeRecompense,
   });
 }
+
 class StoryModel {
   final int id;
   final String user;
@@ -183,8 +184,6 @@ class StoryModel {
     );
   }
 }
-
-
 
 class ActuPage extends StatefulWidget {
   ActuPage({Key? key}) : super(key: key);
@@ -1007,18 +1006,6 @@ class _ActuPageState extends State<ActuPage> {
                 child: ListView(
                   controller: _scrollController,
                   children: [
-                    _buildActionChecklist(
-                      context: context,
-                      showTel: !telIsVerified && mailIsVerified,
-                      showMail: !mailIsVerified,
-                      showProfile:
-                          (nom.toString().replaceAll(' ', '').isEmpty ||
-                              nom == null),
-                      showBoost: (nombreContactDispo <= 100 &&
-                          boostEnCours == false &&
-                          telIsVerified &&
-                          mailIsVerified),
-                    ),
                     const SizedBox(height: 10),
                     // ── Strip de Stories ──────────────────────────────
                     if (_stories.isNotEmpty)
@@ -1043,8 +1030,21 @@ class _ActuPageState extends State<ActuPage> {
                           }
                         },
                       ),
-                      const SizedBox(height: 10),
                     ],
+
+                    _buildActionChecklist(
+                      context: context,
+                      showTel: !telIsVerified && mailIsVerified,
+                      showMail: !mailIsVerified,
+                      showProfile:
+                          (nom.toString().replaceAll(' ', '').isEmpty ||
+                              nom == null),
+                      showBoost: (nombreContactDispo <= 100 &&
+                          boostEnCours == false &&
+                          telIsVerified &&
+                          mailIsVerified),
+                    ),
+                    const SizedBox(height: 10),
 
                     if (nombreContactDispo > 0) ...[
                       const SizedBox(height: 5),
@@ -2142,8 +2142,10 @@ class _StoryViewerState extends State<_StoryViewer>
     final media = _currentMedia;
     final current = media.isNotEmpty ? media[_mediaIdx] : null;
     final isImage = current != null &&
-        (current.contains('/story/') || current.endsWith('.jpg') ||
-            current.endsWith('.jpeg') || current.endsWith('.png') ||
+        (current.contains('/story/') ||
+            current.endsWith('.jpg') ||
+            current.endsWith('.jpeg') ||
+            current.endsWith('.png') ||
             current.endsWith('.webp'));
 
     return Scaffold(
@@ -2153,8 +2155,10 @@ class _StoryViewerState extends State<_StoryViewer>
         onHorizontalDragEnd: (d) {
           final dx = d.globalPosition.dx - _dragStartX;
           if (dx.abs() > 40) {
-            if (dx < 0) _nextMedia();
-            else _prevMedia();
+            if (dx < 0)
+              _nextMedia();
+            else
+              _prevMedia();
           }
         },
         child: Stack(
@@ -2167,10 +2171,12 @@ class _StoryViewerState extends State<_StoryViewer>
                     ? CachedNetworkImage(
                         imageUrl: current,
                         fit: BoxFit.contain,
-                        placeholder: (_, __) =>
-                            const CircularProgressIndicator(color: Colors.white),
-                        errorWidget: (_, __, ___) =>
-                            const Icon(Icons.broken_image, color: Colors.white54, size: 60),
+                        placeholder: (_, __) => const CircularProgressIndicator(
+                            color: Colors.white),
+                        errorWidget: (_, __, ___) => const Icon(
+                            Icons.broken_image,
+                            color: Colors.white54,
+                            size: 60),
                       )
                     : const Icon(Icons.play_circle_fill,
                         color: Colors.white70, size: 80),
@@ -2236,7 +2242,8 @@ class _StoryViewerState extends State<_StoryViewer>
                   ),
                   GestureDetector(
                     onTap: () => Navigator.pop(context),
-                    child: const Icon(Icons.close, color: Colors.white, size: 26),
+                    child:
+                        const Icon(Icons.close, color: Colors.white, size: 26),
                   ),
                 ],
               ),
@@ -2336,7 +2343,7 @@ class _StoryViewerState extends State<_StoryViewer>
                               color: Colors.white, fontSize: 13, height: 1.5),
                         ),
                         if (!_expanded &&
-                            story.description.split('\n').length > 2 ||
+                                story.description.split('\n').length > 2 ||
                             story.description.length > 120)
                           GestureDetector(
                             onTap: () {
