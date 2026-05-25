@@ -111,10 +111,6 @@ var tiktok;
 var instagram;
 var facebook;
 var youtube;
-var totalImpressions;
-var totalVues;
-var totalImpressionsText;
-var totalVuesText;
 var soldeProgrammeRecompense;
 
 Future<bool> isConnectedToInternet() async {
@@ -160,10 +156,6 @@ Future<void> initUserInformations(userInfos) async {
   lesPublicites = userInfos["lesPublicites"];
   preferencePaysText = preferencePaysToText(userInfos["preferencePays"]);
   nombreContactDispo = userInfos["nombreContactDispo"];
-  totalImpressions = userInfos["totalImpressions"];
-  totalVues = userInfos["totalVues"];
-  totalImpressionsText = userInfos["totalImpressionsText"];
-  totalVuesText = userInfos["totalVuesText"];
   boostEnCours = userInfos["boostEnCours"];
   isInscritProgrammeRecompense =
       userInfos["isInscritProgrammeRecompense"] ?? false;

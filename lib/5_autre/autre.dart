@@ -188,32 +188,6 @@ class _SettingPageState extends State<SettingPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // --- SECTION STATISTIQUES ---
-              Padding(
-                padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
-                child: Row(
-                  children: [
-                    _buildStatCard(
-                      context,
-                      icon: FontAwesomeIcons.eye,
-                      value: totalImpressionsText,
-                      label: (langUserPhone == "fr")
-                          ? "Impressions"
-                          : "Impressions",
-                      hasIncreased: totalImpressions > 0,
-                    ),
-                    SizedBox(width: 10),
-                    _buildStatCard(
-                      context,
-                      icon: FontAwesomeIcons.handPointer,
-                      value: totalVuesText,
-                      label: (langUserPhone == "fr") ? "Vues" : "Views",
-                      hasIncreased: totalVues > 0,
-                    ),
-                  ],
-                ),
-              ),
-
               // --- SECTION COMPTE ---
               _buildSectionTitle(
                   (langUserPhone == "fr") ? "Mon Compte" : "My Account"),
