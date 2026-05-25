@@ -1024,7 +1024,7 @@ class _ActuPageState extends State<ActuPage> {
                     if (_stories.isNotEmpty)
                       _StoryStrip(
                         stories: _stories,
-                        apiBase: generalApiDomaine,
+                        routeStoryImage: generalRouteForStoryImage,
                       ),
                     if (_stories.isNotEmpty) const SizedBox(height: 6),
                     // ── Fin Strip de Stories ───────────────────────────
@@ -1937,8 +1937,8 @@ class AdvertisementDetailPage extends StatelessWidget {
 
 class _StoryStrip extends StatelessWidget {
   final List<StoryModel> stories;
-  final String apiBase;
-  const _StoryStrip({required this.stories, required this.apiBase});
+  final String routeStoryImage;
+  const _StoryStrip({required this.stories, required this.routeStoryImage});
 
   @override
   Widget build(BuildContext context) {
@@ -1952,7 +1952,7 @@ class _StoryStrip extends StatelessWidget {
         itemBuilder: (context, i) {
           final story = stories[i];
           final imageUrl = story.images.isNotEmpty
-              ? '$apiBase/story/${story.images[0]}'
+              ? '$routeStoryImage${story.images[0]}'
               : null;
           return GestureDetector(
             onTap: () => _openViewer(context, i),
@@ -2039,7 +2039,7 @@ class _StoryStrip extends StatelessWidget {
         builder: (_) => _StoryViewer(
           stories: stories,
           initialIndex: index,
-          apiBase: apiBase,
+          routeStoryImage: routeStoryImage,
         ),
       ),
     );
@@ -2049,11 +2049,11 @@ class _StoryStrip extends StatelessWidget {
 class _StoryViewer extends StatefulWidget {
   final List<StoryModel> stories;
   final int initialIndex;
-  final String apiBase;
+  final String routeStoryImage;
   const _StoryViewer(
       {required this.stories,
       required this.initialIndex,
-      required this.apiBase});
+      required this.routeStoryImage});
 
   @override
   State<_StoryViewer> createState() => _StoryViewerState();
@@ -2089,7 +2089,7 @@ class _StoryViewerState extends State<_StoryViewer>
   List<String> get _currentMedia {
     final s = widget.stories[_storyIdx];
     return [
-      ...s.images.map((img) => '${widget.apiBase}/story/$img'),
+      ...s.images.map((img) => '${widget.routeStoryImage}$img'),
       ...s.videos,
     ];
   }

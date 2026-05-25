@@ -24,6 +24,7 @@ const nowDataBaseName = 'two_dressur.db';
 bool modeReconnaissanceContactArrierePlan = false;
 const generalRouteForApi = '$generalApiDomaine/api';
 const generalRouteForPromotionImage = '$generalApiDomaine/promotion/';
+const generalRouteForStoryImage = '$generalApiDomaine/story/';
 
 const tiktokDS = "https://www.tiktok.com/@bluelife.tech";
 const facebookDS = "https://www.facebook.com/dressurds";
