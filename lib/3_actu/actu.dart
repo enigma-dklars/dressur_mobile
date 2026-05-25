@@ -155,6 +155,36 @@ class Advertisement {
     required this.inProgrammeRecompense,
   });
 }
+class StoryModel {
+  final int id;
+  final String user;
+  final String description;
+  final String url;
+  final List<String> images;
+  final List<String> videos;
+
+  StoryModel({
+    required this.id,
+    required this.user,
+    required this.description,
+    required this.url,
+    required this.images,
+    required this.videos,
+  });
+
+  factory StoryModel.fromJson(Map<String, dynamic> json) {
+    return StoryModel(
+      id: json['id'] ?? 0,
+      user: json['user'] ?? '',
+      description: json['description'] ?? '',
+      url: json['url'] ?? '',
+      images: List<String>.from(json['images'] ?? []),
+      videos: List<String>.from(json['videos'] ?? []),
+    );
+  }
+}
+
+
 
 class ActuPage extends StatefulWidget {
   ActuPage({Key? key}) : super(key: key);
@@ -175,11 +205,14 @@ class _ActuPageState extends State<ActuPage> {
   bool rechercheEnCours = true;
   late Future<List<Advertisement>> _futureAdvertisements;
   bool _firstLoad = true;
+  List<StoryModel> _stories = [];
+  bool _storiesLoading = false;
 
   @override
   void initState() {
     super.initState();
     _futureAdvertisements = fetchAdvertisements();
+    _fetchStories();
     _scrollController.addListener(_scrollListener);
     // Démarre le timer lors de l'initialisation du widget
     _startTimer();
@@ -352,6 +385,23 @@ class _ActuPageState extends State<ActuPage> {
         ),
       );
     }
+  }
+
+  Future<void> _fetchStories() async {
+    try {
+      final response = await http.get(
+        Uri.parse('$generalRouteForApi/getActiveStories'),
+      );
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        if (data['error'] == false) {
+          final list = (data['stories'] as List)
+              .map((e) => StoryModel.fromJson(e))
+              .toList();
+          if (mounted) setState(() => _stories = list);
+        }
+      }
+    } catch (_) {}
   }
 
   Future<List<Advertisement>> fetchAdvertisements() async {
@@ -970,6 +1020,14 @@ class _ActuPageState extends State<ActuPage> {
                           mailIsVerified),
                     ),
                     const SizedBox(height: 10),
+                    // ── Strip de Stories ──────────────────────────────
+                    if (_stories.isNotEmpty)
+                      _StoryStrip(
+                        stories: _stories,
+                        apiBase: generalApiDomaine,
+                      ),
+                    if (_stories.isNotEmpty) const SizedBox(height: 6),
+                    // ── Fin Strip de Stories ───────────────────────────
                     // Affiche la carte de mise à jour si nécessaire
                     if (int.parse(versionApp.toString().replaceAll(".", "")) <
                         int.parse(myDressurVersion
@@ -1868,6 +1926,438 @@ class AdvertisementDetailPage extends StatelessWidget {
           ),
           Divider(height: 12),
         ],
+      ),
+    );
+  }
+}
+
+// ════════════════════════════════════════════════════
+// STORY STRIP + VIEWER
+// ════════════════════════════════════════════════════
+
+class _StoryStrip extends StatelessWidget {
+  final List<StoryModel> stories;
+  final String apiBase;
+  const _StoryStrip({required this.stories, required this.apiBase});
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 185,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 10),
+        itemCount: stories.length,
+        separatorBuilder: (_, __) => const SizedBox(width: 8),
+        itemBuilder: (context, i) {
+          final story = stories[i];
+          final imageUrl = story.images.isNotEmpty
+              ? '$apiBase/story/${story.images[0]}'
+              : null;
+          return GestureDetector(
+            onTap: () => _openViewer(context, i),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: Stack(
+                children: [
+                  // Image de fond
+                  Container(
+                    width: 108,
+                    height: 180,
+                    color: Colors.black87,
+                    child: imageUrl != null
+                        ? CachedNetworkImage(
+                            imageUrl: imageUrl,
+                            fit: BoxFit.cover,
+                            width: 108,
+                            height: 180,
+                            placeholder: (_, __) =>
+                                Container(color: Colors.grey[900]),
+                            errorWidget: (_, __, ___) => const Icon(
+                                Icons.broken_image,
+                                color: Colors.white54),
+                          )
+                        : const Center(
+                            child: Icon(Icons.play_circle_fill,
+                                color: Colors.white70, size: 36)),
+                  ),
+                  // Dégradé bas
+                  Positioned(
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    child: Container(
+                      height: 56,
+                      decoration: const BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.bottomCenter,
+                          end: Alignment.topCenter,
+                          colors: [Colors.black87, Colors.transparent],
+                        ),
+                      ),
+                    ),
+                  ),
+                  // Nom de l'utilisateur
+                  Positioned(
+                    bottom: 6,
+                    left: 0,
+                    right: 0,
+                    child: Text(
+                      story.user.length > 12
+                          ? story.user.substring(0, 12)
+                          : story.user,
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.poppins(
+                        color: Colors.white,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                  // Bordure bleue
+                  Positioned.fill(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: primaryColor, width: 2),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  void _openViewer(BuildContext context, int index) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => _StoryViewer(
+          stories: stories,
+          initialIndex: index,
+          apiBase: apiBase,
+        ),
+      ),
+    );
+  }
+}
+
+class _StoryViewer extends StatefulWidget {
+  final List<StoryModel> stories;
+  final int initialIndex;
+  final String apiBase;
+  const _StoryViewer(
+      {required this.stories,
+      required this.initialIndex,
+      required this.apiBase});
+
+  @override
+  State<_StoryViewer> createState() => _StoryViewerState();
+}
+
+class _StoryViewerState extends State<_StoryViewer>
+    with SingleTickerProviderStateMixin {
+  late int _storyIdx;
+  int _mediaIdx = 0;
+  Timer? _timer;
+  late AnimationController _progressController;
+  static const _duration = Duration(seconds: 60);
+  bool _expanded = false;
+
+  // Swipe
+  double _dragStartX = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _storyIdx = widget.initialIndex;
+    _progressController = AnimationController(vsync: this, duration: _duration);
+    _startTimer();
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    _progressController.dispose();
+    super.dispose();
+  }
+
+  List<String> get _currentMedia {
+    final s = widget.stories[_storyIdx];
+    return [
+      ...s.images.map((img) => '${widget.apiBase}/story/$img'),
+      ...s.videos,
+    ];
+  }
+
+  void _startTimer() {
+    _timer?.cancel();
+    _expanded = false;
+    _progressController.reset();
+    _progressController.forward();
+    _timer = Timer(_duration, _nextMedia);
+  }
+
+  void _pauseTimer() {
+    _timer?.cancel();
+    _progressController.stop();
+  }
+
+  void _nextMedia() {
+    final media = _currentMedia;
+    if (_mediaIdx < media.length - 1) {
+      setState(() => _mediaIdx++);
+      _startTimer();
+    } else if (_storyIdx < widget.stories.length - 1) {
+      setState(() {
+        _storyIdx++;
+        _mediaIdx = 0;
+      });
+      _startTimer();
+    } else {
+      Navigator.pop(context);
+    }
+  }
+
+  void _prevMedia() {
+    if (_mediaIdx > 0) {
+      setState(() => _mediaIdx--);
+      _startTimer();
+    } else if (_storyIdx > 0) {
+      setState(() {
+        _storyIdx--;
+        _mediaIdx = 0;
+      });
+      _startTimer();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final story = widget.stories[_storyIdx];
+    final media = _currentMedia;
+    final current = media.isNotEmpty ? media[_mediaIdx] : null;
+    final isImage = current != null &&
+        (current.contains('/story/') || current.endsWith('.jpg') ||
+            current.endsWith('.jpeg') || current.endsWith('.png') ||
+            current.endsWith('.webp'));
+
+    return Scaffold(
+      backgroundColor: Colors.black,
+      body: GestureDetector(
+        onHorizontalDragStart: (d) => _dragStartX = d.globalPosition.dx,
+        onHorizontalDragEnd: (d) {
+          final dx = d.globalPosition.dx - _dragStartX;
+          if (dx.abs() > 40) {
+            if (dx < 0) _nextMedia();
+            else _prevMedia();
+          }
+        },
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            // ── Média principal ──
+            if (current != null)
+              Center(
+                child: isImage
+                    ? CachedNetworkImage(
+                        imageUrl: current,
+                        fit: BoxFit.contain,
+                        placeholder: (_, __) =>
+                            const CircularProgressIndicator(color: Colors.white),
+                        errorWidget: (_, __, ___) =>
+                            const Icon(Icons.broken_image, color: Colors.white54, size: 60),
+                      )
+                    : const Icon(Icons.play_circle_fill,
+                        color: Colors.white70, size: 80),
+              ),
+
+            // ── Barres de progression ──
+            Positioned(
+              top: MediaQuery.of(context).padding.top + 6,
+              left: 8,
+              right: 8,
+              child: Row(
+                children: List.generate(media.length, (i) {
+                  return Expanded(
+                    child: Container(
+                      height: 3,
+                      margin: const EdgeInsets.symmetric(horizontal: 2),
+                      decoration: BoxDecoration(
+                        color: Colors.white30,
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                      child: i < _mediaIdx
+                          ? Container(
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(2),
+                              ),
+                            )
+                          : i == _mediaIdx
+                              ? AnimatedBuilder(
+                                  animation: _progressController,
+                                  builder: (_, __) => FractionallySizedBox(
+                                    alignment: Alignment.centerLeft,
+                                    widthFactor: _progressController.value,
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.circular(2),
+                                      ),
+                                    ),
+                                  ),
+                                )
+                              : const SizedBox(),
+                    ),
+                  );
+                }),
+              ),
+            ),
+
+            // ── Header (nom + fermer) ──
+            Positioned(
+              top: MediaQuery.of(context).padding.top + 16,
+              left: 12,
+              right: 12,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    story.user,
+                    style: GoogleFonts.poppins(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 14),
+                  ),
+                  GestureDetector(
+                    onTap: () => Navigator.pop(context),
+                    child: const Icon(Icons.close, color: Colors.white, size: 26),
+                  ),
+                ],
+              ),
+            ),
+
+            // ── Boutons prev/next ──
+            Positioned(
+              left: 4,
+              top: 0,
+              bottom: 0,
+              child: Center(
+                child: IconButton(
+                  icon: const Icon(Icons.chevron_left,
+                      color: Colors.white70, size: 36),
+                  onPressed: _prevMedia,
+                ),
+              ),
+            ),
+            Positioned(
+              right: 4,
+              top: 0,
+              bottom: 0,
+              child: Center(
+                child: IconButton(
+                  icon: const Icon(Icons.chevron_right,
+                      color: Colors.white70, size: 36),
+                  onPressed: _nextMedia,
+                ),
+              ),
+            ),
+
+            // ── Description + URL (bas) ──
+            if (story.description.isNotEmpty || story.url.isNotEmpty)
+              Positioned(
+                bottom: 0,
+                left: 0,
+                right: 0,
+                child: Container(
+                  padding: const EdgeInsets.fromLTRB(14, 12, 14, 28),
+                  decoration: const BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.bottomCenter,
+                      end: Alignment.topCenter,
+                      colors: [Colors.black87, Colors.transparent],
+                    ),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // Bouton lien
+                      if (story.url.isNotEmpty)
+                        GestureDetector(
+                          onTap: () async {
+                            final uri = Uri.tryParse(story.url);
+                            if (uri != null) {
+                              await launchUrl(uri,
+                                  mode: LaunchMode.externalApplication);
+                            }
+                          },
+                          child: Container(
+                            margin: const EdgeInsets.only(bottom: 8),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 8),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.18),
+                              borderRadius: BorderRadius.circular(24),
+                              border: Border.all(
+                                  color: Colors.white.withOpacity(0.4)),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(Icons.link,
+                                    color: Colors.white, size: 16),
+                                const SizedBox(width: 6),
+                                Text(
+                                  'Voir le lien',
+                                  style: GoogleFonts.poppins(
+                                      color: Colors.white,
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w600),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      // Description
+                      if (story.description.isNotEmpty) ...[
+                        Text(
+                          story.description,
+                          maxLines: _expanded ? null : 2,
+                          overflow: _expanded
+                              ? TextOverflow.visible
+                              : TextOverflow.ellipsis,
+                          style: GoogleFonts.poppins(
+                              color: Colors.white, fontSize: 13, height: 1.5),
+                        ),
+                        if (!_expanded &&
+                            story.description.split('\n').length > 2 ||
+                            story.description.length > 120)
+                          GestureDetector(
+                            onTap: () {
+                              _pauseTimer();
+                              setState(() => _expanded = true);
+                            },
+                            child: Text(
+                              'Lire la suite',
+                              style: GoogleFonts.poppins(
+                                  color: Colors.lightBlueAccent,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600),
+                            ),
+                          ),
+                      ],
+                    ],
+                  ),
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }
