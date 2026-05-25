@@ -1013,7 +1013,7 @@ class _ActuPageState extends State<ActuPage> {
                         stories: _stories,
                         routeStoryImage: generalRouteForStoryImage,
                       ),
-                    if (_stories.isNotEmpty) const SizedBox(height: 6),
+                    if (_stories.isNotEmpty) const SizedBox(height: 10),
                     // ── Fin Strip de Stories ───────────────────────────
                     // Affiche la carte de mise à jour si nécessaire
                     if (int.parse(versionApp.toString().replaceAll(".", "")) <
@@ -2309,10 +2309,8 @@ class _StoryViewerState extends State<_StoryViewer>
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 16, vertical: 8),
                             decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.18),
+                              color: const Color(0xFF25D366),
                               borderRadius: BorderRadius.circular(24),
-                              border: Border.all(
-                                  color: Colors.white.withOpacity(0.4)),
                             ),
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
@@ -2343,8 +2341,8 @@ class _StoryViewerState extends State<_StoryViewer>
                               color: Colors.white, fontSize: 13, height: 1.5),
                         ),
                         if (!_expanded &&
-                                story.description.split('\n').length > 2 ||
-                            story.description.length > 120)
+                            (story.description.split('\n').length > 2 ||
+                                story.description.length > 120))
                           GestureDetector(
                             onTap: () {
                               _pauseTimer();
@@ -2352,6 +2350,19 @@ class _StoryViewerState extends State<_StoryViewer>
                             },
                             child: Text(
                               'Lire la suite',
+                              style: GoogleFonts.poppins(
+                                  color: Colors.lightBlueAccent,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600),
+                            ),
+                          ),
+                        if (_expanded)
+                          GestureDetector(
+                            onTap: () {
+                              setState(() => _expanded = false);
+                            },
+                            child: Text(
+                              'Réduire',
                               style: GoogleFonts.poppins(
                                   color: Colors.lightBlueAccent,
                                   fontSize: 12,
