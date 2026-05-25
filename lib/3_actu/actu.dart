@@ -1006,14 +1006,38 @@ class _ActuPageState extends State<ActuPage> {
                 child: ListView(
                   controller: _scrollController,
                   children: [
-                    const SizedBox(height: 10),
+                    const SizedBox(height: 15),
                     // ── Strip de Stories ──────────────────────────────
                     if (_stories.isNotEmpty)
                       _StoryStrip(
                         stories: _stories,
                         routeStoryImage: generalRouteForStoryImage,
                       ),
+                    Container(
+                      width: double.infinity,
+                      margin: const EdgeInsets.fromLTRB(10, 10, 10, 0),
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? Colors.white.withOpacity(0.05)
+                            : Colors.black.withOpacity(0.04),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        "Pour ajouter quelque chose à la story, veuillez contacter le support via WhatsApp.",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 13,
+                          height: 1.4,
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? Colors.white70
+                              : Colors.black87,
+                        ),
+                      ),
+                    ),
+
                     // ── Fin Strip de Stories ───────────────────────────
+
                     // Affiche la carte de mise à jour si nécessaire
                     if (int.parse(versionApp.toString().replaceAll(".", "")) <
                         int.parse(myDressurVersion
