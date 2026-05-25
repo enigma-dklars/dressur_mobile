@@ -4,7 +4,6 @@ import 'package:dressur/1_reception/liste_contact.dart';
 import 'package:dressur/1_reception/recompense_dashboard.dart';
 import 'package:dressur/1_reception/recompense_start.dart';
 import 'package:dressur/components/padding_and_divider.dart';
-import 'package:dressur/components/pub_smt_2024.dart';
 import 'package:dressur/components/sociaux.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -117,8 +116,6 @@ class _ReceptionPageState extends State<ReceptionPage> {
         body: SingleChildScrollView(
           child: Column(
             children: [
-              const SizedBox(height: 10),
-              SpecialPub(context),
               const SizedBox(height: 10),
               _buildNavigationItem(
                 context: context,

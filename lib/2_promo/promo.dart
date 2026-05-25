@@ -6,7 +6,6 @@ import 'package:dressur/2_promo/liste_promo_reseau_sociaux.dart';
 import 'package:dressur/2_promo/new_promo_reseau_sociaux.dart';
 import 'package:dressur/components/noti.dart';
 import 'package:dressur/components/padding_and_divider.dart';
-import 'package:dressur/components/pub_smt_2024.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
