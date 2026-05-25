@@ -1013,7 +1013,6 @@ class _ActuPageState extends State<ActuPage> {
                         stories: _stories,
                         routeStoryImage: generalRouteForStoryImage,
                       ),
-                    if (_stories.isNotEmpty) const SizedBox(height: 10),
                     // ── Fin Strip de Stories ───────────────────────────
                     // Affiche la carte de mise à jour si nécessaire
                     if (int.parse(versionApp.toString().replaceAll(".", "")) <
