@@ -50,5 +50,3 @@ app.*.map.json
 /macos/
 /linux/
 /windows/
-
-/lib/components/111_generaleApiDomaine.dart
