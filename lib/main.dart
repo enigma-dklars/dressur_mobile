@@ -151,7 +151,7 @@ void main() async {
       LinuxInitializationSettings(
     defaultActionName: 'Open notification',
     defaultIcon: AssetsLinuxIcon(
-        'images/dressur_logo_bleu.png'), // Assurez-vous que cette ressource existe
+        'images/dressur_logo.png'),
   );
   final InitializationSettings initializationSettings = InitializationSettings(
     android: initializationSettingsAndroid,
