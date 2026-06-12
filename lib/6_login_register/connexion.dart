@@ -6,7 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
-import 'package:google_sign_in/google_sign_in.dart';
+import 'package:flutter_web_auth_2/flutter_web_auth_2.dart';
 
 import 'package:dressur/6_login_register/mot_de_passe_oublier.dart';
 import 'package:dressur/components/constant.dart';
@@ -14,9 +14,9 @@ import 'package:dressur/components/noti.dart';
 import 'package:dressur/components/bottomBar.dart';
 import 'package:dressur/5_autre/support_assistance.dart';
 
-// Client ID Web (type 3) du projet Firebase — requis pour obtenir un idToken côté serveur
-const String _googleServerClientId =
-    '7474516834-vq1se3sjkmg3e1gjblqrcgm556mdttma.apps.googleusercontent.com';
+const String _googleClientId =
+    '976898334997-2uutru94dncvao495c1j3qju3uaip61c.apps.googleusercontent.com';
+const String _googleRedirectUri = 'com.dressur.ds://auth';
 
 class LoginPage extends StatelessWidget {
   @override
@@ -89,11 +89,6 @@ class _LoginFormState extends State<LoginForm> {
   final _emailController = TextEditingController(text: mailConnexion);
   final _passwordController = TextEditingController();
 
-  final GoogleSignIn _googleSignIn = GoogleSignIn(
-    serverClientId: _googleServerClientId,
-    scopes: ['email', 'profile'],
-  );
-
   @override
   void dispose() {
     _emailController.dispose();
@@ -150,31 +145,34 @@ class _LoginFormState extends State<LoginForm> {
             : "No internet connection.");
       }
 
-      // Déconnecter d'une session Google précédente pour permettre de changer de compte
-      await _googleSignIn.signOut();
+      // Ouvrir le navigateur système avec la page d'autorisation Google
+      final authUrl = Uri.https('accounts.google.com', '/o/oauth2/v2/auth', {
+        'client_id': _googleClientId,
+        'redirect_uri': _googleRedirectUri,
+        'response_type': 'code',
+        'scope': 'openid email profile',
+        'access_type': 'online',
+        'prompt': 'select_account',
+      });
 
-      final GoogleSignInAccount? googleAccount = await _googleSignIn.signIn();
-      if (googleAccount == null) {
-        // L'utilisateur a annulé
-        setState(() => _isGoogleLoading = false);
-        return;
-      }
+      final result = await FlutterWebAuth2.authenticate(
+        url: authUrl.toString(),
+        callbackUrlScheme: 'com.dressur.ds',
+      );
 
-      final GoogleSignInAuthentication googleAuth =
-          await googleAccount.authentication;
-
-      final String? idToken = googleAuth.idToken;
-      if (idToken == null) {
+      final code = Uri.parse(result).queryParameters['code'];
+      if (code == null) {
         throw Exception((langUserPhone == "fr")
-            ? "Impossible d'obtenir le token Google."
-            : "Could not retrieve Google token.");
+            ? "Autorisation Google annulée."
+            : "Google authorization cancelled.");
       }
 
-      // Envoyer le token à notre API
+      // Envoyer le code à notre API pour échange côté serveur
       final response = await http.post(
         Uri.parse('$generalRouteForApi/auth/google'),
         body: {
-          'idToken': idToken,
+          'code': code,
+          'redirect_uri': _googleRedirectUri,
           'langUserPhone': langUserPhone.toString(),
         },
       );
