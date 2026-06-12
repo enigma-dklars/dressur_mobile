@@ -10,8 +10,10 @@ class AdministrationPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: Colors.grey[100],
+      backgroundColor: isDark ? const Color(0xFF121212) : const Color(0xFFF8F9FA),
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.red,
@@ -34,9 +36,10 @@ class AdministrationPage extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
         children: [
-          _buildSectionLabel('Promotions'),
+          _buildSectionLabel('Promotions', isDark),
           _buildAdminTile(
             context,
+            isDark: isDark,
             icon: FontAwesomeIcons.clock,
             iconColor: Colors.orange,
             title: 'Promotions en attente',
@@ -54,7 +57,7 @@ class AdministrationPage extends StatelessWidget {
     );
   }
 
-  Widget _buildSectionLabel(String label) {
+  Widget _buildSectionLabel(String label, bool isDark) {
     return Padding(
       padding: const EdgeInsets.only(left: 4, bottom: 10),
       child: Text(
@@ -62,7 +65,7 @@ class AdministrationPage extends StatelessWidget {
         style: GoogleFonts.poppins(
           fontSize: 11,
           fontWeight: FontWeight.w700,
-          color: Colors.grey[500],
+          color: isDark ? Colors.grey[400] : Colors.grey[500],
           letterSpacing: 1.2,
         ),
       ),
@@ -71,6 +74,7 @@ class AdministrationPage extends StatelessWidget {
 
   Widget _buildAdminTile(
     BuildContext context, {
+    required bool isDark,
     required IconData icon,
     required Color iconColor,
     required String title,
@@ -78,6 +82,7 @@ class AdministrationPage extends StatelessWidget {
     required VoidCallback onTap,
   }) {
     return Card(
+      color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
       elevation: 1.5,
       margin: const EdgeInsets.only(bottom: 12),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
@@ -109,6 +114,7 @@ class AdministrationPage extends StatelessWidget {
                       style: GoogleFonts.poppins(
                         fontWeight: FontWeight.w600,
                         fontSize: 14,
+                        color: isDark ? Colors.white : Colors.black87,
                       ),
                     ),
                     const SizedBox(height: 2),
@@ -116,7 +122,7 @@ class AdministrationPage extends StatelessWidget {
                       subtitle,
                       style: GoogleFonts.poppins(
                         fontSize: 12,
-                        color: Colors.grey[600],
+                        color: isDark ? Colors.grey[400] : Colors.grey[600],
                       ),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
@@ -125,7 +131,10 @@ class AdministrationPage extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 8),
-              Icon(Icons.chevron_right, color: Colors.grey[400]),
+              Icon(
+                Icons.chevron_right,
+                color: isDark ? Colors.grey[600] : Colors.grey[400],
+              ),
             ],
           ),
         ),
