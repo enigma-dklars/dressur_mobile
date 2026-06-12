@@ -16,7 +16,9 @@ import 'package:dressur/5_autre/support_assistance.dart';
 
 const String _googleClientId =
     '976898334997-2uutru94dncvao495c1j3qju3uaip61c.apps.googleusercontent.com';
-const String _googleRedirectUri = 'com.dressur.ds://auth';
+// URI de redirection HTTPS — acceptée par Google Cloud Console
+const String _mobileGoogleRedirectUri =
+    'https://dressur.site/auth/google/mobile/callback';
 
 class LoginPage extends StatelessWidget {
   @override
@@ -145,10 +147,12 @@ class _LoginFormState extends State<LoginForm> {
             : "No internet connection.");
       }
 
-      // Ouvrir le navigateur système avec la page d'autorisation Google
+      // Ouvrir Chrome avec la page d'autorisation Google
+      // Google redirige vers notre callback HTTPS, qui redirige ensuite
+      // vers com.dressur.ds://auth?t=TOKEN (intercepté par Android)
       final authUrl = Uri.https('accounts.google.com', '/o/oauth2/v2/auth', {
         'client_id': _googleClientId,
-        'redirect_uri': _googleRedirectUri,
+        'redirect_uri': _mobileGoogleRedirectUri,
         'response_type': 'code',
         'scope': 'openid email profile',
         'access_type': 'online',
@@ -160,19 +164,26 @@ class _LoginFormState extends State<LoginForm> {
         callbackUrlScheme: 'com.dressur.ds',
       );
 
-      final code = Uri.parse(result).queryParameters['code'];
-      if (code == null) {
+      final resultUri = Uri.parse(result);
+      final error = resultUri.queryParameters['error'];
+      if (error != null) {
+        throw Exception((langUserPhone == "fr")
+            ? "Erreur Google : $error"
+            : "Google error: $error");
+      }
+
+      final signedToken = resultUri.queryParameters['t'];
+      if (signedToken == null) {
         throw Exception((langUserPhone == "fr")
             ? "Autorisation Google annulée."
             : "Google authorization cancelled.");
       }
 
-      // Envoyer le code à notre API pour échange côté serveur
+      // Échanger le token signé contre les données utilisateur
       final response = await http.post(
-        Uri.parse('$generalRouteForApi/auth/google'),
+        Uri.parse('$generalRouteForApi/auth/google/mobile-finalize'),
         body: {
-          'code': code,
-          'redirect_uri': _googleRedirectUri,
+          't': signedToken,
           'langUserPhone': langUserPhone.toString(),
         },
       );
