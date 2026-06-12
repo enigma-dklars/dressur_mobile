@@ -14,9 +14,9 @@ import 'package:dressur/components/noti.dart';
 import 'package:dressur/components/bottomBar.dart';
 import 'package:dressur/5_autre/support_assistance.dart';
 
-// Client ID web du projet Firebase (même projet que google-services.json)
+// Client ID Web (type 3) du projet Firebase — requis pour obtenir un idToken côté serveur
 const String _googleServerClientId =
-    '7474516834-42hmcf18cnautj6dia4rtjrk0mb5csdd.apps.googleusercontent.com';
+    '7474516834-vq1se3sjkmg3e1gjblqrcgm556mdttma.apps.googleusercontent.com';
 
 class LoginPage extends StatelessWidget {
   @override
