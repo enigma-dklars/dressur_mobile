@@ -3,66 +3,9 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:dressur/components/constant.dart';
-import 'package:http/http.dart' as http;
 
-class AdministrationPage extends StatefulWidget {
-  AdministrationPage({Key? key}) : super(key: key);
-  @override
-  State<AdministrationPage> createState() => _AdministrationPageState();
-}
-
-class _AdministrationPageState extends State<AdministrationPage> {
-  bool _desactive2 = false;
-
-  Future<void> sauvegardeBDD() async {
-    setState(() {
-      _desactive2 = true;
-    });
-    try {
-      final url = Uri.parse('$generalRouteForApi/export/database');
-      final response = await http.get(url);
-
-      if (response.statusCode == 200) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          backgroundColor: Colors.green,
-          behavior: SnackBarBehavior.floating,
-          content: Text(
-            "Sauvegarde Terminer",
-            style: GoogleFonts.poppins(
-              color: Colors.white,
-            ),
-          ),
-        ));
-
-        setState(() {
-          _desactive2 = false;
-        });
-      } else {
-        setState(() {
-          _desactive2 = false;
-        });
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          backgroundColor: Colors.red,
-          behavior: SnackBarBehavior.floating,
-          content: Text(
-            "Erreur de sauvegarde",
-            style: GoogleFonts.poppins(
-              color: Colors.white,
-            ),
-          ),
-        ));
-      }
-    } catch (e) {
-      setState(() {
-        _desactive2 = false;
-      });
-    } finally {
-      setState(() {
-        _desactive2 = false;
-      });
-    }
-  }
+class AdministrationPage extends StatelessWidget {
+  const AdministrationPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -88,39 +31,7 @@ class _AdministrationPageState extends State<AdministrationPage> {
           ),
         ),
       ),
-      body: SingleChildScrollView(
-        child: Container(
-          padding: const EdgeInsets.fromLTRB(10, 0, 10, 5),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              const SizedBox(height: 8),
-              GestureDetector(
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: _desactive2 ? Colors.blue : Colors.red,
-                    shape: const StadiumBorder(),
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 13,
-                    ),
-                  ),
-                  child: Text(
-                    _desactive2 ? "Patientez" : "Sauvegarde de la BDD",
-                    style: GoogleFonts.poppins(
-                      color: Colors.white,
-                      fontSize: 15,
-                    ),
-                  ),
-                  onPressed: () {
-                    _desactive2 ? null : sauvegardeBDD();
-                  },
-                ),
-              ),
-              const SizedBox(height: 5),
-            ],
-          ),
-        ),
-      ),
+      body: const SizedBox.shrink(),
     );
   }
 }
