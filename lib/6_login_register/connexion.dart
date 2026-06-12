@@ -6,13 +6,17 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
+import 'package:google_sign_in/google_sign_in.dart';
 
-// --- Importez vos pages et constantes ---
 import 'package:dressur/6_login_register/mot_de_passe_oublier.dart';
 import 'package:dressur/components/constant.dart';
 import 'package:dressur/components/noti.dart';
 import 'package:dressur/components/bottomBar.dart';
 import 'package:dressur/5_autre/support_assistance.dart';
+
+// Client ID web du projet Firebase (même projet que google-services.json)
+const String _googleServerClientId =
+    '7474516834-42hmcf18cnautj6dia4rtjrk0mb5csdd.apps.googleusercontent.com';
 
 class LoginPage extends StatelessWidget {
   @override
@@ -40,7 +44,6 @@ class LoginPage extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               SizedBox(height: 20),
-              // --- EN-TÊTE ---
               FadeInDown(
                 duration: Duration(milliseconds: 500),
                 child: Text(
@@ -64,8 +67,6 @@ class LoginPage extends StatelessWidget {
                 ),
               ),
               SizedBox(height: 50),
-
-              // --- FORMULAIRE ---
               LoginForm(),
             ],
           ),
@@ -83,9 +84,15 @@ class LoginForm extends StatefulWidget {
 class _LoginFormState extends State<LoginForm> {
   final _formKey = GlobalKey<FormState>();
   bool _isLoading = false;
+  bool _isGoogleLoading = false;
   bool _isPasswordObscured = true;
   final _emailController = TextEditingController(text: mailConnexion);
   final _passwordController = TextEditingController();
+
+  final GoogleSignIn _googleSignIn = GoogleSignIn(
+    serverClientId: _googleServerClientId,
+    scopes: ['email', 'profile'],
+  );
 
   @override
   void dispose() {
@@ -95,7 +102,6 @@ class _LoginFormState extends State<LoginForm> {
   }
 
   Future<void> _login() async {
-    // Valide le formulaire avant de continuer
     if (!_formKey.currentState!.validate()) return;
 
     setState(() => _isLoading = true);
@@ -130,14 +136,75 @@ class _LoginFormState extends State<LoginForm> {
       dangerNoti((langUserPhone == "fr") ? "Erreur" : "Error",
           e.toString().replaceAll("Exception: ", ""), context);
     } finally {
-      if (mounted) {
-        setState(() => _isLoading = false);
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _signInWithGoogle() async {
+    setState(() => _isGoogleLoading = true);
+    try {
+      bool isConnected = await isConnectedToInternet();
+      if (!isConnected) {
+        throw Exception((langUserPhone == "fr")
+            ? "Pas de connexion internet."
+            : "No internet connection.");
       }
+
+      // Déconnecter d'une session Google précédente pour permettre de changer de compte
+      await _googleSignIn.signOut();
+
+      final GoogleSignInAccount? googleAccount = await _googleSignIn.signIn();
+      if (googleAccount == null) {
+        // L'utilisateur a annulé
+        setState(() => _isGoogleLoading = false);
+        return;
+      }
+
+      final GoogleSignInAuthentication googleAuth =
+          await googleAccount.authentication;
+
+      final String? idToken = googleAuth.idToken;
+      if (idToken == null) {
+        throw Exception((langUserPhone == "fr")
+            ? "Impossible d'obtenir le token Google."
+            : "Could not retrieve Google token.");
+      }
+
+      // Envoyer le token à notre API
+      final response = await http.post(
+        Uri.parse('$generalRouteForApi/auth/google'),
+        body: {
+          'idToken': idToken,
+          'langUserPhone': langUserPhone.toString(),
+        },
+      );
+
+      final data = convert.jsonDecode(response.body);
+
+      if (response.statusCode == 200 && data["error"] == false) {
+        await initUserInformations(data["user"]);
+        Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (context) => const BottomBar()));
+      } else {
+        throw Exception(data["message"] ?? "Erreur de connexion Google.");
+      }
+    } catch (e) {
+      if (mounted) {
+        dangerNoti(
+          (langUserPhone == "fr") ? "Erreur Google" : "Google Error",
+          e.toString().replaceAll("Exception: ", ""),
+          context,
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isGoogleLoading = false);
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Form(
       key: _formKey,
       child: Column(
@@ -173,7 +240,8 @@ class _LoginFormState extends State<LoginForm> {
               controller: _passwordController,
               obscureText: _isPasswordObscured,
               decoration: _buildInputDecoration(
-                label: (langUserPhone == "fr") ? 'Mot de passe' : 'Password',
+                label:
+                    (langUserPhone == "fr") ? 'Mot de passe' : 'Password',
                 icon: FontAwesomeIcons.lock,
                 suffixIcon: IconButton(
                   icon: FaIcon(
@@ -221,7 +289,7 @@ class _LoginFormState extends State<LoginForm> {
           ),
           SizedBox(height: 30),
 
-          // --- BOUTON DE CONNEXION ---
+          // --- BOUTON DE CONNEXION CLASSIQUE ---
           FadeInUp(
             duration: Duration(milliseconds: 500),
             delay: Duration(milliseconds: 800),
@@ -235,7 +303,8 @@ class _LoginFormState extends State<LoginForm> {
                         height: 24,
                         child: CircularProgressIndicator(
                             color: Colors.white, strokeWidth: 2))
-                    : Text((langUserPhone == "fr") ? "Se Connecter" : "Log In"),
+                    : Text(
+                        (langUserPhone == "fr") ? "Se Connecter" : "Log In"),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: primaryColor,
                   foregroundColor: Colors.white,
@@ -248,12 +317,93 @@ class _LoginFormState extends State<LoginForm> {
               ),
             ),
           ),
+          SizedBox(height: 16),
+
+          // --- SÉPARATEUR ---
+          FadeInUp(
+            duration: Duration(milliseconds: 500),
+            delay: Duration(milliseconds: 850),
+            child: Row(
+              children: [
+                Expanded(
+                    child: Divider(
+                        color: isDark ? Colors.grey[700] : Colors.grey[300])),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  child: Text(
+                    (langUserPhone == "fr") ? "ou" : "or",
+                    style: GoogleFonts.poppins(
+                        fontSize: 13,
+                        color: isDark ? Colors.grey[400] : Colors.grey[500]),
+                  ),
+                ),
+                Expanded(
+                    child: Divider(
+                        color: isDark ? Colors.grey[700] : Colors.grey[300])),
+              ],
+            ),
+          ),
+          SizedBox(height: 16),
+
+          // --- BOUTON GOOGLE ---
+          FadeInUp(
+            duration: Duration(milliseconds: 500),
+            delay: Duration(milliseconds: 900),
+            child: SizedBox(
+              width: double.infinity,
+              child: OutlinedButton(
+                onPressed: _isGoogleLoading ? null : _signInWithGoogle,
+                style: OutlinedButton.styleFrom(
+                  padding: EdgeInsets.symmetric(vertical: 14),
+                  side: BorderSide(
+                      color:
+                          isDark ? Colors.grey[600]! : Colors.grey[300]!),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12)),
+                  backgroundColor:
+                      isDark ? Color(0xFF1E1E1E) : Colors.white,
+                ),
+                child: _isGoogleLoading
+                    ? SizedBox(
+                        width: 22,
+                        height: 22,
+                        child: CircularProgressIndicator(
+                            strokeWidth: 2, color: primaryColor))
+                    : Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          // Logo Google (SVG-like avec texte coloré)
+                          Text(
+                            'G',
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF4285F4),
+                            ),
+                          ),
+                          SizedBox(width: 10),
+                          Text(
+                            (langUserPhone == "fr")
+                                ? "Continuer avec Google"
+                                : "Continue with Google",
+                            style: GoogleFonts.poppins(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w500,
+                              color:
+                                  isDark ? Colors.white : Colors.black87,
+                            ),
+                          ),
+                        ],
+                      ),
+              ),
+            ),
+          ),
+          SizedBox(height: 30),
         ],
       ),
     );
   }
 
-  // Helper pour construire la décoration des champs de texte
   InputDecoration _buildInputDecoration(
       {required String label, required IconData icon, Widget? suffixIcon}) {
     return InputDecoration(
