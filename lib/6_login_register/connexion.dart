@@ -6,7 +6,9 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
-import 'package:flutter_web_auth_2/flutter_web_auth_2.dart';
+import 'dart:async';
+import 'package:app_links/app_links.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'package:dressur/6_login_register/mot_de_passe_oublier.dart';
 import 'package:dressur/components/constant.dart';
@@ -147,9 +149,9 @@ class _LoginFormState extends State<LoginForm> {
             : "No internet connection.");
       }
 
-      // Ouvrir Chrome avec la page d'autorisation Google
-      // Google redirige vers notre callback HTTPS, qui redirige ensuite
-      // vers com.dressur.ds://auth?t=TOKEN (intercepté par Android)
+      // Ouvrir Chrome avec la page d'autorisation Google.
+      // Google redirige vers notre callback HTTPS, qui retourne ensuite
+      // un deep link com.dressur.ds://auth?t=TOKEN capturé par app_links.
       final authUrl = Uri.https('accounts.google.com', '/o/oauth2/v2/auth', {
         'client_id': _googleClientId,
         'redirect_uri': _mobileGoogleRedirectUri,
@@ -159,12 +161,25 @@ class _LoginFormState extends State<LoginForm> {
         'prompt': 'select_account',
       });
 
-      final result = await FlutterWebAuth2.authenticate(
-        url: authUrl.toString(),
-        callbackUrlScheme: 'com.dressur.ds',
-      );
+      final completer = Completer<Uri>();
+      final appLinks = AppLinks();
+      StreamSubscription<Uri>? sub;
 
-      final resultUri = Uri.parse(result);
+      sub = appLinks.uriLinkStream.listen((uri) {
+        if (uri.scheme == 'com.dressur.ds' && !completer.isCompleted) {
+          completer.complete(uri);
+        }
+      });
+
+      await launchUrl(authUrl, mode: LaunchMode.externalApplication);
+
+      Uri resultUri;
+      try {
+        resultUri = await completer.future.timeout(const Duration(minutes: 5));
+      } finally {
+        sub.cancel();
+      }
+
       final error = resultUri.queryParameters['error'];
       if (error != null) {
         throw Exception((langUserPhone == "fr")
