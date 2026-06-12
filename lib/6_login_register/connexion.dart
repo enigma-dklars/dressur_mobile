@@ -16,11 +16,6 @@ import 'package:dressur/components/noti.dart';
 import 'package:dressur/components/bottomBar.dart';
 import 'package:dressur/5_autre/support_assistance.dart';
 
-const String _googleClientId =
-    '976898334997-2uutru94dncvao495c1j3qju3uaip61c.apps.googleusercontent.com';
-// URI de redirection HTTPS — acceptée par Google Cloud Console
-const String _mobileGoogleRedirectUri =
-    'https://dressur.site/auth/google/mobile/callback';
 
 class LoginPage extends StatelessWidget {
   @override
@@ -149,17 +144,18 @@ class _LoginFormState extends State<LoginForm> {
             : "No internet connection.");
       }
 
-      // Ouvrir Chrome avec la page d'autorisation Google.
-      // Google redirige vers notre callback HTTPS, qui retourne ensuite
-      // un deep link com.dressur.ds://auth?t=TOKEN capturé par app_links.
-      final authUrl = Uri.https('accounts.google.com', '/o/oauth2/v2/auth', {
-        'client_id': _googleClientId,
-        'redirect_uri': _mobileGoogleRedirectUri,
-        'response_type': 'code',
-        'scope': 'openid email profile',
-        'access_type': 'online',
-        'prompt': 'select_account',
-      });
+      // Récupérer l'URL OAuth générée par le serveur (client_id géré côté serveur)
+      final urlResp = await http.get(
+        Uri.parse('$generalRouteForApi/auth/google/mobile-url'),
+      );
+      if (urlResp.statusCode != 200) {
+        throw Exception((langUserPhone == "fr")
+            ? "Impossible de contacter le serveur."
+            : "Unable to reach server.");
+      }
+      final authUrl = Uri.parse(
+        (convert.jsonDecode(urlResp.body) as Map<String, dynamic>)['url'] as String,
+      );
 
       final completer = Completer<Uri>();
       final appLinks = AppLinks();
