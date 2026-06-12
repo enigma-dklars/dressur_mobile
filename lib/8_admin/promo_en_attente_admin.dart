@@ -119,8 +119,8 @@ class _AdminPromoEnAttentePageState extends State<AdminPromoEnAttentePage> {
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
             child: Text(
               'Refuser',
-              style:
-                  GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.bold),
+              style: GoogleFonts.poppins(
+                  color: Colors.white, fontWeight: FontWeight.bold),
             ),
           ),
         ],
@@ -139,39 +139,43 @@ class _AdminPromoEnAttentePageState extends State<AdminPromoEnAttentePage> {
     }
   }
 
-  Widget _buildCard(Map<String, dynamic> p) {
+  Widget _buildCard(Map<String, dynamic> p, bool isDark) {
     final int id = p['id'];
     final bool isProcessing = _processing.contains(id);
     final user = p['user'] as Map<String, dynamic>?;
     final String imageUrl = '$generalRouteForPromotionImage${p['image']}';
 
     return Card(
+      color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // ── Image ──
+          // ── Image complète sans recadrage ──
           ClipRRect(
             borderRadius: const BorderRadius.vertical(top: Radius.circular(14)),
             child: CachedNetworkImage(
               imageUrl: imageUrl,
-              height: 185,
               width: double.infinity,
-              fit: BoxFit.cover,
-              placeholder: (_, __) => Container(
-                height: 185,
-                color: Colors.grey[200],
-                child: const Center(child: CircularProgressIndicator()),
+              fit: BoxFit.contain,
+              placeholder: (_, __) => AspectRatio(
+                aspectRatio: 4 / 3,
+                child: Container(
+                  color: isDark ? Colors.grey[850] : Colors.grey[200],
+                  child: const Center(child: CircularProgressIndicator()),
+                ),
               ),
-              errorWidget: (_, __, ___) => Container(
-                height: 185,
-                color: Colors.grey[200],
-                child: const Icon(
-                  Icons.image_not_supported,
-                  size: 48,
-                  color: Colors.grey,
+              errorWidget: (_, __, ___) => AspectRatio(
+                aspectRatio: 4 / 3,
+                child: Container(
+                  color: isDark ? Colors.grey[850] : Colors.grey[200],
+                  child: Icon(
+                    Icons.image_not_supported,
+                    size: 48,
+                    color: Colors.grey[500],
+                  ),
                 ),
               ),
             ),
@@ -193,31 +197,36 @@ class _AdminPromoEnAttentePageState extends State<AdminPromoEnAttentePage> {
                       Text(
                         '${p['source']}',
                         style: GoogleFonts.poppins(
-                            fontSize: 10, color: Colors.grey),
+                            fontSize: 10,
+                            color:
+                                isDark ? Colors.grey[400] : Colors.grey[600]),
                       ),
                   ],
                 ),
                 const SizedBox(height: 8),
 
-                // ── Description ──
+                // ── Description complète ──
                 Text(
                   '${p['description'] ?? ''}',
                   style: GoogleFonts.poppins(
-                      fontSize: 13, color: Colors.grey[800]),
-                  maxLines: 3,
-                  overflow: TextOverflow.ellipsis,
+                    fontSize: 13,
+                    color: isDark ? Colors.grey[300] : Colors.grey[800],
+                  ),
                 ),
                 const SizedBox(height: 8),
 
                 // ── Infos utilisateur ──
                 if (user != null) ...[
-                  _userInfoRow(FontAwesomeIcons.user,
-                      '${user['pseudo'] ?? ''} — ${user['nom'] ?? ''}'),
+                  _userInfoRow(
+                      FontAwesomeIcons.user,
+                      '${user['pseudo'] ?? ''} — ${user['nom'] ?? ''}',
+                      isDark),
+                  const SizedBox(height: 2),
+                  _userInfoRow(FontAwesomeIcons.envelope,
+                      '${user['mail'] ?? ''}', isDark),
                   const SizedBox(height: 2),
                   _userInfoRow(
-                      FontAwesomeIcons.envelope, '${user['mail'] ?? ''}'),
-                  const SizedBox(height: 2),
-                  _userInfoRow(FontAwesomeIcons.phone, '${user['tel'] ?? ''}'),
+                      FontAwesomeIcons.phone, '${user['tel'] ?? ''}', isDark),
                   const SizedBox(height: 4),
                 ],
 
@@ -225,7 +234,8 @@ class _AdminPromoEnAttentePageState extends State<AdminPromoEnAttentePage> {
                 Text(
                   'Soumis le ${p['createdAt'] ?? ''}',
                   style: GoogleFonts.poppins(
-                      fontSize: 10, color: Colors.grey[400]),
+                      fontSize: 10,
+                      color: isDark ? Colors.grey[600] : Colors.grey[400]),
                 ),
                 const SizedBox(height: 12),
 
@@ -257,7 +267,8 @@ class _AdminPromoEnAttentePageState extends State<AdminPromoEnAttentePage> {
                       Expanded(
                         child: ElevatedButton.icon(
                           onPressed: () => _showRefuserDialog(id),
-                          icon: const FaIcon(FontAwesomeIcons.xmark, size: 14),
+                          icon:
+                              const FaIcon(FontAwesomeIcons.xmark, size: 14),
                           label: Text(
                             'Refuser',
                             style: GoogleFonts.poppins(
@@ -292,12 +303,14 @@ class _AdminPromoEnAttentePageState extends State<AdminPromoEnAttentePage> {
       child: Text(
         label,
         style: GoogleFonts.poppins(
-            fontSize: 10, fontWeight: FontWeight.bold, color: color[800]),
+            fontSize: 10,
+            fontWeight: FontWeight.bold,
+            color: color[800]),
       ),
     );
   }
 
-  Widget _userInfoRow(IconData icon, String text) {
+  Widget _userInfoRow(IconData icon, String text, bool isDark) {
     return Row(
       children: [
         FaIcon(icon, size: 11, color: Colors.grey),
@@ -305,8 +318,9 @@ class _AdminPromoEnAttentePageState extends State<AdminPromoEnAttentePage> {
         Expanded(
           child: Text(
             text,
-            style: GoogleFonts.poppins(fontSize: 11, color: Colors.grey[600]),
-            overflow: TextOverflow.ellipsis,
+            style: GoogleFonts.poppins(
+                fontSize: 11,
+                color: isDark ? Colors.grey[400] : Colors.grey[600]),
           ),
         ),
       ],
@@ -315,7 +329,11 @@ class _AdminPromoEnAttentePageState extends State<AdminPromoEnAttentePage> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
+      backgroundColor:
+          isDark ? const Color(0xFF121212) : const Color(0xFFF8F9FA),
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.red,
@@ -350,7 +368,10 @@ class _AdminPromoEnAttentePageState extends State<AdminPromoEnAttentePage> {
                       Text(
                         'Aucune promotion en attente',
                         style: GoogleFonts.poppins(
-                            fontSize: 16, color: Colors.grey[600]),
+                            fontSize: 16,
+                            color: isDark
+                                ? Colors.grey[400]
+                                : Colors.grey[600]),
                       ),
                     ],
                   ),
@@ -360,8 +381,8 @@ class _AdminPromoEnAttentePageState extends State<AdminPromoEnAttentePage> {
                   child: ListView.builder(
                     padding: const EdgeInsets.symmetric(vertical: 8),
                     itemCount: _promotions.length,
-                    itemBuilder: (_, i) =>
-                        _buildCard(_promotions[i] as Map<String, dynamic>),
+                    itemBuilder: (_, i) => _buildCard(
+                        _promotions[i] as Map<String, dynamic>, isDark),
                   ),
                 ),
     );
