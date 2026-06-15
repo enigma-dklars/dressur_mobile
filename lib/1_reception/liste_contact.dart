@@ -10,7 +10,6 @@ import 'package:dressur/1_reception/synchronisation_avance.dart';
 import 'package:dressur/5_autre/support_assistance.dart';
 import 'package:dressur/components/constant.dart';
 import 'package:http/http.dart' as http;
-import 'package:shimmer/shimmer.dart';
 
 class ContactDS {
   final String id;
@@ -246,7 +245,7 @@ class _ContactPageState extends State<ContactPage> {
           // --- AFFICHAGE CONDITIONNEL ---
           Expanded(
             child: _isLoading
-                ? _buildShimmerList()
+                ? const Center(child: CircularProgressIndicator(color: primaryColor))
                 : _filteredContacts.isEmpty
                     ? _buildEmptyState()
                     : _buildContactList(),
@@ -416,52 +415,4 @@ class _ContactPageState extends State<ContactPage> {
     );
   }
 
-  Widget _buildShimmerList() {
-    return Shimmer.fromColors(
-      baseColor: Colors.grey[300]!,
-      highlightColor: Colors.grey[100]!,
-      child: ListView.builder(
-        padding: EdgeInsets.symmetric(horizontal: 15, vertical: 5),
-        itemCount: 5, // Affiche 5 cartes squelettes
-        itemBuilder: (context, index) => Card(
-          margin: EdgeInsets.only(bottom: 12),
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-          child: Padding(
-            padding: const EdgeInsets.all(12.0),
-            child: Column(
-              children: [
-                Row(
-                  children: [
-                    CircleAvatar(radius: 28, backgroundColor: Colors.white),
-                    SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Container(
-                              width: 150, height: 18, color: Colors.white),
-                          SizedBox(height: 5),
-                          Container(
-                              width: 100, height: 14, color: Colors.white),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-                Divider(height: 20),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: List.generate(
-                      4,
-                      (_) => CircleAvatar(
-                          radius: 18, backgroundColor: Colors.white)),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
 }
