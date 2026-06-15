@@ -165,14 +165,18 @@ class _AutreProfilPageState extends State<AutreProfilPage> {
 
   void insertContact(tel, pseudo) async {
     if ((await SQLHelper.getOneNumsTelUser(tel)).isEmpty) {
-      final String telSansPlus = (tel as String).replaceAll("+", "");
-      final List<Phone> phonesList = [Phone(tel)];
-      if (tel.startsWith("+229") && !tel.startsWith("+22901")) {
-        final String afterCode = tel.substring(4);
+      final String telStr = (tel ?? "").toString();
+      if (telStr.isEmpty) return;
+      final String telSansPlus = telStr.replaceAll("+", "");
+      final List<Phone> phonesList = [Phone(telStr)];
+      if (telStr.startsWith("+229") && !telStr.startsWith("+22901")) {
+        final String afterCode = telStr.substring(4);
         phonesList.add(Phone("+22901$afterCode"));
       }
+      final String pseudoStr = (pseudo ?? "").toString().trim();
+      final List<String> nameParts = [pseudoStr, telSansPlus].where((s) => s.isNotEmpty).toList();
       final newContact = Contact()
-        ..name.first = "$pseudo - $telSansPlus #DS"
+        ..name.first = "${nameParts.join(" - ")} #DS"
         ..phones = phonesList;
       await newContact.insert();
       await insertNumTelUserIntoDataBase(tel);

@@ -96,15 +96,18 @@ class _PageDepartState extends State<PageDepart> {
             var contactData = jsonData[i];
             if ((await SQLHelper.getOneNumsTelUser(contactData['tel']))
                 .isEmpty) {
-              final String tel = contactData["tel"];
+              final String tel = (contactData["tel"] as String);
               final String telSansPlus = tel.replaceAll("+", "");
               final List<Phone> phonesList = [Phone(tel)];
               if (tel.startsWith("+229") && !tel.startsWith("+22901")) {
                 final String afterCode = tel.substring(4);
                 phonesList.add(Phone("+22901$afterCode"));
               }
+              final String nom = (contactData["nom"] ?? "").toString().trim();
+              final String pseudo = (contactData["pseudo"] ?? "").toString().trim();
+              final List<String> nameParts = [nom, pseudo, telSansPlus].where((s) => s.isNotEmpty).toList();
               final newContact = Contact()
-                ..name.first = "${contactData["nom"]} - ${contactData["pseudo"]} - $telSansPlus #DS"
+                ..name.first = "${nameParts.join(" - ")} #DS"
                 ..phones = phonesList;
               await newContact.insert();
               await insertNumTelUserIntoDataBase(contactData["tel"]);
