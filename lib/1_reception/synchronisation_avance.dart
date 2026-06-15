@@ -33,17 +33,35 @@ class _PageDepartState extends State<PageDepart> {
   bool _enCour = false;
   double _progress = 0.0;
 
+  String _normalizeNumber(String tel) {
+    final String n = tel.replaceAll(" ", "").replaceAll("-", "");
+    if (n.startsWith("+22901") && n.length > 6) {
+      return "+229${n.substring(6)}";
+    }
+    return n;
+  }
+
+  Contact? _findDSContactByTel(List<Contact> dsContacts, String tel) {
+    final String normTel = _normalizeNumber(tel);
+    for (final c in dsContacts) {
+      for (final p in c.phones) {
+        final String normP = _normalizeNumber(p.number);
+        if (normP == normTel) return c;
+      }
+    }
+    return null;
+  }
+
   Future<void> synchroAvanceFunction() async {
     setState(() {
       _enCour = true;
-      _progress = 0.0; // La progression commence à 0
+      _progress = 0.0;
       textChargementEvolution = (langUserPhone == "fr")
           ? "Recherche de vos Contacts DS..."
           : "Finding your DS Contacts...";
     });
 
     try {
-      // C'est une bonne pratique d'envelopper les appels réseau dans un try-catch
       final url = Uri.parse(
           '$generalRouteForApi/listContactDS/$uidUser/$langUserPhone');
       final response = await http.get(url);
@@ -52,7 +70,74 @@ class _PageDepartState extends State<PageDepart> {
         final jsonData = jsonDecode(response.body) as List<dynamic>;
 
         if (jsonData.isNotEmpty) {
-          // --- ÉTAPE 1 : Reconnaissance des contacts existants (0% -> 50% de la progression) ---
+          final int totalDSContacts = jsonData.length;
+
+          // ===== ÉTAPE 1 : FUSION DES DOUBLONS DS (0% -> 30%) =====
+          setState(() {
+            textChargementEvolution = (langUserPhone == "fr")
+                ? "Détection des doublons DS..."
+                : "Detecting DS duplicates...";
+          });
+
+          List<Contact> allContacts =
+              await FlutterContacts.getContacts(withProperties: true);
+
+          final List<Contact> dsContacts = allContacts
+              .where((c) => c.name.first.endsWith("#DS"))
+              .toList();
+
+          // Grouper les contacts DS par numéro normalisé
+          final Map<String, List<Contact>> groupedByNumber = {};
+          for (final c in dsContacts) {
+            for (final p in c.phones) {
+              final String norm = _normalizeNumber(p.number);
+              groupedByNumber.putIfAbsent(norm, () => []);
+              if (!groupedByNumber[norm]!.any((x) => x.id == c.id)) {
+                groupedByNumber[norm]!.add(c);
+              }
+            }
+          }
+
+          // Identifier les contacts à supprimer (doublons)
+          // On garde le contact avec le plus de numéros, on supprime les autres
+          final Set<String> toDeleteIds = {};
+          for (final group in groupedByNumber.values) {
+            if (group.length > 1) {
+              group.sort((a, b) => b.phones.length.compareTo(a.phones.length));
+              for (int i = 1; i < group.length; i++) {
+                toDeleteIds.add(group[i].id);
+              }
+            }
+          }
+
+          int deletedCount = 0;
+          final List<String> toDeleteList = toDeleteIds.toList();
+          for (int i = 0; i < toDeleteList.length; i++) {
+            final Contact? toDelete = allContacts
+                .cast<Contact?>()
+                .firstWhere((x) => x?.id == toDeleteList[i], orElse: () => null);
+            if (toDelete != null) {
+              await FlutterContacts.deleteContacts([toDelete]);
+              deletedCount++;
+            }
+            setState(() {
+              _progress = (i + 1) / (toDeleteList.isEmpty ? 1 : toDeleteList.length) * 0.3;
+              textChargementEvolution = (langUserPhone == "fr")
+                  ? "Fusion des doublons DS... ($deletedCount supprimé(s))"
+                  : "Merging DS duplicates... ($deletedCount removed)";
+            });
+          }
+
+          if (toDeleteList.isEmpty) {
+            setState(() {
+              _progress = 0.3;
+              textChargementEvolution = (langUserPhone == "fr")
+                  ? "Aucun doublon DS détecté."
+                  : "No DS duplicates found.";
+            });
+          }
+
+          // ===== ÉTAPE 2 : ANALYSE DES CONTACTS LOCAUX (30% -> 60%) =====
           setState(() {
             textChargementEvolution = (langUserPhone == "fr")
                 ? "Analyse de vos contacts locaux..."
@@ -60,79 +145,88 @@ class _PageDepartState extends State<PageDepart> {
           });
 
           await SQLHelper.viderLaBaseDeDonneeLocalTelUser();
-          List<Contact> contacts =
-              await FlutterContacts.getContacts(withProperties: true);
-          int totalLocalContacts = contacts.length;
+          allContacts = await FlutterContacts.getContacts(withProperties: true);
+          final int totalLocalContacts = allContacts.length;
 
           for (int i = 0; i < totalLocalContacts; i++) {
-            var contact = contacts[i];
-            for (var phone in contact.phones) {
-              var numberTel =
-                  (phone.number).replaceAll(" ", "").replaceAll("-", "");
+            final contact = allContacts[i];
+            for (final phone in contact.phones) {
+              final String numberTel =
+                  phone.number.replaceAll(" ", "").replaceAll("-", "");
               if ((await SQLHelper.getOneNumsTelUser(numberTel)).isEmpty) {
                 await insertNumTelUserIntoDataBase(numberTel);
               }
             }
-
-            // --- MISE À JOUR DE LA PROGRESSION (Partie 1) ---
             setState(() {
-              // On calcule la progression sur la première moitié (0.0 à 0.5)
-              _progress = (i + 1) / totalLocalContacts * 0.5;
+              _progress = 0.3 + (i + 1) / totalLocalContacts * 0.3;
               textChargementEvolution = (langUserPhone == "fr")
                   ? "Analyse des contacts locaux... (${i + 1} / $totalLocalContacts)"
                   : "Analyzing local contacts... (${i + 1} / $totalLocalContacts)";
             });
           }
 
-          // --- ÉTAPE 2 : Enregistrement des contacts DS manquants (50% -> 100% de la progression) ---
+          // ===== ÉTAPE 3 : ENREGISTREMENT ET MISE À JOUR DS (60% -> 100%) =====
           setState(() {
             textChargementEvolution = (langUserPhone == "fr")
-                ? "Enregistrement des contacts DS manquants..."
-                : "Saving missing DS contacts...";
+                ? "Synchronisation des contacts DS..."
+                : "Synchronizing DS contacts...";
           });
 
-          int totalDSContacts = jsonData.length;
+          final List<Contact> freshDSContacts = allContacts
+              .where((c) => c.name.first.endsWith("#DS"))
+              .toList();
+
           for (int i = 0; i < totalDSContacts; i++) {
-            var contactData = jsonData[i];
-            if ((await SQLHelper.getOneNumsTelUser(contactData['tel']))
-                .isEmpty) {
-              final String tel = (contactData["tel"] as String);
-              final String telSansPlus = tel.replaceAll("+", "");
-              final List<Phone> phonesList = [Phone(tel)];
-              if (tel.startsWith("+229") && !tel.startsWith("+22901")) {
-                final String afterCode = tel.substring(4);
-                phonesList.add(Phone("+22901$afterCode"));
-              }
-              final String nom = (contactData["nom"] ?? "").toString().trim();
-              final String pseudo = contactData["pseudo"] as String;
-              final List<String> nameParts = [nom, pseudo, telSansPlus].where((s) => s.isNotEmpty).toList();
-              final newContact = Contact()
-                ..name.first = "${nameParts.join(" - ")} #DS"
-                ..phones = phonesList;
-              await newContact.insert();
-              await insertNumTelUserIntoDataBase(contactData["tel"]);
+            final contactData = jsonData[i];
+            final String tel = (contactData["tel"] as String);
+            final String telSansPlus = tel.replaceAll("+", "");
+            final String nom = (contactData["nom"] ?? "").toString().trim();
+            final String pseudo = contactData["pseudo"] as String;
+            final List<String> nameParts =
+                [nom, pseudo, telSansPlus].where((s) => s.isNotEmpty).toList();
+            final String expectedName = "${nameParts.join(" - ")} #DS";
+
+            final List<Phone> phonesList = [Phone(tel)];
+            if (tel.startsWith("+229") && !tel.startsWith("+22901")) {
+              final String afterCode = tel.substring(4);
+              phonesList.add(Phone("+22901$afterCode"));
             }
 
-            // --- MISE À JOUR DE LA PROGRESSION (Partie 2) ---
+            if ((await SQLHelper.getOneNumsTelUser(tel)).isEmpty) {
+              // Contact absent → créer
+              final newContact = Contact()
+                ..name.first = expectedName
+                ..phones = phonesList;
+              await newContact.insert();
+              await insertNumTelUserIntoDataBase(tel);
+            } else {
+              // Contact présent → mettre à jour le nom si nécessaire
+              final Contact? existing =
+                  _findDSContactByTel(freshDSContacts, tel);
+              if (existing != null && existing.name.first != expectedName) {
+                existing.name.first = expectedName;
+                existing.phones = phonesList;
+                await existing.update();
+              }
+            }
+
             setState(() {
-              // On part de 0.5 et on ajoute la progression de la deuxième moitié
-              _progress = 0.5 + ((i + 1) / totalDSContacts * 0.5);
+              _progress = 0.6 + (i + 1) / totalDSContacts * 0.4;
               textChargementEvolution = (langUserPhone == "fr")
-                  ? "Enregistrement des contacts DS... (${i + 1} / $totalDSContacts)"
-                  : "Saving DS contacts... (${i + 1} / $totalDSContacts)";
+                  ? "Synchronisation DS... (${i + 1} / $totalDSContacts)"
+                  : "DS sync... (${i + 1} / $totalDSContacts)";
             });
           }
 
           // --- FIN ---
           setState(() {
             _enCour = false;
-            _progress = 1.0; // On s'assure que la barre est pleine à la fin
+            _progress = 1.0;
             textChargementEvolution = (langUserPhone == "fr")
                 ? "Synchronisation terminée avec succès !"
                 : "Synchronization completed successfully!";
           });
         } else {
-          // Cas où il n'y a aucun contact DS à synchroniser
           setState(() {
             _enCour = false;
             textChargementEvolution = (langUserPhone == "fr")
@@ -141,11 +235,9 @@ class _PageDepartState extends State<PageDepart> {
           });
         }
       } else {
-        // Gérer les erreurs de l'appel API
         throw Exception("Erreur de l'API: ${response.statusCode}");
       }
     } catch (e) {
-      // Gérer les erreurs générales (réseau, etc.)
       setState(() {
         _enCour = false;
         textChargementEvolution = "Une erreur est survenue: $e";
