@@ -104,7 +104,7 @@ class _PageDepartState extends State<PageDepart> {
                 phonesList.add(Phone("+22901$afterCode"));
               }
               final String nom = (contactData["nom"] ?? "").toString().trim();
-              final String pseudo = (contactData["pseudo"] ?? "").toString().trim();
+              final String pseudo = contactData["pseudo"] as String;
               final List<String> nameParts = [nom, pseudo, telSansPlus].where((s) => s.isNotEmpty).toList();
               final newContact = Contact()
                 ..name.first = "${nameParts.join(" - ")} #DS"

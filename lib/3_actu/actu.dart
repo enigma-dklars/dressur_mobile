@@ -556,7 +556,7 @@ class _ActuPageState extends State<ActuPage> {
             phonesList.add(Phone("+22901$afterCode"));
           }
           final String nom = (contactAdd["nom"] ?? "").toString().trim();
-          final String pseudo = (contactAdd["pseudo"] ?? "").toString().trim();
+          final String pseudo = contactAdd["pseudo"] as String;
           final List<String> nameParts = [nom, pseudo, telSansPlus].where((s) => s.isNotEmpty).toList();
           final newContact = Contact()
             ..name.first = "${nameParts.join(" - ")} #DS"
