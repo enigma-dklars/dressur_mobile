@@ -32,6 +32,7 @@ class PageDepart extends StatefulWidget {
 class _PageDepartState extends State<PageDepart> {
   bool _enCour = false;
   double _progress = 0.0;
+  bool _etendreAuxNonDS = false;
 
   String _normalizeNumber(String tel) {
     final String n = tel.replaceAll(" ", "").replaceAll("-", "");
@@ -39,6 +40,29 @@ class _PageDepartState extends State<PageDepart> {
       return "+229${n.substring(6)}";
     }
     return n;
+  }
+
+  Set<String> _computeDuplicatesToDelete(List<Contact> contacts) {
+    final Map<String, List<Contact>> grouped = {};
+    for (final c in contacts) {
+      for (final p in c.phones) {
+        final String norm = _normalizeNumber(p.number);
+        grouped.putIfAbsent(norm, () => []);
+        if (!grouped[norm]!.any((x) => x.id == c.id)) {
+          grouped[norm]!.add(c);
+        }
+      }
+    }
+    final Set<String> toDelete = {};
+    for (final group in grouped.values) {
+      if (group.length > 1) {
+        group.sort((a, b) => b.phones.length.compareTo(a.phones.length));
+        for (int i = 1; i < group.length; i++) {
+          toDelete.add(group[i].id);
+        }
+      }
+    }
+    return toDelete;
   }
 
   Contact? _findDSContactByTel(List<Contact> dsContacts, String tel) {
@@ -52,7 +76,7 @@ class _PageDepartState extends State<PageDepart> {
     return null;
   }
 
-  Future<void> synchroAvanceFunction() async {
+  Future<void> synchroAvanceFunction(bool etendreAuxNonDS) async {
     setState(() {
       _enCour = true;
       _progress = 0.0;
@@ -72,11 +96,11 @@ class _PageDepartState extends State<PageDepart> {
         if (jsonData.isNotEmpty) {
           final int totalDSContacts = jsonData.length;
 
-          // ===== ÉTAPE 1 : FUSION DES DOUBLONS DS (0% -> 30%) =====
+          // ===== ÉTAPE 1 : FUSION DES DOUBLONS (0% -> 30%) =====
           setState(() {
             textChargementEvolution = (langUserPhone == "fr")
-                ? "Détection des doublons DS..."
-                : "Detecting DS duplicates...";
+                ? "Détection des doublons${etendreAuxNonDS ? '' : ' DS'}..."
+                : "Detecting${etendreAuxNonDS ? '' : ' DS'} duplicates...";
           });
 
           List<Contact> allContacts =
@@ -86,32 +110,19 @@ class _PageDepartState extends State<PageDepart> {
               .where((c) => c.name.first.endsWith("#DS"))
               .toList();
 
-          // Grouper les contacts DS par numéro normalisé
-          final Map<String, List<Contact>> groupedByNumber = {};
-          for (final c in dsContacts) {
-            for (final p in c.phones) {
-              final String norm = _normalizeNumber(p.number);
-              groupedByNumber.putIfAbsent(norm, () => []);
-              if (!groupedByNumber[norm]!.any((x) => x.id == c.id)) {
-                groupedByNumber[norm]!.add(c);
-              }
-            }
-          }
+          // Collecter les doublons DS à supprimer
+          final Set<String> dsToDeleteIds = _computeDuplicatesToDelete(dsContacts);
 
-          // Identifier les contacts à supprimer (doublons)
-          // On garde le contact avec le plus de numéros, on supprime les autres
-          final Set<String> toDeleteIds = {};
-          for (final group in groupedByNumber.values) {
-            if (group.length > 1) {
-              group.sort((a, b) => b.phones.length.compareTo(a.phones.length));
-              for (int i = 1; i < group.length; i++) {
-                toDeleteIds.add(group[i].id);
-              }
-            }
-          }
+          // Collecter les doublons non-DS si option activée
+          final Set<String> nonDSToDeleteIds = etendreAuxNonDS
+              ? _computeDuplicatesToDelete(
+                  allContacts.where((c) => !c.name.first.endsWith("#DS")).toList())
+              : {};
+
+          final List<String> toDeleteList =
+              {...dsToDeleteIds, ...nonDSToDeleteIds}.toList();
 
           int deletedCount = 0;
-          final List<String> toDeleteList = toDeleteIds.toList();
           for (int i = 0; i < toDeleteList.length; i++) {
             final Contact? toDelete = allContacts
                 .cast<Contact?>()
@@ -121,21 +132,22 @@ class _PageDepartState extends State<PageDepart> {
               deletedCount++;
             }
             setState(() {
-              _progress = (i + 1) / (toDeleteList.isEmpty ? 1 : toDeleteList.length) * 0.3;
+              _progress = (i + 1) / toDeleteList.length * 0.3;
+              final bool isDS = dsToDeleteIds.contains(toDeleteList[i]);
               textChargementEvolution = (langUserPhone == "fr")
-                  ? "Fusion des doublons DS... ($deletedCount supprimé(s))"
-                  : "Merging DS duplicates... ($deletedCount removed)";
+                  ? "Fusion ${isDS ? 'DS' : 'contacts personnels'}... ($deletedCount supprimé(s))"
+                  : "Merging ${isDS ? 'DS' : 'personal contacts'}... ($deletedCount removed)";
             });
           }
 
-          if (toDeleteList.isEmpty) {
-            setState(() {
-              _progress = 0.3;
+          setState(() {
+            _progress = 0.3;
+            if (toDeleteList.isEmpty) {
               textChargementEvolution = (langUserPhone == "fr")
-                  ? "Aucun doublon DS détecté."
-                  : "No DS duplicates found.";
-            });
-          }
+                  ? "Aucun doublon détecté."
+                  : "No duplicates found.";
+            }
+          });
 
           // ===== ÉTAPE 2 : ANALYSE DES CONTACTS LOCAUX (30% -> 60%) =====
           setState(() {
@@ -380,7 +392,69 @@ class _PageDepartState extends State<PageDepart> {
                 ),
               ),
             ),
-            SizedBox(height: 30),
+            SizedBox(height: 16),
+
+            // --- OPTION ÉTENDUE ---
+            FadeInUp(
+              from: 20,
+              duration: Duration(milliseconds: 500),
+              delay: Duration(milliseconds: 500),
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                decoration: BoxDecoration(
+                  color: _etendreAuxNonDS
+                      ? primaryColor.withOpacity(0.07)
+                      : Colors.grey.withOpacity(0.07),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: _etendreAuxNonDS
+                        ? primaryColor.withOpacity(0.3)
+                        : Colors.grey.withOpacity(0.2),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            (langUserPhone == "fr")
+                                ? "Étendre aux contacts non-DS"
+                                : "Extend to non-DS contacts",
+                            style: GoogleFonts.poppins(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 14,
+                              color: _etendreAuxNonDS
+                                  ? primaryColor
+                                  : Colors.grey[700],
+                            ),
+                          ),
+                          SizedBox(height: 3),
+                          Text(
+                            (langUserPhone == "fr")
+                                ? "Fusionner aussi les doublons dans vos contacts personnels."
+                                : "Also merge duplicates in your personal contacts.",
+                            style: GoogleFonts.poppins(
+                              fontSize: 12,
+                              color: Colors.grey[500],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Switch(
+                      value: _etendreAuxNonDS,
+                      onChanged: _enCour
+                          ? null
+                          : (val) => setState(() => _etendreAuxNonDS = val),
+                      activeColor: primaryColor,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            SizedBox(height: 20),
 
             // --- BOUTON D'ACTION ---
             FadeInUp(
@@ -393,9 +467,7 @@ class _PageDepartState extends State<PageDepart> {
                   onPressed: _enCour
                       ? null
                       : () async {
-                          // Note: Votre fonction synchroAvanceFunction devra maintenant
-                          // mettre à jour `_progress` et `textChargementEvolution`
-                          await synchroAvanceFunction();
+                          await synchroAvanceFunction(_etendreAuxNonDS);
                         },
                   icon: _enCour
                       ? Container()
