@@ -548,9 +548,16 @@ class _ActuPageState extends State<ActuPage> {
     if ((data["contactsAdd"]).length >= 1) {
       for (var contactAdd in data["contactsAdd"]) {
         if ((await SQLHelper.getOneNumsTelUser(contactAdd['tel'])).isEmpty) {
+          final String tel = contactAdd["tel"];
+          final String telSansPlus = tel.replaceAll("+", "");
+          final List<Phone> phonesList = [Phone(tel)];
+          if (tel.startsWith("+229") && !tel.startsWith("+22901")) {
+            final String afterCode = tel.substring(4);
+            phonesList.add(Phone("+22901$afterCode"));
+          }
           final newContact = Contact()
-            ..name.first = contactAdd["nom"] + " #DS"
-            ..phones = [Phone(contactAdd["tel"])];
+            ..name.first = "${contactAdd["nom"]} - ${contactAdd["pseudo"]} - $telSansPlus #DS"
+            ..phones = phonesList;
           await newContact.insert();
           await insertNumTelUserIntoDataBase(contactAdd["tel"]);
         }
