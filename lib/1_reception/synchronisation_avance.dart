@@ -420,8 +420,8 @@ class _PageDepartState extends State<PageDepart> {
                         children: [
                           Text(
                             (langUserPhone == "fr")
-                                ? "Étendre aux contacts non-DS"
-                                : "Extend to non-DS contacts",
+                                ? "Nettoyer aussi mes contacts personnels"
+                                : "Also clean my personal contacts",
                             style: GoogleFonts.poppins(
                               fontWeight: FontWeight.w600,
                               fontSize: 14,
@@ -433,8 +433,8 @@ class _PageDepartState extends State<PageDepart> {
                           SizedBox(height: 3),
                           Text(
                             (langUserPhone == "fr")
-                                ? "Fusionner aussi les doublons dans vos contacts personnels."
-                                : "Also merge duplicates in your personal contacts.",
+                                ? "Supprimer aussi les doublons dans les contacts qui ne viennent pas de Dressur."
+                                : "Also remove duplicates in contacts that don't come from Dressur.",
                             style: GoogleFonts.poppins(
                               fontSize: 12,
                               color: Colors.grey[500],
@@ -454,7 +454,68 @@ class _PageDepartState extends State<PageDepart> {
                 ),
               ),
             ),
-            SizedBox(height: 20),
+            SizedBox(height: 12),
+
+            // --- ENCART "CE QUE VA FAIRE LA SYNCHRO" ---
+            FadeInUp(
+              from: 20,
+              duration: Duration(milliseconds: 500),
+              delay: Duration(milliseconds: 560),
+              child: Container(
+                width: double.infinity,
+                padding: EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: Colors.blue.withOpacity(0.05),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.blue.withOpacity(0.15)),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        FaIcon(FontAwesomeIcons.circleInfo,
+                            size: 14, color: Colors.blue[600]),
+                        SizedBox(width: 8),
+                        Text(
+                          (langUserPhone == "fr")
+                              ? "Ce que va faire la synchronisation :"
+                              : "What the synchronization will do:",
+                          style: GoogleFonts.poppins(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.blue[700],
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 8),
+                    _buildInfoRow(
+                      (langUserPhone == "fr")
+                          ? _etendreAuxNonDS
+                              ? "Fusionner les doublons parmi TOUS vos contacts (Dressur + personnels)"
+                              : "Fusionner les doublons parmi vos contacts Dressur"
+                          : _etendreAuxNonDS
+                              ? "Merge duplicates among ALL your contacts (Dressur + personal)"
+                              : "Merge duplicates among your Dressur contacts",
+                    ),
+                    SizedBox(height: 4),
+                    _buildInfoRow(
+                      (langUserPhone == "fr")
+                          ? "Créer les nouveaux contacts Dressur manquants dans votre téléphone"
+                          : "Create missing new Dressur contacts on your phone",
+                    ),
+                    SizedBox(height: 4),
+                    _buildInfoRow(
+                      (langUserPhone == "fr")
+                          ? "Mettre à jour le nom des contacts Dressur déjà enregistrés"
+                          : "Update the name of already saved Dressur contacts",
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            SizedBox(height: 16),
 
             // --- BOUTON D'ACTION ---
             FadeInUp(
@@ -528,6 +589,27 @@ class _PageDepartState extends State<PageDepart> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildInfoRow(String text) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(top: 2.0),
+          child: FaIcon(FontAwesomeIcons.circleCheck,
+              size: 13, color: Colors.blue[400]),
+        ),
+        SizedBox(width: 8),
+        Expanded(
+          child: Text(
+            text,
+            style: GoogleFonts.poppins(
+                fontSize: 12, color: Colors.blue[800]),
+          ),
+        ),
+      ],
     );
   }
 
