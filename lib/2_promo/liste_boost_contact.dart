@@ -246,7 +246,7 @@ class _ListeBoostContactPageState extends State<ListeBoostContactPage> {
         ],
       ),
       body: _loading
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator(color: primaryColor))
           : _boosts.isEmpty
               ? Center(
                   child: Text(
