@@ -310,14 +310,30 @@ class _PreferencePageState extends State<PreferencePage> {
                     FaIcon(FontAwesomeIcons.globe,
                         color: primaryColor, size: 28),
                     SizedBox(width: 12),
-                    Text(
-                      (langUserPhone == "fr")
-                          ? "Vos Pays Cibles"
-                          : "Your Target Countries",
-                      style: GoogleFonts.poppins(
-                        color: isDark ? Colors.white : Colors.black87,
-                        fontWeight: FontWeight.w600,
-                        fontSize: 18,
+                    Expanded(
+                      child: Text(
+                        (langUserPhone == "fr")
+                            ? "Pays ciblés"
+                            : "Target countries",
+                        style: GoogleFonts.poppins(
+                          color: isDark ? Colors.white : Colors.black87,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 18,
+                        ),
+                      ),
+                    ),
+                    ElevatedButton.icon(
+                      onPressed: onEdit,
+                      icon: FaIcon(FontAwesomeIcons.pen, size: 14),
+                      label: Text(
+                        (langUserPhone == "fr") ? 'Modifier' : 'Edit',
+                        style: GoogleFonts.poppins(fontWeight: FontWeight.w600, fontSize: 13),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: primaryColor,
+                        foregroundColor: Colors.white,
+                        padding: EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                       ),
                     ),
                   ],
@@ -370,28 +386,6 @@ class _PreferencePageState extends State<PreferencePage> {
                   ),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                ),
-                SizedBox(height: 15),
-
-                // --- BOUTON D'ACTION ---
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: ElevatedButton.icon(
-                    onPressed: onEdit,
-                    icon: FaIcon(FontAwesomeIcons.pen, size: 18),
-                    label: Text(
-                      (langUserPhone == "fr") ? 'Modifier' : 'Edit',
-                      style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: primaryColor,
-                      foregroundColor: Colors.white,
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12)),
-                    ),
-                  ),
                 ),
               ],
             ),
