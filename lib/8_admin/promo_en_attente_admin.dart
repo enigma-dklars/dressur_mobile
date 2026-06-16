@@ -164,7 +164,7 @@ class _AdminPromoEnAttentePageState extends State<AdminPromoEnAttentePage> {
                 aspectRatio: 4 / 3,
                 child: Container(
                   color: isDark ? Colors.grey[850] : Colors.grey[200],
-                  child: const Center(child: CircularProgressIndicator()),
+                  child: const Center(child: CircularProgressIndicator(color: primaryColor)),
                 ),
               ),
               errorWidget: (_, __, ___) => AspectRatio(
@@ -241,7 +241,7 @@ class _AdminPromoEnAttentePageState extends State<AdminPromoEnAttentePage> {
 
                 // ── Boutons ──
                 if (isProcessing)
-                  const Center(child: CircularProgressIndicator())
+                  const Center(child: CircularProgressIndicator(color: primaryColor))
                 else
                   Row(
                     children: [
@@ -356,7 +356,7 @@ class _AdminPromoEnAttentePageState extends State<AdminPromoEnAttentePage> {
         ],
       ),
       body: _loading
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator(color: primaryColor))
           : _promotions.isEmpty
               ? Center(
                   child: Column(
