@@ -1697,30 +1697,10 @@ class AdvertisementDetailPage extends StatelessWidget {
   }
 
   void openWhatsAppChat() async {
-    final String message = (langUserPhone == "fr")
-        ? "Je suis intéressé par cette promotion affaire"
-        : "I am interested in this business promotion";
-
-    try {
-      final response = await http.get(Uri.parse(advertisement.image));
-      if (response.statusCode == 200) {
-        final tempDir = await getTemporaryDirectory();
-        final file = File('${tempDir.path}/promo_${advertisement.id}.jpg');
-        await file.writeAsBytes(response.bodyBytes);
-        await Share.shareXFiles(
-          [XFile(file.path)],
-          text: message,
-        );
-      } else {
-        final encodedText = Uri.encodeComponent(message);
-        final url = 'https://wa.me/${advertisement.whatsappNumber}?text=$encodedText';
-        await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
-      }
-    } catch (_) {
-      final encodedText = Uri.encodeComponent(message);
-      final url = 'https://wa.me/${advertisement.whatsappNumber}?text=$encodedText';
-      await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
-    }
+    await launchUrl(
+      Uri.parse('https://wa.me/${advertisement.whatsappNumber}'),
+      mode: LaunchMode.externalApplication,
+    );
   }
 
   void _showRewardInfo(BuildContext context) {
