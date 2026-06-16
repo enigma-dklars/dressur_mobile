@@ -430,7 +430,7 @@ class _RegisterForm3State extends State<RegisterForm3> {
         children: [
           _loading_liste_formule
               ? const Center(
-                  child: CircularProgressIndicator(),
+                  child: CircularProgressIndicator(color: primaryColor),
                 )
               : listSocialNetworks.isEmpty
                   ? Center(
