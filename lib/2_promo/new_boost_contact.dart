@@ -245,6 +245,7 @@ class _RegisterFormState extends State<RegisterForm> {
           var data1 = await response.stream.bytesToString();
           var data = convert.jsonDecode(data1);
           if (data["error"] == false) {
+            cancelBoostReminderNotification();
             setState(() {
               _desactive = false;
               ScaffoldMessenger.of(context).showSnackBar(SnackBar(
