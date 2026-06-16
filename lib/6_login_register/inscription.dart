@@ -13,6 +13,7 @@ import 'dart:convert' as convert;
 // --- Importez vos pages et constantes ---
 import 'package:dressur/components/constant.dart';
 import 'package:dressur/components/noti.dart';
+import 'package:dressur/components/noti_sys.dart';
 import 'package:dressur/components/bottomBar.dart';
 import 'package:dressur/5_autre/support_assistance.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -157,6 +158,7 @@ class _RegisterFormState extends State<RegisterForm> {
       if (response.statusCode == 200 && data["error"] == false) {
         modeReconnaissanceContactArrierePlan = true;
         isNouvelUtilisateur = true;
+        scheduleBoostReminderNotification();
         initUserInformations(data['user']);
         Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(builder: (context) => const BottomBar()),
