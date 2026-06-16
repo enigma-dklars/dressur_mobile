@@ -1,5 +1,6 @@
 // ignore_for_file: use_build_context_synchronously, prefer_const_constructors
 
+import 'package:animate_do/animate_do.dart';
 import 'package:dressur/5_autre/suggestions.dart';
 import 'package:dressur/components/sociaux.dart';
 import 'package:flutter/material.dart';
@@ -27,6 +28,9 @@ class SettingPage extends StatefulWidget {
 }
 
 class _SettingPageState extends State<SettingPage> {
+  bool _deletingDS = false;
+  double _deleteProgress = 0.0;
+  String _deleteStatusText = "";
 
   // --- LOGIQUE DES ACTIONS (pour garder le build() propre) ---
   void _handleDeleteDSContacts() async {
@@ -72,32 +76,35 @@ class _SettingPageState extends State<SettingPage> {
       return;
     }
 
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      behavior: SnackBarBehavior.floating,
-      duration: const Duration(minutes: 1),
-      content: Text(
-        (langUserPhone == "fr")
-            ? "${dsContacts.length} contact(s) DS détecté(s). Suppression en cours…\n\nPatientez tout le long du processus.\n\nCe processus peut durer plusieurs minutes."
-            : "${dsContacts.length} DS contact(s) detected. Deletion in progress…\n\nWait all the way through the process.\n\nThis process may take several minutes.",
-      ),
-    ));
+    final int total = dsContacts.length;
+    setState(() {
+      _deletingDS = true;
+      _deleteProgress = 0.0;
+      _deleteStatusText = (langUserPhone == "fr")
+          ? "$total contact(s) DS détecté(s). Suppression en cours…"
+          : "$total DS contact(s) detected. Deletion in progress…";
+    });
 
     int supprimés = 0;
-    int restant = dsContacts.length;
     for (var contact in dsContacts) {
       await contact.delete();
       supprimés++;
-      restant--;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        behavior: SnackBarBehavior.floating,
-        content: Text((langUserPhone == "fr")
-            ? "$restant contact(s) DS restant à supprimer."
-            : "$restant DS contact(s) remaining to delete."),
-      ));
+      setState(() {
+        _deleteProgress = supprimés / total;
+        _deleteStatusText = (langUserPhone == "fr")
+            ? "Suppression… ($supprimés / $total)"
+            : "Deleting… ($supprimés / $total)";
+      });
     }
+
+    setState(() {
+      _deletingDS = false;
+      _deleteProgress = 1.0;
+    });
 
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       behavior: SnackBarBehavior.floating,
+      backgroundColor: Colors.green[700],
       content: Text(
         (langUserPhone == "fr")
             ? "$supprimés contact(s) DS supprimé(s) avec succès."
@@ -171,6 +178,61 @@ class _SettingPageState extends State<SettingPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // --- BARRE DE PROGRESSION SUPPRESSION DS ---
+              if (_deletingDS)
+                FadeIn(
+                  duration: Duration(milliseconds: 300),
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+                    child: Container(
+                      padding: EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.orange.withOpacity(0.07),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: Colors.orange.withOpacity(0.3)),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              FaIcon(FontAwesomeIcons.broom,
+                                  size: 14, color: Colors.orange[700]),
+                              SizedBox(width: 8),
+                              Text(
+                                (langUserPhone == "fr")
+                                    ? "Suppression des contacts DS…"
+                                    : "Deleting DS contacts…",
+                                style: GoogleFonts.poppins(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.orange[700],
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 10),
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(10),
+                            child: LinearProgressIndicator(
+                              value: _deleteProgress,
+                              minHeight: 8,
+                              backgroundColor: Colors.grey[200],
+                              color: Colors.orange[700],
+                            ),
+                          ),
+                          SizedBox(height: 8),
+                          Text(
+                            _deleteStatusText,
+                            style: GoogleFonts.poppins(
+                                fontSize: 13, color: Colors.grey[600]),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+
               // --- SECTION COMPTE ---
               _buildSectionTitle(
                   (langUserPhone == "fr") ? "Mon Compte" : "My Account"),
@@ -233,8 +295,8 @@ class _SettingPageState extends State<SettingPage> {
                   (langUserPhone == "fr")
                       ? "Supprimer les contacts DS"
                       : "Delete DS Contacts",
-                  _handleDeleteDSContacts,
-                  color: Colors.orange[700],
+                  _deletingDS ? null : _handleDeleteDSContacts,
+                  color: _deletingDS ? Colors.grey : Colors.orange[700],
                 ),
                 _buildMenuRow(
                   FontAwesomeIcons.trash,
@@ -351,7 +413,7 @@ class _SettingPageState extends State<SettingPage> {
     );
   }
 
-  Widget _buildMenuRow(IconData icon, String text, VoidCallback onTap,
+  Widget _buildMenuRow(IconData icon, String text, VoidCallback? onTap,
       {Color? color}) {
     return InkWell(
       onTap: onTap,
