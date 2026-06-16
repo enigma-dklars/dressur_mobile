@@ -1,11 +1,8 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'dart:convert';
-import 'package:dressur/components/noti.dart';
-import 'package:dressur/components/sql_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:dressur/components/constant.dart';
@@ -73,10 +70,6 @@ class _AutreProfilPageState extends State<AutreProfilPage> {
           // autre_profilePic = userAutreInfos["profilePic"];
           // autre_bannerPic = userAutreInfos["bannerPic"];
           _loading = false;
-          if (addUserOnAutreProfilPage == "oui") {
-            addUserContact(autre_tel, autre_nom, context);
-          }
-          addUserOnAutreProfilPage = "oui";
         });
       } else {
         setState(() {
@@ -121,65 +114,6 @@ class _AutreProfilPageState extends State<AutreProfilPage> {
           );
         },
       );
-    }
-  }
-
-  void addUserContact(tel, pseudo, context) async {
-    var request = http.MultipartRequest('POST',
-        Uri.parse('$generalRouteForApi/addUserContactAfterScanneQRCode'));
-    request.fields.addAll({
-      'uid': uidUser,
-      'langUserPhone': langUserPhone.toString(),
-      'tel': tel
-    });
-
-    http.StreamedResponse response = await request.send();
-
-    if (response.statusCode == 200) {
-      var data1 = await response.stream.bytesToString();
-      var data = jsonDecode(data1);
-      if (data["error"] == true) {
-        dangerNoti(data["titre"], data["message"], context);
-      } else {
-        insertContact(tel, pseudo);
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          backgroundColor: Colors.green,
-          behavior: SnackBarBehavior.floating,
-          duration: const Duration(seconds: 5),
-          padding: const EdgeInsets.fromLTRB(5, 20, 5, 20),
-          content: Text(
-            (langUserPhone == "fr")
-                ? 'ADD $pseudo avec succès.'
-                : 'ADD $pseudo successfully.',
-            style: GoogleFonts.poppins(
-              fontWeight: FontWeight.w600,
-              fontSize: 20,
-              color: Colors.white,
-            ),
-            textAlign: TextAlign.center,
-          ),
-        ));
-      }
-    }
-  }
-
-  void insertContact(tel, pseudo) async {
-    if ((await SQLHelper.getOneNumsTelUser(tel)).isEmpty) {
-      final String telStr = (tel ?? "").toString();
-      if (telStr.isEmpty) return;
-      final String telSansPlus = telStr.replaceAll("+", "");
-      final List<Phone> phonesList = [Phone(telStr)];
-      if (telStr.startsWith("+229") && !telStr.startsWith("+22901")) {
-        final String afterCode = telStr.substring(4);
-        phonesList.add(Phone("+22901$afterCode"));
-      }
-      final String pseudoStr = (pseudo ?? "").toString().trim();
-      final List<String> nameParts = [pseudoStr, telSansPlus].where((s) => s.isNotEmpty).toList();
-      final newContact = Contact()
-        ..name.first = "${nameParts.join(" - ")} #DS"
-        ..phones = phonesList;
-      await newContact.insert();
-      await insertNumTelUserIntoDataBase(tel);
     }
   }
 
