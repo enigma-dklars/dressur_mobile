@@ -156,6 +156,8 @@ class _PreferencePageState extends State<PreferencePage> {
             child: Column(
               children: [
                 const SizedBox(height: 10),
+                _buildAddPageActuCard(context: context),
+                const SizedBox(height: 10),
                 _buildCountryPreferenceCard(
                   context: context,
                   selectedCountriesText: preferencePaysText.toString(),
@@ -166,8 +168,6 @@ class _PreferencePageState extends State<PreferencePage> {
                     );
                   },
                 ),
-                const SizedBox(height: 10),
-                _buildAddPageActuCard(context: context),
                 const SizedBox(height: 10),
                 SociauxPage(),
                 const SizedBox(height: 10),
