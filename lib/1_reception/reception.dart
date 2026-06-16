@@ -112,6 +112,21 @@ class _ReceptionPageState extends State<ReceptionPage> {
               const SizedBox(height: 10),
               _buildNavigationItem(
                 context: context,
+                icon: FontAwesomeIcons.solidAddressBook,
+                title: "Contacts",
+                subtitle: (langUserPhone == "fr")
+                    ? "Gérez vos contacts ajoutés et scannés"
+                    : "Manage your added and scanned contacts",
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => ContactPage()),
+                  );
+                },
+              ),
+              const SizedBox(height: 10),
+              _buildNavigationItem(
+                context: context,
                 icon: FontAwesomeIcons.trophy,
                 title: "Récompenses",
                 subtitle: (langUserPhone == "fr")
@@ -125,21 +140,6 @@ class _ReceptionPageState extends State<ReceptionPage> {
                           ? ProgrammeRecompenseDashboard()
                           : ProgrammeRecompensePage(optionPage: false),
                     ),
-                  );
-                },
-              ),
-              const SizedBox(height: 10),
-              _buildNavigationItem(
-                context: context,
-                icon: FontAwesomeIcons.solidAddressBook,
-                title: "Contacts",
-                subtitle: (langUserPhone == "fr")
-                    ? "Gérez vos contacts ajoutés et scannés"
-                    : "Manage your added and scanned contacts",
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => ContactPage()),
                   );
                 },
               ),

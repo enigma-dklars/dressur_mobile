@@ -83,8 +83,7 @@ class _ContactPageState extends State<ContactPage> {
         _isLoading = false;
         _contacts = contacts;
         nombreContacts = contacts.length;
-        _filteredContacts =
-            List.from(_contacts); // Initialiser avec tous les contacts
+        _filteredContacts = List.from(_contacts);
       });
     } else {
       showDialog(
@@ -136,6 +135,23 @@ class _ContactPageState extends State<ContactPage> {
             contact.tel.toLowerCase().contains(query);
       }).toList();
     });
+  }
+
+  String _getInitials(ContactDS contact) {
+    final String name = (contact.nom.isNotEmpty ? contact.nom : contact.pseudo).trim();
+    final List<String> parts = name.split(" ").where((p) => p.isNotEmpty).toList();
+    if (parts.isEmpty) return "?";
+    if (parts.length == 1) return parts[0][0].toUpperCase();
+    return (parts[0][0] + parts[1][0]).toUpperCase();
+  }
+
+  String _buildDisplayName(ContactDS contact) {
+    final hasNom = contact.nom.isNotEmpty;
+    final hasPseudo = contact.pseudo.isNotEmpty;
+    if (hasNom && hasPseudo) return "${contact.nom} - ${contact.pseudo}";
+    if (hasNom) return contact.nom;
+    if (hasPseudo) return contact.pseudo;
+    return "—";
   }
 
   @override
@@ -240,9 +256,7 @@ class _ContactPageState extends State<ContactPage> {
       ),
       body: Column(
         children: [
-          // --- BARRE DE RECHERCHE AMÉLIORÉE ---
           _buildSearchBar(),
-          // --- AFFICHAGE CONDITIONNEL ---
           Expanded(
             child: _isLoading
                 ? const Center(child: CircularProgressIndicator(color: primaryColor))
@@ -255,11 +269,9 @@ class _ContactPageState extends State<ContactPage> {
     );
   }
 
-  // --- WIDGETS DE CONSTRUCTION ---
-
   Widget _buildSearchBar() {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
+      padding: const EdgeInsets.fromLTRB(10, 10, 10, 6),
       child: TextField(
         controller: _searchController,
         style: GoogleFonts.poppins(),
@@ -268,18 +280,14 @@ class _ContactPageState extends State<ContactPage> {
               ? "Rechercher par nom, pseudo..."
               : "Search by name, pseudo...",
           hintStyle: GoogleFonts.poppins(color: Colors.grey[500]),
-
-          // Utilisez `prefix` au lieu de `prefixIcon`
           prefixIcon: Padding(
             padding: const EdgeInsets.only(left: 20, right: 13, top: 14),
             child: FaIcon(
               FontAwesomeIcons.magnifyingGlass,
               color: Colors.grey[500],
-              size:
-                  20, // J'ai légèrement réduit la taille pour un meilleur alignement vertical
+              size: 18,
             ),
           ),
-
           filled: true,
           fillColor: Theme.of(context).brightness == Brightness.dark
               ? Colors.grey[850]
@@ -288,9 +296,7 @@ class _ContactPageState extends State<ContactPage> {
             borderRadius: BorderRadius.circular(15),
             borderSide: BorderSide.none,
           ),
-
-          // Le contentPadding horizontal est maintenant géré par le Padding du widget `prefix`
-          contentPadding: EdgeInsets.symmetric(vertical: 14),
+          contentPadding: EdgeInsets.symmetric(vertical: 12),
         ),
       ),
     );
@@ -302,7 +308,7 @@ class _ContactPageState extends State<ContactPage> {
       color: primaryColor,
       child: ListView.builder(
         physics: BouncingScrollPhysics(),
-        padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+        padding: EdgeInsets.symmetric(horizontal: 10, vertical: 4),
         itemCount: _filteredContacts.length,
         itemBuilder: (context, index) {
           final contact = _filteredContacts[index];
@@ -315,44 +321,43 @@ class _ContactPageState extends State<ContactPage> {
   Widget _buildContactCard(ContactDS contact) {
     return Card(
       elevation: 0.5,
-      margin: EdgeInsets.only(bottom: 12),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      margin: EdgeInsets.only(bottom: 8),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(13)),
       child: Padding(
-        padding: const EdgeInsets.all(12.0),
+        padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 8.0),
         child: Column(
           children: [
-            // --- PARTIE HAUTE : AVATAR, NOM, PSEUDO ---
             Row(
               children: [
                 CircleAvatar(
-                  radius: 28,
-                  backgroundImage:
-                      AssetImage("images-pays/${contact.pays}.png"),
-                  onBackgroundImageError: (e, s) => print("Erreur image"),
-                  child: AssetImage("images-pays/${contact.pays}.png") == null
-                      ? Image.asset("images-pays/no_pays.png")
-                      : null,
+                  radius: 22,
+                  backgroundColor: primaryColor,
+                  child: Text(
+                    _getInitials(contact),
+                    style: GoogleFonts.poppins(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
                 ),
-                SizedBox(width: 12),
+                SizedBox(width: 10),
                 Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(contact.nom,
-                          style: GoogleFonts.poppins(
-                              fontSize: 17, fontWeight: FontWeight.bold),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis),
-                      if (contact.pseudo != null && contact.pseudo.isNotEmpty)
-                        Text("@${contact.pseudo}",
-                            style: GoogleFonts.poppins(
-                                fontSize: 14, color: Colors.grey[600])),
-                    ],
+                  child: Text(
+                    _buildDisplayName(contact),
+                    style: GoogleFonts.poppins(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
                 IconButton(
+                  padding: EdgeInsets.zero,
+                  constraints: BoxConstraints(),
                   icon: FaIcon(FontAwesomeIcons.circleInfo,
-                      color: Colors.grey[400]),
+                      color: Colors.grey[400], size: 18),
                   onPressed: () {
                     uidAutreUser = contact.id;
                     addUserOnAutreProfilPage = "non";
@@ -362,8 +367,7 @@ class _ContactPageState extends State<ContactPage> {
                 ),
               ],
             ),
-            Divider(height: 20, thickness: 0.5),
-            // --- PARTIE BASSE : ACTIONS ---
+            Divider(height: 12, thickness: 0.5),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
@@ -391,8 +395,10 @@ class _ContactPageState extends State<ContactPage> {
       {required IconData icon, required VoidCallback onTap}) {
     return IconButton(
       onPressed: onTap,
-      icon: FaIcon(icon, color: primaryColor, size: 22),
-      splashRadius: 24,
+      icon: FaIcon(icon, color: primaryColor, size: 18),
+      splashRadius: 20,
+      padding: EdgeInsets.symmetric(vertical: 4),
+      constraints: BoxConstraints(),
     );
   }
 
@@ -418,5 +424,4 @@ class _ContactPageState extends State<ContactPage> {
       ),
     );
   }
-
 }
