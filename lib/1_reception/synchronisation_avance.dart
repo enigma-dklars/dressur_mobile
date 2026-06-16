@@ -33,6 +33,10 @@ class _PageDepartState extends State<PageDepart> {
   bool _enCour = false;
   double _progress = 0.0;
   bool _etendreAuxNonDS = false;
+  int _nbCreated = 0;
+  int _nbUpdated = 0;
+  int _nbMerged = 0;
+  bool _showSummary = false;
 
   String _normalizeNumber(String tel) {
     final String n = tel.replaceAll(" ", "").replaceAll("-", "");
@@ -80,6 +84,10 @@ class _PageDepartState extends State<PageDepart> {
     setState(() {
       _enCour = true;
       _progress = 0.0;
+      _nbCreated = 0;
+      _nbUpdated = 0;
+      _nbMerged = 0;
+      _showSummary = false;
       textChargementEvolution = (langUserPhone == "fr")
           ? "Recherche de vos Contacts DS..."
           : "Finding your DS Contacts...";
@@ -142,6 +150,7 @@ class _PageDepartState extends State<PageDepart> {
 
           setState(() {
             _progress = 0.3;
+            _nbMerged = deletedCount;
             if (toDeleteList.isEmpty) {
               textChargementEvolution = (langUserPhone == "fr")
                   ? "Aucun doublon détecté."
@@ -211,6 +220,7 @@ class _PageDepartState extends State<PageDepart> {
                 ..phones = phonesList;
               await newContact.insert();
               await insertNumTelUserIntoDataBase(tel);
+              _nbCreated++;
             } else {
               // Contact présent → mettre à jour le nom si nécessaire
               final Contact? existing =
@@ -219,6 +229,7 @@ class _PageDepartState extends State<PageDepart> {
                 existing.name.first = expectedName;
                 existing.phones = phonesList;
                 await existing.update();
+                _nbUpdated++;
               }
             }
 
@@ -234,6 +245,7 @@ class _PageDepartState extends State<PageDepart> {
           setState(() {
             _enCour = false;
             _progress = 1.0;
+            _showSummary = true;
             textChargementEvolution = (langUserPhone == "fr")
                 ? "Synchronisation terminée avec succès !"
                 : "Synchronization completed successfully!";
@@ -568,7 +580,7 @@ class _PageDepartState extends State<PageDepart> {
                       ClipRRect(
                         borderRadius: BorderRadius.circular(10),
                         child: LinearProgressIndicator(
-                          value: _progress, // Doit être entre 0.0 et 1.0
+                          value: _progress,
                           minHeight: 8,
                           backgroundColor: Colors.grey[200],
                           color: primaryColor,
@@ -586,9 +598,85 @@ class _PageDepartState extends State<PageDepart> {
                   ),
                 ),
               ),
+
+            // --- RÉSUMÉ FINAL ---
+            if (_showSummary && !_enCour)
+              FadeInUp(
+                duration: Duration(milliseconds: 400),
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: 20.0),
+                  child: Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.green[50],
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.green.withOpacity(0.3)),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            FaIcon(FontAwesomeIcons.circleCheck,
+                                color: Colors.green[700], size: 16),
+                            SizedBox(width: 8),
+                            Text(
+                              (langUserPhone == "fr")
+                                  ? "Résumé de la synchronisation"
+                                  : "Sync Summary",
+                              style: GoogleFonts.poppins(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 14,
+                                color: Colors.green[800],
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 12),
+                        _buildSummaryRow(
+                          FontAwesomeIcons.userPlus,
+                          _nbCreated,
+                          (langUserPhone == "fr")
+                              ? "contact(s) créé(s)"
+                              : "contact(s) created",
+                        ),
+                        SizedBox(height: 6),
+                        _buildSummaryRow(
+                          FontAwesomeIcons.penToSquare,
+                          _nbUpdated,
+                          (langUserPhone == "fr")
+                              ? "contact(s) mis à jour"
+                              : "contact(s) updated",
+                        ),
+                        SizedBox(height: 6),
+                        _buildSummaryRow(
+                          FontAwesomeIcons.codeMerge,
+                          _nbMerged,
+                          (langUserPhone == "fr")
+                              ? "doublon(s) fusionné(s)"
+                              : "duplicate(s) merged",
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildSummaryRow(IconData icon, int count, String label) {
+    return Row(
+      children: [
+        FaIcon(icon, size: 14, color: Colors.green[600]),
+        SizedBox(width: 10),
+        Text(
+          '$count $label',
+          style: GoogleFonts.poppins(fontSize: 13, color: Colors.green[800]),
+        ),
+      ],
     );
   }
 
