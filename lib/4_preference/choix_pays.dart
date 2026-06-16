@@ -211,7 +211,7 @@ class _ChoixDesPaysState extends State<ChoixDesPays> {
           ),
           _countries.isEmpty
               ? const Center(
-                  child: CircularProgressIndicator(),
+                  child: CircularProgressIndicator(color: primaryColor),
                 )
               : Expanded(
                   child: ListView.builder(
