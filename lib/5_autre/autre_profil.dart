@@ -17,7 +17,6 @@ class AutreProfilPage extends StatefulWidget {
 class _AutreProfilPageState extends State<AutreProfilPage> {
   static const espaceEntreLesOptionsContact = 10.0;
   bool _loading = false;
-  bool _firstLoad = true;
   var autre_name_complete;
   var autre_avatar;
   var autre_banniere;
@@ -120,6 +119,9 @@ class _AutreProfilPageState extends State<AutreProfilPage> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      fetchAutreProfil();
+    });
   }
 
   String _getInitials() {
@@ -132,15 +134,6 @@ class _AutreProfilPageState extends State<AutreProfilPage> {
 
   @override
   Widget build(BuildContext context) {
-    if (_firstLoad) {
-      WidgetsBinding.instance.addPostFrameCallback((_) async {
-        fetchAutreProfil();
-        setState(() {
-          _firstLoad = false;
-        });
-      });
-    }
-
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
@@ -158,7 +151,7 @@ class _AutreProfilPageState extends State<AutreProfilPage> {
           ),
         ),
       ),
-      body: (_firstLoad || _loading)
+      body: _loading
           ? Center(child: CircularProgressIndicator(color: primaryColor))
           : SingleChildScrollView(
               physics: const BouncingScrollPhysics(),
