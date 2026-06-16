@@ -543,7 +543,7 @@ class _PromotionListPageState extends State<PromotionListPage> {
         ],
       ),
       body: _loading
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator(color: primaryColor))
           : _promotions.isEmpty
               ? Center(
                   child: Text(
@@ -1141,7 +1141,7 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             loading_formule_payant
-                ? const Center(child: CircularProgressIndicator())
+                ? const Center(child: CircularProgressIndicator(color: primaryColor))
                 : SelectFormField(
                     decoration: const InputDecoration(
                         labelText: 'Formule de Boost',
