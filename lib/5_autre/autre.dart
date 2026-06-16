@@ -141,7 +141,7 @@ class _SettingPageState extends State<SettingPage> {
           elevation: 0,
           backgroundColor: primaryColor,
           title: Text(
-            (langUserPhone == "fr") ? "Autres Pages" : "Other Pages",
+            (langUserPhone == "fr") ? "Paramètres" : "Settings",
             style: GoogleFonts.poppins(
               color: Colors.white,
               fontWeight: FontWeight.w400,
