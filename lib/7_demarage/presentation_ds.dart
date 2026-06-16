@@ -66,9 +66,19 @@ final List<_SlideData> _slides = [
     titleFr: 'Promeut ton business',
     titleEn: 'Promote your business',
     descFr:
-        'Fais connaître tes services, produits\nou ton réseau social à grande échelle.',
+        'Fais connaître tes services et produits\nà des milliers de personnes ciblées.',
     descEn:
-        'Share your services, products\nor social media at scale.',
+        'Promote your services and products\nto thousands of targeted users.',
+  ),
+  _SlideData(
+    icon: FontAwesomeIcons.thumbsUp,
+    accent: Color(0xFFE91E8C),
+    titleFr: 'Booste tes réseaux sociaux',
+    titleEn: 'Boost your social media',
+    descFr:
+        'Gagne des abonnés, des vues et des likes\nsur TikTok, Instagram et YouTube.',
+    descEn:
+        'Gain followers, views and likes\non TikTok, Instagram and YouTube.',
   ),
 ];
 
@@ -80,7 +90,7 @@ class PresentationPage extends StatefulWidget {
 class _PresentationPageState extends State<PresentationPage> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
-  final int _totalPages = 4;
+  final int _totalPages = 5;
 
   Future<bool> _onWillPop() async => false;
 
