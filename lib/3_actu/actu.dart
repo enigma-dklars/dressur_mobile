@@ -236,7 +236,7 @@ class _ActuPageState extends State<ActuPage> {
         enableDrag: false,
         isScrollControlled: true,
         backgroundColor: Colors.transparent,
-        builder: (_) => const _WarningBottomSheet(),
+        builder: (_) => _WarningBottomSheet(totalSeconds: duree),
       );
     }
 
