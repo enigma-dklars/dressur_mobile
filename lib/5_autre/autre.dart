@@ -70,55 +70,64 @@ class _SettingPageState extends State<SettingPage> {
           type: ArtSweetAlertType.warning),
     );
 
-    if (response.isTapConfirmButton) {
-      if (contactsEnregistrer.isNotEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          behavior: SnackBarBehavior.floating,
-          duration: const Duration(minutes: 1),
-          content: Text(
-            (langUserPhone == "fr")
-                ? "Dressur vas parcourir vos contacts un a un et supprimer les contacts DS.\n\nPatientez tous le long du processus.\n\nCe processus peut durée plusieurs minutes."
-                : "Dressur will go through your contacts one by one and delete DS contacts.\n\nWait all the way through the process.\n\nThis process may take several minutes.",
-          ),
-        ));
-        List<Contact> contacts =
-            await FlutterContacts.getContacts(withProperties: true);
-        var nombreContact = contacts.length;
-        for (var contact in contacts) {
-          for (var phone in contact.phones) {
-            var numberTel =
-                (phone.number).replaceAll(" ", "").replaceAll("-", "");
-            if (contactsEnregistrer.contains(numberTel)) {
-              await contact.delete();
-            }
-          }
-          nombreContact--;
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            behavior: SnackBarBehavior.floating,
-            content: Text((langUserPhone == "fr")
-                ? "$nombreContact contact(s) restant à parcourir."
-                : "$nombreContact contact(s) remaining to be scanned."),
-          ));
-        }
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          behavior: SnackBarBehavior.floating,
-          content: Text(
-            (langUserPhone == "fr")
-                ? "${contactsEnregistrer.length} contact(s) DS supprimer."
-                : "${contactsEnregistrer.length} DS contact(s) delete.",
-          ),
-        ));
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          behavior: SnackBarBehavior.floating,
-          content: Text(
-            (langUserPhone == "fr")
-                ? "Vous n'avez aucun contact DS actuellement. Faite un boost pour en avoir."
-                : "You don't currently have any DS Contacts. Boost to get some.",
-          ),
-        ));
-      }
+    if (!response.isTapConfirmButton) return;
+
+    // Récupère tous les contacts du téléphone (nom requis pour détecter #DS)
+    List<Contact> tousLesContacts =
+        await FlutterContacts.getContacts(withProperties: true);
+
+    // Le marqueur officiel d'un contact DS est le suffixe #DS dans le nom.
+    // On n'utilise pas contactsEnregistrer (cache SQLite) car il peut être
+    // vide ou désynchronisé, ce qui conduirait à des suppressions manquées
+    // ou, pire, à la suppression de contacts personnels partageant un numéro.
+    List<Contact> dsContacts = tousLesContacts
+        .where((c) => c.displayName.contains('#DS'))
+        .toList();
+
+    if (dsContacts.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        behavior: SnackBarBehavior.floating,
+        content: Text(
+          (langUserPhone == "fr")
+              ? "Aucun contact DS trouvé dans vos contacts."
+              : "No DS contacts found in your contacts.",
+        ),
+      ));
+      return;
     }
+
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      behavior: SnackBarBehavior.floating,
+      duration: const Duration(minutes: 1),
+      content: Text(
+        (langUserPhone == "fr")
+            ? "${dsContacts.length} contact(s) DS détecté(s). Suppression en cours…\n\nPatientez tout le long du processus.\n\nCe processus peut durer plusieurs minutes."
+            : "${dsContacts.length} DS contact(s) detected. Deletion in progress…\n\nWait all the way through the process.\n\nThis process may take several minutes.",
+      ),
+    ));
+
+    int supprimés = 0;
+    int restant = dsContacts.length;
+    for (var contact in dsContacts) {
+      await contact.delete();
+      supprimés++;
+      restant--;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        behavior: SnackBarBehavior.floating,
+        content: Text((langUserPhone == "fr")
+            ? "$restant contact(s) DS restant à supprimer."
+            : "$restant DS contact(s) remaining to delete."),
+      ));
+    }
+
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      behavior: SnackBarBehavior.floating,
+      content: Text(
+        (langUserPhone == "fr")
+            ? "$supprimés contact(s) DS supprimé(s) avec succès."
+            : "$supprimés DS contact(s) successfully deleted.",
+      ),
+    ));
   }
 
   void _handleLogout() async {
