@@ -104,10 +104,9 @@ class _BoostPageState extends State<BoostPage> {
           ],
         ),
         body: SingleChildScrollView(
-          child: Column(
-            children: [
-              SizedBox(height: 10),
-              _buildServiceCard(
+          child: Builder(
+            builder: (context) {
+              final boostContactCard = _buildServiceCard(
                 context: context,
                 icon: FontAwesomeIcons.addressBook,
                 title: "Boost Contact",
@@ -126,63 +125,76 @@ class _BoostPageState extends State<BoostPage> {
                     context,
                     MaterialPageRoute(
                         builder: (context) => ListeBoostContactPage())),
-              ),
-              SizedBox(height: 10),
-              _buildServiceCard(
-                context: context,
-                icon: FontAwesomeIcons.store,
-                title: (langUserPhone == "fr")
-                    ? "Promotion Affaire"
-                    : "Business Promotion",
-                description: (langUserPhone == "fr")
-                    ? "Faite la promotion de vos produits et services. Les utilisateurs intéressés vous contacterons."
-                    : "Promote your products and services. Interested users will contact you.",
-                primaryActionText: (langUserPhone == "fr")
-                    ? "Faire une Promo"
-                    : "Make a Promo",
-                onPrimaryAction: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => PromotionFormPage())),
-                secondaryActionText:
-                    (langUserPhone == "fr") ? "Voir la liste" : "See the list",
-                onSecondaryAction: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => PromotionListPage())),
-              ),
-              SizedBox(height: 10),
-              if (mailIsMaxxFire == false) ...[
-                _buildServiceCard(
-                  context: context,
-                  icon: FontAwesomeIcons.chartLine,
-                  title: (langUserPhone == "fr")
-                      ? "Promotion Réseau Sociaux"
-                      : "Social Network Promotion",
-                  description: (langUserPhone == "fr")
-                      ? "Payer pour des abonnés, des vues, des likes, etc. sur TikTok, Instagram, Telegram, YouTube, etc."
-                      : "Pay for subscribers, views, likes, etc. on TikTok, Instagram, Telegram, YouTube, etc.",
-                  primaryActionText:
-                      (langUserPhone == "fr") ? "Démarrer" : "To start up",
-                  onPrimaryAction: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) =>
-                              PromotionReseauSociauxFormPage())),
-                  secondaryActionText: (langUserPhone == "fr")
-                      ? "Voir la liste"
-                      : "See the list",
-                  onSecondaryAction: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) =>
-                              PromotionReseauSociauxListePage())),
-                ),
-              ],
-              const SizedBox(height: 10),
-              SociauxPage(),
-              const SizedBox(height: 10),
-            ],
+              );
+
+              return Column(
+                children: [
+                  SizedBox(height: 10),
+                  if (addPageActu) ...[
+                    boostContactCard,
+                    SizedBox(height: 10),
+                  ],
+                  _buildServiceCard(
+                    context: context,
+                    icon: FontAwesomeIcons.store,
+                    title: (langUserPhone == "fr")
+                        ? "Promotion Affaire"
+                        : "Business Promotion",
+                    description: (langUserPhone == "fr")
+                        ? "Faite la promotion de vos produits et services. Les utilisateurs intéressés vous contacterons."
+                        : "Promote your products and services. Interested users will contact you.",
+                    primaryActionText: (langUserPhone == "fr")
+                        ? "Faire une Promo"
+                        : "Make a Promo",
+                    onPrimaryAction: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => PromotionFormPage())),
+                    secondaryActionText:
+                        (langUserPhone == "fr") ? "Voir la liste" : "See the list",
+                    onSecondaryAction: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => PromotionListPage())),
+                  ),
+                  SizedBox(height: 10),
+                  if (mailIsMaxxFire == false) ...[
+                    _buildServiceCard(
+                      context: context,
+                      icon: FontAwesomeIcons.chartLine,
+                      title: (langUserPhone == "fr")
+                          ? "Promotion Réseau Sociaux"
+                          : "Social Network Promotion",
+                      description: (langUserPhone == "fr")
+                          ? "Payer pour des abonnés, des vues, des likes, etc. sur TikTok, Instagram, Telegram, YouTube, etc."
+                          : "Pay for subscribers, views, likes, etc. on TikTok, Instagram, Telegram, YouTube, etc.",
+                      primaryActionText:
+                          (langUserPhone == "fr") ? "Démarrer" : "To start up",
+                      onPrimaryAction: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  PromotionReseauSociauxFormPage())),
+                      secondaryActionText: (langUserPhone == "fr")
+                          ? "Voir la liste"
+                          : "See the list",
+                      onSecondaryAction: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  PromotionReseauSociauxListePage())),
+                    ),
+                    SizedBox(height: 10),
+                  ],
+                  if (!addPageActu) ...[
+                    boostContactCard,
+                    SizedBox(height: 10),
+                  ],
+                  SociauxPage(),
+                  const SizedBox(height: 10),
+                ],
+              );
+            },
           ),
         ),
     );
