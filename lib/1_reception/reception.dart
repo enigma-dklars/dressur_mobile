@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'dart:async';
 import 'package:dressur/1_reception/liste_contact.dart';
 import 'package:dressur/1_reception/recompense_dashboard.dart';
@@ -6,7 +5,6 @@ import 'package:dressur/1_reception/recompense_start.dart';
 import 'package:dressur/components/padding_and_divider.dart';
 import 'package:dressur/components/sociaux.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:dressur/5_autre/support_assistance.dart';
@@ -19,45 +17,6 @@ class ReceptionPage extends StatefulWidget {
 }
 
 class _ReceptionPageState extends State<ReceptionPage> {
-  Future<bool> _onWillPop() async {
-    return (await showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: (langUserPhone == "fr")
-                ? const Text('Êtes-vous sûr?')
-                : const Text('Are you sure?'),
-            content: (langUserPhone == "fr")
-                ? const Text("Voulez-vous quitter l'application ?")
-                : const Text("Do you want to quit the application?"),
-            actions: <Widget>[
-              TextButton(
-                onPressed: () =>
-                    Navigator.of(context).pop(false), //<-- SEE HERE
-                child: (langUserPhone == "fr")
-                    ? const Text('Non')
-                    : const Text('No'),
-              ),
-              TextButton(
-                onPressed: () {
-                  if (Platform.isAndroid) {
-                    // Android : minimise l'app (comportement attendu)
-                    SystemNavigator.pop();
-                  } else {
-                    // iOS : exit(0) est interdit par Apple (rejet App Store).
-                    // On ferme simplement le dialogue — l'utilisateur utilise
-                    // le bouton Home pour passer en arrière-plan.
-                    Navigator.of(context).pop(false);
-                  }
-                }, // <-- SEE HERE
-                child: (langUserPhone == "fr")
-                    ? const Text('Oui')
-                    : const Text('Yes'),
-              ),
-            ],
-          ),
-        )) ??
-        false;
-  }
 
   @override
   void initState() {
@@ -65,9 +24,7 @@ class _ReceptionPageState extends State<ReceptionPage> {
   }
 
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: _onWillPop,
-      child: Scaffold(
+    return Scaffold(
         appBar: AppBar(
           automaticallyImplyLeading: false,
           elevation: 0,
@@ -259,7 +216,6 @@ class _ReceptionPageState extends State<ReceptionPage> {
             ),
           ],
         ),
-      ),
     );
   }
 }
