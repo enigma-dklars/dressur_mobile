@@ -256,11 +256,15 @@ class _ListeBoostContactPageState extends State<ListeBoostContactPage> {
                     style: GoogleFonts.poppins(fontSize: 16),
                   ),
                 )
-              : ListView.builder(
-                  itemCount: _boosts.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    return _buildBoostCard(_boosts[index]);
-                  },
+              : RefreshIndicator(
+                  onRefresh: fetchBoosts,
+                  color: primaryColor,
+                  child: ListView.builder(
+                    itemCount: _boosts.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      return _buildBoostCard(_boosts[index]);
+                    },
+                  ),
                 ),
     );
   }
