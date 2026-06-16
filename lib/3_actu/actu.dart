@@ -2371,6 +2371,7 @@ class _StoryViewerState extends State<_StoryViewer>
               ),
           ],
         ),
+      ),
     );
   }
 }
