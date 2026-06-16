@@ -215,12 +215,17 @@ class _BottomBarState extends State<BottomBar> with WidgetsBindingObserver {
   }
 
 
-  // Quitter l'application — centralisé ici pour les 3 onglets racine.
-  // iOS : pas de dialog (interdit par Apple, le bouton Home suffit).
-  // Android : confirmation unique sur l'onglet actif.
-  Future<bool> _onWillPop() async {
-    if (Platform.isIOS) return false;
-    return (await showDialog<bool>(
+  @override
+  Widget build(BuildContext context) {
+    return PopScope(
+      // Quitter l'application — centralisé ici pour les 3 onglets racine.
+      // iOS : pas de dialog (interdit par Apple, le bouton Home suffit).
+      // Android : confirmation unique sur l'onglet actif.
+      canPop: false,
+      onPopInvoked: (bool didPop) async {
+        if (didPop) return;
+        if (Platform.isIOS) return;
+        await showDialog<void>(
           context: context,
           builder: (context) => AlertDialog(
             title: Text(
@@ -233,26 +238,20 @@ class _BottomBarState extends State<BottomBar> with WidgetsBindingObserver {
             ),
             actions: [
               TextButton(
-                onPressed: () => Navigator.of(context).pop(false),
+                onPressed: () => Navigator.of(context).pop(),
                 child: Text((langUserPhone == "fr") ? 'Non' : 'No'),
               ),
               TextButton(
                 onPressed: () {
-                  Navigator.of(context).pop(true);
+                  Navigator.of(context).pop();
                   SystemNavigator.pop();
                 },
                 child: Text((langUserPhone == "fr") ? 'Oui' : 'Yes'),
               ),
             ],
           ),
-        )) ??
-        false;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: _onWillPop,
+        );
+      },
       child: Scaffold(
         // Le corps utilise un PageView pour permettre le swipe
       body: PageView(
