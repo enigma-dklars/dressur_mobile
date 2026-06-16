@@ -27,6 +27,7 @@ import 'package:dressur/components/sociaux.dart';
 import 'package:dressur/components/sql_helper.dart';
 import 'package:dressur/5_autre/support_assistance.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:share_plus/share_plus.dart';
 
 class AnimatedRewardBadge extends StatefulWidget {
   final VoidCallback onTap;
@@ -1696,31 +1697,29 @@ class AdvertisementDetailPage extends StatelessWidget {
   }
 
   void openWhatsAppChat() async {
-    String text;
-    if (langUserPhone == "fr") {
-      text =
-          "Bonjour/Bonsoir *${advertisement.pseudoAnnonceur}*, j'ai une question concernant la promotion ci-dessous: \n\n";
-    } else {
-      text =
-          "Good morning or Good evening *${advertisement.pseudoAnnonceur}*, I have a question regarding the promotion below: \n\n";
-    }
+    final String message = (langUserPhone == "fr")
+        ? "Je suis intéressé par cette promotion affaire"
+        : "I am interested in this business promotion";
 
-    // Vérification de la longueur de la description
-    if (advertisement.description.length >= 100) {
-      text +=
-          "<<${advertisement.description.substring(0, 100)}...>>\n\n*Depuis Dressur.*";
-    } else {
-      text += "<<${advertisement.description}>>\n\n*Depuis Dressur.*";
-    }
-
-    String encodedText = Uri.encodeComponent(text);
-
-    String url =
-        'https://wa.me/${advertisement.whatsappNumber}?text=$encodedText';
-
-    final Uri _url = Uri.parse(url);
-    if (!await launchUrl(_url, mode: LaunchMode.externalApplication)) {
-      throw 'Could not launch $_url';
+    try {
+      final response = await http.get(Uri.parse(advertisement.image));
+      if (response.statusCode == 200) {
+        final tempDir = await getTemporaryDirectory();
+        final file = File('${tempDir.path}/promo_${advertisement.id}.jpg');
+        await file.writeAsBytes(response.bodyBytes);
+        await Share.shareXFiles(
+          [XFile(file.path)],
+          text: message,
+        );
+      } else {
+        final encodedText = Uri.encodeComponent(message);
+        final url = 'https://wa.me/${advertisement.whatsappNumber}?text=$encodedText';
+        await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+      }
+    } catch (_) {
+      final encodedText = Uri.encodeComponent(message);
+      final url = 'https://wa.me/${advertisement.whatsappNumber}?text=$encodedText';
+      await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
     }
   }
 
