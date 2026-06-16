@@ -2343,7 +2343,7 @@ class _StoryViewerState extends State<_StoryViewer>
 
   class _WarningBottomSheetState extends State<_WarningBottomSheet>
       with SingleTickerProviderStateMixin {
-    static const int _totalSeconds = 5;
+    static const int _totalSeconds = 10;
     int _remaining = _totalSeconds;
     Timer? _timer;
     late AnimationController _progressCtrl;
