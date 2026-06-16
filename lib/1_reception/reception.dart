@@ -29,6 +29,7 @@ class _ReceptionPageState extends State<ReceptionPage> {
   Future<void> _fetchCounts() async {
     try {
       final results = await Future.wait([
+        http.get(Uri.parse('$generalRouteForApi/listContactDS/$uidUser/$langUserPhone')),
         http.get(Uri.parse('$generalRouteForApi/listBoost/$uidUser/$langUserPhone')),
         http.get(Uri.parse('$generalRouteForApi/listPromotion/$uidUser/$langUserPhone')),
         http.get(Uri.parse('$generalRouteForApi/listPromoReseau/$uidUser/$langUserPhone')),
@@ -39,14 +40,18 @@ class _ReceptionPageState extends State<ReceptionPage> {
       setState(() {
         if (results[0].statusCode == 200) {
           final data = jsonDecode(results[0].body);
-          if (data is List) nbrBoostContact = data.length;
+          if (data is List) nombreContacts = data.length;
         }
         if (results[1].statusCode == 200) {
           final data = jsonDecode(results[1].body);
-          if (data is List) nbrPromoAffaire = data.length;
+          if (data is List) nbrBoostContact = data.length;
         }
         if (results[2].statusCode == 200) {
           final data = jsonDecode(results[2].body);
+          if (data is List) nbrPromoAffaire = data.length;
+        }
+        if (results[3].statusCode == 200) {
+          final data = jsonDecode(results[3].body);
           if (data is List) nbrPromoReseau = data.length;
         }
       });
