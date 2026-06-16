@@ -381,8 +381,8 @@ class _ActuPageState extends State<ActuPage> {
 
   Future<List<Advertisement>> fetchAdvertisements() async {
     if (nbrAffichageAvertissement == 0) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        showWarningDialog(context);
+      Future.delayed(const Duration(milliseconds: 2500), () {
+        if (mounted) showWarningDialog(context);
       });
     }
 
