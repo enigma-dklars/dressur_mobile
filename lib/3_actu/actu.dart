@@ -2355,16 +2355,21 @@ class _StoryViewerState extends State<_StoryViewer>
         vsync: this,
         duration: const Duration(seconds: _totalSeconds),
         value: 1.0,
-      )..animateTo(0.0, curve: Curves.linear);
+      );
 
-      _timer = Timer.periodic(const Duration(seconds: 1), (t) {
-        if (!mounted) { t.cancel(); return; }
-        if (_remaining <= 1) {
-          t.cancel();
-          setState(() => _remaining = 0);
-        } else {
-          setState(() => _remaining--);
-        }
+      // Attendre que le bottom sheet ait fini de monter avant de démarrer
+      Future.delayed(const Duration(milliseconds: 700), () {
+        if (!mounted) return;
+        _progressCtrl.animateTo(0.0, curve: Curves.linear);
+        _timer = Timer.periodic(const Duration(seconds: 1), (t) {
+          if (!mounted) { t.cancel(); return; }
+          if (_remaining <= 1) {
+            t.cancel();
+            setState(() => _remaining = 0);
+          } else {
+            setState(() => _remaining--);
+          }
+        });
       });
     }
 
