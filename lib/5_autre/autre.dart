@@ -327,7 +327,10 @@ class _SettingPageState extends State<SettingPage> {
                     _handleLogout),
               ]),
 
-              _buildSectionTitle("Abonnement et Partage"),
+              // --- SECTION ABONNEMENT & PARTAGE ---
+              _buildSectionTitle((langUserPhone == "fr")
+                  ? "Abonnement et Partage"
+                  : "Subscription & Sharing"),
               SociauxPage(),
 
               if (admin) ...[
@@ -335,7 +338,7 @@ class _SettingPageState extends State<SettingPage> {
                 _buildMenuContainer(isDark, [
                   _buildMenuRow(
                       FontAwesomeIcons.userShield,
-                      "Panneau Administrateur",
+                      (langUserPhone == "fr") ? "Panneau Administrateur" : "Admin Panel",
                       () => Navigator.push(
                           context,
                           MaterialPageRoute(
