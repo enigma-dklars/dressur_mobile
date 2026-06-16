@@ -585,41 +585,6 @@ class _ActuPageState extends State<ActuPage> {
     }
   }
 
-  Future<bool> _onWillPop() async {
-    return (await showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: (langUserPhone == "fr")
-                ? const Text('Êtes-vous sûr?')
-                : const Text('Are you sure?'),
-            content: (langUserPhone == "fr")
-                ? const Text("Voulez-vous quitter l'application ?")
-                : const Text("Do you want to quit the application ?"),
-            actions: <Widget>[
-              TextButton(
-                onPressed: () =>
-                    Navigator.of(context).pop(false), //<-- SEE HERE
-                child: (langUserPhone == "fr")
-                    ? const Text('Non')
-                    : const Text('No'),
-              ),
-              TextButton(
-                onPressed: () {
-                  if (Platform.isAndroid) {
-                    SystemNavigator.pop();
-                  } else if (Platform.isIOS) {
-                    exit(0);
-                  }
-                }, // <-- SEE HERE
-                child: (langUserPhone == "fr")
-                    ? const Text('Oui')
-                    : const Text('Yes'),
-              ),
-            ],
-          ),
-        )) ??
-        false;
-  }
 
   void _showPasDeContactAdd(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -916,9 +881,7 @@ class _ActuPageState extends State<ActuPage> {
         _firstLoad = false;
       });
     }
-    return WillPopScope(
-      onWillPop: _onWillPop,
-      child: Scaffold(
+    return Scaffold(
         appBar: AppBar(
           automaticallyImplyLeading: false,
           elevation: 0,
@@ -2409,7 +2372,6 @@ class _StoryViewerState extends State<_StoryViewer>
               ),
           ],
         ),
-      ),
     );
   }
 }
