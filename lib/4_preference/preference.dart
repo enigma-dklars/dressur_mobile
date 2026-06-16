@@ -289,6 +289,7 @@ class _PreferencePageState extends State<PreferencePage> {
             ),
           ),
         ),
+      ),
     );
   }
 }

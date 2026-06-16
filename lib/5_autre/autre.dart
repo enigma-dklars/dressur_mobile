@@ -85,15 +85,15 @@ class _SettingPageState extends State<SettingPage> {
           : "$total DS contact(s) detected. Deletion in progress…";
     });
 
-    int supprimés = 0;
+    int supprimes = 0;
     for (var contact in dsContacts) {
       await contact.delete();
-      supprimés++;
+      supprimes++;
       setState(() {
-        _deleteProgress = supprimés / total;
+        _deleteProgress = supprimes / total;
         _deleteStatusText = (langUserPhone == "fr")
-            ? "Suppression… ($supprimés / $total)"
-            : "Deleting… ($supprimés / $total)";
+            ? "Suppression… ($supprimes / $total)"
+            : "Deleting… ($supprimes / $total)";
       });
     }
 
@@ -107,8 +107,8 @@ class _SettingPageState extends State<SettingPage> {
       backgroundColor: Colors.green[700],
       content: Text(
         (langUserPhone == "fr")
-            ? "$supprimés contact(s) DS supprimé(s) avec succès."
-            : "$supprimés DS contact(s) successfully deleted.",
+            ? "$supprimes contact(s) DS supprimé(s) avec succès."
+            : "$supprimes DS contact(s) successfully deleted.",
       ),
     ));
   }
@@ -438,6 +438,7 @@ class _SettingPageState extends State<SettingPage> {
                   size: 16, color: Colors.grey[400]),
           ],
         ),
+      ),
     );
   }
 }

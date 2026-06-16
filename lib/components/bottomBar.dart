@@ -310,10 +310,11 @@ class _BottomBarState extends State<BottomBar> with WidgetsBindingObserver {
           );
         },
       ),
-    );
-  }
+    ),
+  );
+}
 
-  // --- WIDGETS HELPERS POUR LA BARRE DE NAVIGATION ---
+// --- WIDGETS HELPERS POUR LA BARRE DE NAVIGATION ---
 
   // Bouton normal pour les onglets standards
   Widget _buildNormalButton(int index, bool isActive) {
@@ -337,7 +338,6 @@ class _BottomBarState extends State<BottomBar> with WidgetsBindingObserver {
           ),
         )
       ],
-      ),
     );
   }
 

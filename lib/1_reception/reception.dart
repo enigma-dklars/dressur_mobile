@@ -216,6 +216,7 @@ class _ReceptionPageState extends State<ReceptionPage> {
             ),
           ],
         ),
+      ),
     );
   }
 }

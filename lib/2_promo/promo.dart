@@ -297,6 +297,7 @@ class _BoostPageState extends State<BoostPage> {
             ],
           ),
         ],
+      ),
     );
   }
 }
