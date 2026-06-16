@@ -553,11 +553,15 @@ class _PromotionListPageState extends State<PromotionListPage> {
                     style: GoogleFonts.poppins(fontSize: 16),
                   ),
                 )
-              : ListView.builder(
-                  itemCount: _promotions.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    return _buildPromotionCard(_promotions[index]);
-                  },
+              : RefreshIndicator(
+                  onRefresh: fetchPromotions,
+                  color: primaryColor,
+                  child: ListView.builder(
+                    itemCount: _promotions.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      return _buildPromotionCard(_promotions[index]);
+                    },
+                  ),
                 ),
     );
   }
