@@ -230,68 +230,15 @@ class _ActuPageState extends State<ActuPage> {
   }
 
   void showWarningDialog(BuildContext context) {
-    int countdown = 5;
-
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) {
-        return StatefulBuilder(
-          builder: (context, setState) {
-            // Timer déclenché une seule fois
-            Future.delayed(const Duration(seconds: 1), () {
-              if (countdown > 0) {
-                setState(() => countdown--);
-              }
-            });
-
-            return WillPopScope(
-              onWillPop: () async => false, // ❌ bouton retour désactivé
-              child: AlertDialog(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  side: const BorderSide(color: Colors.red),
-                ),
-                title: Row(
-                  children: [
-                    const FaIcon(FontAwesomeIcons.triangleExclamation,
-                        color: Colors.red),
-                    const SizedBox(width: 8),
-                    Text(
-                      "Avertissement important",
-                      style:
-                          GoogleFonts.poppins(color: Colors.red, fontSize: 16),
-                    ),
-                  ],
-                ),
-                content: const Text(
-                  "Dressur ne peut garantir la fiabilité ou la moralité des utilisateurs.\n\n"
-                  "Il est fortement conseillé de ne jamais envoyer de l’argent pour un service "
-                  "sans être certain de pouvoir entrer en possession de ce pour quoi vous payez.\n\n"
-                  "Dressur décline toute responsabilité en cas d’arnaque ou de perte financière "
-                  "causée par un autre utilisateur.",
-                ),
-                actions: [
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red,
-                    ),
-                    onPressed: countdown == 0
-                        ? () => Navigator.of(context).pop()
-                        : null,
-                    child: Text(
-                      countdown > 0 ? "Fermer ($countdown)" : "Fermer",
-                      style: GoogleFonts.poppins(color: Colors.white),
-                    ),
-                  ),
-                ],
-              ),
-            );
-          },
-        );
-      },
-    );
-  }
+      showModalBottomSheet(
+        context: context,
+        isDismissible: false,
+        enableDrag: false,
+        isScrollControlled: true,
+        backgroundColor: Colors.transparent,
+        builder: (_) => const _WarningBottomSheet(),
+      );
+    }
 
   void _scrollListener() {
     if (_scrollController.position.userScrollDirection ==
@@ -2384,7 +2331,246 @@ class _StoryViewerState extends State<_StoryViewer>
   }
 }
 
-extension StringExtension on String {
+
+  // ─── Bottom sheet avertissement ───────────────────────────────────────────────
+
+  class _WarningBottomSheet extends StatefulWidget {
+    const _WarningBottomSheet();
+
+    @override
+    State<_WarningBottomSheet> createState() => _WarningBottomSheetState();
+  }
+
+  class _WarningBottomSheetState extends State<_WarningBottomSheet>
+      with SingleTickerProviderStateMixin {
+    static const int _totalSeconds = 5;
+    int _remaining = _totalSeconds;
+    Timer? _timer;
+    late AnimationController _progressCtrl;
+
+    @override
+    void initState() {
+      super.initState();
+      _progressCtrl = AnimationController(
+        vsync: this,
+        duration: const Duration(seconds: _totalSeconds),
+        value: 1.0,
+      )..animateTo(0.0, curve: Curves.linear);
+
+      _timer = Timer.periodic(const Duration(seconds: 1), (t) {
+        if (!mounted) { t.cancel(); return; }
+        if (_remaining <= 1) {
+          t.cancel();
+          setState(() => _remaining = 0);
+        } else {
+          setState(() => _remaining--);
+        }
+      });
+    }
+
+    @override
+    void dispose() {
+      _timer?.cancel();
+      _progressCtrl.dispose();
+      super.dispose();
+    }
+
+    Widget _buildItem(IconData icon, String text) {
+      return Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 38,
+            height: 38,
+            decoration: BoxDecoration(
+              color: Colors.red[50],
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Center(
+              child: FaIcon(icon, size: 16, color: Colors.red[700]),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.only(top: 7),
+              child: Text(
+                text,
+                style: GoogleFonts.poppins(
+                  fontSize: 13,
+                  color: Colors.grey[700],
+                  height: 1.5,
+                ),
+              ),
+            ),
+          ),
+        ],
+      );
+    }
+
+    @override
+    Widget build(BuildContext context) {
+      final bool canClose = _remaining == 0;
+      final bool isFr = langUserPhone == "fr";
+
+      return WillPopScope(
+        onWillPop: () async => false,
+        child: Container(
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+          ),
+          padding: EdgeInsets.fromLTRB(
+            24, 12, 24, MediaQuery.of(context).padding.bottom + 28,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Barre de poignée
+              Container(
+                width: 44,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: Colors.grey[300],
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              const SizedBox(height: 24),
+
+              // Icône centrale
+              Container(
+                width: 76,
+                height: 76,
+                decoration: BoxDecoration(
+                  color: Colors.red[50],
+                  shape: BoxShape.circle,
+                ),
+                child: Center(
+                  child: FaIcon(
+                    FontAwesomeIcons.triangleExclamation,
+                    color: Colors.red[700],
+                    size: 34,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              // Titre
+              Text(
+                isFr ? "Avertissement important" : "Important Warning",
+                style: GoogleFonts.poppins(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.red[700],
+                ),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                isFr
+                    ? "Lis attentivement avant de continuer"
+                    : "Read carefully before continuing",
+                style: GoogleFonts.poppins(
+                  fontSize: 13,
+                  color: Colors.grey[500],
+                ),
+              ),
+
+              const SizedBox(height: 24),
+
+              // Points d'avertissement
+              _buildItem(
+                FontAwesomeIcons.userShield,
+                isFr
+                    ? "Dressur ne peut garantir la fiabilité ou la moralité des utilisateurs."
+                    : "Dressur cannot guarantee the reliability or integrity of users.",
+              ),
+              const SizedBox(height: 14),
+              _buildItem(
+                FontAwesomeIcons.moneyBillWave,
+                isFr
+                    ? "Ne jamais envoyer d'argent pour un service sans être certain de ce que vous recevrez en retour."
+                    : "Never send money for a service without being certain of what you will receive.",
+              ),
+              const SizedBox(height: 14),
+              _buildItem(
+                FontAwesomeIcons.scaleBalanced,
+                isFr
+                    ? "Dressur décline toute responsabilité en cas d'arnaque ou de perte financière causée par un utilisateur."
+                    : "Dressur disclaims all liability for scams or financial losses caused by another user.",
+              ),
+
+              const SizedBox(height: 24),
+
+              // Barre de progression
+              AnimatedBuilder(
+                animation: _progressCtrl,
+                builder: (_, __) => Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(6),
+                      child: LinearProgressIndicator(
+                        value: _progressCtrl.value,
+                        backgroundColor: Colors.grey[200],
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                          canClose ? Colors.green : Colors.red,
+                        ),
+                        minHeight: 6,
+                      ),
+                    ),
+                    if (!canClose) ...[
+                      const SizedBox(height: 6),
+                      Text(
+                        isFr
+                            ? "Disponible dans $_remaining s"
+                            : "Available in $_remaining s",
+                        style: GoogleFonts.poppins(
+                          fontSize: 11,
+                          color: Colors.grey[400],
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 16),
+
+              // Bouton
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: canClose ? () => Navigator.of(context).pop() : null,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red[700],
+                    disabledBackgroundColor: Colors.red[100],
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 15),
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                  ),
+                  child: Text(
+                    canClose
+                        ? (isFr ? "J'ai compris ✓" : "I understand ✓")
+                        : (isFr ? "J'ai compris ($_remaining)" : "I understand ($_remaining)"),
+                    style: GoogleFonts.poppins(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 15,
+                      color: canClose ? Colors.white : Colors.red[300],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+  }
+
+  extension StringExtension on String {
   String capitalize() {
     if (this.isEmpty) return "";
     return "${this[0].toUpperCase()}${this.substring(1)}";
