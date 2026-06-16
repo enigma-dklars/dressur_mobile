@@ -46,9 +46,13 @@ class _BoostPageState extends State<BoostPage> {
               TextButton(
                 onPressed: () {
                   if (Platform.isAndroid) {
+                    // Android : minimise l'app (comportement attendu)
                     SystemNavigator.pop();
-                  } else if (Platform.isIOS) {
-                    exit(0);
+                  } else {
+                    // iOS : exit(0) est interdit par Apple (rejet App Store).
+                    // On ferme simplement le dialogue — l'utilisateur utilise
+                    // le bouton Home pour passer en arrière-plan.
+                    Navigator.of(context).pop(false);
                   }
                 }, // <-- SEE HERE
                 child: (langUserPhone == "fr")
