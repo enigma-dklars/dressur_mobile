@@ -213,8 +213,8 @@ class _PreferencePageState extends State<PreferencePage> {
                   Expanded(
                     child: Text(
                       (langUserPhone == "fr")
-                          ? "Contacts disponibles sur l'Actu"
-                          : "Available contacts on News",
+                          ? "Suggestion des contacts disponibles"
+                          : "Available contact suggestions",
                       style: GoogleFonts.poppins(
                         color: isDark ? Colors.white : Colors.black87,
                         fontWeight: FontWeight.w600,
@@ -250,8 +250,8 @@ class _PreferencePageState extends State<PreferencePage> {
                 ),
                 child: Text(
                   (langUserPhone == "fr")
-                      ? "Affiche les cavaliers disponibles et la suggestion de mise en avant sur votre page Actu."
-                      : "Shows available riders and the boost suggestion on your News page.",
+                      ? "Affiche une sélection de cavaliers disponibles selon vos critères, ainsi qu'une suggestion pour booster votre visibilité sur la page Actu."
+                      : "Shows a selection of available riders matching your criteria, along with a suggestion to boost your visibility on the News page.",
                   style: GoogleFonts.poppins(
                     color: isDark ? Colors.grey[300] : Colors.grey[700],
                     fontSize: 13,
