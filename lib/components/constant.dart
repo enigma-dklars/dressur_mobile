@@ -160,6 +160,7 @@ Future<void> initUserInformations(userInfos) async {
   lesPublicites = userInfos["lesPublicites"];
   preferencePaysText = preferencePaysToText(userInfos["preferencePays"]);
   nombreContactDispo = userInfos["nombreContactDispo"];
+  nombreContacts = userInfos["nombreContacts"] ?? 0;
   boostEnCours = userInfos["boostEnCours"];
   isInscritProgrammeRecompense =
       userInfos["isInscritProgrammeRecompense"] ?? false;
