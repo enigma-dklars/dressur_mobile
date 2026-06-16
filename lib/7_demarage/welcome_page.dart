@@ -25,7 +25,7 @@ class WelcomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Colors.black,
       body: PageDepart(),
     );
   }
@@ -46,16 +46,14 @@ class _PageDepartState extends State<PageDepart> {
     bool allGranted = permissionsStatus.values.every((granted) => granted);
 
     if (!allGranted) {
-      // Au moins une permission refusée → on bloque l'accès
       Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(
             builder: (context) => const PermissionsRequiredPage()),
-        (route) => false, // Supprime toutes les pages précédentes
+        (route) => false,
       );
       return;
     }
 
-    // Toutes les permissions sont OK → on continue
     Navigator.of(context).pushAndRemoveUntil(
       MaterialPageRoute(builder: (context) => PresentationPage()),
       (route) => false,
@@ -65,15 +63,12 @@ class _PageDepartState extends State<PageDepart> {
   Future<Map<Permission, bool>> _requestCriticalPermissions() async {
     Map<Permission, bool> results = {};
 
-    // 1. Contacts
     PermissionStatus contactStatus = await Permission.contacts.request();
     results[Permission.contacts] = contactStatus.isGranted;
 
-    // 2. Stockage
     PermissionStatus storageStatus = await Permission.storage.request();
     results[Permission.storage] = storageStatus.isGranted;
 
-    // 3. Alarme exacte (très important pour les notifications programmées)
     PermissionStatus alarmStatus =
         await Permission.scheduleExactAlarm.request();
     results[Permission.scheduleExactAlarm] = alarmStatus.isGranted;
@@ -83,16 +78,10 @@ class _PageDepartState extends State<PageDepart> {
 
   Future<Future<Object?>> directConnect() async {
     setState(() {
-      if (langUserPhone != "fr") {
-        textChargementEvolution = "Loading ...";
-      } else {
-        textChargementEvolution = "Chargement ...";
-      }
+      textChargementEvolution =
+          langUserPhone != "fr" ? "Loading ..." : "Chargement ...";
     });
 
-    /**
-     * verification de la version de l'application
-     */
     var request = http.MultipartRequest(
         'POST', Uri.parse('$generalRouteForApi/getVersionApp'));
     request.fields.addAll({});
@@ -113,9 +102,6 @@ class _PageDepartState extends State<PageDepart> {
     }
 
     try {
-      /**
-       * voir si le user est deja dans la base de donné principal
-       */
       try {
         var __yo_uidUser = (await SQLHelper.getUidUser())[0]['uid'];
         setState(() {
@@ -124,12 +110,8 @@ class _PageDepartState extends State<PageDepart> {
           }
         });
       } catch (e) {
-        /**
-         * voir si le user est deja dans la base de donné ancienne
-         */
         try {
           var __yo_uidUser = (await SQLHelper.getUidUserOld())[0]['uid'];
-
           setState(() {
             if (__yo_uidUser.toString().isNotEmpty) {
               uidUser = __yo_uidUser;
@@ -141,22 +123,18 @@ class _PageDepartState extends State<PageDepart> {
 
     if (uidUser != null && uidUser.toString().isNotEmpty) {
       setState(() {
-        if (langUserPhone != "fr") {
-          textChargementEvolution = "Login ...";
-        } else {
-          textChargementEvolution = "Connexion ...";
-        }
+        textChargementEvolution =
+            langUserPhone != "fr" ? "Login ..." : "Connexion ...";
       });
 
       await getUserInfo();
 
       setState(() {
-        if (langUserPhone != "fr") {
-          textChargementEvolution = "Initialization Finish";
-        } else {
-          textChargementEvolution = "Initialisation Terminer";
-        }
+        textChargementEvolution = langUserPhone != "fr"
+            ? "Initialization Finish"
+            : "Initialisation Terminée";
       });
+
       final numsTelUser = await SQLHelper.getAll("numsTelUser");
       if (numsTelUser.isEmpty) {
         setState(() {
@@ -169,10 +147,7 @@ class _PageDepartState extends State<PageDepart> {
             .push(MaterialPageRoute(builder: (context) => const BottomBar()));
       }
     } else {
-      // Nouveau comportement : on vérifie les permissions AVANT de montrer l'onboarding
       await _checkAndRequestPermissions();
-      // Si les permissions ne sont pas accordées → on est redirigé vers PermissionsRequiredPage
-      // Si elles le sont → on arrive ici et on continue vers l'onboarding
       return Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(builder: (context) => PresentationPage()),
         (route) => false,
@@ -182,11 +157,8 @@ class _PageDepartState extends State<PageDepart> {
 
   Future<void> getUserInfo() async {
     setState(() {
-      if (langUserPhone != "fr") {
-        textChargementEvolution = "Initialization ...";
-      } else {
-        textChargementEvolution = "Initialisation ...";
-      }
+      textChargementEvolution =
+          langUserPhone != "fr" ? "Initialization ..." : "Initialisation ...";
     });
 
     var request = http.MultipartRequest(
@@ -217,40 +189,39 @@ class _PageDepartState extends State<PageDepart> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        elevation: 0,
-        backgroundColor: primaryColor,
-      ),
-      backgroundColor: primaryColor,
-      body: Align(
-        alignment: Alignment.topCenter,
-        child: SizedBox(
-          width: MediaQuery.of(context).size.width * 0.80,
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(
-              maxWidth: 1024,
-            ),
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                return Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    LogoAnimation(),
-                    Text(
-                      textChargementEvolution,
-                      style: GoogleFonts.poppins(
-                        fontWeight: FontWeight.w300,
-                        fontSize: 20,
-                        color: Colors.white,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
-                );
-              },
-            ),
+      backgroundColor: Colors.transparent,
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        decoration: const BoxDecoration(
+          gradient: RadialGradient(
+            center: Alignment.center,
+            radius: 0.9,
+            colors: [Color(0xFF1A237E), Colors.black],
+            stops: [0.0, 1.0],
+          ),
+        ),
+        child: SafeArea(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Spacer(flex: 2),
+              const LogoAnimation(),
+              const Spacer(flex: 2),
+              // Texte de chargement discret en bas
+              Padding(
+                padding: const EdgeInsets.only(bottom: 48),
+                child: Text(
+                  textChargementEvolution,
+                  style: GoogleFonts.poppins(
+                    fontWeight: FontWeight.w300,
+                    fontSize: 13,
+                    color: Colors.white38,
+                    letterSpacing: 1.5,
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ),
@@ -258,54 +229,250 @@ class _PageDepartState extends State<PageDepart> {
   }
 }
 
+// ─── Peintre des anneaux radar ────────────────────────────────────────────────
+
+class _RadarPainter extends CustomPainter {
+  final double animValue;
+  final Color color;
+
+  _RadarPainter({required this.animValue, required this.color});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final center = Offset(size.width / 2, size.height / 2);
+    final baseRadius = size.width * 0.38;
+    final maxRadius = size.width * 0.95;
+
+    for (int i = 0; i < 3; i++) {
+      final phase = (animValue + i / 3) % 1.0;
+      final radius = baseRadius + (maxRadius - baseRadius) * phase;
+      final opacity = (1.0 - phase) * 0.35;
+
+      if (opacity > 0.01) {
+        final paint = Paint()
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 1.5
+          ..color = color.withOpacity(opacity);
+        canvas.drawCircle(center, radius, paint);
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(_RadarPainter old) => old.animValue != animValue;
+}
+
+// ─── Animation du logo ───────────────────────────────────────────────────────
+
 class LogoAnimation extends StatefulWidget {
+  const LogoAnimation({Key? key}) : super(key: key);
+
   @override
   _LogoAnimationState createState() => _LogoAnimationState();
 }
 
 class _LogoAnimationState extends State<LogoAnimation>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _animationController;
-  late Animation<double> _animation;
+    with TickerProviderStateMixin {
+  // Contrôleur d'entrée (joue une fois)
+  late AnimationController _entryCtrl;
+  // Contrôleur de pulse radar (boucle)
+  late AnimationController _radarCtrl;
+
+  late Animation<double> _logoFade;
+  late Animation<double> _logoScale;
+  late Animation<double> _nameFade;
+  late Animation<Offset> _nameSlide;
+  late Animation<double> _lineScale;
+  late Animation<double> _taglineFade;
 
   @override
   void initState() {
     super.initState();
-    _animationController = AnimationController(
+
+    _entryCtrl = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 3),
-    );
-    _animation = Tween<double>(begin: 0.3, end: 1.0).animate(
+      duration: const Duration(milliseconds: 2200),
+    )..forward();
+
+    _radarCtrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 2800),
+    )..repeat();
+
+    // Logo : fade + scale (0 → 55% du timeline)
+    _logoFade = Tween(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(
-        parent: _animationController,
-        curve: Curves.easeInOut,
+        parent: _entryCtrl,
+        curve: const Interval(0.0, 0.5, curve: Curves.easeOut),
       ),
     );
-    _animationController.repeat(reverse: true);
+    _logoScale = Tween(begin: 0.55, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _entryCtrl,
+        curve: const Interval(0.0, 0.6, curve: Curves.easeOutBack),
+      ),
+    );
+
+    // Nom : slide vers le haut + fade (40% → 75%)
+    _nameFade = Tween(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _entryCtrl,
+        curve: const Interval(0.4, 0.72, curve: Curves.easeOut),
+      ),
+    );
+    _nameSlide = Tween(
+      begin: const Offset(0, 0.6),
+      end: Offset.zero,
+    ).animate(
+      CurvedAnimation(
+        parent: _entryCtrl,
+        curve: const Interval(0.4, 0.72, curve: Curves.easeOut),
+      ),
+    );
+
+    // Ligne décorative (65% → 88%)
+    _lineScale = Tween(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _entryCtrl,
+        curve: const Interval(0.65, 0.88, curve: Curves.easeOut),
+      ),
+    );
+
+    // Tagline (75% → 100%)
+    _taglineFade = Tween(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _entryCtrl,
+        curve: const Interval(0.75, 1.0, curve: Curves.easeOut),
+      ),
+    );
   }
 
   @override
   void dispose() {
-    _animationController.dispose();
+    _entryCtrl.dispose();
+    _radarCtrl.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: AnimatedBuilder(
-        animation: _animationController,
-        builder: (BuildContext context, Widget? child) {
-          return Transform.scale(
-            scale: _animation.value,
-            child: Image.asset(
-              'images/dressur_logo.png',
-              width: 300,
-              height: 300,
+    return AnimatedBuilder(
+      animation: Listenable.merge([_entryCtrl, _radarCtrl]),
+      builder: (context, child) {
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Zone logo + anneaux radar
+            SizedBox(
+              width: 240,
+              height: 240,
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  // Anneaux radar en arrière-plan
+                  CustomPaint(
+                    size: const Size(240, 240),
+                    painter: _RadarPainter(
+                      animValue: _radarCtrl.value,
+                      color: const Color(0xFF5B8DEF),
+                    ),
+                  ),
+
+                  // Halo lumineux derrière le logo
+                  Opacity(
+                    opacity: _logoFade.value * 0.6,
+                    child: Container(
+                      width: 150,
+                      height: 150,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: const Color(0xFF2a4b9a).withOpacity(0.8),
+                            blurRadius: 60,
+                            spreadRadius: 20,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+
+                  // Logo avec fade + scale
+                  Opacity(
+                    opacity: _logoFade.value,
+                    child: Transform.scale(
+                      scale: _logoScale.value,
+                      child: Image.asset(
+                        'images/dressur_logo.png',
+                        width: 170,
+                        height: 170,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
-          );
-        },
-      ),
+
+            const SizedBox(height: 28),
+
+            // Nom de l'app
+            FadeTransition(
+              opacity: _nameFade,
+              child: SlideTransition(
+                position: _nameSlide,
+                child: Text(
+                  'DRESSUR',
+                  style: GoogleFonts.poppins(
+                    fontSize: 30,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                    letterSpacing: 10,
+                  ),
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 14),
+
+            // Ligne décorative dégradée
+            Transform.scale(
+              scaleX: _lineScale.value,
+              child: Container(
+                width: 200,
+                height: 2,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      Colors.transparent,
+                      const Color(0xFF5B8DEF),
+                      Colors.transparent,
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(1),
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 12),
+
+            // Tagline
+            Opacity(
+              opacity: _taglineFade.value,
+              child: Text(
+                langUserPhone == "fr"
+                    ? 'Connecte · Booste · Grandit'
+                    : 'Connect · Boost · Grow',
+                style: GoogleFonts.poppins(
+                  fontSize: 13,
+                  color: Colors.white54,
+                  letterSpacing: 2,
+                  fontWeight: FontWeight.w300,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }
