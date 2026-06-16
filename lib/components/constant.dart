@@ -90,6 +90,7 @@ bool ihaveConnexion = false;
 bool admin = false;
 bool permissionAdd = false;
 bool boostEnCours = false;
+bool addPageActu = true;
 bool isInscritProgrammeRecompense = false;
 int nbrBoostContact = 0;
 int nbrPromoAffaire = 0;
@@ -159,6 +160,7 @@ Future<void> initUserInformations(userInfos) async {
   messageErreurPermissionAdd = userInfos["messageErreurPermissionAdd"];
   lesPublicites = userInfos["lesPublicites"];
   preferencePaysText = preferencePaysToText(userInfos["preferencePays"]);
+  addPageActu = userInfos["addPageActu"] ?? true;
   nombreContactDispo = userInfos["nombreContactDispo"];
   nombreContacts = userInfos["nombreContacts"] ?? 0;
   boostEnCours = userInfos["boostEnCours"];

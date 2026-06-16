@@ -1064,14 +1064,15 @@ class _ActuPageState extends State<ActuPage> {
                       showProfile:
                           (nom.toString().replaceAll(' ', '').isEmpty ||
                               nom == null),
-                      showBoost: (nombreContactDispo <= 100 &&
+                      showBoost: (addPageActu &&
+                          nombreContactDispo <= 100 &&
                           boostEnCours == false &&
                           telIsVerified &&
                           mailIsVerified),
                     ),
                     const SizedBox(height: 10),
 
-                    if (nombreContactDispo > 0) ...[
+                    if (addPageActu && nombreContactDispo > 0) ...[
                       const SizedBox(height: 5),
                       _buildAvailableContactsCard(
                         context: context,

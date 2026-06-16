@@ -11,6 +11,7 @@ import 'package:dressur/components/constant.dart';
 import 'package:dressur/components/sociaux.dart';
 import 'package:dressur/5_autre/support_assistance.dart';
 import 'dart:async';
+import 'package:http/http.dart' as http;
 
 class PreferencePage extends StatefulWidget {
   PreferencePage({Key? key}) : super(key: key);
@@ -22,6 +23,8 @@ class PreferencePage extends StatefulWidget {
 class _PreferencePageState extends State<PreferencePage> {
   var data;
   Timer? _timer;
+  bool _addPageActuLocal = addPageActu;
+  bool _updatingAddPageActu = false;
 
   @override
   void dispose() {
@@ -47,6 +50,22 @@ class _PreferencePageState extends State<PreferencePage> {
     // Code à exécuter toutes les secondes
     setState(() {
       preferencePaysText = preferencePaysText;
+    });
+  }
+
+  Future<void> _updateAddPageActu(bool value) async {
+    setState(() {
+      _updatingAddPageActu = true;
+      _addPageActuLocal = value;
+      addPageActu = value;
+    });
+
+    final valueParam = value ? '1' : '0';
+    await http.get(Uri.parse(
+        '$generalRouteForApi/updateAddPageActu/$uidUser/$valueParam'));
+
+    setState(() {
+      _updatingAddPageActu = false;
     });
   }
 
@@ -148,12 +167,102 @@ class _PreferencePageState extends State<PreferencePage> {
                   },
                 ),
                 const SizedBox(height: 10),
+                _buildAddPageActuCard(context: context),
+                const SizedBox(height: 10),
                 SociauxPage(),
                 const SizedBox(height: 10),
               ],
             ),
           ),
         ),
+    );
+  }
+
+  Widget _buildAddPageActuCard({required BuildContext context}) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
+      child: Ink(
+        decoration: BoxDecoration(
+          color: isDark ? Color(0xFF1E1E1E) : Colors.white,
+          borderRadius: BorderRadius.circular(15),
+          border: Border.all(
+              color: isDark ? Colors.grey[800]! : Colors.grey[200]!, width: 1),
+          boxShadow: [
+            BoxShadow(
+              color: isDark
+                  ? Colors.black.withOpacity(0.2)
+                  : Colors.grey.withOpacity(0.1),
+              blurRadius: 10,
+              offset: Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  FaIcon(FontAwesomeIcons.addressCard,
+                      color: primaryColor, size: 28),
+                  SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      (langUserPhone == "fr")
+                          ? "Contacts sur l'Actu"
+                          : "Contacts on News",
+                      style: GoogleFonts.poppins(
+                        color: isDark ? Colors.white : Colors.black87,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 18,
+                      ),
+                    ),
+                  ),
+                  _updatingAddPageActu
+                      ? SizedBox(
+                          width: 24,
+                          height: 24,
+                          child: CircularProgressIndicator(
+                              strokeWidth: 2.5, color: primaryColor),
+                        )
+                      : Switch(
+                          trackOutlineColor: MaterialStateColor.resolveWith(
+                              (states) => primaryColor),
+                          activeColor: Colors.green,
+                          activeTrackColor: primaryColor,
+                          inactiveThumbColor: Colors.white,
+                          inactiveTrackColor: Colors.grey,
+                          value: _addPageActuLocal,
+                          onChanged: _updateAddPageActu,
+                        ),
+                ],
+              ),
+              SizedBox(height: 15),
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                decoration: BoxDecoration(
+                  color: primaryColor.withOpacity(0.05),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  (langUserPhone == "fr")
+                      ? "Activez cette option pour afficher la carte des contacts disponibles et la suggestion de boost contact sur la page Actu."
+                      : "Enable this option to show the available contacts card and the boost contact suggestion on the News page.",
+                  style: GoogleFonts.poppins(
+                    color: isDark ? Colors.grey[300] : Colors.grey[700],
+                    fontSize: 13,
+                    height: 1.5,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
