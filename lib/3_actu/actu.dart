@@ -3,6 +3,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'package:path_provider/path_provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dressur/1_reception/liste_contact.dart';
 import 'package:dressur/2_promo/new_boost_contact.dart';
@@ -211,7 +212,7 @@ class _ActuPageState extends State<ActuPage> {
   void initState() {
     super.initState();
     _futureAdvertisements = fetchAdvertisements();
-    _fetchStories();
+    _loadStoriesWithCache();
     _scrollController.addListener(_scrollListener);
     // Démarre le timer lors de l'initialisation du widget
     _startTimer();
@@ -386,6 +387,29 @@ class _ActuPageState extends State<ActuPage> {
     }
   }
 
+  Future<File> _storiesCacheFile() async {
+    final dir = await getApplicationDocumentsDirectory();
+    return File('${dir.path}/stories_cache.json');
+  }
+
+  Future<void> _loadStoriesWithCache() async {
+    // 1. Affichage immédiat depuis le cache local (0 ms de délai)
+    try {
+      final file = await _storiesCacheFile();
+      if (await file.exists()) {
+        final raw = await file.readAsString();
+        final cached = jsonDecode(raw) as List<dynamic>;
+        final list = cached.map((e) => StoryModel.fromJson(e)).toList();
+        if (mounted && list.isNotEmpty) {
+          setState(() => _stories = list);
+        }
+      }
+    } catch (_) {}
+
+    // 2. Rafraîchissement réseau en arrière-plan
+    _fetchStories();
+  }
+
   Future<void> _fetchStories() async {
     try {
       final response = await http.get(
@@ -394,10 +418,14 @@ class _ActuPageState extends State<ActuPage> {
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         if (data['error'] == false) {
-          final list = (data['stories'] as List)
-              .map((e) => StoryModel.fromJson(e))
-              .toList();
+          final rawList = data['stories'] as List;
+          final list = rawList.map((e) => StoryModel.fromJson(e)).toList();
           if (mounted) setState(() => _stories = list);
+          // Sauvegarde du cache pour le prochain lancement
+          try {
+            final file = await _storiesCacheFile();
+            await file.writeAsString(jsonEncode(rawList));
+          } catch (_) {}
         }
       }
     } catch (_) {}
