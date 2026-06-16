@@ -284,7 +284,7 @@ class _ProduitsServicesState extends State<ProduitsServices> {
     request.fields['totalViewsGoal'] = _totalViewsGoal.toString();
     request.fields['publishOnDressurStatus'] =
         _publishOnDressurStatus ? "1" : "0";
-    request.fields['totalAmount'] = _totalAmount.toStringAsFixed(0);
+    request.fields['totalAmount'] = _subTotal.toStringAsFixed(0);
 
     final tempDir = await getTemporaryDirectory();
     final filePath = '${tempDir.path}/temp_image.jpg';
@@ -472,18 +472,15 @@ class _ProduitsServicesState extends State<ProduitsServices> {
           if (_publishOnDressurStatus)
             _recapRow("Statut Dressur", _dressurStatusAmount),
           Divider(height: 20),
-          _recapRow("Sous-total", _subTotal, isBold: true),
-          _recapRow("Commission Fedapay (approx.)", _fedapayMax, isSmall: true),
-          const SizedBox(height: 10),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text("TOTAL ESTIMÉ",
+              Text("TOTAL",
                   style: GoogleFonts.poppins(
                     fontWeight: FontWeight.bold,
                     fontSize: 18,
                   )),
-              Text("${_totalWithMaxCommission.toStringAsFixed(0)} FCFA",
+              Text("${_subTotal.toStringAsFixed(0)} FCFA",
                   style: GoogleFonts.poppins(
                     fontWeight: FontWeight.bold,
                     fontSize: 18,
@@ -491,14 +488,6 @@ class _ProduitsServicesState extends State<ProduitsServices> {
                   )),
             ],
           ),
-          const SizedBox(height: 5),
-          Text(
-              "Note: La commission Fedapay varie entre 1.8% et 4% selon le moyen de paiement.",
-              style: GoogleFonts.poppins(
-                  fontSize: 10,
-                  color: Colors.grey[600],
-                  fontStyle: FontStyle.italic),
-              textAlign: TextAlign.center),
         ],
       ),
     );
