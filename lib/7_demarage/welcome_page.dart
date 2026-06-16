@@ -83,7 +83,7 @@ class _PageDepartState extends State<PageDepart> {
     });
 
     // Durée minimale du splash pour laisser l'animation se dérouler
-    final splashMinimum = Future.delayed(const Duration(milliseconds: 4000));
+    final splashMinimum = Future.delayed(const Duration(milliseconds: 6000));
 
     var request = http.MultipartRequest(
         'POST', Uri.parse('$generalRouteForApi/getVersionApp'));
@@ -300,7 +300,7 @@ class _LogoAnimationState extends State<LogoAnimation>
 
     _entryCtrl = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 3800),
+      duration: const Duration(milliseconds: 5500),
     )..forward();
 
     _radarCtrl = AnimationController(
