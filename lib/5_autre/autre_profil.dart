@@ -188,6 +188,14 @@ class _AutreProfilPageState extends State<AutreProfilPage> {
     super.initState();
   }
 
+  String _getInitials() {
+    final String name = (autre_nom ?? autre_pseudo ?? "?").toString().trim();
+    final List<String> parts = name.split(" ").where((p) => p.isNotEmpty).toList();
+    if (parts.isEmpty) return "?";
+    if (parts.length == 1) return parts[0][0].toUpperCase();
+    return (parts[0][0] + parts[1][0]).toUpperCase();
+  }
+
   @override
   Widget build(BuildContext context) {
     if (_firstLoad) {
@@ -198,186 +206,139 @@ class _AutreProfilPageState extends State<AutreProfilPage> {
         });
       });
     }
+
     return Scaffold(
-      body: Column(
-        children: [
-          SizedBox(
-            height: 44,
-            child: Container(
-              color: primaryColor,
-            ),
+      appBar: AppBar(
+        elevation: 0,
+        backgroundColor: primaryColor,
+        leading: IconButton(
+          onPressed: () => Navigator.of(context).pop(),
+          icon: const FaIcon(FontAwesomeIcons.chevronLeft, color: Colors.white),
+        ),
+        title: Text(
+          (langUserPhone == "fr") ? "Profil" : "Profile",
+          style: GoogleFonts.poppins(
+            color: Colors.white,
+            fontWeight: FontWeight.w400,
+            fontSize: 18,
           ),
-          Expanded(
-            child: CustomScrollView(
-              slivers: <Widget>[
-                SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (BuildContext context, int index) {
-                      return _firstLoad
-                          ? const Center(
-                              child: CircularProgressIndicator(),
-                            )
-                          : _loading
-                              ? const Center(
-                                  child: CircularProgressIndicator(),
-                                )
-                              : SingleChildScrollView(
-                                  child: Column(
-                                    children: [
-                                      Stack(
-                                        alignment: Alignment.center,
-                                        clipBehavior: Clip.none,
-                                        children: [
-                                          Image.asset(
-                                            "images/$autre_banniere",
-                                          ),
-                                          Positioned(
-                                            bottom: -60,
-                                            child: CircleAvatar(
-                                              backgroundImage: AssetImage(
-                                                  "images/$autre_avatar"),
-                                              backgroundColor: Colors.white,
-                                              radius: 60,
-                                              child: Container(
-                                                decoration: BoxDecoration(
-                                                  shape: BoxShape.circle,
-                                                  border: Border.all(
-                                                    color: primaryColor,
-                                                    width: 2.5,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                          Positioned(
-                                            top: 10,
-                                            left: 10,
-                                            child: GestureDetector(
-                                              onTap: () {
-                                                Navigator.of(context).pop();
-                                              },
-                                              child: Container(
-                                                padding: EdgeInsets.fromLTRB(
-                                                    13, 5, 5, 5),
-                                                decoration: BoxDecoration(
-                                                  color: primaryColor,
-                                                  shape: BoxShape.circle,
-                                                ),
-                                                child: FaIcon(
-                                                  FontAwesomeIcons.chevronLeft,
-                                                  color: Colors.white,
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      const SizedBox(height: 70),
-                                      if (autre_nom != null) ...[
-                                        Text(
-                                          autre_nom,
-                                          style: GoogleFonts.poppins(
-                                            fontSize: 20,
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                        ),
-                                        const SizedBox(height: 1),
-                                      ],
-                                      if (autre_pseudo != null) ...[
-                                        Text(
-                                          "@$autre_pseudo",
-                                          style:
-                                              GoogleFonts.poppins(fontSize: 14),
-                                        ),
-                                        const SizedBox(height: 6),
-                                      ],
-                                      // Remplacez votre ancienne Row par celle-ci
-
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        spacing: 10,
-                                        children: [
-                                          _buildActionIcon(
-                                            icon: FontAwesomeIcons.phone,
-                                            tooltip: (langUserPhone == "fr")
-                                                ? "Appeler"
-                                                : "Call",
-                                            onTap: () =>
-                                                launchPhoneCall(autre_tel),
-                                          ),
-                                          _buildActionIcon(
-                                            icon: FontAwesomeIcons.solidMessage,
-                                            tooltip: "SMS",
-                                            onTap: () => launchSMS(autre_tel),
-                                          ),
-                                          _buildActionIcon(
-                                            icon:
-                                                FontAwesomeIcons.solidEnvelope,
-                                            tooltip: "Email",
-                                            onTap: () =>
-                                                launchEmail(autre_mail),
-                                          ),
-                                          // Pour WhatsApp, on utilise FontAwesome pour avoir l'icône officielle
-                                          _buildActionIcon(
-                                            icon: FontAwesomeIcons
-                                                .whatsapp, // Assurez-vous d'avoir le package font_awesome_flutter
-                                            tooltip: "WhatsApp",
-                                            onTap: () =>
-                                                launchWhatsApp(autre_tel),
-                                          ),
-                                        ],
-                                      ),
-
-                                      Padding(
-                                        padding: const EdgeInsets.all(10.0),
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            if (autre_mail != null)
-                                              buildInfoCard(
-                                                  "E-Mail", autre_mail),
-                                            if (autre_tel != null)
-                                              buildInfoCard(
-                                                  (langUserPhone == "fr")
-                                                      ? "Numéro de Téléphone"
-                                                      : "Phone number",
-                                                  autre_tel),
-                                            if (autre_tiktok != null)
-                                              buildSocialMediaCard(
-                                                  "TikTok", autre_tiktok),
-                                            if (autre_youtube != null)
-                                              buildSocialMediaCard(
-                                                  "Youtube", autre_youtube),
-                                            if (autre_facebook != null)
-                                              buildSocialMediaCard(
-                                                  "Facebook", autre_facebook),
-                                            if (autre_instagram != null)
-                                              buildSocialMediaCard(
-                                                  "Instagram", autre_instagram),
-                                            if (autre_apropos != null)
-                                              buildInfoCard(
-                                                  (langUserPhone == "fr")
-                                                      ? "À propos"
-                                                      : "About",
-                                                  autre_apropos),
-                                          ],
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                );
-                    },
-                    childCount:
-                        1, // Utilisez 1 pour un seul élément dans la liste
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
+        ),
       ),
+      body: (_firstLoad || _loading)
+          ? Center(child: CircularProgressIndicator(color: primaryColor))
+          : SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              child: Column(
+                children: [
+                  // --- EN-TÊTE AVEC INITIALES ---
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(vertical: 32),
+                    decoration: BoxDecoration(
+                      color: primaryColor.withOpacity(0.06),
+                      border: Border(
+                        bottom: BorderSide(
+                            color: primaryColor.withOpacity(0.12), width: 1),
+                      ),
+                    ),
+                    child: Column(
+                      children: [
+                        CircleAvatar(
+                          radius: 44,
+                          backgroundColor: primaryColor,
+                          child: Text(
+                            _getInitials(),
+                            style: GoogleFonts.poppins(
+                              fontSize: 30,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 14),
+                        if (autre_nom != null) ...[
+                          Text(
+                            autre_nom,
+                            style: GoogleFonts.poppins(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                        ],
+                        if (autre_pseudo != null) ...[
+                          Text(
+                            "@$autre_pseudo",
+                            style: GoogleFonts.poppins(
+                                fontSize: 14, color: Colors.grey[600]),
+                          ),
+                          const SizedBox(height: 16),
+                        ],
+                        // --- BOUTONS D'ACTION ---
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            _buildActionIcon(
+                              icon: FontAwesomeIcons.phone,
+                              tooltip: (langUserPhone == "fr") ? "Appeler" : "Call",
+                              onTap: () => launchPhoneCall(autre_tel),
+                            ),
+                            const SizedBox(width: 12),
+                            _buildActionIcon(
+                              icon: FontAwesomeIcons.solidMessage,
+                              tooltip: "SMS",
+                              onTap: () => launchSMS(autre_tel),
+                            ),
+                            const SizedBox(width: 12),
+                            _buildActionIcon(
+                              icon: FontAwesomeIcons.solidEnvelope,
+                              tooltip: "Email",
+                              onTap: () => launchEmail(autre_mail),
+                            ),
+                            const SizedBox(width: 12),
+                            _buildActionIcon(
+                              icon: FontAwesomeIcons.whatsapp,
+                              tooltip: "WhatsApp",
+                              onTap: () => launchWhatsApp(autre_tel),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  // --- INFORMATIONS ---
+                  Padding(
+                    padding: const EdgeInsets.all(14.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (autre_mail != null)
+                          buildInfoCard("E-Mail", autre_mail),
+                        if (autre_tel != null)
+                          buildInfoCard(
+                              (langUserPhone == "fr")
+                                  ? "Numéro de Téléphone"
+                                  : "Phone number",
+                              autre_tel),
+                        if (autre_tiktok != null)
+                          buildSocialMediaCard("TikTok", autre_tiktok),
+                        if (autre_youtube != null)
+                          buildSocialMediaCard("Youtube", autre_youtube),
+                        if (autre_facebook != null)
+                          buildSocialMediaCard("Facebook", autre_facebook),
+                        if (autre_instagram != null)
+                          buildSocialMediaCard("Instagram", autre_instagram),
+                        if (autre_apropos != null)
+                          buildInfoCard(
+                              (langUserPhone == "fr") ? "À propos" : "About",
+                              autre_apropos),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
     );
   }
 
