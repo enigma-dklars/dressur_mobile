@@ -230,6 +230,7 @@ class _ActuPageState extends State<ActuPage> {
   }
 
   void showWarningDialog(BuildContext context) {
+      final int duree = isNouvelUtilisateur ? 10 : 5;
       showModalBottomSheet(
         context: context,
         isDismissible: false,
@@ -240,7 +241,7 @@ class _ActuPageState extends State<ActuPage> {
       );
     }
 
-  void _scrollListener() {
+    void _scrollListener() {
     if (_scrollController.position.userScrollDirection ==
         ScrollDirection.reverse) {
       _showFabText.value = false;
@@ -2329,13 +2330,14 @@ class _StoryViewerState extends State<_StoryViewer>
       ),
     );
   }
-}
+  }
 
 
   // ─── Bottom sheet avertissement ───────────────────────────────────────────────
 
   class _WarningBottomSheet extends StatefulWidget {
-    const _WarningBottomSheet();
+    final int totalSeconds;
+    const _WarningBottomSheet({required this.totalSeconds});
 
     @override
     State<_WarningBottomSheet> createState() => _WarningBottomSheetState();
@@ -2343,17 +2345,17 @@ class _StoryViewerState extends State<_StoryViewer>
 
   class _WarningBottomSheetState extends State<_WarningBottomSheet>
       with SingleTickerProviderStateMixin {
-    static const int _totalSeconds = 10;
-    int _remaining = _totalSeconds;
+    late int _remaining;
     Timer? _timer;
     late AnimationController _progressCtrl;
 
     @override
     void initState() {
       super.initState();
+      _remaining = widget.totalSeconds;
       _progressCtrl = AnimationController(
         vsync: this,
-        duration: const Duration(seconds: _totalSeconds),
+        duration: Duration(seconds: widget.totalSeconds),
         value: 1.0,
       );
 
@@ -2381,7 +2383,7 @@ class _StoryViewerState extends State<_StoryViewer>
     }
 
     Widget _buildItem(IconData icon, String text) {
-      return Row(
+        return Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
