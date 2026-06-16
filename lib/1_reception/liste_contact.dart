@@ -297,14 +297,18 @@ class _ContactPageState extends State<ContactPage> {
   }
 
   Widget _buildContactList() {
-    return ListView.builder(
-      physics: BouncingScrollPhysics(),
-      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-      itemCount: _filteredContacts.length,
-      itemBuilder: (context, index) {
-        final contact = _filteredContacts[index];
-        return _buildContactCard(contact);
-      },
+    return RefreshIndicator(
+      onRefresh: fetchContactDSs,
+      color: primaryColor,
+      child: ListView.builder(
+        physics: BouncingScrollPhysics(),
+        padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+        itemCount: _filteredContacts.length,
+        itemBuilder: (context, index) {
+          final contact = _filteredContacts[index];
+          return _buildContactCard(contact);
+        },
+      ),
     );
   }
 
