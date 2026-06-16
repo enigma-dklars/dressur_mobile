@@ -1,6 +1,8 @@
 // ignore_for_file: prefer_const_constructors, use_build_context_synchronously
 
 import 'dart:async';
+import 'dart:io';
+import 'package:flutter/services.dart';
 import 'dart:convert';
 import 'dart:convert' as convert;
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -212,10 +214,47 @@ class _BottomBarState extends State<BottomBar> with WidgetsBindingObserver {
     }
   }
 
+
+  // Quitter l'application — centralisé ici pour les 3 onglets racine.
+  // iOS : pas de dialog (interdit par Apple, le bouton Home suffit).
+  // Android : confirmation unique sur l'onglet actif.
+  Future<bool> _onWillPop() async {
+    if (Platform.isIOS) return false;
+    return (await showDialog<bool>(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text(
+              (langUserPhone == "fr") ? 'Êtes-vous sûr ?' : 'Are you sure?',
+            ),
+            content: Text(
+              (langUserPhone == "fr")
+                  ? "Voulez-vous quitter l'application ?"
+                  : "Do you want to quit the application?",
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: Text((langUserPhone == "fr") ? 'Non' : 'No'),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop(true);
+                  SystemNavigator.pop();
+                },
+                child: Text((langUserPhone == "fr") ? 'Oui' : 'Yes'),
+              ),
+            ],
+          ),
+        )) ??
+        false;
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      // Le corps utilise un PageView pour permettre le swipe
+    return WillPopScope(
+      onWillPop: _onWillPop,
+      child: Scaffold(
+        // Le corps utilise un PageView pour permettre le swipe
       body: PageView(
         controller: _pageController,
         physics: BouncingScrollPhysics(),
@@ -299,6 +338,7 @@ class _BottomBarState extends State<BottomBar> with WidgetsBindingObserver {
           ),
         )
       ],
+      ),
     );
   }
 
