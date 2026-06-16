@@ -1220,7 +1220,6 @@ class _ActuPageState extends State<ActuPage> {
             ),
           ],
         ),
-      ),
     );
   }
 
