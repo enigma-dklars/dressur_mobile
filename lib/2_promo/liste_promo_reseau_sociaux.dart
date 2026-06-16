@@ -498,7 +498,7 @@ class _PromotionReseauSociauxListePageState
   }
 
   Widget _buildShimmerList() {
-    /* ... */ return Center(child: CircularProgressIndicator());
+    /* ... */ return Center(child: CircularProgressIndicator(color: primaryColor));
   }
 }
 
