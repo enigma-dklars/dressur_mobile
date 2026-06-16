@@ -629,7 +629,7 @@ class _RegisterForm2State extends State<RegisterForm2> {
         children: [
           loading_formule_payant
               ? const Center(
-                  child: CircularProgressIndicator(),
+                  child: CircularProgressIndicator(color: primaryColor),
                 )
               : SelectFormField(
                   decoration: const InputDecoration(
