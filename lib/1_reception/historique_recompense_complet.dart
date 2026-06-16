@@ -151,7 +151,7 @@ class _HistoriqueCompletPageState extends State<HistoriqueCompletPage> {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const Padding(
                   padding: EdgeInsets.all(20),
-                  child: Center(child: CircularProgressIndicator()),
+                  child: Center(child: CircularProgressIndicator(color: primaryColor)),
                 );
               }
 
