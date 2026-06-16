@@ -82,6 +82,9 @@ class _PageDepartState extends State<PageDepart> {
           langUserPhone != "fr" ? "Loading ..." : "Chargement ...";
     });
 
+    // Durée minimale du splash pour laisser l'animation se dérouler
+    final splashMinimum = Future.delayed(const Duration(milliseconds: 4000));
+
     var request = http.MultipartRequest(
         'POST', Uri.parse('$generalRouteForApi/getVersionApp'));
     request.fields.addAll({});
@@ -136,6 +139,10 @@ class _PageDepartState extends State<PageDepart> {
       });
 
       final numsTelUser = await SQLHelper.getAll("numsTelUser");
+
+      // Attendre que l'animation soit terminée avant de naviguer
+      await splashMinimum;
+
       if (numsTelUser.isEmpty) {
         setState(() {
           modeReconnaissanceContactArrierePlan = true;
@@ -147,6 +154,8 @@ class _PageDepartState extends State<PageDepart> {
             .push(MaterialPageRoute(builder: (context) => const BottomBar()));
       }
     } else {
+      // Attendre que l'animation soit terminée avant de naviguer
+      await splashMinimum;
       await _checkAndRequestPermissions();
       return Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(builder: (context) => PresentationPage()),
@@ -291,12 +300,12 @@ class _LogoAnimationState extends State<LogoAnimation>
 
     _entryCtrl = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 2200),
+      duration: const Duration(milliseconds: 3800),
     )..forward();
 
     _radarCtrl = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 2800),
+      duration: const Duration(milliseconds: 3200),
     )..repeat();
 
     // Logo : fade + scale (0 → 55% du timeline)
