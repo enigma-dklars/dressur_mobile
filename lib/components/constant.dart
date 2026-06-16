@@ -22,6 +22,7 @@ const versionApp = '1.1.4';
 const oldDatabaseName = 'one_dressur.db';
 const nowDataBaseName = 'two_dressur.db';
 bool modeReconnaissanceContactArrierePlan = false;
+bool isNouvelUtilisateur = false;
 const generalRouteForApi = '$generalApiDomaine/api';
 const generalRouteForPromotionImage = '$generalApiDomaine/promotion/';
 const generalRouteForStoryImage = '$generalApiDomaine/story/';
