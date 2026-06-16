@@ -116,6 +116,7 @@ class _LoginFormState extends State<LoginForm> {
       var data = convert.jsonDecode(responseBody);
 
       if (response.statusCode == 200 && data["error"] == false) {
+        isNouvelUtilisateur = false;
         initUserInformations(data["user"]);
         Navigator.of(context).pushReplacement(
             MaterialPageRoute(builder: (context) => const BottomBar()));
