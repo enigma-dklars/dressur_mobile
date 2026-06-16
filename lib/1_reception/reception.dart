@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:dressur/1_reception/liste_contact.dart';
 import 'package:dressur/1_reception/recompense_dashboard.dart';
 import 'package:dressur/1_reception/recompense_start.dart';
@@ -10,6 +11,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:dressur/5_autre/support_assistance.dart';
 import 'package:dressur/1_reception/liste_notification.dart';
 import 'package:dressur/components/constant.dart';
+import 'package:http/http.dart' as http;
 
 class ReceptionPage extends StatefulWidget {
   @override
@@ -21,6 +23,34 @@ class _ReceptionPageState extends State<ReceptionPage> {
   @override
   void initState() {
     super.initState();
+    _fetchCounts();
+  }
+
+  Future<void> _fetchCounts() async {
+    try {
+      final results = await Future.wait([
+        http.get(Uri.parse('$generalRouteForApi/listBoost/$uidUser/$langUserPhone')),
+        http.get(Uri.parse('$generalRouteForApi/listPromotion/$uidUser/$langUserPhone')),
+        http.get(Uri.parse('$generalRouteForApi/listPromoReseau/$uidUser/$langUserPhone')),
+      ]);
+
+      if (!mounted) return;
+
+      setState(() {
+        if (results[0].statusCode == 200) {
+          final data = jsonDecode(results[0].body);
+          if (data is List) nbrBoostContact = data.length;
+        }
+        if (results[1].statusCode == 200) {
+          final data = jsonDecode(results[1].body);
+          if (data is List) nbrPromoAffaire = data.length;
+        }
+        if (results[2].statusCode == 200) {
+          final data = jsonDecode(results[2].body);
+          if (data is List) nbrPromoReseau = data.length;
+        }
+      });
+    } catch (_) {}
   }
 
   Widget build(BuildContext context) {
@@ -139,8 +169,6 @@ class _ReceptionPageState extends State<ReceptionPage> {
   }
 
   Widget _buildSummaryBanner(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 10),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
@@ -159,37 +187,73 @@ class _ReceptionPageState extends State<ReceptionPage> {
           ),
         ],
       ),
-      child: Row(
+      child: Column(
         children: [
-          Expanded(
-            child: _buildSummaryCell(
-              icon: FontAwesomeIcons.trophy,
-              label: (langUserPhone == "fr") ? "Solde pts" : "Points",
-              value: isInscritProgrammeRecompense
-                  ? "${soldeProgrammeRecompense ?? 0} pts"
-                  : (langUserPhone == "fr") ? "Non inscrit" : "Not enrolled",
-            ),
+          // ── Ligne 1 : Solde FCFA · Contacts · Boost ──
+          Row(
+            children: [
+              Expanded(
+                child: _buildSummaryCell(
+                  icon: FontAwesomeIcons.trophy,
+                  label: (langUserPhone == "fr") ? "Solde FCFA" : "Balance",
+                  value: isInscritProgrammeRecompense
+                      ? "${soldeProgrammeRecompense ?? 0} FCFA"
+                      : (langUserPhone == "fr") ? "Non inscrit" : "Not enrolled",
+                ),
+              ),
+              _buildVerticalDivider(),
+              Expanded(
+                child: _buildSummaryCell(
+                  icon: FontAwesomeIcons.solidAddressBook,
+                  label: (langUserPhone == "fr") ? "Contacts" : "Contacts",
+                  value: "$nombreContacts",
+                ),
+              ),
+              _buildVerticalDivider(),
+              Expanded(
+                child: _buildSummaryCell(
+                  icon: boostEnCours
+                      ? FontAwesomeIcons.rocket
+                      : FontAwesomeIcons.circleStop,
+                  label: "Boost",
+                  value: boostEnCours
+                      ? (langUserPhone == "fr") ? "En cours" : "Active"
+                      : (langUserPhone == "fr") ? "Inactif" : "Inactive",
+                  valueColor: boostEnCours ? Colors.greenAccent : Colors.white60,
+                ),
+              ),
+            ],
           ),
-          _buildVerticalDivider(),
-          Expanded(
-            child: _buildSummaryCell(
-              icon: FontAwesomeIcons.solidAddressBook,
-              label: (langUserPhone == "fr") ? "Contacts dispo" : "Available",
-              value: "$nombreContactDispo",
-            ),
-          ),
-          _buildVerticalDivider(),
-          Expanded(
-            child: _buildSummaryCell(
-              icon: boostEnCours
-                  ? FontAwesomeIcons.rocket
-                  : FontAwesomeIcons.circleStop,
-              label: "Boost",
-              value: boostEnCours
-                  ? (langUserPhone == "fr") ? "En cours" : "Active"
-                  : (langUserPhone == "fr") ? "Inactif" : "Inactive",
-              valueColor: boostEnCours ? Colors.greenAccent : Colors.white60,
-            ),
+          const SizedBox(height: 12),
+          Container(height: 1, color: Colors.white24),
+          const SizedBox(height: 12),
+          // ── Ligne 2 : Boost Contact · Promo Affaire · Promo Réseau ──
+          Row(
+            children: [
+              Expanded(
+                child: _buildSummaryCell(
+                  icon: FontAwesomeIcons.userPlus,
+                  label: (langUserPhone == "fr") ? "Boost contact" : "Boost contact",
+                  value: "$nbrBoostContact",
+                ),
+              ),
+              _buildVerticalDivider(),
+              Expanded(
+                child: _buildSummaryCell(
+                  icon: FontAwesomeIcons.briefcase,
+                  label: (langUserPhone == "fr") ? "Promo affaire" : "Business promo",
+                  value: "$nbrPromoAffaire",
+                ),
+              ),
+              _buildVerticalDivider(),
+              Expanded(
+                child: _buildSummaryCell(
+                  icon: FontAwesomeIcons.shareNodes,
+                  label: (langUserPhone == "fr") ? "Promo réseau" : "Network promo",
+                  value: "$nbrPromoReseau",
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -274,7 +338,6 @@ class _ReceptionPageState extends State<ReceptionPage> {
         ),
         child: Row(
           children: [
-            // --- Icône stylisée ---
             Container(
               padding: EdgeInsets.all(12),
               decoration: BoxDecoration(
@@ -284,8 +347,6 @@ class _ReceptionPageState extends State<ReceptionPage> {
               child: FaIcon(icon, color: primaryColor, size: 26),
             ),
             SizedBox(width: 16),
-
-            // --- Textes ---
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -312,8 +373,6 @@ class _ReceptionPageState extends State<ReceptionPage> {
               ),
             ),
             SizedBox(width: 8),
-
-            // --- Flèche de navigation ---
             FaIcon(
               FontAwesomeIcons.chevronRight,
               color: isDark ? Colors.grey[600] : Colors.grey[400],
