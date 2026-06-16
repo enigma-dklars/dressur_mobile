@@ -1110,7 +1110,7 @@ class _ActuPageState extends State<ActuPage> {
                           if (snapshot.connectionState ==
                               ConnectionState.waiting) {
                             return const Center(
-                              child: CircularProgressIndicator(),
+                              child: CircularProgressIndicator(color: primaryColor),
                             );
                           } else if (snapshot.hasError) {
                             return Center(
