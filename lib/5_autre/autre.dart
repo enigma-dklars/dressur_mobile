@@ -1,10 +1,8 @@
 // ignore_for_file: use_build_context_synchronously, prefer_const_constructors
 
-import 'dart:io';
 import 'package:dressur/5_autre/suggestions.dart';
 import 'package:dressur/components/sociaux.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:dressur/8_admin/admin.dart';
 import 'package:dressur/5_autre/a_propos_ds.dart';
@@ -29,28 +27,6 @@ class SettingPage extends StatefulWidget {
 }
 
 class _SettingPageState extends State<SettingPage> {
-  Future<bool> _onWillPop() async {
-    // ... (votre code _onWillPop existant)
-    return (await showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: Text(
-                (langUserPhone == "fr") ? 'Êtes-vous sûr?' : 'Are you sure?'),
-            content: Text((langUserPhone == "fr")
-                ? "Voulez-vous quitter l'application ?"
-                : "Do you want to quit the application?"),
-            actions: <Widget>[
-              TextButton(
-                  onPressed: () => Navigator.of(context).pop(false),
-                  child: Text((langUserPhone == "fr") ? 'Non' : 'No')),
-              TextButton(
-                  onPressed: () => SystemNavigator.pop(),
-                  child: Text((langUserPhone == "fr") ? 'Oui' : 'Yes')),
-            ],
-          ),
-        )) ??
-        false;
-  }
 
   // --- LOGIQUE DES ACTIONS (pour garder le build() propre) ---
   void _handleDeleteDSContacts() async {
@@ -158,9 +134,7 @@ class _SettingPageState extends State<SettingPage> {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
-    return WillPopScope(
-      onWillPop: _onWillPop,
-      child: Scaffold(
+    return Scaffold(
         backgroundColor: isDark ? Color(0xFF121212) : Color(0xFFF8F9FA),
         appBar: AppBar(
           automaticallyImplyLeading: false,
@@ -399,7 +373,6 @@ class _SettingPageState extends State<SettingPage> {
                   size: 16, color: Colors.grey[400]),
           ],
         ),
-      ),
     );
   }
 }
