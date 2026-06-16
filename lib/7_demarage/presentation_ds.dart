@@ -56,9 +56,9 @@ final List<_SlideData> _slides = [
     titleFr: 'Gagne des FCFA',
     titleEn: 'Earn FCFA',
     descFr:
-        'Consulte les annonces et promotions\npour être récompensé en FCFA.',
+        'Partage les promotions du programme\nrécompenses et touche des FCFA à chaque partage.',
     descEn:
-        'View ads and promotions\nto earn FCFA rewards.',
+        'Share reward program promotions\nand earn FCFA with every share.',
   ),
   _SlideData(
     icon: FontAwesomeIcons.bullhorn,
