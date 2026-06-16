@@ -1,6 +1,5 @@
 // ignore_for_file: use_build_context_synchronously
 
-import 'dart:io';
 import 'package:dressur/components/padding_and_divider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -51,42 +50,6 @@ class _PreferencePageState extends State<PreferencePage> {
     });
   }
 
-  Future<bool> _onWillPop() async {
-    return (await showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: (langUserPhone == "fr")
-                ? const Text('Êtes-vous sûr?')
-                : const Text('Are you sure?'),
-            content: (langUserPhone == "fr")
-                ? const Text("Voulez-vous quitter l'application ?")
-                : const Text("Do you want to quit the application?"),
-            actions: <Widget>[
-              TextButton(
-                onPressed: () =>
-                    Navigator.of(context).pop(false), //<-- SEE HERE
-                child: (langUserPhone == "fr")
-                    ? const Text('Non')
-                    : const Text('No'),
-              ),
-              TextButton(
-                onPressed: () {
-                  if (Platform.isAndroid) {
-                    SystemNavigator.pop();
-                  } else if (Platform.isIOS) {
-                    exit(0);
-                  }
-                }, // <-- SEE HERE
-                child: (langUserPhone == "fr")
-                    ? const Text('Oui')
-                    : const Text('Yes'),
-              ),
-            ],
-          ),
-        )) ??
-        false;
-  }
-
   @override
   void initState() {
     super.initState();
@@ -96,9 +59,7 @@ class _PreferencePageState extends State<PreferencePage> {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: _onWillPop,
-      child: Scaffold(
+    return Scaffold(
         appBar: AppBar(
           automaticallyImplyLeading: false,
           elevation: 0,
@@ -328,7 +289,6 @@ class _PreferencePageState extends State<PreferencePage> {
             ),
           ),
         ),
-      ),
     );
   }
 }
