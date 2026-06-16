@@ -135,6 +135,13 @@ class _BusinessPromotionsPageState extends State<BusinessPromotionsPage> {
     _futurePromotions = getPromotionAffaireInProgrammeRecompense();
   }
 
+  Future<void> _refresh() {
+    setState(() {
+      _futurePromotions = getPromotionAffaireInProgrammeRecompense();
+    });
+    return _futurePromotions;
+  }
+
   Future<List<Advertisement>> getPromotionAffaireInProgrammeRecompense() async {
     // Remplacez par votre route API réelle pour les promotions affaires
     var request = http.MultipartRequest(
@@ -411,7 +418,10 @@ class _BusinessPromotionsPageState extends State<BusinessPromotionsPage> {
               ),
             );
           } else {
-            return ListView.builder(
+            return RefreshIndicator(
+              onRefresh: _refresh,
+              color: primaryColor,
+              child: ListView.builder(
               itemCount: snapshot.data!.length,
               itemBuilder: (context, index) {
                 Advertisement advertisement = snapshot.data![index];
@@ -554,7 +564,8 @@ class _BusinessPromotionsPageState extends State<BusinessPromotionsPage> {
                   ),
                 );
               },
-            );
+            ),
+          );
           }
         },
       ),
