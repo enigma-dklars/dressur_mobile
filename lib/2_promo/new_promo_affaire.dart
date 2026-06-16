@@ -533,7 +533,7 @@ class _ProduitsServicesState extends State<ProduitsServices> {
         children: [
           const SizedBox(height: 5),
           loading_formule_gratuit
-              ? const Center(child: CircularProgressIndicator())
+              ? const Center(child: CircularProgressIndicator(color: primaryColor))
               : SelectFormField(
                   decoration: const InputDecoration(
                       labelText: 'Formule de Boost',
