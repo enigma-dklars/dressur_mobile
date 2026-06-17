@@ -5,7 +5,7 @@ import 'package:dressur/components/constant.dart';
 import 'package:dressur/components/noti_sys.dart';
 
 /// Singleton qui gère la suppression des contacts DS en arrière-plan.
-/// Survit à la navigation — la page peut être quittée et rouverte
+/// Survit à la navigation : la page peut être quittée et rouverte
 /// et retrouvera toujours l'état courant de la suppression.
 class DSDeletionService extends ChangeNotifier {
   // ── Singleton ─────────────────────────────────────────────────────────────
