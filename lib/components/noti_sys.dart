@@ -236,3 +236,78 @@ Future<void> showDSDeletionComplete(int totalSupprime) async {
 Future<void> cancelDSDeletionNotification() async {
   await flutterLocalNotificationsPlugin.cancel(_dsDeletionNotifId);
 }
+
+// ── Synchronisation avancée ────────────────────────────────────────────────────
+
+const int _synchroAvanceNotifId = 201;
+
+/// Affiche (ou met à jour) une notification avec barre de progression pendant
+/// la synchronisation avancée. L'ID est fixe pour écraser la précédente.
+Future<void> showSynchroAvanceProgress(
+    double progress, String statusText) async {
+  final bool isFr = langUserPhone == 'fr';
+  final int progressInt = (progress * 100).round().clamp(0, 100);
+
+  final AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
+    'synchro_avance_channel',
+    isFr ? 'Synchronisation avancée' : 'Advanced synchronization',
+    channelDescription: isFr
+        ? 'Progression de la synchronisation avancée des contacts'
+        : 'Advanced contact synchronization progress',
+    importance: Importance.low,
+    priority: Priority.low,
+    showProgress: true,
+    maxProgress: 100,
+    progress: progressInt,
+    ongoing: true,
+    autoCancel: false,
+    onlyAlertOnce: true,
+    playSound: false,
+    enableVibration: false,
+  );
+  final NotificationDetails notifDetails =
+      NotificationDetails(android: androidDetails);
+
+  await flutterLocalNotificationsPlugin.show(
+    _synchroAvanceNotifId,
+    isFr ? '🔄 Synchronisation en cours…' : '🔄 Synchronization in progress…',
+    statusText,
+    notifDetails,
+  );
+}
+
+/// Remplace la notification de progression par une notification de succès
+/// une fois la synchronisation terminée.
+Future<void> showSynchroAvanceComplete(
+    int nbCreated, int nbUpdated, int nbMerged) async {
+  final bool isFr = langUserPhone == 'fr';
+  await flutterLocalNotificationsPlugin.cancel(_synchroAvanceNotifId);
+
+  const AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
+    'synchro_avance_channel',
+    'Synchronisation avancée',
+    channelDescription:
+        'Progression de la synchronisation avancée des contacts',
+    importance: Importance.defaultImportance,
+    priority: Priority.defaultPriority,
+    autoCancel: true,
+  );
+  const NotificationDetails notifDetails =
+      NotificationDetails(android: androidDetails);
+
+  final String body = isFr
+      ? '$nbCreated créé(s) · $nbUpdated mis à jour · $nbMerged doublon(s) fusionné(s)'
+      : '$nbCreated created · $nbUpdated updated · $nbMerged duplicate(s) merged';
+
+  await flutterLocalNotificationsPlugin.show(
+    _synchroAvanceNotifId,
+    isFr ? '✅ Synchronisation terminée' : '✅ Synchronization complete',
+    body,
+    notifDetails,
+  );
+}
+
+/// Annule la notification de synchronisation avancée.
+Future<void> cancelSynchroAvanceNotification() async {
+  await flutterLocalNotificationsPlugin.cancel(_synchroAvanceNotifId);
+}
