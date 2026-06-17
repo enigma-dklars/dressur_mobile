@@ -369,27 +369,27 @@ class _PreferencePageState extends State<PreferencePage> {
                     }
                   }
 
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        sublabel,
-                        style: GoogleFonts.poppins(
-                          color: isDark ? Colors.grey[400] : Colors.grey[600],
-                          fontSize: 14,
-                          fontWeight: FontWeight.w400,
+                  return RichText(
+                    text: TextSpan(
+                      children: [
+                        TextSpan(
+                          text: '$sublabel ',
+                          style: GoogleFonts.poppins(
+                            color: isDark ? Colors.grey[400] : Colors.grey[600],
+                            fontSize: 14,
+                            fontWeight: FontWeight.w400,
+                          ),
                         ),
-                      ),
-                      SizedBox(height: 5),
-                      Text(
-                        value,
-                        style: GoogleFonts.poppins(
-                          color: isDark ? Colors.white : Colors.black,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
+                        TextSpan(
+                          text: value,
+                          style: GoogleFonts.poppins(
+                            color: isDark ? Colors.white : Colors.black,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   );
                 }),
               ],
