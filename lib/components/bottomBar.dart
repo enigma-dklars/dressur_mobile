@@ -12,7 +12,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
 import 'package:dressur/1_reception/reception.dart';
-import 'package:dressur/2_promo/promo.dart';
+import 'package:dressur/2_promo/services.dart';
 import 'package:dressur/3_actu/actu.dart';
 import 'package:dressur/4_preference/preference.dart';
 import 'package:dressur/5_autre/autre.dart';
