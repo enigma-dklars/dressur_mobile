@@ -42,6 +42,39 @@ class _SupprimerContactsDSPageState extends State<SupprimerContactsDSPage> {
     }
   }
 
+  Future<void> _confirmerArret() async {
+    final bool isFr = langUserPhone == 'fr';
+    final bool? confirm = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(
+          isFr ? 'Arrêter la suppression ?' : 'Stop the deletion?',
+          style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+        ),
+        content: Text(
+          isFr
+              ? 'Le traitement sera interrompu. Les contacts déjà supprimés ne seront pas restaurés.'
+              : 'The operation will be stopped. Already deleted contacts will not be restored.',
+          style: GoogleFonts.poppins(fontSize: 13),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text(isFr ? 'Continuer' : 'Continue'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: Text(
+              isFr ? 'Arrêter' : 'Stop',
+              style: const TextStyle(color: Colors.red),
+            ),
+          ),
+        ],
+      ),
+    );
+    if (confirm == true) _service.cancel();
+  }
+
   Widget _buildWarningRow(String text) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -84,6 +117,7 @@ class _SupprimerContactsDSPageState extends State<SupprimerContactsDSPage> {
     final bool enCour = _service.isRunning;
     final bool termine = _service.isCompleted;
     final bool erreur = _service.errorText != null;
+    final bool annule = _service.isCancelled;
     final double progress = _service.progress;
     final String statusText = _service.statusText;
     final int totalSupprime = _service.totalSupprime;
@@ -229,7 +263,79 @@ class _SupprimerContactsDSPageState extends State<SupprimerContactsDSPage> {
             ],
 
             // ── ERREUR ───────────────────────────────────────────────────
-            if (erreur && !termine) ...[
+            // ── ANNULÉ ───────────────────────────────────────────────────
+            if (annule && !enCour) ...[
+              FadeInUp(
+                from: 20,
+                duration: const Duration(milliseconds: 400),
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.orange.withOpacity(0.07),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.orange.withOpacity(0.3)),
+                  ),
+                  child: Text(
+                    statusText,
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.poppins(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.orange[800],
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              FadeInUp(
+                from: 20,
+                duration: const Duration(milliseconds: 400),
+                delay: const Duration(milliseconds: 100),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    onPressed: () => _service.reset(),
+                    icon: const FaIcon(FontAwesomeIcons.arrowsRotate),
+                    label: Text(
+                        isFr ? 'Relancer la suppression' : 'Restart deletion'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.orange[700],
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      textStyle: GoogleFonts.poppins(
+                          fontSize: 15, fontWeight: FontWeight.bold),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12)),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 8),
+              FadeInUp(
+                from: 20,
+                duration: const Duration(milliseconds: 400),
+                delay: const Duration(milliseconds: 150),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton.icon(
+                    onPressed: () => Navigator.pop(context),
+                    icon: const FaIcon(FontAwesomeIcons.chevronLeft),
+                    label: Text(isFr ? 'Retour' : 'Go back'),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: primaryColor,
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      textStyle: GoogleFonts.poppins(
+                          fontSize: 15, fontWeight: FontWeight.bold),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12)),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+
+            if (erreur && !termine && !annule) ...[
               FadeInUp(
                 from: 20,
                 duration: const Duration(milliseconds: 400),
@@ -272,7 +378,7 @@ class _SupprimerContactsDSPageState extends State<SupprimerContactsDSPage> {
             ],
 
             // ── VUE INITIALE / EN COURS ───────────────────────────────────
-            if (!termine && !erreur) ...[
+            if (!termine && !erreur && !annule) ...[
 
               // Bannière "en cours", rappel navigation possible
               if (enCour) ...[
@@ -439,6 +545,29 @@ class _SupprimerContactsDSPageState extends State<SupprimerContactsDSPage> {
                   ),
                 ),
               ),
+
+              // ── BOUTON D'ARRÊT (visible uniquement pendant le traitement) ─
+              if (enCour) ...[
+                const SizedBox(height: 10),
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton.icon(
+                    onPressed: _confirmerArret,
+                    icon: const FaIcon(FontAwesomeIcons.stop, size: 14),
+                    label: Text(
+                        isFr ? 'Arrêter le processus' : 'Stop the process'),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: Colors.red[600],
+                      side: BorderSide(color: Colors.red.shade300),
+                      padding: const EdgeInsets.symmetric(vertical: 13),
+                      textStyle: GoogleFonts.poppins(
+                          fontSize: 14, fontWeight: FontWeight.w600),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12)),
+                    ),
+                  ),
+                ),
+              ],
             ],
 
             const Spacer(),
