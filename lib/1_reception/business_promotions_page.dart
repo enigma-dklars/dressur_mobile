@@ -422,6 +422,9 @@ class _BusinessPromotionsPageState extends State<BusinessPromotionsPage> {
               onRefresh: _refresh,
               color: primaryColor,
               child: ListView.builder(
+              physics: const BouncingScrollPhysics(
+                  parent: AlwaysScrollableScrollPhysics()),
+              cacheExtent: 600,
               itemCount: snapshot.data!.length,
               itemBuilder: (context, index) {
                 Advertisement advertisement = snapshot.data![index];
