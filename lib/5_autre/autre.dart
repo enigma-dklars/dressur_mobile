@@ -2,9 +2,9 @@
 
 import 'package:animate_do/animate_do.dart';
 import 'package:dressur/5_autre/suggestions.dart';
+import 'package:dressur/5_autre/supprimer_contacts_ds.dart';
 import 'package:dressur/components/sociaux.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:dressur/8_admin/admin.dart';
 import 'package:dressur/5_autre/a_propos_ds.dart';
 import 'package:dressur/5_autre/delete_compte_user.dart';
@@ -28,91 +28,6 @@ class SettingPage extends StatefulWidget {
 }
 
 class _SettingPageState extends State<SettingPage> {
-  bool _deletingDS = false;
-  double _deleteProgress = 0.0;
-  String _deleteStatusText = "";
-
-  // --- LOGIQUE DES ACTIONS (pour garder le build() propre) ---
-  void _handleDeleteDSContacts() async {
-    ArtDialogResponse response = await ArtSweetAlert.show(
-      barrierDismissible: false,
-      context: context,
-      artDialogArgs: ArtDialogArgs(
-          title: (langUserPhone == "fr")
-              ? "Action irréversible"
-              : "Irreversible action",
-          text: (langUserPhone == "fr")
-              ? "Voulez-vous vraiment supprimer tous vos contacts DS ?"
-              : "Are you sure you want to delete all your DS contacts?",
-          confirmButtonText:
-              (langUserPhone == "fr") ? "Oui, Supprimer" : "Yes, Delete",
-          denyButtonText: (langUserPhone == "fr") ? "Annuler" : "Cancel",
-          type: ArtSweetAlertType.warning),
-    );
-
-    if (!response.isTapConfirmButton) return;
-
-    // Récupère tous les contacts du téléphone (nom requis pour détecter #DS)
-    List<Contact> tousLesContacts =
-        await FlutterContacts.getContacts(withProperties: true);
-
-    // Le marqueur officiel d'un contact DS est le suffixe #DS dans le nom.
-    // On n'utilise pas contactsEnregistrer (cache SQLite) car il peut être
-    // vide ou désynchronisé, ce qui conduirait à des suppressions manquées
-    // ou, pire, à la suppression de contacts personnels partageant un numéro.
-    List<Contact> dsContacts = tousLesContacts
-        .where((c) => c.displayName.contains('#DS'))
-        .toList();
-
-    if (dsContacts.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        behavior: SnackBarBehavior.floating,
-        content: Text(
-          (langUserPhone == "fr")
-              ? "Aucun contact DS trouvé dans vos contacts."
-              : "No DS contacts found in your contacts.",
-        ),
-      ));
-      return;
-    }
-
-    final int total = dsContacts.length;
-    setState(() {
-      _deletingDS = true;
-      _deleteProgress = 0.0;
-      _deleteStatusText = (langUserPhone == "fr")
-          ? "$total contact(s) DS détecté(s). Suppression en cours…"
-          : "$total DS contact(s) detected. Deletion in progress…";
-    });
-
-    int supprimes = 0;
-    for (var contact in dsContacts) {
-      await contact.delete();
-      supprimes++;
-      setState(() {
-        _deleteProgress = supprimes / total;
-        _deleteStatusText = (langUserPhone == "fr")
-            ? "Suppression… ($supprimes / $total)"
-            : "Deleting… ($supprimes / $total)";
-      });
-    }
-
-    setState(() {
-      _deletingDS = false;
-      _deleteProgress = 1.0;
-    });
-
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      behavior: SnackBarBehavior.floating,
-      backgroundColor: Colors.green[700],
-      content: Text(
-        (langUserPhone == "fr")
-            ? "$supprimes contact(s) DS supprimé(s) avec succès."
-            : "$supprimes DS contact(s) successfully deleted.",
-      ),
-    ));
-  }
-
   void _handleLogout() async {
     ArtDialogResponse response = await ArtSweetAlert.show(
         barrierDismissible: false,
@@ -220,61 +135,6 @@ class _SettingPageState extends State<SettingPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // --- BARRE DE PROGRESSION SUPPRESSION DS ---
-              if (_deletingDS)
-                FadeIn(
-                  duration: Duration(milliseconds: 300),
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-                    child: Container(
-                      padding: EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: Colors.orange.withOpacity(0.07),
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: Colors.orange.withOpacity(0.3)),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              FaIcon(FontAwesomeIcons.broom,
-                                  size: 14, color: Colors.orange[700]),
-                              SizedBox(width: 8),
-                              Text(
-                                (langUserPhone == "fr")
-                                    ? "Suppression des contacts DS…"
-                                    : "Deleting DS contacts…",
-                                style: GoogleFonts.poppins(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.orange[700],
-                                ),
-                              ),
-                            ],
-                          ),
-                          SizedBox(height: 10),
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(10),
-                            child: LinearProgressIndicator(
-                              value: _deleteProgress,
-                              minHeight: 8,
-                              backgroundColor: Colors.grey[200],
-                              color: Colors.orange[700],
-                            ),
-                          ),
-                          SizedBox(height: 8),
-                          Text(
-                            _deleteStatusText,
-                            style: GoogleFonts.poppins(
-                                fontSize: 13, color: Colors.grey[600]),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-
               // --- SECTION COMPTE ---
               _buildSectionTitle(
                   (langUserPhone == "fr") ? "Mon Compte" : "My Account"),
@@ -337,8 +197,12 @@ class _SettingPageState extends State<SettingPage> {
                   (langUserPhone == "fr")
                       ? "Supprimer les contacts DS"
                       : "Delete DS Contacts",
-                  _deletingDS ? null : _handleDeleteDSContacts,
-                  color: _deletingDS ? Colors.grey : Colors.orange[700],
+                  () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) =>
+                              const SupprimerContactsDSPage())),
+                  color: Colors.orange[700],
                 ),
                 _buildMenuRow(
                   FontAwesomeIcons.trash,
