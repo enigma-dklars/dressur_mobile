@@ -4,9 +4,6 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:dressur/components/constant.dart';
 import 'package:dressur/components/noti_sys.dart';
 
-/// Singleton qui gère la suppression des contacts DS en arrière-plan.
-/// Survit à la navigation : la page peut être quittée et rouverte
-/// et retrouvera toujours l'état courant de la suppression.
 class DSDeletionService extends ChangeNotifier {
   // ── Singleton ─────────────────────────────────────────────────────────────
   static final DSDeletionService _instance = DSDeletionService._internal();
@@ -28,11 +25,22 @@ class DSDeletionService extends ChangeNotifier {
   double get progress => total > 0 ? current / total : 0.0;
   bool get hasResult => isCompleted || errorText != null || isCancelled;
 
+  /// Vrai dès que l'utilisateur a demandé l'arrêt mais que la boucle
+  /// n'a pas encore fini son itération courante.
+  bool get isCancelPending => _cancelRequested && isRunning;
+
   // ── Actions ───────────────────────────────────────────────────────────────
 
   /// Demande l'interruption du traitement en cours.
+  /// Déclenche une notification immédiate à l'UI sans attendre la fin de
+  /// l'itération courante.
   void cancel() {
-    if (isRunning) _cancelRequested = true;
+    if (_cancelRequested) return; // déjà demandé
+    _cancelRequested = true;
+    statusText = langUserPhone == 'fr'
+        ? "Annulation en cours, veuillez patienter…"
+        : "Cancellation in progress, please wait…";
+    notifyListeners(); // feedback immédiat → le bouton se grise
   }
 
   /// Réinitialise l'état pour permettre une nouvelle suppression.
@@ -50,7 +58,6 @@ class DSDeletionService extends ChangeNotifier {
   }
 
   /// Lance la suppression des contacts DS.
-  /// Retourne une [String?] non nulle si une erreur de permission survient.
   Future<String?> start() async {
     if (isRunning) return null;
 
@@ -79,12 +86,15 @@ class DSDeletionService extends ChangeNotifier {
     total = 0;
     totalSupprime = 0;
     errorText = null;
-    statusText = isFr ? "Recherche des contacts DS…" : "Looking for DS contacts…";
+    statusText =
+        isFr ? "Recherche des contacts DS…" : "Looking for DS contacts…";
     notifyListeners();
 
     try {
       final List<Contact> tousLesContacts =
           await FlutterContacts.getContacts(withProperties: true);
+
+      if (_cancelRequested) { _applyCancel(isFr); return null; }
 
       final List<Contact> dsContacts = tousLesContacts
           .where((c) => c.displayName.contains('#DS'))
@@ -95,7 +105,8 @@ class DSDeletionService extends ChangeNotifier {
         isRunning = false;
         isCompleted = true;
         totalSupprime = 0;
-        statusText = isFr ? "Aucun contact DS trouvé." : "No DS contacts found.";
+        statusText =
+            isFr ? "Aucun contact DS trouvé." : "No DS contacts found.";
         notifyListeners();
         return null;
       }
@@ -106,16 +117,16 @@ class DSDeletionService extends ChangeNotifier {
           : "$total DS contact(s) detected. Deletion in progress…";
       notifyListeners();
 
-      // Notification initiale
       await showDSDeletionProgress(0, total);
 
       for (final contact in dsContacts) {
-        // Vérifier si une annulation a été demandée
         if (_cancelRequested) break;
 
         await contact.delete();
-        current++;
 
+        if (_cancelRequested) break; // vérification post-delete
+
+        current++;
         await showDSDeletionProgress(current, total);
         statusText = isFr
             ? "Suppression… ($current / $total)"
@@ -123,15 +134,8 @@ class DSDeletionService extends ChangeNotifier {
         notifyListeners();
       }
 
-      // ── Annulé ────────────────────────────────────────────────────────────
       if (_cancelRequested) {
-        await cancelDSDeletionNotification();
-        isRunning = false;
-        isCancelled = true;
-        statusText = isFr
-            ? "Suppression interrompue. $current / $total contact(s) traité(s)."
-            : "Deletion interrupted. $current / $total contact(s) processed.";
-        notifyListeners();
+        _applyCancel(isFr);
         return null;
       }
 
@@ -147,10 +151,21 @@ class DSDeletionService extends ChangeNotifier {
     } catch (e) {
       await cancelDSDeletionNotification();
       isRunning = false;
-      errorText = isFr ? "Une erreur est survenue : $e" : "An error occurred: $e";
+      errorText =
+          isFr ? "Une erreur est survenue : $e" : "An error occurred: $e";
       notifyListeners();
     }
 
     return null;
+  }
+
+  void _applyCancel(bool isFr) {
+    cancelDSDeletionNotification();
+    isRunning = false;
+    isCancelled = true;
+    statusText = isFr
+        ? "Suppression interrompue. $current / $total contact(s) traité(s)."
+        : "Deletion interrupted. $current / $total contact(s) processed.";
+    notifyListeners();
   }
 }
