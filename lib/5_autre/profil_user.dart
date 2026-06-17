@@ -337,11 +337,10 @@ class _RegisterFormState extends State<RegisterForm> {
               size: 20),
         ),
         suffixIcon: readOnly
-            ? Padding(
-                padding: const EdgeInsets.only(right: 14),
-                child: FaIcon(FontAwesomeIcons.lock,
-                    color: Colors.green[400], size: 16),
-              )
+            ? Icon(Icons.lock_rounded, color: Colors.green[400], size: 18)
+            : null,
+        suffixIconConstraints: readOnly
+            ? const BoxConstraints(minWidth: 44, minHeight: 44)
             : null,
         filled: true,
         fillColor: readOnly
