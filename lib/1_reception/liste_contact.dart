@@ -151,7 +151,7 @@ class _ContactPageState extends State<ContactPage> {
     if (hasNom && hasPseudo) return "${contact.nom} - ${contact.pseudo}";
     if (hasNom) return contact.nom;
     if (hasPseudo) return contact.pseudo;
-    return "—";
+    return "";
   }
 
   static const List<Color> _avatarColors = [
