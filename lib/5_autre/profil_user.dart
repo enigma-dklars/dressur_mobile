@@ -192,16 +192,36 @@ class _RegisterFormState extends State<RegisterForm> {
               icon: FontAwesomeIcons.solidEnvelope,
               keyboardType: TextInputType.emailAddress),
           SizedBox(height: 12),
-          if (telIsVerified == false) ...[
-            _buildTextField(
-                controller: telController,
-                label: (langUserPhone == "fr")
-                    ? 'Numéro WhatsApp'
-                    : 'WhatsApp Number',
-                icon: FontAwesomeIcons.phone,
-                keyboardType: TextInputType.phone),
-            SizedBox(height: 12),
+          _buildTextField(
+              controller: telController,
+              label: (langUserPhone == "fr")
+                  ? 'Numéro WhatsApp'
+                  : 'WhatsApp Number',
+              icon: FontAwesomeIcons.phone,
+              keyboardType: TextInputType.phone,
+              readOnly: telIsVerified == true),
+          if (telIsVerified == true) ...[
+            SizedBox(height: 6),
+            Row(
+              children: [
+                FaIcon(FontAwesomeIcons.circleCheck,
+                    color: Colors.green[600], size: 13),
+                SizedBox(width: 6),
+                Expanded(
+                  child: Text(
+                    (langUserPhone == "fr")
+                        ? "Numéro confirmé — non modifiable. Pour utiliser un autre numéro, créez un nouveau compte."
+                        : "Confirmed number — read-only. To use another number, create a new account.",
+                    style: GoogleFonts.poppins(
+                        fontSize: 11,
+                        color: Colors.green[700],
+                        fontWeight: FontWeight.w400),
+                  ),
+                ),
+              ],
+            ),
           ],
+          SizedBox(height: 12),
 
           // --- SECTION RÉSEAUX SOCIAUX ---
           _buildSectionTitle((langUserPhone == "fr")
@@ -293,29 +313,49 @@ class _RegisterFormState extends State<RegisterForm> {
     required IconData icon,
     int maxLines = 1,
     TextInputType? keyboardType,
+    bool readOnly = false,
   }) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return TextFormField(
       controller: controller,
       maxLines: maxLines,
       keyboardType: keyboardType,
-      style: GoogleFonts.poppins(fontWeight: FontWeight.w500),
+      readOnly: readOnly,
+      style: GoogleFonts.poppins(
+        fontWeight: FontWeight.w500,
+        color: readOnly
+            ? (isDark ? Colors.grey[500] : Colors.grey[600])
+            : null,
+      ),
       decoration: InputDecoration(
         labelText: label,
         labelStyle: GoogleFonts.poppins(color: Colors.grey[600]),
         prefixIcon: Padding(
           padding: const EdgeInsets.only(left: 20, right: 13, top: 14),
-          child: FaIcon(icon, color: Colors.grey[500], size: 20),
+          child: FaIcon(icon,
+              color: readOnly ? Colors.green[400] : Colors.grey[500],
+              size: 20),
         ),
+        suffixIcon: readOnly
+            ? Padding(
+                padding: const EdgeInsets.only(right: 14),
+                child: FaIcon(FontAwesomeIcons.lock,
+                    color: Colors.green[400], size: 16),
+              )
+            : null,
         filled: true,
-        fillColor: isDark ? Colors.grey[850] : Colors.grey[100],
+        fillColor: readOnly
+            ? (isDark ? Colors.grey[900] : Colors.grey[200])
+            : (isDark ? Colors.grey[850] : Colors.grey[100]),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide.none,
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: primaryColor, width: 2),
+          borderSide: readOnly
+              ? BorderSide(color: Colors.green, width: 1)
+              : BorderSide(color: primaryColor, width: 2),
         ),
       ),
       validator: (value) {
