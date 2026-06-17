@@ -230,7 +230,8 @@ class _SettingPageState extends State<SettingPage> {
                 _buildMenuRow(
                     FontAwesomeIcons.rightFromBracket,
                     (langUserPhone == "fr") ? "Se déconnecter" : "Sign Out",
-                    _handleLogout),
+                    _handleLogout,
+                    showChevron: false),
               ]),
 
               // --- SECTION ABONNEMENT & PARTAGE ---
@@ -322,7 +323,7 @@ class _SettingPageState extends State<SettingPage> {
   }
 
   Widget _buildMenuRow(IconData icon, String text, VoidCallback? onTap,
-      {Color? color}) {
+      {Color? color, bool showChevron = true}) {
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(15),
@@ -338,7 +339,7 @@ class _SettingPageState extends State<SettingPage> {
                         fontSize: 15,
                         fontWeight: FontWeight.w500,
                         color: color))),
-            if (color == null)
+            if (showChevron)
               FaIcon(FontAwesomeIcons.chevronRight,
                   size: 16, color: Colors.grey[400]),
           ],
