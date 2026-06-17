@@ -196,12 +196,15 @@ class _PromotionReseauSociauxListePageState
                   onRefresh: fetchPromotionReseauSociaux,
                   color: primaryColor,
                   child: ListView.builder(
-                    physics: BouncingScrollPhysics(),
-                    padding: EdgeInsets.all(10),
+                    physics: const BouncingScrollPhysics(
+                        parent: AlwaysScrollableScrollPhysics()),
+                    cacheExtent: 500,
+                    padding: const EdgeInsets.all(10),
                     itemCount: _promotionReseauSociaux.length,
                     itemBuilder: (context, index) {
-                      return _buildPromotionCard(
-                          _promotionReseauSociaux[index]);
+                      return RepaintBoundary(
+                          child: _buildPromotionCard(
+                              _promotionReseauSociaux[index]));
                     },
                   ),
                 ),
