@@ -7,9 +7,6 @@ import 'package:dressur/components/constant.dart';
 import 'package:dressur/components/sql_helper.dart';
 import 'package:dressur/components/noti_sys.dart';
 
-/// Singleton qui gère la synchronisation avancée en arrière-plan.
-/// Survit à la navigation : la page peut être quittée et rouverte
-/// et retrouvera toujours l'état courant de la synchronisation.
 class SynchroAvanceService extends ChangeNotifier {
   // ── Singleton ─────────────────────────────────────────────────────────────
   static final SynchroAvanceService _instance =
@@ -33,11 +30,19 @@ class SynchroAvanceService extends ChangeNotifier {
 
   bool get hasResult => isCompleted || errorText != null || isCancelled;
 
+  /// Vrai dès que l'utilisateur a demandé l'arrêt mais que la boucle
+  /// n'a pas encore fini son itération courante.
+  bool get isCancelPending => _cancelRequested && isRunning;
+
   // ── Annulation ────────────────────────────────────────────────────────────
 
-  /// Demande l'interruption de la synchronisation en cours.
   void cancel() {
-    if (isRunning) _cancelRequested = true;
+    if (_cancelRequested) return;
+    _cancelRequested = true;
+    statusText = langUserPhone == 'fr'
+        ? "Annulation en cours, veuillez patienter…"
+        : "Cancellation in progress, please wait…";
+    notifyListeners();
   }
 
   // ── Réinitialisation ──────────────────────────────────────────────────────
@@ -97,9 +102,8 @@ class SynchroAvanceService extends ChangeNotifier {
     return null;
   }
 
-  // ── Arrêt propre (commun aux 3 étapes) ───────────────────────────────────
-  Future<void> _handleCancellation(bool isFr) async {
-    await cancelSynchroAvanceNotification();
+  void _applyCancel(bool isFr) {
+    cancelSynchroAvanceNotification();
     isRunning = false;
     isCancelled = true;
     statusText = isFr
@@ -110,15 +114,11 @@ class SynchroAvanceService extends ChangeNotifier {
   }
 
   // ── Démarrage ─────────────────────────────────────────────────────────────
-
-  /// Lance la synchronisation avancée.
-  /// Retourne un message d'erreur si une permission est refusée, sinon null.
   Future<String?> start(bool etendreOption) async {
     if (isRunning) return null;
 
     final bool isFr = langUserPhone == 'fr';
 
-    // Permission contacts
     PermissionStatus contactPerm = await Permission.contacts.status;
     if (contactPerm != PermissionStatus.granted) {
       contactPerm = await Permission.contacts.request();
@@ -129,10 +129,8 @@ class SynchroAvanceService extends ChangeNotifier {
           : "Please allow Dressur to access your contacts.";
     }
 
-    // Permission notifications (Android 13+)
     await Permission.notification.request();
 
-    // Init
     isRunning = true;
     isCompleted = false;
     isCancelled = false;
@@ -152,6 +150,8 @@ class SynchroAvanceService extends ChangeNotifier {
       final url = Uri.parse(
           '$generalRouteForApi/listContactDS/$uidUser/$langUserPhone');
       final response = await http.get(url);
+
+      if (_cancelRequested) { _applyCancel(isFr); return null; }
 
       if (response.statusCode != 200) {
         throw Exception("Erreur API: ${response.statusCode}");
@@ -173,8 +173,8 @@ class SynchroAvanceService extends ChangeNotifier {
 
       final int totalDSContacts = jsonData.length;
 
-      // ── ÉTAPE 1 : Fusion des doublons (0 % → 30 %) ──────────────────────
-      if (_cancelRequested) { await _handleCancellation(isFr); return null; }
+      // ── ÉTAPE 1 : Fusion des doublons ────────────────────────────────────
+      if (_cancelRequested) { _applyCancel(isFr); return null; }
 
       statusText = isFr
           ? "Détection des doublons${etendreAuxNonDS ? '' : ' DS'}..."
@@ -184,6 +184,9 @@ class SynchroAvanceService extends ChangeNotifier {
 
       List<Contact> allContacts =
           await FlutterContacts.getContacts(withProperties: true);
+
+      if (_cancelRequested) { _applyCancel(isFr); return null; }
+
       final List<Contact> dsContacts =
           allContacts.where((c) => c.name.first.endsWith("#DS")).toList();
 
@@ -198,13 +201,14 @@ class SynchroAvanceService extends ChangeNotifier {
 
       int deletedCount = 0;
       for (int i = 0; i < toDeleteList.length; i++) {
-        if (_cancelRequested) { await _handleCancellation(isFr); return null; }
+        if (_cancelRequested) { _applyCancel(isFr); return null; }
 
         final Contact? toDelete = allContacts
             .cast<Contact?>()
             .firstWhere((x) => x?.id == toDeleteList[i], orElse: () => null);
         if (toDelete != null) {
           await FlutterContacts.deleteContacts([toDelete]);
+          if (_cancelRequested) { _applyCancel(isFr); return null; }
           deletedCount++;
         }
         final double p =
@@ -227,8 +231,8 @@ class SynchroAvanceService extends ChangeNotifier {
       }
       notifyListeners();
 
-      // ── ÉTAPE 2 : Analyse contacts locaux (30 % → 60 %) ─────────────────
-      if (_cancelRequested) { await _handleCancellation(isFr); return null; }
+      // ── ÉTAPE 2 : Analyse contacts locaux ────────────────────────────────
+      if (_cancelRequested) { _applyCancel(isFr); return null; }
 
       statusText = isFr
           ? "Analyse de vos contacts locaux..."
@@ -239,10 +243,13 @@ class SynchroAvanceService extends ChangeNotifier {
 
       await SQLHelper.viderLaBaseDeDonneeLocalTelUser();
       allContacts = await FlutterContacts.getContacts(withProperties: true);
+
+      if (_cancelRequested) { _applyCancel(isFr); return null; }
+
       final int totalLocalContacts = allContacts.length;
 
       for (int i = 0; i < totalLocalContacts; i++) {
-        if (_cancelRequested) { await _handleCancellation(isFr); return null; }
+        if (_cancelRequested) { _applyCancel(isFr); return null; }
 
         final contact = allContacts[i];
         for (final phone in contact.phones) {
@@ -261,8 +268,8 @@ class SynchroAvanceService extends ChangeNotifier {
         notifyListeners();
       }
 
-      // ── ÉTAPE 3 : Enregistrement et mise à jour DS (60 % → 100 %) ────────
-      if (_cancelRequested) { await _handleCancellation(isFr); return null; }
+      // ── ÉTAPE 3 : Synchronisation DS ─────────────────────────────────────
+      if (_cancelRequested) { _applyCancel(isFr); return null; }
 
       statusText = isFr
           ? "Synchronisation des contacts DS..."
@@ -275,7 +282,7 @@ class SynchroAvanceService extends ChangeNotifier {
           allContacts.where((c) => c.name.first.endsWith("#DS")).toList();
 
       for (int i = 0; i < totalDSContacts; i++) {
-        if (_cancelRequested) { await _handleCancellation(isFr); return null; }
+        if (_cancelRequested) { _applyCancel(isFr); return null; }
 
         final contactData = jsonData[i];
         final String tel = (contactData["tel"] as String);
@@ -297,6 +304,7 @@ class SynchroAvanceService extends ChangeNotifier {
             ..name.first = expectedName
             ..phones = phonesList;
           await newContact.insert();
+          if (_cancelRequested) { _applyCancel(isFr); return null; }
           await insertNumTelUserIntoDataBase(tel);
           nbCreated++;
         } else {
@@ -306,6 +314,7 @@ class SynchroAvanceService extends ChangeNotifier {
             existing.name.first = expectedName;
             existing.phones = phonesList;
             await existing.update();
+            if (_cancelRequested) { _applyCancel(isFr); return null; }
             nbUpdated++;
           }
         }
@@ -332,7 +341,8 @@ class SynchroAvanceService extends ChangeNotifier {
     } catch (e) {
       await cancelSynchroAvanceNotification();
       isRunning = false;
-      errorText = isFr ? "Une erreur est survenue : $e" : "An error occurred: $e";
+      errorText =
+          isFr ? "Une erreur est survenue : $e" : "An error occurred: $e";
       notifyListeners();
     }
 
