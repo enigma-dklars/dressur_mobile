@@ -16,22 +16,31 @@ class DSDeletionService extends ChangeNotifier {
   // ── État ──────────────────────────────────────────────────────────────────
   bool isRunning = false;
   bool isCompleted = false;
+  bool isCancelled = false;
   int current = 0;
   int total = 0;
   int totalSupprime = 0;
   String statusText = "";
   String? errorText;
 
-  double get progress => total > 0 ? current / total : 0.0;
+  bool _cancelRequested = false;
 
-  bool get hasResult => isCompleted || errorText != null;
+  double get progress => total > 0 ? current / total : 0.0;
+  bool get hasResult => isCompleted || errorText != null || isCancelled;
 
   // ── Actions ───────────────────────────────────────────────────────────────
+
+  /// Demande l'interruption du traitement en cours.
+  void cancel() {
+    if (isRunning) _cancelRequested = true;
+  }
 
   /// Réinitialise l'état pour permettre une nouvelle suppression.
   void reset() {
     isRunning = false;
     isCompleted = false;
+    isCancelled = false;
+    _cancelRequested = false;
     current = 0;
     total = 0;
     totalSupprime = 0;
@@ -64,6 +73,8 @@ class DSDeletionService extends ChangeNotifier {
     // Démarrage
     isRunning = true;
     isCompleted = false;
+    isCancelled = false;
+    _cancelRequested = false;
     current = 0;
     total = 0;
     totalSupprime = 0;
@@ -99,20 +110,33 @@ class DSDeletionService extends ChangeNotifier {
       await showDSDeletionProgress(0, total);
 
       for (final contact in dsContacts) {
+        // Vérifier si une annulation a été demandée
+        if (_cancelRequested) break;
+
         await contact.delete();
         current++;
 
         await showDSDeletionProgress(current, total);
-
         statusText = isFr
             ? "Suppression… ($current / $total)"
             : "Deleting… ($current / $total)";
         notifyListeners();
       }
 
-      // Terminé
-      await showDSDeletionComplete(current);
+      // ── Annulé ────────────────────────────────────────────────────────────
+      if (_cancelRequested) {
+        await cancelDSDeletionNotification();
+        isRunning = false;
+        isCancelled = true;
+        statusText = isFr
+            ? "Suppression interrompue. $current / $total contact(s) traité(s)."
+            : "Deletion interrupted. $current / $total contact(s) processed.";
+        notifyListeners();
+        return null;
+      }
 
+      // ── Terminé ───────────────────────────────────────────────────────────
+      await showDSDeletionComplete(current);
       isRunning = false;
       isCompleted = true;
       totalSupprime = current;
