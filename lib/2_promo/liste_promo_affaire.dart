@@ -557,9 +557,15 @@ class _PromotionListPageState extends State<PromotionListPage> {
                   onRefresh: fetchPromotions,
                   color: primaryColor,
                   child: ListView.builder(
+                    physics: const BouncingScrollPhysics(
+                        parent: AlwaysScrollableScrollPhysics()),
+                    cacheExtent: 500,
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 10, vertical: 4),
                     itemCount: _promotions.length,
                     itemBuilder: (BuildContext context, int index) {
-                      return _buildPromotionCard(_promotions[index]);
+                      return RepaintBoundary(
+                          child: _buildPromotionCard(_promotions[index]));
                     },
                   ),
                 ),
