@@ -261,7 +261,8 @@ class _ActuPageState extends State<ActuPage> {
     return File('${dir.path}/promos_cache.json');
   }
 
-  Future<void> _savePromoCache(String promosJson) async {
+  Future<void> _savePromoCache(dynamic promosJson) async {
+    if (promosJson is! String || promosJson.isEmpty) return;
     try {
       final file = await _promoCacheFile();
       await file.writeAsString(jsonEncode({
@@ -272,7 +273,7 @@ class _ActuPageState extends State<ActuPage> {
   }
 
   Future<void> _loadPromoWithCache() async {
-    if (lesPublicites.isNotEmpty) {
+    if (lesPublicites is String && (lesPublicites as String).isNotEmpty) {
       _savePromoCache(lesPublicites);
       return;
     }
