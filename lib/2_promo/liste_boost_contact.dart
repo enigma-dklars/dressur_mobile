@@ -260,9 +260,15 @@ class _ListeBoostContactPageState extends State<ListeBoostContactPage> {
                   onRefresh: fetchBoosts,
                   color: primaryColor,
                   child: ListView.builder(
+                    physics: const BouncingScrollPhysics(
+                        parent: AlwaysScrollableScrollPhysics()),
+                    cacheExtent: 500,
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 10, vertical: 4),
                     itemCount: _boosts.length,
                     itemBuilder: (BuildContext context, int index) {
-                      return _buildBoostCard(_boosts[index]);
+                      return RepaintBoundary(
+                          child: _buildBoostCard(_boosts[index]));
                     },
                   ),
                 ),
