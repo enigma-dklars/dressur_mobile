@@ -87,10 +87,14 @@ class _BoostPageState extends State<BoostPage> {
             itemBuilder: (context) => [
               PopupMenuItem(
                 value: 1,
-                child: Text(
-                  (langUserPhone == "fr") ? "Aide" : "Help",
-                  style: GoogleFonts.poppins(
-                      color: Colors.white, fontWeight: FontWeight.w600),
+                child: Row(
+                  children: [
+                    Text(
+                      (langUserPhone == "fr") ? "Aide" : "Help",
+                      style: GoogleFonts.poppins(
+                          color: Colors.white, fontWeight: FontWeight.w600),
+                    ),
+                  ],
                 ),
               ),
             ],
@@ -112,81 +116,99 @@ class _BoostPageState extends State<BoostPage> {
         color: primaryColor,
         child: SingleChildScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
-          child: Column(
-            children: [
-              const SizedBox(height: 10),
-              _buildStatsBanner(),
-              const SizedBox(height: 14),
-              if (addPageActu)
-                _buildServiceTile(
-                  context: context,
-                  icon: FontAwesomeIcons.addressBook,
-                  title: "Boost Contact",
-                  count: nbrBoostContact,
-                  accentColor: const Color(0xFF1565C0),
-                  newLabel: (langUserPhone == "fr") ? "Nouveau boost" : "New boost",
-                  listLabel: (langUserPhone == "fr") ? "Voir la liste" : "See list",
-                  onNew: () => Navigator.push(context,
-                      MaterialPageRoute(builder: (_) => NewBoostContactPage())),
-                  onList: () => Navigator.push(context,
-                      MaterialPageRoute(builder: (_) => ListeBoostContactPage())),
-                ),
-              if (addPageActu) const SizedBox(height: 10),
-              _buildServiceTile(
+          child: Builder(
+            builder: (context) {
+              final boostContactCard = _buildServiceCard(
                 context: context,
-                icon: FontAwesomeIcons.store,
-                title: (langUserPhone == "fr") ? "Promo Affaire" : "Business Promo",
-                count: nbrPromoAffaire,
-                accentColor: const Color(0xFF2E7D32),
-                newLabel: (langUserPhone == "fr") ? "Nouvelle promo" : "New promo",
-                listLabel: (langUserPhone == "fr") ? "Voir la liste" : "See list",
-                onNew: () => Navigator.push(context,
-                    MaterialPageRoute(builder: (_) => PromotionFormPage())),
-                onList: () => Navigator.push(context,
-                    MaterialPageRoute(builder: (_) => PromotionListPage())),
-              ),
-              if (mailIsMaxxFire == false) ...[
-                const SizedBox(height: 10),
-                _buildServiceTile(
-                  context: context,
-                  icon: FontAwesomeIcons.chartLine,
-                  title: (langUserPhone == "fr")
-                      ? "Promo Réseau Sociaux"
-                      : "Social Network Promo",
-                  count: nbrPromoReseau,
-                  accentColor: const Color(0xFF6A1B9A),
-                  newLabel: (langUserPhone == "fr") ? "Démarrer" : "Start",
-                  listLabel: (langUserPhone == "fr") ? "Voir la liste" : "See list",
-                  onNew: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (_) => PromotionReseauSociauxFormPage())),
-                  onList: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (_) => PromotionReseauSociauxListePage())),
-                ),
-              ],
-              if (!addPageActu) ...[
-                const SizedBox(height: 10),
-                _buildServiceTile(
-                  context: context,
-                  icon: FontAwesomeIcons.addressBook,
-                  title: "Boost Contact",
-                  count: nbrBoostContact,
-                  accentColor: const Color(0xFF1565C0),
-                  newLabel: (langUserPhone == "fr") ? "Nouveau boost" : "New boost",
-                  listLabel: (langUserPhone == "fr") ? "Voir la liste" : "See list",
-                  onNew: () => Navigator.push(context,
-                      MaterialPageRoute(builder: (_) => NewBoostContactPage())),
-                  onList: () => Navigator.push(context,
-                      MaterialPageRoute(builder: (_) => ListeBoostContactPage())),
-                ),
-              ],
-              const SizedBox(height: 14),
-              SociauxPage(),
-              const SizedBox(height: 10),
-            ],
+                icon: FontAwesomeIcons.addressBook,
+                title: "Boost Contact",
+                description: (langUserPhone == "fr")
+                    ? "Rendez visible le ($tel) aux contacts correspondant à vos préférences pays."
+                    : "Make the ($tel) visible to contacts corresponding to your country preferences.",
+                primaryActionText:
+                    (langUserPhone == "fr") ? "Faire un Boost" : "Boost",
+                onPrimaryAction: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => NewBoostContactPage())),
+                secondaryActionText:
+                    (langUserPhone == "fr") ? "Voir la liste" : "See the list",
+                onSecondaryAction: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => ListeBoostContactPage())),
+              );
+
+              return Column(
+                children: [
+                  const SizedBox(height: 10),
+                  _buildStatsBanner(),
+                  const SizedBox(height: 10),
+                  if (addPageActu) ...[
+                    boostContactCard,
+                    const SizedBox(height: 10),
+                  ],
+                  _buildServiceCard(
+                    context: context,
+                    icon: FontAwesomeIcons.store,
+                    title: (langUserPhone == "fr")
+                        ? "Promotion Affaire"
+                        : "Business Promotion",
+                    description: (langUserPhone == "fr")
+                        ? "Faite la promotion de vos produits et services. Les utilisateurs intéressés vous contacterons."
+                        : "Promote your products and services. Interested users will contact you.",
+                    primaryActionText: (langUserPhone == "fr")
+                        ? "Faire une Promo"
+                        : "Make a Promo",
+                    onPrimaryAction: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => PromotionFormPage())),
+                    secondaryActionText:
+                        (langUserPhone == "fr") ? "Voir la liste" : "See the list",
+                    onSecondaryAction: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => PromotionListPage())),
+                  ),
+                  const SizedBox(height: 10),
+                  if (mailIsMaxxFire == false) ...[
+                    _buildServiceCard(
+                      context: context,
+                      icon: FontAwesomeIcons.chartLine,
+                      title: (langUserPhone == "fr")
+                          ? "Promotion Réseau Sociaux"
+                          : "Social Network Promotion",
+                      description: (langUserPhone == "fr")
+                          ? "Payer pour des abonnés, des vues, des likes, etc. sur TikTok, Instagram, Telegram, YouTube, etc."
+                          : "Pay for subscribers, views, likes, etc. on TikTok, Instagram, Telegram, YouTube, etc.",
+                      primaryActionText:
+                          (langUserPhone == "fr") ? "Démarrer" : "To start up",
+                      onPrimaryAction: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  PromotionReseauSociauxFormPage())),
+                      secondaryActionText: (langUserPhone == "fr")
+                          ? "Voir la liste"
+                          : "See the list",
+                      onSecondaryAction: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  PromotionReseauSociauxListePage())),
+                    ),
+                    const SizedBox(height: 10),
+                  ],
+                  if (!addPageActu) ...[
+                    boostContactCard,
+                    const SizedBox(height: 10),
+                  ],
+                  SociauxPage(),
+                  const SizedBox(height: 10),
+                ],
+              );
+            },
           ),
         ),
       ),
@@ -221,8 +243,10 @@ class _BoostPageState extends State<BoostPage> {
               value: "$nbrBoostContact",
             ),
           ),
-          Container(height: 50, width: 1, color: Colors.white24,
-              margin: const EdgeInsets.symmetric(horizontal: 4)),
+          Container(
+            height: 50, width: 1, color: Colors.white24,
+            margin: const EdgeInsets.symmetric(horizontal: 4),
+          ),
           Expanded(
             child: _buildStatCell(
               icon: FontAwesomeIcons.store,
@@ -230,8 +254,10 @@ class _BoostPageState extends State<BoostPage> {
               value: "$nbrPromoAffaire",
             ),
           ),
-          Container(height: 50, width: 1, color: Colors.white24,
-              margin: const EdgeInsets.symmetric(horizontal: 4)),
+          Container(
+            height: 50, width: 1, color: Colors.white24,
+            margin: const EdgeInsets.symmetric(horizontal: 4),
+          ),
           Expanded(
             child: _buildStatCell(
               icon: FontAwesomeIcons.chartLine,
@@ -275,118 +301,108 @@ class _BoostPageState extends State<BoostPage> {
     );
   }
 
-  Widget _buildServiceTile({
+  Widget _buildServiceCard({
     required BuildContext context,
     required IconData icon,
     required String title,
-    required int count,
-    required Color accentColor,
-    required String newLabel,
-    required String listLabel,
-    required VoidCallback onNew,
-    required VoidCallback onList,
+    required String description,
+    required String primaryActionText,
+    required VoidCallback onPrimaryAction,
+    required String secondaryActionText,
+    required VoidCallback onSecondaryAction,
   }) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 10),
-      padding: const EdgeInsets.fromLTRB(14, 14, 14, 14),
+      margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
+        color: isDark ? Color(0xFF1E1E1E) : Colors.white,
         borderRadius: BorderRadius.circular(15),
         border: Border.all(
             color: isDark ? Colors.grey[800]! : Colors.grey[200]!, width: 1),
         boxShadow: [
           BoxShadow(
             color: isDark
-                ? Colors.black.withOpacity(0.15)
-                : Colors.grey.withOpacity(0.08),
-            blurRadius: 8,
-            offset: const Offset(0, 3),
+                ? Colors.black.withOpacity(0.2)
+                : Colors.grey.withOpacity(0.1),
+            blurRadius: 10,
+            offset: Offset(0, 4),
           ),
         ],
       ),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(10),
+                padding: EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: accentColor.withOpacity(0.1),
+                  color: primaryColor.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: FaIcon(icon, color: accentColor, size: 22),
+                child: FaIcon(icon, color: primaryColor, size: 28),
               ),
-              const SizedBox(width: 12),
+              SizedBox(width: 15),
               Expanded(
                 child: Text(
                   title,
                   style: GoogleFonts.poppins(
                     color: isDark ? Colors.white : Colors.black87,
                     fontWeight: FontWeight.w600,
-                    fontSize: 16,
-                  ),
-                ),
-              ),
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                decoration: BoxDecoration(
-                  color: accentColor.withOpacity(0.12),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Text(
-                  "$count",
-                  style: GoogleFonts.poppins(
-                    color: accentColor,
-                    fontWeight: FontWeight.w700,
-                    fontSize: 13,
+                    fontSize: 18,
                   ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: 15),
+          Text(
+            description,
+            style: GoogleFonts.poppins(
+              color: isDark ? Colors.grey[400] : Colors.grey[700],
+              fontSize: 14,
+              height: 1.5,
+            ),
+          ),
+          SizedBox(height: 20),
           Row(
             children: [
               Expanded(
-                child: ElevatedButton.icon(
-                  onPressed: onNew,
-                  icon: const FaIcon(FontAwesomeIcons.plus, size: 13),
-                  label: Text(
-                    newLabel,
-                    style: GoogleFonts.poppins(
-                        fontWeight: FontWeight.w600, fontSize: 13),
-                  ),
+                child: ElevatedButton(
+                  onPressed: onPrimaryAction,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: accentColor,
+                    backgroundColor: primaryColor,
                     foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 11),
+                    padding: EdgeInsets.symmetric(vertical: 14),
                     shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10)),
-                    elevation: 1,
+                        borderRadius: BorderRadius.circular(12)),
+                    elevation: 2,
+                  ),
+                  child: Text(
+                    primaryActionText,
+                    style: GoogleFonts.poppins(
+                        fontWeight: FontWeight.w600, fontSize: 14),
                   ),
                 ),
               ),
-              const SizedBox(width: 10),
+              SizedBox(width: 12),
               Expanded(
-                child: OutlinedButton.icon(
-                  onPressed: onList,
-                  icon: FaIcon(FontAwesomeIcons.listUl,
-                      size: 13, color: accentColor),
-                  label: Text(
-                    listLabel,
-                    style: GoogleFonts.poppins(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 13,
-                        color: accentColor),
-                  ),
+                child: OutlinedButton(
+                  onPressed: onSecondaryAction,
                   style: OutlinedButton.styleFrom(
-                    side: BorderSide(color: accentColor.withOpacity(0.5)),
-                    padding: const EdgeInsets.symmetric(vertical: 11),
+                    side: BorderSide(color: secondaryColor.withOpacity(0.7)),
+                    foregroundColor: secondaryColor,
+                    padding: EdgeInsets.symmetric(vertical: 14),
                     shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10)),
+                        borderRadius: BorderRadius.circular(12)),
+                  ),
+                  child: Text(
+                    secondaryActionText,
+                    style: GoogleFonts.poppins(
+                        fontWeight: FontWeight.w600, fontSize: 14),
                   ),
                 ),
               ),
