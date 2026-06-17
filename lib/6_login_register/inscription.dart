@@ -159,6 +159,7 @@ class _RegisterFormState extends State<RegisterForm> {
         modeReconnaissanceContactArrierePlan = true;
         isNouvelUtilisateur = true;
         scheduleBoostReminderNotification();
+        schedulePromoReminderNotification();
         initUserInformations(data['user']);
         Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(builder: (context) => const BottomBar()),
