@@ -12,7 +12,7 @@ import 'package:dressur/5_autre/modifier_mot_de_passe.dart';
 import 'package:dressur/5_autre/profil_user.dart';
 import 'package:dressur/5_autre/signaler_user.dart';
 import 'package:dressur/1_reception/liste_notification.dart';
-import 'package:dressur/6_login_register/connexion.dart';
+import 'package:dressur/7_demarage/presentation_ds.dart';
 import 'package:dressur/5_autre/support_assistance.dart';
 import 'package:art_sweetalert/art_sweetalert.dart';
 import 'package:dressur/components/constant.dart';
@@ -45,7 +45,7 @@ class _SettingPageState extends State<SettingPage> {
       SQLHelper.viderLaBaseDeDonneeLocal();
       Navigator.pushAndRemoveUntil(
         context,
-        MaterialPageRoute(builder: (context) => LoginPage()),
+        MaterialPageRoute(builder: (context) => WelcomePage()),
         (Route<dynamic> route) => false,
       );
     }
