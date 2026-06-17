@@ -20,6 +20,7 @@ class SynchroAvanceService extends ChangeNotifier {
   // ── État ──────────────────────────────────────────────────────────────────
   bool isRunning = false;
   bool isCompleted = false;
+  bool isCancelled = false;
   double progress = 0.0;
   int nbCreated = 0;
   int nbUpdated = 0;
@@ -28,12 +29,23 @@ class SynchroAvanceService extends ChangeNotifier {
   String statusText = "";
   String? errorText;
 
-  bool get hasResult => isCompleted || errorText != null;
+  bool _cancelRequested = false;
+
+  bool get hasResult => isCompleted || errorText != null || isCancelled;
+
+  // ── Annulation ────────────────────────────────────────────────────────────
+
+  /// Demande l'interruption de la synchronisation en cours.
+  void cancel() {
+    if (isRunning) _cancelRequested = true;
+  }
 
   // ── Réinitialisation ──────────────────────────────────────────────────────
   void reset() {
     isRunning = false;
     isCompleted = false;
+    isCancelled = false;
+    _cancelRequested = false;
     progress = 0.0;
     nbCreated = 0;
     nbUpdated = 0;
@@ -85,6 +97,18 @@ class SynchroAvanceService extends ChangeNotifier {
     return null;
   }
 
+  // ── Arrêt propre (commun aux 3 étapes) ───────────────────────────────────
+  Future<void> _handleCancellation(bool isFr) async {
+    await cancelSynchroAvanceNotification();
+    isRunning = false;
+    isCancelled = true;
+    statusText = isFr
+        ? "Synchronisation interrompue (${(progress * 100).round()} % effectué)."
+        : "Synchronization interrupted (${(progress * 100).round()} % done).";
+    textChargementEvolution = statusText;
+    notifyListeners();
+  }
+
   // ── Démarrage ─────────────────────────────────────────────────────────────
 
   /// Lance la synchronisation avancée.
@@ -111,6 +135,8 @@ class SynchroAvanceService extends ChangeNotifier {
     // Init
     isRunning = true;
     isCompleted = false;
+    isCancelled = false;
+    _cancelRequested = false;
     progress = 0.0;
     nbCreated = 0;
     nbUpdated = 0;
@@ -148,6 +174,8 @@ class SynchroAvanceService extends ChangeNotifier {
       final int totalDSContacts = jsonData.length;
 
       // ── ÉTAPE 1 : Fusion des doublons (0 % → 30 %) ──────────────────────
+      if (_cancelRequested) { await _handleCancellation(isFr); return null; }
+
       statusText = isFr
           ? "Détection des doublons${etendreAuxNonDS ? '' : ' DS'}..."
           : "Detecting${etendreAuxNonDS ? '' : ' DS'} duplicates...";
@@ -170,6 +198,8 @@ class SynchroAvanceService extends ChangeNotifier {
 
       int deletedCount = 0;
       for (int i = 0; i < toDeleteList.length; i++) {
+        if (_cancelRequested) { await _handleCancellation(isFr); return null; }
+
         final Contact? toDelete = allContacts
             .cast<Contact?>()
             .firstWhere((x) => x?.id == toDeleteList[i], orElse: () => null);
@@ -198,6 +228,8 @@ class SynchroAvanceService extends ChangeNotifier {
       notifyListeners();
 
       // ── ÉTAPE 2 : Analyse contacts locaux (30 % → 60 %) ─────────────────
+      if (_cancelRequested) { await _handleCancellation(isFr); return null; }
+
       statusText = isFr
           ? "Analyse de vos contacts locaux..."
           : "Analyzing your local contacts...";
@@ -210,6 +242,8 @@ class SynchroAvanceService extends ChangeNotifier {
       final int totalLocalContacts = allContacts.length;
 
       for (int i = 0; i < totalLocalContacts; i++) {
+        if (_cancelRequested) { await _handleCancellation(isFr); return null; }
+
         final contact = allContacts[i];
         for (final phone in contact.phones) {
           final String numberTel =
@@ -228,6 +262,8 @@ class SynchroAvanceService extends ChangeNotifier {
       }
 
       // ── ÉTAPE 3 : Enregistrement et mise à jour DS (60 % → 100 %) ────────
+      if (_cancelRequested) { await _handleCancellation(isFr); return null; }
+
       statusText = isFr
           ? "Synchronisation des contacts DS..."
           : "Synchronizing DS contacts...";
@@ -239,6 +275,8 @@ class SynchroAvanceService extends ChangeNotifier {
           allContacts.where((c) => c.name.first.endsWith("#DS")).toList();
 
       for (int i = 0; i < totalDSContacts; i++) {
+        if (_cancelRequested) { await _handleCancellation(isFr); return null; }
+
         final contactData = jsonData[i];
         final String tel = (contactData["tel"] as String);
         final String telSansPlus = tel.replaceAll("+", "");
