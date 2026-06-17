@@ -76,6 +76,8 @@ Future<void> scheduleBoostReminderNotification() async {
     tz.TZDateTime.now(tz.local).add(const Duration(hours: 24)),
     notifDetails,
     androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+    uiLocalNotificationDateInterpretation:
+        UILocalNotificationDateInterpretation.absoluteTime,
     payload: 'boost_reminder',
   );
 }
