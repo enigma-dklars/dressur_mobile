@@ -10,7 +10,6 @@ import 'package:dressur/1_reception/liste_notification.dart';
 import 'package:dressur/components/constant.dart';
 import 'package:dressur/components/sociaux.dart';
 import 'package:dressur/5_autre/support_assistance.dart';
-import 'dart:async';
 import 'package:http/http.dart' as http;
 
 class PreferencePage extends StatefulWidget {
@@ -22,35 +21,12 @@ class PreferencePage extends StatefulWidget {
 
 class _PreferencePageState extends State<PreferencePage> {
   var data;
-  Timer? _timer;
   bool _addPageActuLocal = addPageActu;
   bool _updatingAddPageActu = false;
 
   @override
   void dispose() {
-    // Arrête le timer lors de la suppression du widget
-    _stopTimer();
     super.dispose();
-  }
-
-  void _startTimer() {
-    // Crée un nouveau timer qui exécute la fonction everySecond toutes les secondes
-    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      everySecond();
-    });
-  }
-
-  void _stopTimer() {
-    // Arrête et annule le timer
-    _timer?.cancel();
-    _timer = null;
-  }
-
-  void everySecond() {
-    // Code à exécuter toutes les secondes
-    setState(() {
-      preferencePaysText = preferencePaysText;
-    });
   }
 
   Future<void> _updateAddPageActu(bool value) async {
@@ -72,8 +48,6 @@ class _PreferencePageState extends State<PreferencePage> {
   @override
   void initState() {
     super.initState();
-    // Démarre le timer lors de l'initialisation du widget
-    _startTimer();
   }
 
   @override
@@ -165,7 +139,7 @@ class _PreferencePageState extends State<PreferencePage> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(builder: (context) => ChoixDesPays()),
-                    );
+                    ).then((_) => setState(() {}));
                   },
                 ),
                 const SizedBox(height: 10),
@@ -372,21 +346,38 @@ class _PreferencePageState extends State<PreferencePage> {
                   ),
                 ),
                 SizedBox(height: 5),
-                Text(
-                  // Affiche un texte par défaut si la sélection est vide
-                  selectedCountriesText.isEmpty
-                      ? (langUserPhone == "fr"
-                          ? "Aucun pays sélectionné"
-                          : "No country selected")
-                      : selectedCountriesText,
-                  style: GoogleFonts.poppins(
-                    color: isDark ? Colors.white : Colors.black,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                  ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
+                Builder(builder: (_) {
+                  final String raw = selectedCountriesText.trim();
+                  final bool isEmpty = raw.isEmpty ||
+                      raw == "Aucun Choix" ||
+                      raw == "No Choice";
+
+                  String label;
+                  if (isEmpty) {
+                    label = langUserPhone == "fr"
+                        ? "Aucun pays sélectionné"
+                        : "No country selected";
+                  } else {
+                    final List<String> pays =
+                        raw.split(', ').where((s) => s.isNotEmpty).toList();
+                    if (pays.length <= 3) {
+                      label = pays.join(', ');
+                    } else {
+                      label = langUserPhone == "fr"
+                          ? "${pays.length} pays sélectionnés"
+                          : "${pays.length} countries selected";
+                    }
+                  }
+
+                  return Text(
+                    label,
+                    style: GoogleFonts.poppins(
+                      color: isDark ? Colors.white : Colors.black,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  );
+                }),
               ],
             ),
           ),
