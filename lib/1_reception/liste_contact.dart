@@ -24,7 +24,7 @@ class ContactDS {
   final String facebook;
   final String youtube;
 
-  ContactDS({
+  const ContactDS({
     required this.id,
     required this.pseudo,
     required this.nom,
@@ -39,6 +39,157 @@ class ContactDS {
   });
 }
 
+// ── Couleurs d'avatar ────────────────────────────────────────────────────────
+const List<Color> _kAvatarColors = [
+  Color(0xFF1565C0),
+  Color(0xFF2E7D32),
+  Color(0xFF6A1B9A),
+  Color(0xFFC62828),
+  Color(0xFF00838F),
+  Color(0xFFE65100),
+  Color(0xFF4527A0),
+  Color(0xFF00695C),
+  Color(0xFF558B2F),
+  Color(0xFF283593),
+  Color(0xFF880E4F),
+  Color(0xFF37474F),
+];
+
+Color _avatarColor(ContactDS c) {
+  final String key = (c.nom.isNotEmpty ? c.nom : c.pseudo).toLowerCase();
+  int hash = 0;
+  for (final int code in key.codeUnits) {
+    hash = (hash * 31 + code) & 0x7FFFFFFF;
+  }
+  return _kAvatarColors[hash % _kAvatarColors.length];
+}
+
+String _initials(ContactDS c) {
+  final String name = (c.nom.isNotEmpty ? c.nom : c.pseudo).trim();
+  final List<String> parts =
+      name.split(" ").where((p) => p.isNotEmpty).toList();
+  if (parts.isEmpty) return "?";
+  if (parts.length == 1) return parts[0][0].toUpperCase();
+  return (parts[0][0] + parts[1][0]).toUpperCase();
+}
+
+String _displayName(ContactDS c) {
+  final bool hasNom = c.nom.isNotEmpty;
+  final bool hasPseudo = c.pseudo.isNotEmpty;
+  if (hasNom && hasPseudo) return "${c.nom} - ${c.pseudo}";
+  if (hasNom) return c.nom;
+  if (hasPseudo) return c.pseudo;
+  return "";
+}
+
+// ── Carte contact — StatelessWidget pour que Flutter puisse la recycler ──────
+
+class _ContactCard extends StatelessWidget {
+  const _ContactCard({required this.contact});
+
+  final ContactDS contact;
+
+  @override
+  Widget build(BuildContext context) {
+    final Color avatarColor = _avatarColor(contact);
+    final String initials = _initials(contact);
+    final String name = _displayName(contact);
+
+    return Card(
+      elevation: 0,
+      margin: const EdgeInsets.only(bottom: 8),
+      shape:
+          RoundedRectangleBorder(borderRadius: BorderRadius.circular(13)),
+      child: Padding(
+        padding:
+            const EdgeInsets.symmetric(horizontal: 10.0, vertical: 8.0),
+        child: Column(
+          children: [
+            Row(
+              children: [
+                CircleAvatar(
+                  radius: 22,
+                  backgroundColor: avatarColor,
+                  child: Text(
+                    initials,
+                    style: GoogleFonts.poppins(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    name,
+                    style: GoogleFonts.poppins(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                IconButton(
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
+                  icon: FaIcon(FontAwesomeIcons.circleInfo,
+                      color: Colors.grey[400], size: 18),
+                  onPressed: () {
+                    uidAutreUser = contact.id;
+                    addUserOnAutreProfilPage = "non";
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (_) => AutreProfilPage()));
+                  },
+                ),
+              ],
+            ),
+            Divider(height: 12, thickness: 0.5),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                _ActionBtn(
+                    icon: FontAwesomeIcons.phone,
+                    onTap: () => launchPhoneCall(contact.tel)),
+                _ActionBtn(
+                    icon: FontAwesomeIcons.solidMessage,
+                    onTap: () => launchSMS(contact.tel)),
+                _ActionBtn(
+                    icon: FontAwesomeIcons.solidEnvelope,
+                    onTap: () => launchEmail(contact.mail)),
+                _ActionBtn(
+                    icon: FontAwesomeIcons.whatsapp,
+                    onTap: () => launchWhatsApp(contact.tel)),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ActionBtn extends StatelessWidget {
+  const _ActionBtn({required this.icon, required this.onTap});
+
+  final IconData icon;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      onPressed: onTap,
+      icon: FaIcon(icon, color: primaryColor, size: 18),
+      splashRadius: 20,
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      constraints: const BoxConstraints(),
+    );
+  }
+}
+
+// ── Page principale ──────────────────────────────────────────────────────────
+
 class ContactPage extends StatefulWidget {
   @override
   State<ContactPage> createState() => _ContactPageState();
@@ -49,6 +200,7 @@ class _ContactPageState extends State<ContactPage> {
   List<ContactDS> _contacts = [];
   List<ContactDS> _filteredContacts = [];
   final TextEditingController _searchController = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
 
   Future<void> fetchContactDSs() async {
     setState(() {
@@ -79,37 +231,37 @@ class _ContactPageState extends State<ContactPage> {
         );
       }).toList();
 
-      setState(() {
-        _isLoading = false;
-        _contacts = contacts;
-        nombreContacts = contacts.length;
-        _filteredContacts = List.from(_contacts);
-      });
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+          _contacts = contacts;
+          nombreContacts = contacts.length;
+          _filteredContacts = List.from(_contacts);
+        });
+      }
     } else {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text('Erreur'),
-            content: (langUserPhone == "fr")
-                ? Text(
-                    'Échec de récupération des contacts. Code d\'erreur: ${response.statusCode}')
-                : Text(
-                    'Failed to retrieve contacts. Error code: ${response.statusCode}'),
-            actions: <Widget>[
-              TextButton(
-                child: const Text('OK'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          );
-        },
-      );
-      setState(() {
-        _isLoading = false;
-      });
+      if (mounted) {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text('Erreur'),
+              content: (langUserPhone == "fr")
+                  ? Text(
+                      'Échec de récupération des contacts. Code d\'erreur: ${response.statusCode}')
+                  : Text(
+                      'Failed to retrieve contacts. Error code: ${response.statusCode}'),
+              actions: <Widget>[
+                TextButton(
+                  child: const Text('OK'),
+                  onPressed: () => Navigator.of(context).pop(),
+                ),
+              ],
+            );
+          },
+        );
+        setState(() => _isLoading = false);
+      }
     }
   }
 
@@ -123,11 +275,12 @@ class _ContactPageState extends State<ContactPage> {
   @override
   void dispose() {
     _searchController.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
   void _filterContacts() {
-    final query = _searchController.text.toLowerCase();
+    final String query = _searchController.text.toLowerCase();
     setState(() {
       _filteredContacts = _contacts.where((contact) {
         return contact.nom.toLowerCase().contains(query) ||
@@ -135,47 +288,6 @@ class _ContactPageState extends State<ContactPage> {
             contact.tel.toLowerCase().contains(query);
       }).toList();
     });
-  }
-
-  String _getInitials(ContactDS contact) {
-    final String name = (contact.nom.isNotEmpty ? contact.nom : contact.pseudo).trim();
-    final List<String> parts = name.split(" ").where((p) => p.isNotEmpty).toList();
-    if (parts.isEmpty) return "?";
-    if (parts.length == 1) return parts[0][0].toUpperCase();
-    return (parts[0][0] + parts[1][0]).toUpperCase();
-  }
-
-  String _buildDisplayName(ContactDS contact) {
-    final hasNom = contact.nom.isNotEmpty;
-    final hasPseudo = contact.pseudo.isNotEmpty;
-    if (hasNom && hasPseudo) return "${contact.nom} - ${contact.pseudo}";
-    if (hasNom) return contact.nom;
-    if (hasPseudo) return contact.pseudo;
-    return "";
-  }
-
-  static const List<Color> _avatarColors = [
-    Color(0xFF1565C0), // bleu foncé
-    Color(0xFF2E7D32), // vert foncé
-    Color(0xFF6A1B9A), // violet
-    Color(0xFFC62828), // rouge foncé
-    Color(0xFF00838F), // cyan foncé
-    Color(0xFFE65100), // orange foncé
-    Color(0xFF4527A0), // indigo
-    Color(0xFF00695C), // teal
-    Color(0xFF558B2F), // vert olive
-    Color(0xFF283593), // bleu marine
-    Color(0xFF880E4F), // rose foncé
-    Color(0xFF37474F), // gris ardoise
-  ];
-
-  Color _getAvatarColor(ContactDS contact) {
-    final String key = (contact.nom.isNotEmpty ? contact.nom : contact.pseudo).toLowerCase();
-    int hash = 0;
-    for (final int c in key.codeUnits) {
-      hash = (hash * 31 + c) & 0x7FFFFFFF;
-    }
-    return _avatarColors[hash % _avatarColors.length];
   }
 
   @override
@@ -193,9 +305,7 @@ class _ContactPageState extends State<ContactPage> {
           ),
         ),
         leading: IconButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
+          onPressed: () => Navigator.pop(context),
           icon: const FaIcon(
             FontAwesomeIcons.chevronLeft,
             color: Colors.white,
@@ -207,48 +317,30 @@ class _ContactPageState extends State<ContactPage> {
               PopupMenuItem(
                 value: 1,
                 onTap: () {
-                  _isLoading ? '' : fetchContactDSs();
+                  if (!_isLoading) fetchContactDSs();
                 },
-                child: Row(
-                  children: [
-                    Text(
-                      (langUserPhone == "fr") ? "Actualiser" : "Refresh",
-                      style: GoogleFonts.poppins(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
+                child: Text(
+                  (langUserPhone == "fr") ? "Actualiser" : "Refresh",
+                  style: GoogleFonts.poppins(
+                      color: Colors.white, fontWeight: FontWeight.w600),
                 ),
               ),
               PopupMenuItem(
                 value: 3,
-                child: Row(
-                  children: [
-                    Text(
-                      (langUserPhone == "fr")
-                          ? "Synchronisation avancé"
-                          : "Advanced synchronization",
-                      style: GoogleFonts.poppins(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
+                child: Text(
+                  (langUserPhone == "fr")
+                      ? "Synchronisation avancée"
+                      : "Advanced synchronization",
+                  style: GoogleFonts.poppins(
+                      color: Colors.white, fontWeight: FontWeight.w600),
                 ),
               ),
               PopupMenuItem(
                 value: 4,
-                child: Row(
-                  children: [
-                    Text(
-                      (langUserPhone == "fr") ? "Aide" : "Help",
-                      style: GoogleFonts.poppins(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
+                child: Text(
+                  (langUserPhone == "fr") ? "Aide" : "Help",
+                  style: GoogleFonts.poppins(
+                      color: Colors.white, fontWeight: FontWeight.w600),
                 ),
               ),
             ],
@@ -265,13 +357,13 @@ class _ContactPageState extends State<ContactPage> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => const SynchroAvance()),
+                      builder: (_) => const SynchroAvance()),
                 );
               }
               if (value == 4) {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => SupportPage()),
+                  MaterialPageRoute(builder: (_) => SupportPage()),
                 );
               }
             },
@@ -283,7 +375,8 @@ class _ContactPageState extends State<ContactPage> {
           _buildSearchBar(),
           Expanded(
             child: _isLoading
-                ? const Center(child: CircularProgressIndicator(color: primaryColor))
+                ? const Center(
+                    child: CircularProgressIndicator(color: primaryColor))
                 : _filteredContacts.isEmpty
                     ? _buildEmptyState()
                     : _buildContactList(),
@@ -320,7 +413,7 @@ class _ContactPageState extends State<ContactPage> {
             borderRadius: BorderRadius.circular(15),
             borderSide: BorderSide.none,
           ),
-          contentPadding: EdgeInsets.symmetric(vertical: 12),
+          contentPadding: const EdgeInsets.symmetric(vertical: 12),
         ),
       ),
     );
@@ -331,98 +424,26 @@ class _ContactPageState extends State<ContactPage> {
       onRefresh: fetchContactDSs,
       color: primaryColor,
       child: ListView.builder(
-        physics: BouncingScrollPhysics(),
-        padding: EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+        controller: _scrollController,
+        // Pré-rendu des items hors écran pour un scroll sans accroc
+        cacheExtent: 500,
+        // Bouncing natif + RefreshIndicator toujours actif
+        physics: const BouncingScrollPhysics(
+          parent: AlwaysScrollableScrollPhysics(),
+        ),
+        // Ferme le clavier automatiquement au scroll
+        keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
         itemCount: _filteredContacts.length,
         itemBuilder: (context, index) {
-          final contact = _filteredContacts[index];
-          return _buildContactCard(contact);
+          final ContactDS contact = _filteredContacts[index];
+          // RepaintBoundary isole chaque carte : une carte qui change ne
+          // force pas le re-rendu des autres.
+          return RepaintBoundary(
+            child: _ContactCard(contact: contact),
+          );
         },
       ),
-    );
-  }
-
-  Widget _buildContactCard(ContactDS contact) {
-    return Card(
-      elevation: 0.5,
-      margin: EdgeInsets.only(bottom: 8),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(13)),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 8.0),
-        child: Column(
-          children: [
-            Row(
-              children: [
-                CircleAvatar(
-                  radius: 22,
-                  backgroundColor: _getAvatarColor(contact),
-                  child: Text(
-                    _getInitials(contact),
-                    style: GoogleFonts.poppins(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-                SizedBox(width: 10),
-                Expanded(
-                  child: Text(
-                    _buildDisplayName(contact),
-                    style: GoogleFonts.poppins(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-                IconButton(
-                  padding: EdgeInsets.zero,
-                  constraints: BoxConstraints(),
-                  icon: FaIcon(FontAwesomeIcons.circleInfo,
-                      color: Colors.grey[400], size: 18),
-                  onPressed: () {
-                    uidAutreUser = contact.id;
-                    addUserOnAutreProfilPage = "non";
-                    Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => AutreProfilPage()));
-                  },
-                ),
-              ],
-            ),
-            Divider(height: 12, thickness: 0.5),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                _buildActionButton(
-                    icon: FontAwesomeIcons.phone,
-                    onTap: () => launchPhoneCall(contact.tel)),
-                _buildActionButton(
-                    icon: FontAwesomeIcons.solidMessage,
-                    onTap: () => launchSMS(contact.tel)),
-                _buildActionButton(
-                    icon: FontAwesomeIcons.solidEnvelope,
-                    onTap: () => launchEmail(contact.mail)),
-                _buildActionButton(
-                    icon: FontAwesomeIcons.whatsapp,
-                    onTap: () => launchWhatsApp(contact.tel)),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildActionButton(
-      {required IconData icon, required VoidCallback onTap}) {
-    return IconButton(
-      onPressed: onTap,
-      icon: FaIcon(icon, color: primaryColor, size: 18),
-      splashRadius: 20,
-      padding: EdgeInsets.symmetric(vertical: 4),
-      constraints: BoxConstraints(),
     );
   }
 
@@ -433,7 +454,7 @@ class _ContactPageState extends State<ContactPage> {
         children: [
           FaIcon(FontAwesomeIcons.magnifyingGlass,
               size: 60, color: Colors.grey[400]),
-          SizedBox(height: 15),
+          const SizedBox(height: 15),
           Text(
             _searchController.text.isEmpty
                 ? ((langUserPhone == "fr")
@@ -442,7 +463,8 @@ class _ContactPageState extends State<ContactPage> {
                 : ((langUserPhone == "fr")
                     ? "Aucun contact trouvé"
                     : "No contact found"),
-            style: GoogleFonts.poppins(fontSize: 16, color: Colors.grey[600]),
+            style:
+                GoogleFonts.poppins(fontSize: 16, color: Colors.grey[600]),
           ),
         ],
       ),
