@@ -200,7 +200,8 @@ class _ActuPageState extends State<ActuPage> {
   final ValueNotifier<bool> _showFabText = ValueNotifier(true);
   bool _loading = false;
   List<Map<String, dynamic>> historiqueContactsAdd = [];
-  Timer? _timer;
+  final Set<int> _pendingWatchIds = {};
+  Timer? _batchWatchTimer;
 
   bool havePublicites = false;
   bool rechercheEnCours = true;
@@ -214,9 +215,8 @@ class _ActuPageState extends State<ActuPage> {
     super.initState();
     _futureAdvertisements = fetchAdvertisements();
     _loadStoriesWithCache();
+    _loadPromoWithCache();
     _scrollController.addListener(_scrollListener);
-    // Démarre le timer lors de l'initialisation du widget
-    _startTimer();
   }
 
   @override
@@ -224,8 +224,7 @@ class _ActuPageState extends State<ActuPage> {
     _scrollController.removeListener(_scrollListener);
     _scrollController.dispose();
     _showFabText.dispose();
-    // Arrête le timer lors de la suppression du widget
-    _stopTimer();
+    _batchWatchTimer?.cancel();
     super.dispose();
   }
 
@@ -257,18 +256,73 @@ class _ActuPageState extends State<ActuPage> {
     });
   }
 
-  void _startTimer() {
-    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
-      setState(() {
-        nombreContactDispo = nombreContactDispo;
-      });
-    });
+  Future<File> _promoCacheFile() async {
+    final dir = await getApplicationDocumentsDirectory();
+    return File('${dir.path}/promos_cache.json');
   }
 
-  void _stopTimer() {
-    // Arrête et annule le timer
-    _timer?.cancel();
-    _timer = null;
+  Future<void> _savePromoCache(String promosJson) async {
+    try {
+      final file = await _promoCacheFile();
+      await file.writeAsString(jsonEncode({
+        'ts': DateTime.now().millisecondsSinceEpoch,
+        'data': jsonDecode(promosJson),
+      }));
+    } catch (_) {}
+  }
+
+  Future<void> _loadPromoWithCache() async {
+    if (lesPublicites.isNotEmpty) {
+      _savePromoCache(lesPublicites);
+      return;
+    }
+    try {
+      final file = await _promoCacheFile();
+      if (await file.exists()) {
+        final raw = await file.readAsString();
+        final cacheData = jsonDecode(raw) as Map<String, dynamic>;
+        final ts = cacheData['ts'] as int? ?? 0;
+        final age = DateTime.now().millisecondsSinceEpoch - ts;
+        if (cacheData['data'] != null) {
+          final cachedPromos = jsonEncode(cacheData['data']);
+          if (mounted) {
+            setState(() {
+              lesPublicites = cachedPromos;
+              _futureAdvertisements = fetchAdvertisements();
+            });
+          }
+          if (age < 30 * 60 * 1000) return;
+        }
+      }
+    } catch (_) {}
+    _refreshPromosBackground();
+  }
+
+  Future<void> _refreshPromosBackground() async {
+    try {
+      final request = http.MultipartRequest(
+          'POST', Uri.parse('$generalRouteForApi/getUserInfo'));
+      request.fields
+          .addAll({'uid': uidUser, 'langUserPhone': langUserPhone.toString()});
+      final response = await request.send();
+      if (response.statusCode == 200) {
+        final data1 = await response.stream.bytesToString();
+        final data = jsonDecode(data1) as Map<String, dynamic>;
+        if (data['error'] == false) {
+          final newPromos = (data['user']['lesPublicites'] as String?) ?? '';
+          if (mounted) {
+            setState(() {
+              initUserInformations(data['user']);
+              if (newPromos.isNotEmpty) {
+                lesPublicites = newPromos;
+                _futureAdvertisements = fetchAdvertisements();
+              }
+            });
+            if (newPromos.isNotEmpty) await _savePromoCache(newPromos);
+          }
+        }
+      }
+    } catch (_) {}
   }
 
   void actualise(affMessage) async {
@@ -308,6 +362,7 @@ class _ActuPageState extends State<ActuPage> {
           _futureAdvertisements = fetchAdvertisements();
           _loading = false;
         });
+        _savePromoCache(lesPublicites);
       } else {
         setState(() {
           _loading = false;
@@ -421,15 +476,24 @@ class _ActuPageState extends State<ActuPage> {
     }
   }
 
-  Future<void> setPromotionToWatch(Advertisement advertisement) async {
-    // Faites votre requête HTTP ici
-    if (advertisement.uidUser != uidUser) {
-      final response = await http.get(Uri.parse(
-          '$generalRouteForApi/setPromotionToWatch/${advertisement.id}/$uidUser'));
-      if (response.statusCode == 200) {
-        // print(advertisement.id);
-      }
-    }
+  void setPromotionToWatch(Advertisement advertisement) {
+    if (advertisement.uidUser == uidUser) return;
+    _pendingWatchIds.add(advertisement.id);
+    _batchWatchTimer?.cancel();
+    _batchWatchTimer = Timer(const Duration(seconds: 3), _flushWatchBatch);
+  }
+
+  Future<void> _flushWatchBatch() async {
+    if (_pendingWatchIds.isEmpty) return;
+    final ids = List<int>.from(_pendingWatchIds);
+    _pendingWatchIds.clear();
+    try {
+      await http.post(
+        Uri.parse('$generalRouteForApi/setMultiplePromotionsToWatch/$uidUser'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'ids': ids}),
+      );
+    } catch (_) {}
   }
 
   void _showMessagePasPermiAdd(message, context) async {
