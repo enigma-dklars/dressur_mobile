@@ -171,6 +171,48 @@ class _SettingPageState extends State<SettingPage> {
                 );
               },
             ),
+            const Padding(
+              padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
+              child: VerticalDivider(
+                width: 0,
+                color: Colors.white,
+                thickness: 1,
+              ),
+            ),
+            PopupMenuButton<int>(
+              itemBuilder: (context) => [
+                PopupMenuItem(
+                  value: 1,
+                  child: Row(
+                    children: [
+                      Text(
+                        (langUserPhone == "fr") ? "Aide" : "Help",
+                        style: GoogleFonts.poppins(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+              offset: const Offset(0, 60),
+              color: primaryColor,
+              icon: const FaIcon(
+                FontAwesomeIcons.bars,
+                color: Colors.white,
+                size: 20,
+              ),
+              elevation: 2,
+              onSelected: (value) {
+                if (value == 1) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => SupportPage()),
+                  );
+                }
+              },
+            ),
           ],
         ),
         body: SingleChildScrollView(
