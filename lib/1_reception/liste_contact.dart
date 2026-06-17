@@ -154,6 +154,30 @@ class _ContactPageState extends State<ContactPage> {
     return "—";
   }
 
+  static const List<Color> _avatarColors = [
+    Color(0xFF1565C0), // bleu foncé
+    Color(0xFF2E7D32), // vert foncé
+    Color(0xFF6A1B9A), // violet
+    Color(0xFFC62828), // rouge foncé
+    Color(0xFF00838F), // cyan foncé
+    Color(0xFFE65100), // orange foncé
+    Color(0xFF4527A0), // indigo
+    Color(0xFF00695C), // teal
+    Color(0xFF558B2F), // vert olive
+    Color(0xFF283593), // bleu marine
+    Color(0xFF880E4F), // rose foncé
+    Color(0xFF37474F), // gris ardoise
+  ];
+
+  Color _getAvatarColor(ContactDS contact) {
+    final String key = (contact.nom.isNotEmpty ? contact.nom : contact.pseudo).toLowerCase();
+    int hash = 0;
+    for (final int c in key.codeUnits) {
+      hash = (hash * 31 + c) & 0x7FFFFFFF;
+    }
+    return _avatarColors[hash % _avatarColors.length];
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -331,7 +355,7 @@ class _ContactPageState extends State<ContactPage> {
               children: [
                 CircleAvatar(
                   radius: 22,
-                  backgroundColor: primaryColor,
+                  backgroundColor: _getAvatarColor(contact),
                   child: Text(
                     _getInitials(contact),
                     style: GoogleFonts.poppins(
