@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:dressur/1_reception/liste_contact.dart';
+import 'package:dressur/1_reception/synchronisation_avance.dart';
 import 'package:dressur/1_reception/recompense_dashboard.dart';
 import 'package:dressur/1_reception/recompense_start.dart';
 import 'package:dressur/components/padding_and_divider.dart';
@@ -156,6 +157,24 @@ class _ReceptionPageState extends State<ReceptionPage> {
                     context,
                     MaterialPageRoute(
                         builder: (context) => ListeNotification()),
+                  );
+                },
+              ),
+              const SizedBox(height: 10),
+              _buildNavigationItem(
+                context: context,
+                icon: FontAwesomeIcons.arrowsRotate,
+                title: (langUserPhone == "fr")
+                    ? "Synchronisation avancée"
+                    : "Advanced synchronization",
+                subtitle: (langUserPhone == "fr")
+                    ? "Synchronisez vos contacts avec votre téléphone"
+                    : "Sync your contacts with your phone",
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const SynchroAvance()),
                   );
                 },
               ),
