@@ -218,7 +218,7 @@ class _BottomBarState extends State<BottomBar> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     return PopScope(
-      // Quitter l'application — centralisé ici pour les 3 onglets racine.
+      // Quitter l'application, centralisé ici pour les 3 onglets racine.
       // iOS : pas de dialog (interdit par Apple, le bouton Home suffit).
       // Android : confirmation unique sur l'onglet actif.
       canPop: false,
