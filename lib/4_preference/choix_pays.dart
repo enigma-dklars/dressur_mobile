@@ -215,6 +215,11 @@ class _ChoixDesPaysState extends State<ChoixDesPays> {
                 )
               : Expanded(
                   child: ListView.builder(
+                    physics: const BouncingScrollPhysics(
+                        parent: AlwaysScrollableScrollPhysics()),
+                    cacheExtent: 500,
+                    keyboardDismissBehavior:
+                        ScrollViewKeyboardDismissBehavior.onDrag,
                     itemCount: _searchResults.length,
                     itemBuilder: (BuildContext context, int index) {
                       final country = _searchResults[index];
