@@ -210,8 +210,8 @@ class _RegisterFormState extends State<RegisterForm> {
                 Expanded(
                   child: Text(
                     (langUserPhone == "fr")
-                        ? "Numéro confirmé — non modifiable. Pour utiliser un autre numéro, créez un nouveau compte."
-                        : "Confirmed number — read-only. To use another number, create a new account.",
+                        ? "Numéro confirmé, non modifiable. Pour utiliser un autre numéro, créez un nouveau compte."
+                        : "Confirmed number, read-only. To use another number, create a new account.",
                     style: GoogleFonts.poppins(
                         fontSize: 11,
                         color: Colors.green[700],
