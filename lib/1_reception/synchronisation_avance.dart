@@ -172,6 +172,7 @@ class _SynchroAvancePageState extends State<_SynchroAvancePage> {
     final bool termine = _service.isCompleted;
     final bool erreur = _service.errorText != null;
     final bool annule = _service.isCancelled;
+    final bool cancelPending = _service.isCancelPending;
 
     return Scaffold(
       appBar: AppBar(
@@ -495,13 +496,24 @@ class _SynchroAvancePageState extends State<_SynchroAvancePage> {
               SizedBox(
                 width: double.infinity,
                 child: OutlinedButton.icon(
-                  onPressed: _confirmerArret,
-                  icon: const FaIcon(FontAwesomeIcons.stop, size: 14),
-                  label: Text(
-                      isFr ? 'Arrêter le processus' : 'Stop the process'),
+                  onPressed: cancelPending ? null : _confirmerArret,
+                  icon: cancelPending
+                      ? const SizedBox(
+                          height: 14,
+                          width: 14,
+                          child: CircularProgressIndicator(
+                              strokeWidth: 2, color: Colors.red))
+                      : const FaIcon(FontAwesomeIcons.stop, size: 14),
+                  label: Text(cancelPending
+                      ? (isFr ? 'Annulation en cours…' : 'Cancelling…')
+                      : (isFr ? 'Arrêter le processus' : 'Stop the process')),
                   style: OutlinedButton.styleFrom(
-                    foregroundColor: Colors.red[600],
-                    side: BorderSide(color: Colors.red.shade300),
+                    foregroundColor:
+                        cancelPending ? Colors.red[300] : Colors.red[600],
+                    side: BorderSide(
+                        color: cancelPending
+                            ? Colors.red.shade200
+                            : Colors.red.shade300),
                     padding: const EdgeInsets.symmetric(vertical: 13),
                     textStyle: GoogleFonts.poppins(
                         fontSize: 14, fontWeight: FontWeight.w600),
