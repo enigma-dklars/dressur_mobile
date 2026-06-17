@@ -77,6 +77,39 @@ class _SynchroAvancePageState extends State<_SynchroAvancePage> {
     }
   }
 
+  Future<void> _confirmerArret() async {
+    final bool isFr = langUserPhone == 'fr';
+    final bool? confirm = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(
+          isFr ? 'Arrêter la synchronisation ?' : 'Stop the synchronization?',
+          style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+        ),
+        content: Text(
+          isFr
+              ? 'La synchronisation en cours sera interrompue.'
+              : 'The ongoing synchronization will be interrupted.',
+          style: GoogleFonts.poppins(fontSize: 13),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text(isFr ? 'Continuer' : 'Continue'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: Text(
+              isFr ? 'Arrêter' : 'Stop',
+              style: const TextStyle(color: Colors.red),
+            ),
+          ),
+        ],
+      ),
+    );
+    if (confirm == true) _service.cancel();
+  }
+
   // ── Helpers UI ─────────────────────────────────────────────────────────────
 
   Widget _buildWarningRow(String text) {
@@ -138,6 +171,7 @@ class _SynchroAvancePageState extends State<_SynchroAvancePage> {
     final bool enCour = _service.isRunning;
     final bool termine = _service.isCompleted;
     final bool erreur = _service.errorText != null;
+    final bool annule = _service.isCancelled;
 
     return Scaffold(
       appBar: AppBar(
@@ -222,7 +256,7 @@ class _SynchroAvancePageState extends State<_SynchroAvancePage> {
             ],
 
             // ── VUE INITIALE (pas en cours, pas terminé, pas d'erreur) ─────
-            if (!enCour && !termine && !erreur) ...[
+            if (!enCour && !termine && !erreur && !annule) ...[
 
               // Avertissements
               FadeInUp(
@@ -455,6 +489,27 @@ class _SynchroAvancePageState extends State<_SynchroAvancePage> {
                   ),
                 ),
               ),
+
+              // ── BOUTON D'ARRÊT ─────────────────────────────────────────────
+              const SizedBox(height: 10),
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  onPressed: _confirmerArret,
+                  icon: const FaIcon(FontAwesomeIcons.stop, size: 14),
+                  label: Text(
+                      isFr ? 'Arrêter le processus' : 'Stop the process'),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: Colors.red[600],
+                    side: BorderSide(color: Colors.red.shade300),
+                    padding: const EdgeInsets.symmetric(vertical: 13),
+                    textStyle: GoogleFonts.poppins(
+                        fontSize: 14, fontWeight: FontWeight.w600),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12)),
+                  ),
+                ),
+              ),
             ],
 
             // ── VUE TERMINÉE ───────────────────────────────────────────────
@@ -536,6 +591,76 @@ class _SynchroAvancePageState extends State<_SynchroAvancePage> {
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     textStyle: GoogleFonts.poppins(
                         fontSize: 14, fontWeight: FontWeight.w600),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12)),
+                  ),
+                ),
+              ),
+            ],
+
+            // ── VUE ANNULÉE ────────────────────────────────────────────────
+            if (annule && !enCour) ...[
+              FadeInUp(
+                duration: const Duration(milliseconds: 400),
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.orange.withOpacity(0.07),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.orange.withOpacity(0.3)),
+                  ),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      FaIcon(FontAwesomeIcons.circleStop,
+                          color: Colors.orange[700], size: 16),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Text(
+                          _service.statusText,
+                          style: GoogleFonts.poppins(
+                              fontSize: 13,
+                              color: Colors.orange[800],
+                              fontWeight: FontWeight.w500),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  onPressed: () => _service.reset(),
+                  icon: const FaIcon(FontAwesomeIcons.arrowsRotate),
+                  label: Text(isFr
+                      ? "Recommencer la synchronisation"
+                      : "Run synchronization again"),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: primaryColor,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    textStyle: GoogleFonts.poppins(
+                        fontSize: 15, fontWeight: FontWeight.bold),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12)),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 8),
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  onPressed: () => Navigator.pop(context),
+                  icon: const FaIcon(FontAwesomeIcons.chevronLeft),
+                  label: Text(isFr ? 'Retour' : 'Go back'),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: primaryColor,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    textStyle: GoogleFonts.poppins(
+                        fontSize: 15, fontWeight: FontWeight.bold),
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12)),
                   ),
