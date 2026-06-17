@@ -147,22 +147,6 @@ class _ReceptionPageState extends State<ReceptionPage> {
               const SizedBox(height: 10),
               _buildNavigationItem(
                 context: context,
-                icon: FontAwesomeIcons.solidBell,
-                title: "Notifications",
-                subtitle: (langUserPhone == "fr")
-                    ? "Cadeaux, astuces, recommandations..."
-                    : "Gifts, tips, recommendations...",
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => ListeNotification()),
-                  );
-                },
-              ),
-              const SizedBox(height: 10),
-              _buildNavigationItem(
-                context: context,
                 icon: FontAwesomeIcons.arrowsRotate,
                 title: (langUserPhone == "fr")
                     ? "Synchronisation avancée"
@@ -175,6 +159,22 @@ class _ReceptionPageState extends State<ReceptionPage> {
                     context,
                     MaterialPageRoute(
                         builder: (context) => const SynchroAvance()),
+                  );
+                },
+              ),
+              const SizedBox(height: 10),
+              _buildNavigationItem(
+                context: context,
+                icon: FontAwesomeIcons.solidBell,
+                title: "Notifications",
+                subtitle: (langUserPhone == "fr")
+                    ? "Cadeaux, astuces, recommandations..."
+                    : "Gifts, tips, recommendations...",
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => ListeNotification()),
                   );
                 },
               ),
