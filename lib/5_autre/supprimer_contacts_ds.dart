@@ -15,7 +15,7 @@ class SupprimerContactsDSPage extends StatefulWidget {
 }
 
 class _SupprimerContactsDSPageState extends State<SupprimerContactsDSPage> {
-  // Singleton partagé — survit à la navigation
+  // Singleton partagé, survit à la navigation
   final DSDeletionService _service = DSDeletionService();
 
   @override
@@ -274,7 +274,7 @@ class _SupprimerContactsDSPageState extends State<SupprimerContactsDSPage> {
             // ── VUE INITIALE / EN COURS ───────────────────────────────────
             if (!termine && !erreur) ...[
 
-              // Bannière "en cours" — rappel navigation possible
+              // Bannière "en cours", rappel navigation possible
               if (enCour) ...[
                 FadeIn(
                   duration: const Duration(milliseconds: 300),
@@ -295,8 +295,8 @@ class _SupprimerContactsDSPageState extends State<SupprimerContactsDSPage> {
                         Expanded(
                           child: Text(
                             isFr
-                                ? "Suppression en cours — vous pouvez naviguer, la progression est visible ici et dans vos notifications."
-                                : "Deletion in progress — you can navigate freely, progress is shown here and in your notifications.",
+                                ? "Suppression en cours, vous pouvez naviguer, la progression est visible ici et dans vos notifications."
+                                : "Deletion in progress, you can navigate freely, progress is shown here and in your notifications.",
                             style: GoogleFonts.poppins(
                                 fontSize: 12, color: Colors.blue[700]),
                           ),
