@@ -179,10 +179,13 @@ class _HistoriqueCompletPageState extends State<HistoriqueCompletPage> {
 
               return ListView.builder(
                 itemCount: snapshot.data!.length,
-                physics: BouncingScrollPhysics(),
+                physics: const BouncingScrollPhysics(
+                    parent: AlwaysScrollableScrollPhysics()),
+                cacheExtent: 500,
                 itemBuilder: (context, index) {
                   final item = snapshot.data![index];
-                  return _promotionItem(context, item);
+                  return RepaintBoundary(
+                      child: _promotionItem(context, item));
                 },
               );
             },
