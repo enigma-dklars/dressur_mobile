@@ -276,6 +276,7 @@ class _RegisterForm3State extends State<RegisterForm3> {
           var data1 = await response.stream.bytesToString();
           var data = convert.jsonDecode(data1);
           if (data["error"] == false) {
+            cancelPromoReminderNotification();
             setState(() {
               _desactive3 = false;
             });
