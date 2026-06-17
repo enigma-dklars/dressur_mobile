@@ -14,6 +14,8 @@ import 'package:path_provider/path_provider.dart';
 import 'package:image/image.dart' as img;
 import 'package:dressur/components/constant.dart';
 import 'package:dressur/components/noti.dart';
+  import 'package:dressur/components/noti_sys.dart';
+  import 'package:dressur/components/noti_sys.dart';
 import 'package:select_form_field/select_form_field.dart';
 
 class PromotionFormPage extends StatefulWidget {
@@ -334,6 +336,7 @@ class _ProduitsServicesState extends State<ProduitsServices> {
           valueMethodePaiement = "mtn";
         });
 
+        cancelPromoReminderNotification();
         if (data["direct"] == true) {
           successNoti(
               "Succès",
@@ -779,6 +782,7 @@ class _DemandesEmploiState extends State<DemandesEmploi> {
           setState(() {
             _desactive = false;
           });
+          cancelPromoReminderNotification();
           successNoti(
               "Good",
               (langUserPhone == "fr")
@@ -1101,6 +1105,7 @@ class _OffresEmploiState extends State<OffresEmploi> {
           setState(() {
             _desactive = false;
           });
+          cancelPromoReminderNotification();
           successNoti(
               "Good",
               (langUserPhone == "fr")
