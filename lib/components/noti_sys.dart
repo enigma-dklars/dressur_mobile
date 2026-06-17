@@ -6,10 +6,11 @@ import 'package:timezone/timezone.dart' as tz;
 int id = 0;
 
 // ── IDs réservés ──────────────────────────────────────────────────────────────
-const int _boostReminderNotifId   = 99;
+const int _boostReminderNotifId    = 99;
 const int _boostReminder48hNotifId = 100;
-const int _promoReminderNotifId   = 101;
+const int _promoReminderNotifId    = 101;
 const int _promoReminder48hNotifId = 102;
+const int _dsDeletionNotifId       = 200;
 
 // ── Notifications immédiates ───────────────────────────────────────────────────
 
@@ -167,4 +168,71 @@ Future<void> schedulePromoReminderNotification() async {
 Future<void> cancelPromoReminderNotification() async {
   await flutterLocalNotificationsPlugin.cancel(_promoReminderNotifId);
   await flutterLocalNotificationsPlugin.cancel(_promoReminder48hNotifId);
+}
+
+// ── Suppression contacts DS ────────────────────────────────────────────────────
+
+/// Affiche (ou met à jour) une notification avec barre de progression pendant
+/// la suppression des contacts DS. L'ID est fixe pour écraser la précédente.
+Future<void> showDSDeletionProgress(int current, int total) async {
+  final bool isFr = langUserPhone == 'fr';
+  final AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
+    'ds_deletion_channel',
+    isFr ? 'Suppression contacts DS' : 'DS contact deletion',
+    channelDescription:
+        isFr ? 'Progression de la suppression des contacts DS' : 'DS contact deletion progress',
+    importance: Importance.low,
+    priority: Priority.low,
+    showProgress: true,
+    maxProgress: total,
+    progress: current,
+    ongoing: true,
+    autoCancel: false,
+    onlyAlertOnce: true,
+    playSound: false,
+    enableVibration: false,
+  );
+  final NotificationDetails notifDetails =
+      NotificationDetails(android: androidDetails);
+
+  await flutterLocalNotificationsPlugin.show(
+    _dsDeletionNotifId,
+    isFr ? '🧹 Suppression en cours…' : '🧹 Deletion in progress…',
+    isFr
+        ? '$current / $total contact(s) DS supprimé(s)'
+        : '$current / $total DS contact(s) deleted',
+    notifDetails,
+  );
+}
+
+/// Remplace la notification de progression par une notification de succès
+/// une fois la suppression terminée.
+Future<void> showDSDeletionComplete(int totalSupprime) async {
+  final bool isFr = langUserPhone == 'fr';
+  await flutterLocalNotificationsPlugin.cancel(_dsDeletionNotifId);
+
+  const AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
+    'ds_deletion_channel',
+    'Suppression contacts DS',
+    channelDescription: 'Progression de la suppression des contacts DS',
+    importance: Importance.defaultImportance,
+    priority: Priority.defaultPriority,
+    autoCancel: true,
+  );
+  const NotificationDetails notifDetails =
+      NotificationDetails(android: androidDetails);
+
+  await flutterLocalNotificationsPlugin.show(
+    _dsDeletionNotifId,
+    isFr ? '✅ Suppression terminée' : '✅ Deletion complete',
+    isFr
+        ? '$totalSupprime contact(s) DS supprimé(s) avec succès.'
+        : '$totalSupprime DS contact(s) successfully deleted.',
+    notifDetails,
+  );
+}
+
+/// Annule la notification de suppression DS (si l'utilisateur annule ou en cas d'erreur).
+Future<void> cancelDSDeletionNotification() async {
+  await flutterLocalNotificationsPlugin.cancel(_dsDeletionNotifId);
 }

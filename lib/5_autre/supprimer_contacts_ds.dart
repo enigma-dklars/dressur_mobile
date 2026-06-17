@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:dressur/components/constant.dart';
 import 'package:dressur/components/noti.dart';
+import 'package:dressur/components/noti_sys.dart';
 
 class SupprimerContactsDSPage extends StatefulWidget {
   const SupprimerContactsDSPage({Key? key}) : super(key: key);
@@ -23,30 +24,38 @@ class _SupprimerContactsDSPageState extends State<SupprimerContactsDSPage> {
   String _statusText = "";
 
   Future<void> _supprimerContactsDS() async {
-    PermissionStatus permission = await Permission.contacts.status;
-    if (permission != PermissionStatus.granted) {
-      permission = await Permission.contacts.request();
+    // --- Permission contacts ---
+    PermissionStatus contactPerm = await Permission.contacts.status;
+    if (contactPerm != PermissionStatus.granted) {
+      contactPerm = await Permission.contacts.request();
     }
-    if (permission != PermissionStatus.granted) {
-      warningNoti(
-        "Attention !",
-        (langUserPhone == "fr")
-            ? "Veuillez autoriser Dressur à accéder à vos contacts."
-            : "Please allow Dressur to access your contacts.",
-        context,
-      );
+    if (contactPerm != PermissionStatus.granted) {
+      if (mounted) {
+        warningNoti(
+          "Attention !",
+          (langUserPhone == "fr")
+              ? "Veuillez autoriser Dressur à accéder à vos contacts."
+              : "Please allow Dressur to access your contacts.",
+          context,
+        );
+      }
       return;
     }
 
-    setState(() {
-      _enCour = true;
-      _progress = 0.0;
-      _showSummary = false;
-      _totalSupprime = 0;
-      _statusText = (langUserPhone == "fr")
-          ? "Recherche des contacts DS…"
-          : "Looking for DS contacts…";
-    });
+    // --- Permission notifications (Android 13+) ---
+    await Permission.notification.request();
+
+    if (mounted) {
+      setState(() {
+        _enCour = true;
+        _progress = 0.0;
+        _showSummary = false;
+        _totalSupprime = 0;
+        _statusText = (langUserPhone == "fr")
+            ? "Recherche des contacts DS…"
+            : "Looking for DS contacts…";
+      });
+    }
 
     try {
       final List<Contact> tousLesContacts =
@@ -57,53 +66,77 @@ class _SupprimerContactsDSPageState extends State<SupprimerContactsDSPage> {
           .toList();
 
       if (dsContacts.isEmpty) {
-        setState(() {
-          _enCour = false;
-          _progress = 1.0;
-          _showSummary = true;
-          _totalSupprime = 0;
-          _statusText = (langUserPhone == "fr")
-              ? "Aucun contact DS trouvé."
-              : "No DS contacts found.";
-        });
+        await cancelDSDeletionNotification();
+        if (mounted) {
+          setState(() {
+            _enCour = false;
+            _progress = 1.0;
+            _showSummary = true;
+            _totalSupprime = 0;
+            _statusText = (langUserPhone == "fr")
+                ? "Aucun contact DS trouvé."
+                : "No DS contacts found.";
+          });
+        }
         return;
       }
 
       final int total = dsContacts.length;
-      setState(() {
-        _statusText = (langUserPhone == "fr")
-            ? "$total contact(s) DS détecté(s). Suppression en cours…"
-            : "$total DS contact(s) detected. Deletion in progress…";
-      });
+
+      // Notification initiale (0 / total)
+      await showDSDeletionProgress(0, total);
+
+      if (mounted) {
+        setState(() {
+          _statusText = (langUserPhone == "fr")
+              ? "$total contact(s) DS détecté(s). Suppression en cours…"
+              : "$total DS contact(s) detected. Deletion in progress…";
+        });
+      }
 
       int supprimes = 0;
       for (final contact in dsContacts) {
         await contact.delete();
         supprimes++;
-        setState(() {
-          _progress = supprimes / total;
-          _statusText = (langUserPhone == "fr")
-              ? "Suppression… ($supprimes / $total)"
-              : "Deleting… ($supprimes / $total)";
-        });
+
+        // Mise à jour de la notification
+        await showDSDeletionProgress(supprimes, total);
+
+        // Mise à jour de l'UI seulement si la page est encore visible
+        if (mounted) {
+          setState(() {
+            _progress = supprimes / total;
+            _statusText = (langUserPhone == "fr")
+                ? "Suppression… ($supprimes / $total)"
+                : "Deleting… ($supprimes / $total)";
+          });
+        }
       }
 
-      setState(() {
-        _enCour = false;
-        _progress = 1.0;
-        _showSummary = true;
-        _totalSupprime = supprimes;
-        _statusText = (langUserPhone == "fr")
-            ? "$supprimes contact(s) DS supprimé(s) avec succès."
-            : "$supprimes DS contact(s) successfully deleted.";
-      });
+      // Notification de fin
+      await showDSDeletionComplete(supprimes);
+
+      if (mounted) {
+        setState(() {
+          _enCour = false;
+          _progress = 1.0;
+          _showSummary = true;
+          _totalSupprime = supprimes;
+          _statusText = (langUserPhone == "fr")
+              ? "$supprimes contact(s) DS supprimé(s) avec succès."
+              : "$supprimes DS contact(s) successfully deleted.";
+        });
+      }
     } catch (e) {
-      setState(() {
-        _enCour = false;
-        _statusText = (langUserPhone == "fr")
-            ? "Une erreur est survenue : $e"
-            : "An error occurred: $e";
-      });
+      await cancelDSDeletionNotification();
+      if (mounted) {
+        setState(() {
+          _enCour = false;
+          _statusText = (langUserPhone == "fr")
+              ? "Une erreur est survenue : $e"
+              : "An error occurred: $e";
+        });
+      }
     }
   }
 
@@ -131,8 +164,7 @@ class _SupprimerContactsDSPageState extends State<SupprimerContactsDSPage> {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        FaIcon(FontAwesomeIcons.circleCheck,
-            size: 13, color: Colors.blue[600]),
+        FaIcon(FontAwesomeIcons.circleCheck, size: 13, color: Colors.blue[600]),
         SizedBox(width: 8),
         Expanded(
           child: Text(
@@ -161,7 +193,9 @@ class _SupprimerContactsDSPageState extends State<SupprimerContactsDSPage> {
           ),
         ),
         leading: IconButton(
-          onPressed: _enCour ? null : () => Navigator.pop(context),
+          // Le back button reste toujours actif : l'utilisateur peut naviguer
+          // librement pendant la suppression — la notification suit en arrière-plan.
+          onPressed: () => Navigator.pop(context),
           icon: const FaIcon(
             FontAwesomeIcons.chevronLeft,
             color: Colors.white,
@@ -180,11 +214,9 @@ class _SupprimerContactsDSPageState extends State<SupprimerContactsDSPage> {
             FadeIn(
               duration: Duration(milliseconds: 500),
               child: FaIcon(
-                _showSummary && _totalSupprime == 0
+                _showSummary
                     ? FontAwesomeIcons.circleCheck
-                    : _showSummary
-                        ? FontAwesomeIcons.circleCheck
-                        : FontAwesomeIcons.broom,
+                    : FontAwesomeIcons.broom,
                 size: 80,
                 color: _showSummary ? Colors.green : Colors.orange[700],
               ),
@@ -261,96 +293,136 @@ class _SupprimerContactsDSPageState extends State<SupprimerContactsDSPage> {
               ),
             ],
 
-            // --- VUE INITIALE (avant suppression) ---
+            // --- VUE INITIALE (avant / pendant suppression) ---
             if (!_showSummary) ...[
-              // Avertissements
-              FadeInUp(
-                from: 20,
-                duration: Duration(milliseconds: 500),
-                delay: Duration(milliseconds: 400),
-                child: Container(
-                  padding: EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Colors.red.withOpacity(0.05),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.red.withOpacity(0.2)),
-                  ),
-                  child: Column(
-                    children: [
-                      _buildWarningRow(
-                        (langUserPhone == "fr")
-                            ? "Cette action est irréversible."
-                            : "This action is irreversible.",
-                      ),
-                      SizedBox(height: 10),
-                      _buildWarningRow(
-                        (langUserPhone == "fr")
-                            ? "Ne quittez pas l'application pendant l'opération."
-                            : "Do not leave the application during the operation.",
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              SizedBox(height: 16),
 
-              // Info box
-              FadeInUp(
-                from: 20,
-                duration: Duration(milliseconds: 500),
-                delay: Duration(milliseconds: 500),
-                child: Container(
-                  width: double.infinity,
-                  padding: EdgeInsets.all(14),
-                  decoration: BoxDecoration(
-                    color: Colors.blue.withOpacity(0.05),
-                    borderRadius: BorderRadius.circular(12),
-                    border:
-                        Border.all(color: Colors.blue.withOpacity(0.15)),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          FaIcon(FontAwesomeIcons.circleInfo,
-                              size: 14, color: Colors.blue[600]),
-                          SizedBox(width: 8),
-                          Text(
+              // Rappel notification pendant l'opération
+              if (_enCour) ...[
+                FadeIn(
+                  duration: Duration(milliseconds: 300),
+                  child: Container(
+                    padding: EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                    decoration: BoxDecoration(
+                      color: Colors.blue.withOpacity(0.06),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.blue.withOpacity(0.2)),
+                    ),
+                    child: Row(
+                      children: [
+                        FaIcon(FontAwesomeIcons.bell,
+                            size: 13, color: Colors.blue[600]),
+                        SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
                             (langUserPhone == "fr")
-                                ? "Ce que va faire cette opération :"
-                                : "What this operation will do:",
+                                ? "Suppression en cours — vous pouvez naviguer, la progression est visible dans vos notifications."
+                                : "Deletion in progress — you can navigate freely, progress is shown in your notifications.",
                             style: GoogleFonts.poppins(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.blue[700],
-                            ),
+                                fontSize: 12, color: Colors.blue[700]),
                           ),
-                        ],
-                      ),
-                      SizedBox(height: 8),
-                      _buildInfoRow(
-                        (langUserPhone == "fr")
-                            ? "Détecter tous les contacts dont le nom contient « #DS »"
-                            : "Detect all contacts whose name contains \"#DS\"",
-                      ),
-                      SizedBox(height: 4),
-                      _buildInfoRow(
-                        (langUserPhone == "fr")
-                            ? "Les supprimer définitivement de votre répertoire téléphonique"
-                            : "Permanently delete them from your phone contacts",
-                      ),
-                      SizedBox(height: 4),
-                      _buildInfoRow(
-                        (langUserPhone == "fr")
-                            ? "Vos contacts personnels ne seront pas affectés"
-                            : "Your personal contacts will not be affected",
-                      ),
-                    ],
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-              SizedBox(height: 16),
+                SizedBox(height: 14),
+              ],
+
+              // Avertissements (masqués pendant la suppression)
+              if (!_enCour) ...[
+                FadeInUp(
+                  from: 20,
+                  duration: Duration(milliseconds: 500),
+                  delay: Duration(milliseconds: 400),
+                  child: Container(
+                    padding: EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.red.withOpacity(0.05),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.red.withOpacity(0.2)),
+                    ),
+                    child: Column(
+                      children: [
+                        _buildWarningRow(
+                          (langUserPhone == "fr")
+                              ? "Cette action est irréversible."
+                              : "This action is irreversible.",
+                        ),
+                        SizedBox(height: 10),
+                        _buildWarningRow(
+                          (langUserPhone == "fr")
+                              ? "Ne fermez pas complètement l'application."
+                              : "Do not fully close the application.",
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                SizedBox(height: 16),
+
+                // Info box
+                FadeInUp(
+                  from: 20,
+                  duration: Duration(milliseconds: 500),
+                  delay: Duration(milliseconds: 500),
+                  child: Container(
+                    width: double.infinity,
+                    padding: EdgeInsets.all(14),
+                    decoration: BoxDecoration(
+                      color: Colors.blue.withOpacity(0.05),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.blue.withOpacity(0.15)),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            FaIcon(FontAwesomeIcons.circleInfo,
+                                size: 14, color: Colors.blue[600]),
+                            SizedBox(width: 8),
+                            Text(
+                              (langUserPhone == "fr")
+                                  ? "Ce que va faire cette opération :"
+                                  : "What this operation will do:",
+                              style: GoogleFonts.poppins(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.blue[700],
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 8),
+                        _buildInfoRow(
+                          (langUserPhone == "fr")
+                              ? "Détecter tous les contacts dont le nom contient « #DS »"
+                              : "Detect all contacts whose name contains \"#DS\"",
+                        ),
+                        SizedBox(height: 4),
+                        _buildInfoRow(
+                          (langUserPhone == "fr")
+                              ? "Les supprimer définitivement de votre répertoire téléphonique"
+                              : "Permanently delete them from your phone contacts",
+                        ),
+                        SizedBox(height: 4),
+                        _buildInfoRow(
+                          (langUserPhone == "fr")
+                              ? "Vos contacts personnels ne seront pas affectés"
+                              : "Your personal contacts will not be affected",
+                        ),
+                        SizedBox(height: 4),
+                        _buildInfoRow(
+                          (langUserPhone == "fr")
+                              ? "La progression sera affichée dans vos notifications"
+                              : "Progress will be shown in your notifications",
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                SizedBox(height: 16),
+              ],
 
               // Bouton d'action
               FadeInUp(
@@ -391,7 +463,7 @@ class _SupprimerContactsDSPageState extends State<SupprimerContactsDSPage> {
 
             Spacer(),
 
-            // --- BARRE DE PROGRESSION EN BAS ---
+            // --- BARRE DE PROGRESSION EN BAS (visible pendant la suppression) ---
             if (_enCour)
               FadeIn(
                 duration: Duration(milliseconds: 300),
