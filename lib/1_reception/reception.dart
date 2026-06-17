@@ -1,5 +1,3 @@
-import 'dart:async';
-import 'dart:convert';
 import 'package:dressur/1_reception/liste_contact.dart';
 import 'package:dressur/1_reception/synchronisation_avance.dart';
 import 'package:dressur/1_reception/recompense_dashboard.dart';
@@ -12,7 +10,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:dressur/5_autre/support_assistance.dart';
 import 'package:dressur/1_reception/liste_notification.dart';
 import 'package:dressur/components/constant.dart';
-import 'package:http/http.dart' as http;
 
 class ReceptionPage extends StatefulWidget {
   @override
@@ -20,39 +17,6 @@ class ReceptionPage extends StatefulWidget {
 }
 
 class _ReceptionPageState extends State<ReceptionPage> {
-
-  @override
-  void initState() {
-    super.initState();
-    _fetchCounts();
-  }
-
-  Future<void> _fetchCounts() async {
-    try {
-      final results = await Future.wait([
-        http.get(Uri.parse('$generalRouteForApi/listBoost/$uidUser/$langUserPhone')),
-        http.get(Uri.parse('$generalRouteForApi/listPromotion/$uidUser/$langUserPhone')),
-        http.get(Uri.parse('$generalRouteForApi/listPromoReseau/$uidUser/$langUserPhone')),
-      ]);
-
-      if (!mounted) return;
-
-      setState(() {
-        if (results[0].statusCode == 200) {
-          final data = jsonDecode(results[0].body);
-          if (data is List) nbrBoostContact = data.length;
-        }
-        if (results[1].statusCode == 200) {
-          final data = jsonDecode(results[1].body);
-          if (data is List) nbrPromoAffaire = data.length;
-        }
-        if (results[2].statusCode == 200) {
-          final data = jsonDecode(results[2].body);
-          if (data is List) nbrPromoReseau = data.length;
-        }
-      });
-    } catch (_) {}
-  }
 
   Widget build(BuildContext context) {
     return Scaffold(
@@ -239,37 +203,6 @@ class _ReceptionPageState extends State<ReceptionPage> {
                       ? (langUserPhone == "fr") ? "En cours" : "Active"
                       : (langUserPhone == "fr") ? "Inactif" : "Inactive",
                   valueColor: boostEnCours ? Colors.greenAccent : Colors.white60,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Container(height: 1, color: Colors.white24),
-          const SizedBox(height: 12),
-          // ── Ligne 2 : Boost Contact · Promo Affaire · Promo Réseau ──
-          Row(
-            children: [
-              Expanded(
-                child: _buildSummaryCell(
-                  icon: FontAwesomeIcons.userPlus,
-                  label: (langUserPhone == "fr") ? "Boost contact" : "Boost contact",
-                  value: "$nbrBoostContact",
-                ),
-              ),
-              _buildVerticalDivider(),
-              Expanded(
-                child: _buildSummaryCell(
-                  icon: FontAwesomeIcons.briefcase,
-                  label: (langUserPhone == "fr") ? "Promo affaire" : "Business promo",
-                  value: "$nbrPromoAffaire",
-                ),
-              ),
-              _buildVerticalDivider(),
-              Expanded(
-                child: _buildSummaryCell(
-                  icon: FontAwesomeIcons.shareNodes,
-                  label: (langUserPhone == "fr") ? "Promo réseau" : "Network promo",
-                  value: "$nbrPromoReseau",
                 ),
               ),
             ],
