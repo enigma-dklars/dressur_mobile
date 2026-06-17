@@ -219,7 +219,7 @@ class _AdminPromoEnAttentePageState extends State<AdminPromoEnAttentePage> {
                 if (user != null) ...[
                   _userInfoRow(
                       FontAwesomeIcons.user,
-                      '${user['pseudo'] ?? ''} — ${user['nom'] ?? ''}',
+                      '${user['pseudo'] ?? ''} ${user['nom'] ?? ''}',
                       isDark),
                   const SizedBox(height: 2),
                   _userInfoRow(FontAwesomeIcons.envelope,
