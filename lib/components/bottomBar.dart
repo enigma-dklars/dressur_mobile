@@ -372,7 +372,7 @@ class _BottomBarState extends State<BottomBar> with WidgetsBindingObserver {
       case 0:
         return isFrench ? "Réception" : "Home";
       case 1:
-        return isFrench ? "Promo" : "Promo";
+        return isFrench ? "Services" : "Services";
       case 2:
         return isFrench ? "Actu" : "News"; // Label pour l'onglet central
       case 3:
