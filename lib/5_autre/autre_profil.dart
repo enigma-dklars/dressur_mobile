@@ -132,6 +132,30 @@ class _AutreProfilPageState extends State<AutreProfilPage> {
     return (parts[0][0] + parts[1][0]).toUpperCase();
   }
 
+  static const List<Color> _avatarColors = [
+    Color(0xFF1565C0),
+    Color(0xFF2E7D32),
+    Color(0xFF6A1B9A),
+    Color(0xFFC62828),
+    Color(0xFF00838F),
+    Color(0xFFE65100),
+    Color(0xFF4527A0),
+    Color(0xFF00695C),
+    Color(0xFF558B2F),
+    Color(0xFF283593),
+    Color(0xFF880E4F),
+    Color(0xFF37474F),
+  ];
+
+  Color _getAvatarColor() {
+    final String key = ((autre_nom ?? autre_pseudo) ?? "?").toLowerCase().trim();
+    int hash = 0;
+    for (final int c in key.codeUnits) {
+      hash = (hash * 31 + c) & 0x7FFFFFFF;
+    }
+    return _avatarColors[hash % _avatarColors.length];
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -162,17 +186,17 @@ class _AutreProfilPageState extends State<AutreProfilPage> {
                     width: double.infinity,
                     padding: const EdgeInsets.symmetric(vertical: 32),
                     decoration: BoxDecoration(
-                      color: primaryColor.withOpacity(0.06),
+                      color: _getAvatarColor().withOpacity(0.06),
                       border: Border(
                         bottom: BorderSide(
-                            color: primaryColor.withOpacity(0.12), width: 1),
+                            color: _getAvatarColor().withOpacity(0.12), width: 1),
                       ),
                     ),
                     child: Column(
                       children: [
                         CircleAvatar(
                           radius: 44,
-                          backgroundColor: primaryColor,
+                          backgroundColor: _getAvatarColor(),
                           child: Text(
                             _getInitials(),
                             style: GoogleFonts.poppins(
