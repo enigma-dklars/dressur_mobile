@@ -5,8 +5,13 @@ import 'package:timezone/timezone.dart' as tz;
 
 int id = 0;
 
-const int _boostReminderNotifId = 99;
+// ── IDs réservés ──────────────────────────────────────────────────────────────
+const int _boostReminderNotifId   = 99;
 const int _boostReminder48hNotifId = 100;
+const int _promoReminderNotifId   = 101;
+const int _promoReminder48hNotifId = 102;
+
+// ── Notifications immédiates ───────────────────────────────────────────────────
 
 Future<void> showNotification(title, body) async {
   const AndroidNotificationDetails androidNotificationDetails =
@@ -33,10 +38,8 @@ Future<void> showNotificationTimeOutAfter(
     ticker: 'ticker',
     timeoutAfter: timeOut,
   );
-
   NotificationDetails notificationDetails =
       NotificationDetails(android: androidNotificationDetails);
-
   await flutterLocalNotificationsPlugin.show(
     id++,
     title,
@@ -46,10 +49,11 @@ Future<void> showNotificationTimeOutAfter(
   );
 }
 
+// ── Rappels Boost Contact ──────────────────────────────────────────────────────
+
 /// Planifie deux notifications de rappel après l'inscription :
-///   - 24h : rappel doux
+///   - 24h : rappel doux si pas de boost
 ///   - 48h : rappel urgent si toujours pas de boost
-/// Annule tout rappel existant avant de planifier les nouveaux.
 Future<void> scheduleBoostReminderNotification() async {
   await flutterLocalNotificationsPlugin.cancel(_boostReminderNotifId);
   await flutterLocalNotificationsPlugin.cancel(_boostReminder48hNotifId);
@@ -68,7 +72,7 @@ Future<void> scheduleBoostReminderNotification() async {
   const NotificationDetails notifDetails =
       NotificationDetails(android: androidDetails);
 
-  // ── Rappel 24h ────────────────────────────────────────────────────────────
+  // 24h
   await flutterLocalNotificationsPlugin.zonedSchedule(
     _boostReminderNotifId,
     isFr ? 'Rappel Dressur 🚀' : 'Dressur Reminder 🚀',
@@ -83,7 +87,7 @@ Future<void> scheduleBoostReminderNotification() async {
     payload: 'boost_reminder_24h',
   );
 
-  // ── Rappel 48h (message plus incitatif) ───────────────────────────────────
+  // 48h
   await flutterLocalNotificationsPlugin.zonedSchedule(
     _boostReminder48hNotifId,
     isFr ? '⏰ Tu passes à côté !' : '⏰ You\'re missing out!',
@@ -99,8 +103,68 @@ Future<void> scheduleBoostReminderNotification() async {
   );
 }
 
-/// Annule les deux rappels boost dès que l'utilisateur effectue son premier boost.
+/// Annule les rappels boost dès que l'utilisateur effectue son premier boost.
 Future<void> cancelBoostReminderNotification() async {
   await flutterLocalNotificationsPlugin.cancel(_boostReminderNotifId);
   await flutterLocalNotificationsPlugin.cancel(_boostReminder48hNotifId);
+}
+
+// ── Rappels Promo Affaire ──────────────────────────────────────────────────────
+
+/// Planifie deux notifications de rappel pour inciter à créer une première promo :
+///   - 24h : rappel doux
+///   - 48h : rappel plus incitatif
+Future<void> schedulePromoReminderNotification() async {
+  await flutterLocalNotificationsPlugin.cancel(_promoReminderNotifId);
+  await flutterLocalNotificationsPlugin.cancel(_promoReminder48hNotifId);
+
+  final bool isFr = langUserPhone == 'fr';
+
+  const AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
+    'promo_reminder_channel',
+    'Rappel Promotion',
+    channelDescription:
+        'Rappels pour créer votre première promotion après inscription',
+    importance: Importance.max,
+    priority: Priority.high,
+    ticker: 'Dressur',
+  );
+  const NotificationDetails notifDetails =
+      NotificationDetails(android: androidDetails);
+
+  // 24h
+  await flutterLocalNotificationsPlugin.zonedSchedule(
+    _promoReminderNotifId,
+    isFr ? '📣 Ta business n\'est pas encore visible !' : '📣 Your business isn\'t visible yet!',
+    isFr
+        ? "Tu n'as pas encore créé de promotion ! Des milliers d'utilisateurs pourraient découvrir ta business dès aujourd'hui."
+        : "You haven't created a promotion yet! Thousands of users could discover your business today.",
+    tz.TZDateTime.now(tz.local).add(const Duration(hours: 24)),
+    notifDetails,
+    androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+    uiLocalNotificationDateInterpretation:
+        UILocalNotificationDateInterpretation.absoluteTime,
+    payload: 'promo_reminder_24h',
+  );
+
+  // 48h
+  await flutterLocalNotificationsPlugin.zonedSchedule(
+    _promoReminder48hNotifId,
+    isFr ? '🔥 2 jours sans promo, c\'est trop long !' : '🔥 2 days without a promo is too long!',
+    isFr
+        ? "Des milliers d'utilisateurs ne te voient pas encore. Crée ta première promotion maintenant et booste ta visibilité 👇"
+        : "Thousands of users still can't see you. Create your first promotion now and boost your visibility 👇",
+    tz.TZDateTime.now(tz.local).add(const Duration(hours: 48)),
+    notifDetails,
+    androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+    uiLocalNotificationDateInterpretation:
+        UILocalNotificationDateInterpretation.absoluteTime,
+    payload: 'promo_reminder_48h',
+  );
+}
+
+/// Annule les rappels promo dès que l'utilisateur crée sa première promotion.
+Future<void> cancelPromoReminderNotification() async {
+  await flutterLocalNotificationsPlugin.cancel(_promoReminderNotifId);
+  await flutterLocalNotificationsPlugin.cancel(_promoReminder48hNotifId);
 }
