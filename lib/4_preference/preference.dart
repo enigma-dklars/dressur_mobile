@@ -335,47 +335,61 @@ class _PreferencePageState extends State<PreferencePage> {
                 SizedBox(height: 20),
 
                 // --- AFFICHAGE DES PAYS SÉLECTIONNÉS ---
-                Text(
-                  (langUserPhone == "fr")
-                      ? "Sélection actuelle :"
-                      : "Current selection:",
-                  style: GoogleFonts.poppins(
-                    color: isDark ? Colors.grey[400] : Colors.grey[600],
-                    fontSize: 14,
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-                SizedBox(height: 5),
                 Builder(builder: (_) {
                   final String raw = selectedCountriesText.trim();
                   final bool isEmpty = raw.isEmpty ||
                       raw == "Aucun Choix" ||
                       raw == "No Choice";
 
-                  String label;
+                  final String sublabel;
+                  final String value;
+
                   if (isEmpty) {
-                    label = langUserPhone == "fr"
+                    sublabel = langUserPhone == "fr"
+                        ? "Sélection actuelle :"
+                        : "Current selection:";
+                    value = langUserPhone == "fr"
                         ? "Aucun pays sélectionné"
                         : "No country selected";
                   } else {
                     final List<String> pays =
                         raw.split(', ').where((s) => s.isNotEmpty).toList();
                     if (pays.length <= 3) {
-                      label = pays.join(', ');
+                      sublabel = langUserPhone == "fr"
+                          ? "Pays sélectionnés :"
+                          : "Selected countries:";
+                      value = pays.join(', ');
                     } else {
-                      label = langUserPhone == "fr"
-                          ? "${pays.length} pays sélectionnés"
-                          : "${pays.length} countries selected";
+                      sublabel = langUserPhone == "fr"
+                          ? "Nombre de pays sélectionnés :"
+                          : "Number of selected countries:";
+                      value = langUserPhone == "fr"
+                          ? "${pays.length} pays"
+                          : "${pays.length} countries";
                     }
                   }
 
-                  return Text(
-                    label,
-                    style: GoogleFonts.poppins(
-                      color: isDark ? Colors.white : Colors.black,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                    ),
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        sublabel,
+                        style: GoogleFonts.poppins(
+                          color: isDark ? Colors.grey[400] : Colors.grey[600],
+                          fontSize: 14,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                      SizedBox(height: 5),
+                      Text(
+                        value,
+                        style: GoogleFonts.poppins(
+                          color: isDark ? Colors.white : Colors.black,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
                   );
                 }),
               ],
