@@ -28,6 +28,7 @@ import 'package:dressur/components/sql_helper.dart';
 import 'package:dressur/5_autre/support_assistance.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:dressur/8_admin/admin.dart';
 
 class AnimatedRewardBadge extends StatefulWidget {
   final VoidCallback onTap;
@@ -928,6 +929,14 @@ class _ActuPageState extends State<ActuPage> {
           automaticallyImplyLeading: false,
           elevation: 0,
           backgroundColor: primaryColor,
+          leading: admin
+              ? IconButton(
+                  icon: const FaIcon(FontAwesomeIcons.userShield,
+                      size: 20, color: Colors.white),
+                  onPressed: () => Navigator.push(context,
+                      MaterialPageRoute(builder: (_) => AdministrationPage())),
+                )
+              : null,
           title: Text(
             (langUserPhone == "fr") ? "Actu" : "News",
             style: GoogleFonts.poppins(
