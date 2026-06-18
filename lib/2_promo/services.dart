@@ -18,6 +18,7 @@ import 'package:dressur/1_reception/liste_notification.dart';
 import 'package:dressur/components/constant.dart';
 import 'package:dressur/components/sociaux.dart';
 import 'package:http/http.dart' as http;
+import 'package:dressur/8_admin/admin.dart';
 
 class BoostPage extends StatefulWidget {
   @override
@@ -64,6 +65,14 @@ class _BoostPageState extends State<BoostPage> {
         automaticallyImplyLeading: false,
         elevation: 0,
         backgroundColor: primaryColor,
+        leading: admin
+            ? IconButton(
+                icon: const FaIcon(FontAwesomeIcons.userShield,
+                    size: 20, color: Colors.white),
+                onPressed: () => Navigator.push(context,
+                    MaterialPageRoute(builder: (_) => AdministrationPage())),
+              )
+            : null,
         title: Text(
           "Services",
           style: GoogleFonts.poppins(
