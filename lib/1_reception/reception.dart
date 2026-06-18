@@ -10,6 +10,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:dressur/5_autre/support_assistance.dart';
 import 'package:dressur/1_reception/liste_notification.dart';
 import 'package:dressur/components/constant.dart';
+import 'package:dressur/8_admin/admin.dart';
 
 class ReceptionPage extends StatefulWidget {
   @override
@@ -24,6 +25,14 @@ class _ReceptionPageState extends State<ReceptionPage> {
           automaticallyImplyLeading: false,
           elevation: 0,
           backgroundColor: primaryColor,
+          leading: admin
+              ? IconButton(
+                  icon: const FaIcon(FontAwesomeIcons.userShield,
+                      size: 20, color: Colors.white),
+                  onPressed: () => Navigator.push(context,
+                      MaterialPageRoute(builder: (_) => AdministrationPage())),
+                )
+              : null,
           title: Text(
             (langUserPhone == "fr") ? "Boîte de Réception" : "Inbox",
             style: GoogleFonts.poppins(
