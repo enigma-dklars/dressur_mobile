@@ -11,6 +11,7 @@ import 'package:dressur/components/constant.dart';
 import 'package:dressur/components/sociaux.dart';
 import 'package:dressur/5_autre/support_assistance.dart';
 import 'package:http/http.dart' as http;
+import 'package:dressur/8_admin/admin.dart';
 
 class PreferencePage extends StatefulWidget {
   PreferencePage({Key? key}) : super(key: key);
@@ -57,6 +58,14 @@ class _PreferencePageState extends State<PreferencePage> {
           automaticallyImplyLeading: false,
           elevation: 0,
           backgroundColor: primaryColor,
+          leading: admin
+              ? IconButton(
+                  icon: const FaIcon(FontAwesomeIcons.userShield,
+                      size: 20, color: Colors.white),
+                  onPressed: () => Navigator.push(context,
+                      MaterialPageRoute(builder: (_) => AdministrationPage())),
+                )
+              : null,
           title: Text(
             (langUserPhone == "fr") ? "Préférences" : "Preferences",
             style: GoogleFonts.poppins(
