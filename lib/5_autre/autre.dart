@@ -149,6 +149,22 @@ class _SettingPageState extends State<SettingPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // --- SECTION ADMINISTRATION (admins uniquement) ---
+              if (admin) ...[
+                _buildSectionTitle("Administration"),
+                _buildMenuContainer(isDark, [
+                  _buildMenuRow(
+                      FontAwesomeIcons.userShield,
+                      (langUserPhone == "fr")
+                          ? "Panneau Administrateur"
+                          : "Admin Panel",
+                      () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => AdministrationPage()))),
+                ]),
+              ],
+
               // --- SECTION COMPTE ---
               _buildSectionTitle(
                   (langUserPhone == "fr") ? "Mon Compte" : "My Account"),
@@ -256,55 +272,6 @@ class _SettingPageState extends State<SettingPage> {
               SociauxPage(),
 
               SizedBox(height: 20),
-
-              if (admin) ...[
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(10, 0, 10, 20),
-                  child: InkWell(
-                    onTap: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => AdministrationPage()),
-                    ),
-                    borderRadius: BorderRadius.circular(15),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 14),
-                      decoration: BoxDecoration(
-                        color: isDark
-                            ? Color(0xFF1E1E1E)
-                            : Colors.white,
-                        borderRadius: BorderRadius.circular(15),
-                        border: Border.all(
-                          color: primaryColor.withOpacity(0.3),
-                          width: 1,
-                        ),
-                      ),
-                      child: Row(
-                        children: [
-                          FaIcon(FontAwesomeIcons.userShield,
-                              color: primaryColor, size: 18),
-                          SizedBox(width: 16),
-                          Expanded(
-                            child: Text(
-                              (langUserPhone == "fr")
-                                  ? "Panneau Administrateur"
-                                  : "Admin Panel",
-                              style: GoogleFonts.poppins(
-                                fontSize: 15,
-                                fontWeight: FontWeight.w500,
-                                color: primaryColor,
-                              ),
-                            ),
-                          ),
-                          FaIcon(FontAwesomeIcons.chevronRight,
-                              size: 16, color: primaryColor.withOpacity(0.6)),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ],
             ],
           ),
         ),
