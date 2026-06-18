@@ -17,8 +17,10 @@ import 'package:dressur/5_autre/support_assistance.dart';
 import 'package:art_sweetalert/art_sweetalert.dart';
 import 'package:dressur/components/constant.dart';
 import 'package:dressur/components/sql_helper.dart';
+import 'package:dressur/main.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SettingPage extends StatefulWidget {
   SettingPage({Key? key}) : super(key: key);
@@ -28,6 +30,18 @@ class SettingPage extends StatefulWidget {
 }
 
 class _SettingPageState extends State<SettingPage> {
+  Future<void> _setTheme(ThemeMode mode) async {
+    MyApp.themeNotifier.value = mode;
+    final prefs = await SharedPreferences.getInstance();
+    final key = mode == ThemeMode.light
+        ? 'light'
+        : mode == ThemeMode.dark
+            ? 'dark'
+            : 'system';
+    await prefs.setString('themeMode', key);
+    setState(() {});
+  }
+
   void _handleLogout() async {
     ArtDialogResponse response = await ArtSweetAlert.show(
         barrierDismissible: false,
@@ -220,6 +234,7 @@ class _SettingPageState extends State<SettingPage> {
               // --- SECTION APPLICATION ---
               _buildSectionTitle("Application"),
               _buildMenuContainer(isDark, [
+                _buildThemeSelector(isDark),
                 _buildMenuRow(
                     FontAwesomeIcons.circleInfo,
                     (langUserPhone == "fr") ? "À Propos" : "About Us",
@@ -261,6 +276,98 @@ class _SettingPageState extends State<SettingPage> {
   }
 
   // --- WIDGETS HELPERS POUR UN DESIGN PROPRE ET RÉUTILISABLE ---
+
+  Widget _buildThemeSelector(bool isDark) {
+    final currentMode = MyApp.themeNotifier.value;
+
+    final options = [
+      (
+        ThemeMode.system,
+        FontAwesomeIcons.circleHalfStroke,
+        (langUserPhone == "fr") ? "Système" : "System",
+      ),
+      (
+        ThemeMode.light,
+        FontAwesomeIcons.sun,
+        (langUserPhone == "fr") ? "Clair" : "Light",
+      ),
+      (
+        ThemeMode.dark,
+        FontAwesomeIcons.moon,
+        (langUserPhone == "fr") ? "Sombre" : "Dark",
+      ),
+    ];
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      child: Row(
+        children: [
+          FaIcon(FontAwesomeIcons.palette, color: primaryColor, size: 18),
+          SizedBox(width: 16),
+          Expanded(
+            child: Text(
+              (langUserPhone == "fr") ? "Thème" : "Theme",
+              style: GoogleFonts.poppins(
+                fontSize: 15,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+          Container(
+            decoration: BoxDecoration(
+              color: isDark ? Color(0xFF2C2C2C) : Color(0xFFF0F0F0),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: options.map((opt) {
+                final isSelected = currentMode == opt.$1;
+                return GestureDetector(
+                  onTap: () => _setTheme(opt.$1),
+                  child: AnimatedContainer(
+                    duration: Duration(milliseconds: 200),
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+                    decoration: BoxDecoration(
+                      color: isSelected ? primaryColor : Colors.transparent,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        FaIcon(
+                          opt.$2,
+                          size: 13,
+                          color: isSelected
+                              ? Colors.white
+                              : (isDark
+                                  ? Colors.grey[400]
+                                  : Colors.grey[600]),
+                        ),
+                        SizedBox(width: 5),
+                        Text(
+                          opt.$3,
+                          style: GoogleFonts.poppins(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: isSelected
+                                ? Colors.white
+                                : (isDark
+                                    ? Colors.grey[400]
+                                    : Colors.grey[600]),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
   Widget _buildStatCard(BuildContext context,
       {required IconData icon,
