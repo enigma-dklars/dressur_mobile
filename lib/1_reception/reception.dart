@@ -44,7 +44,7 @@ class _ReceptionPageState extends State<ReceptionPage> {
               const Padding(
                 padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
                 child: VerticalDivider(
-                    width: 0, color: Colors.white38, thickness: 1),
+                    width: 0, color: Colors.white, thickness: 1),
               ),
             ],
             IconButton(
