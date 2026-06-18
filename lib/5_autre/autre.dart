@@ -318,6 +318,7 @@ class _SettingPageState extends State<SettingPage> {
           ),
           SizedBox(height: 12),
           Container(
+            margin: EdgeInsets.only(left: 34),
             decoration: BoxDecoration(
               color: isDark ? Color(0xFF2C2C2C) : Color(0xFFF0F0F0),
               borderRadius: BorderRadius.circular(10),
