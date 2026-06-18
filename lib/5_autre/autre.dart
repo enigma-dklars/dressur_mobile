@@ -299,65 +299,65 @@ class _SettingPageState extends State<SettingPage> {
     ];
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-      child: Row(
+      padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          FaIcon(FontAwesomeIcons.palette, color: primaryColor, size: 18),
-          SizedBox(width: 16),
-          Expanded(
-            child: Text(
-              (langUserPhone == "fr") ? "Thème" : "Theme",
-              style: GoogleFonts.poppins(
-                fontSize: 15,
-                fontWeight: FontWeight.w500,
+          Row(
+            children: [
+              FaIcon(FontAwesomeIcons.palette, color: primaryColor, size: 18),
+              SizedBox(width: 16),
+              Text(
+                (langUserPhone == "fr") ? "Thème" : "Theme",
+                style: GoogleFonts.poppins(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
-            ),
+            ],
           ),
+          SizedBox(height: 12),
           Container(
             decoration: BoxDecoration(
               color: isDark ? Color(0xFF2C2C2C) : Color(0xFFF0F0F0),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Row(
-              mainAxisSize: MainAxisSize.min,
               children: options.map((opt) {
                 final isSelected = currentMode == opt.$1;
-                return GestureDetector(
-                  onTap: () => _setTheme(opt.$1),
-                  child: AnimatedContainer(
-                    duration: Duration(milliseconds: 200),
-                    padding:
-                        EdgeInsets.symmetric(horizontal: 12, vertical: 7),
-                    decoration: BoxDecoration(
-                      color: isSelected ? primaryColor : Colors.transparent,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        FaIcon(
-                          opt.$2,
-                          size: 13,
-                          color: isSelected
-                              ? Colors.white
-                              : (isDark
-                                  ? Colors.grey[400]
-                                  : Colors.grey[600]),
-                        ),
-                        SizedBox(width: 5),
-                        Text(
-                          opt.$3,
-                          style: GoogleFonts.poppins(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
+                return Expanded(
+                  child: GestureDetector(
+                    onTap: () => _setTheme(opt.$1),
+                    child: AnimatedContainer(
+                      duration: Duration(milliseconds: 200),
+                      padding: EdgeInsets.symmetric(vertical: 9),
+                      decoration: BoxDecoration(
+                        color: isSelected ? primaryColor : Colors.transparent,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          FaIcon(
+                            opt.$2,
+                            size: 14,
                             color: isSelected
                                 ? Colors.white
-                                : (isDark
-                                    ? Colors.grey[400]
-                                    : Colors.grey[600]),
+                                : (isDark ? Colors.grey[400] : Colors.grey[600]),
                           ),
-                        ),
-                      ],
+                          SizedBox(height: 4),
+                          Text(
+                            opt.$3,
+                            style: GoogleFonts.poppins(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                              color: isSelected
+                                  ? Colors.white
+                                  : (isDark ? Colors.grey[400] : Colors.grey[600]),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 );
