@@ -929,14 +929,6 @@ class _ActuPageState extends State<ActuPage> {
           automaticallyImplyLeading: false,
           elevation: 0,
           backgroundColor: primaryColor,
-          leading: admin
-              ? IconButton(
-                  icon: const FaIcon(FontAwesomeIcons.userShield,
-                      size: 20, color: Colors.white),
-                  onPressed: () => Navigator.push(context,
-                      MaterialPageRoute(builder: (_) => AdministrationPage())),
-                )
-              : null,
           title: Text(
             (langUserPhone == "fr") ? "Actu" : "News",
             style: GoogleFonts.poppins(
@@ -946,6 +938,19 @@ class _ActuPageState extends State<ActuPage> {
             ),
           ),
           actions: [
+            if (admin) ...[
+              IconButton(
+                icon: const FaIcon(FontAwesomeIcons.userShield,
+                    size: 20, color: Colors.amber),
+                onPressed: () => Navigator.push(context,
+                    MaterialPageRoute(builder: (_) => AdministrationPage())),
+              ),
+              const Padding(
+                padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
+                child: VerticalDivider(
+                    width: 0, color: Colors.white38, thickness: 1),
+              ),
+            ],
             IconButton(
               icon: const FaIcon(
                 FontAwesomeIcons.solidBell,
