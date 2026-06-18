@@ -6,6 +6,7 @@ import 'package:dressur/7_demarage/welcome_page.dart';
 import 'package:dressur/components/constant.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 import 'package:flutter_timezone/flutter_timezone.dart';
@@ -181,6 +182,15 @@ void main() async {
 
   // Appelez initializeNotifications() après l'initialisation du plugin
   initializeNotifications(); // Cette fonction ne contient pas d'await bloquant l'UI, donc pas besoin de l'await ici si elle ne fait que récupérer des détails
+
+  // Charger le thème sauvegardé
+  final prefs = await SharedPreferences.getInstance();
+  final savedTheme = prefs.getString('themeMode') ?? 'system';
+  MyApp.themeNotifier.value = savedTheme == 'light'
+      ? ThemeMode.light
+      : savedTheme == 'dark'
+          ? ThemeMode.dark
+          : ThemeMode.system;
 
   runApp(const MyApp());
 }
