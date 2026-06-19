@@ -1,5 +1,4 @@
 // ignore_for_file: use_build_context_synchronously
-
 import 'package:dressur/2_promo/liste_boost_contact.dart';
 import 'package:dressur/components/noti_sys.dart';
 import 'package:flutter/material.dart';
@@ -10,200 +9,68 @@ import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
 import 'package:select_form_field/select_form_field.dart';
 import 'package:dressur/components/noti.dart';
-
 class NewBoostContactPage extends StatefulWidget {
   @override
   State<NewBoostContactPage> createState() => _NewBoostContactPageState();
 }
-
 class _NewBoostContactPageState extends State<NewBoostContactPage> {
-  bool load = false;
+  bool _isPaid = false;
   String _typeBoost = 'date';
   @override
   Widget build(BuildContext context) {
+    final bool isFr = langUserPhone == "fr";
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
         backgroundColor: primaryColor,
         title: Text(
-          (langUserPhone == "fr")
-              ? "Nouveau Boost Contact"
-              : "New Boost Contact",
+          isFr ? "Nouveau Boost Contact" : "New Boost Contact",
           style: GoogleFonts.poppins(
-            color: Colors.white,
-            fontWeight: FontWeight.w400,
-            fontSize: 18,
-          ),
+              color: Colors.white, fontWeight: FontWeight.w400, fontSize: 18),
         ),
         leading: IconButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          icon: const FaIcon(
-            FontAwesomeIcons.chevronLeft,
-            color: Colors.white,
-          ),
+          onPressed: () => Navigator.pop(context),
+          icon: const FaIcon(FontAwesomeIcons.chevronLeft, color: Colors.white),
         ),
       ),
       body: SingleChildScrollView(
         child: Column(
           children: [
             const SizedBox(height: 5),
-            Card(
-              margin:
-                  const EdgeInsets.only(left: 10, top: 5, right: 10, bottom: 5),
-              child: Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(5),
-                  gradient: const LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      Colors.red,
-                      Color.fromARGB(255, 85, 3, 3),
-                    ],
-                  ),
-                ),
-                padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    const SizedBox(height: 10),
-                    Text(
-                      (langUserPhone == "fr")
-                          ? "Informations : \n- Les Boosts Payant sont beaucoup plus mis en avant ! Il est donc conseillé de faire des Boosts Payant plutôt que Gratuit.\n- Il n'est pas possible de connaitre à l'avance le nombre de contacts après boost ni la tranche rapproché. \n- Vous pouvez programmer plusieurs Boosts Contact Payant. \n-Votre Boost Contact Devient Inactif si votre dernière connexion remonte à plus de 48H. Connectez-vous donc au minimum une fois par jour pour récupérer les contacts obtenus. \n- Après un Boost Contact Gratuit, vous etès obligé de faire au moins un Boost Conatct Payant avant de pouvoir faire encore un Boost Contact Gratuit. \n- Après un Boost Contact, vous vous connectez chaque jour pour que les nouveaux contacts soient enregistrés directement dans votre téléphone."
-                          : "Information: \n- Paid Boosts are much more prominently featured! It is therefore advisable to use Paid Boosts rather than Free ones. \n- It is not possible to know in advance the number of contacts after a boost or the next contact period. \n- You can schedule several Paid Contact Boosts. \n- Your Contact Boost becomes inactive if your last login was more than 48 hours ago. Therefore, log in at least once a day to retrieve the contacts obtained. \n- After a Free Contact Boost, you must complete at least one Paid Contact Boost before you can perform another Free Contact Boost. \n- After a Contact Boost, you log in every day so that new contacts are saved directly to your phone.",
-                      style: GoogleFonts.poppins(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 10,
-                        color: Colors.white,
-                      ),
-                      textAlign: TextAlign.justify,
-                    ),
-                    const SizedBox(height: 15),
-                  ],
-                ),
-              ),
-            ),
-            Container(
-              margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+            _buildInfoCard(isFr),
+            const SizedBox(height: 16),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 15),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
+                  Text(
+                    isFr ? "Type de boost" : "Boost type",
+                    style: GoogleFonts.poppins(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 13,
+                        color: Colors.grey[600]),
+                  ),
+                  const SizedBox(height: 8),
+                  _buildTypeSelector(isFr),
                   const SizedBox(height: 20),
                   Text(
-                    (langUserPhone == "fr")
-                        ? "Après BOOST, votre numéro sera visible dans les pays que vous avez choisie au niveau de vos préférences pendant un certain temps."
-                        : "After BOOST, your number will be visible in the countries you have chosen in your preferences for a certain time.",
+                    isFr ? "Mode de boost" : "Boost mode",
                     style: GoogleFonts.poppins(
-                      fontSize: 16,
-                    ),
-                    textAlign: TextAlign.center,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 13,
+                        color: Colors.grey[600]),
                   ),
-
-                  const SizedBox(height: 20),
-                  // --- Sélecteur de type ---
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Expanded(
-                        child: GestureDetector(
-                          onTap: () => setState(() => _typeBoost = 'date'),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(vertical: 12),
-                            decoration: BoxDecoration(
-                              color: _typeBoost == 'date' ? primaryColor : Colors.grey[200],
-                              borderRadius: const BorderRadius.only(
-                                topLeft: Radius.circular(25),
-                                bottomLeft: Radius.circular(25),
-                              ),
-                            ),
-                            child: Text(
-                              langUserPhone == "fr" ? "Par durée" : "By duration",
-                              textAlign: TextAlign.center,
-                              style: GoogleFonts.poppins(
-                                fontWeight: FontWeight.w600,
-                                color: _typeBoost == 'date' ? Colors.white : Colors.black54,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      Expanded(
-                        child: GestureDetector(
-                          onTap: () => setState(() => _typeBoost = 'quota'),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(vertical: 12),
-                            decoration: BoxDecoration(
-                              color: _typeBoost == 'quota' ? primaryColor : Colors.grey[200],
-                              borderRadius: const BorderRadius.only(
-                                topRight: Radius.circular(25),
-                                bottomRight: Radius.circular(25),
-                              ),
-                            ),
-                            child: Text(
-                              langUserPhone == "fr" ? "Par contacts" : "By contacts",
-                              textAlign: TextAlign.center,
-                              style: GoogleFonts.poppins(
-                                fontWeight: FontWeight.w600,
-                                color: _typeBoost == 'quota' ? Colors.white : Colors.black54,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        (langUserPhone == "fr") ? 'Gratuit' : 'Free',
-                        style: GoogleFonts.poppins(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w800,
-                          color: Colors.green,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(width: 10),
-                      Switch(
-                        trackOutlineColor: MaterialStateColor.resolveWith(
-                            (states) => primaryColor),
-                        activeColor: Colors.red,
-                        activeTrackColor: primaryColor,
-                        inactiveThumbColor: Colors.green,
-                        inactiveTrackColor: primaryColor,
-                        value: load,
-                        onChanged: (bool? newValue) {
-                          setState(() {
-                            if (newValue == true) {
-                              load = true;
-                            } else {
-                              load = false;
-                            }
-                          });
-                        },
-                      ),
-                      const SizedBox(width: 10),
-                      Text(
-                        (langUserPhone == "fr") ? 'Payant' : 'Paid',
-                        style: GoogleFonts.poppins(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w800,
-                          color: Colors.red,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ],
-                  ),
-
-                  const SizedBox(height: 20),
-                  // Formulaire
-                  load ? RegisterForm2(typeBoost: _typeBoost) : RegisterForm(typeBoost: _typeBoost),
-
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 8),
+                  _buildModeSelector(isFr),
+                  const SizedBox(height: 14),
+                  _buildDescription(isFr),
+                  const SizedBox(height: 16),
+                  _isPaid
+                      ? RegisterForm2(
+                          key: ValueKey(_typeBoost), typeBoost: _typeBoost)
+                      : RegisterForm(typeBoost: _typeBoost),
+                  const SizedBox(height: 24),
                 ],
               ),
             ),
@@ -212,81 +79,274 @@ class _NewBoostContactPageState extends State<NewBoostContactPage> {
       ),
     );
   }
+  Widget _buildInfoCard(bool isFr) {
+    return Card(
+      margin: const EdgeInsets.only(left: 10, top: 5, right: 10, bottom: 0),
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(5),
+          gradient: const LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [Colors.red, Color.fromARGB(255, 85, 3, 3)],
+          ),
+        ),
+        padding: const EdgeInsets.all(12),
+        child: Text(
+          isFr
+              ? "Informations :\n"
+                  "- Deux types de Boost disponibles :\n"
+                  "  · Par Durée : votre numéro est visible X jours dans vos pays préférés.\n"
+                  "  · Par Contacts : vous recevez un nombre précis de contacts ; le boost se termine automatiquement.\n"
+                  "- Les Boosts Payants sont beaucoup plus mis en avant !\n"
+                  "- Vous pouvez programmer plusieurs Boosts Payants.\n"
+                  "- Votre Boost devient Inactif si votre dernière connexion remonte à plus de 48H.\n"
+                  "- Après un Boost Gratuit, vous devez faire au moins un Boost Payant avant d'en refaire un Gratuit.\n"
+                  "- Connectez-vous chaque jour pour récupérer les contacts obtenus."
+              : "Information:\n"
+                  "- Two Boost types available:\n"
+                  "  · By Duration: your number is visible for X days in your preferred countries.\n"
+                  "  · By Contacts: you receive a set number of contacts; the boost ends automatically.\n"
+                  "- Paid Boosts are much more prominently featured!\n"
+                  "- You can schedule several Paid Boosts.\n"
+                  "- Your Boost becomes inactive if your last login was more than 48 hours ago.\n"
+                  "- After a Free Boost, you must complete at least one Paid Boost before getting another Free Boost.\n"
+                  "- Log in every day to retrieve the contacts obtained.",
+          style: GoogleFonts.poppins(
+              fontWeight: FontWeight.w600, fontSize: 10, color: Colors.white),
+          textAlign: TextAlign.justify,
+        ),
+      ),
+    );
+  }
+  Widget _buildTypeSelector(bool isFr) {
+    return Row(
+      children: [
+        Expanded(
+          child: GestureDetector(
+            onTap: () => setState(() => _typeBoost = 'date'),
+            child: Container(
+              padding: const EdgeInsets.symmetric(vertical: 14),
+              decoration: BoxDecoration(
+                color: _typeBoost == 'date' ? primaryColor : Colors.grey[100],
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(12),
+                  bottomLeft: Radius.circular(12),
+                ),
+                border: Border.all(
+                    color: _typeBoost == 'date'
+                        ? primaryColor
+                        : Colors.grey[300]!),
+              ),
+              child: Column(
+                children: [
+                  FaIcon(FontAwesomeIcons.clock,
+                      size: 18,
+                      color: _typeBoost == 'date'
+                          ? Colors.white
+                          : Colors.grey[500]),
+                  const SizedBox(height: 4),
+                  Text(
+                    isFr ? "Par Durée" : "By Duration",
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.poppins(
+                      fontWeight: FontWeight.w700,
+                      fontSize: 13,
+                      color: _typeBoost == 'date'
+                          ? Colors.white
+                          : Colors.grey[600],
+                    ),
+                  ),
+                  Text(
+                    isFr ? "Limité en jours" : "Day-limited",
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.poppins(
+                        fontSize: 10,
+                        color: _typeBoost == 'date'
+                            ? Colors.white70
+                            : Colors.grey[400]),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+        Expanded(
+          child: GestureDetector(
+            onTap: () => setState(() => _typeBoost = 'quota'),
+            child: Container(
+              padding: const EdgeInsets.symmetric(vertical: 14),
+              decoration: BoxDecoration(
+                color: _typeBoost == 'quota' ? primaryColor : Colors.grey[100],
+                borderRadius: const BorderRadius.only(
+                  topRight: Radius.circular(12),
+                  bottomRight: Radius.circular(12),
+                ),
+                border: Border.all(
+                    color: _typeBoost == 'quota'
+                        ? primaryColor
+                        : Colors.grey[300]!),
+              ),
+              child: Column(
+                children: [
+                  FaIcon(FontAwesomeIcons.users,
+                      size: 18,
+                      color: _typeBoost == 'quota'
+                          ? Colors.white
+                          : Colors.grey[500]),
+                  const SizedBox(height: 4),
+                  Text(
+                    isFr ? "Par Contacts" : "By Contacts",
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.poppins(
+                      fontWeight: FontWeight.w700,
+                      fontSize: 13,
+                      color: _typeBoost == 'quota'
+                          ? Colors.white
+                          : Colors.grey[600],
+                    ),
+                  ),
+                  Text(
+                    isFr ? "Nombre précis" : "Set number",
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.poppins(
+                        fontSize: 10,
+                        color: _typeBoost == 'quota'
+                            ? Colors.white70
+                            : Colors.grey[400]),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+  Widget _buildModeSelector(bool isFr) {
+    return Row(
+      children: [
+        Expanded(
+          child: GestureDetector(
+            onTap: () => setState(() => _isPaid = false),
+            child: Container(
+              padding: const EdgeInsets.symmetric(vertical: 14),
+              decoration: BoxDecoration(
+                color: !_isPaid ? Colors.green : Colors.grey[100],
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(12),
+                  bottomLeft: Radius.circular(12),
+                ),
+                border: Border.all(
+                    color: !_isPaid ? Colors.green : Colors.grey[300]!),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  FaIcon(FontAwesomeIcons.gift,
+                      size: 16,
+                      color: !_isPaid ? Colors.white : Colors.grey[500]),
+                  const SizedBox(width: 6),
+                  Text(
+                    isFr ? "Gratuit" : "Free",
+                    style: GoogleFonts.poppins(
+                      fontWeight: FontWeight.w700,
+                      fontSize: 15,
+                      color: !_isPaid ? Colors.white : Colors.grey[600],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+        Expanded(
+          child: GestureDetector(
+            onTap: () => setState(() => _isPaid = true),
+            child: Container(
+              padding: const EdgeInsets.symmetric(vertical: 14),
+              decoration: BoxDecoration(
+                color: _isPaid ? Colors.red : Colors.grey[100],
+                borderRadius: const BorderRadius.only(
+                  topRight: Radius.circular(12),
+                  bottomRight: Radius.circular(12),
+                ),
+                border: Border.all(
+                    color: _isPaid ? Colors.red : Colors.grey[300]!),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  FaIcon(FontAwesomeIcons.creditCard,
+                      size: 16,
+                      color: _isPaid ? Colors.white : Colors.grey[500]),
+                  const SizedBox(width: 6),
+                  Text(
+                    isFr ? "Payant" : "Paid",
+                    style: GoogleFonts.poppins(
+                      fontWeight: FontWeight.w700,
+                      fontSize: 15,
+                      color: _isPaid ? Colors.white : Colors.grey[600],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+  Widget _buildDescription(bool isFr) {
+    String text;
+    if (_typeBoost == 'quota') {
+      text = _isPaid
+          ? (isFr
+              ? "Choisissez une formule : vous recevrez un nombre précis de contacts. Le boost se termine automatiquement dès que le quota est atteint."
+              : "Choose a plan: you will receive a set number of contacts. The boost ends automatically once the quota is reached.")
+          : (isFr
+              ? "Boost Gratuit limité à 20 contacts. Le boost se termine automatiquement dès que les 20 contacts sont obtenus."
+              : "Free Boost limited to 20 contacts. The boost ends automatically once the 20 contacts are obtained.");
+    } else {
+      text = _isPaid
+          ? (isFr
+              ? "Choisissez une formule : votre numéro sera visible dans vos pays préférés pendant la durée choisie."
+              : "Choose a plan: your number will be visible in your preferred countries for the chosen duration.")
+          : (isFr
+              ? "Boost Gratuit de 5 jours : votre numéro sera visible dans vos pays préférés pendant 5 jours."
+              : "Free 5-Day Boost: your number will be visible in your preferred countries for 5 days.");
+    }
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.grey[50],
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: Colors.grey[200]!),
+      ),
+      child: Text(
+        text,
+        style: GoogleFonts.poppins(fontSize: 13, color: Colors.grey[700]),
+        textAlign: TextAlign.center,
+      ),
+    );
+  }
 }
-
+// ─────────────────────────────────────────────────────────────────────────────
+// BOOST GRATUIT
+// ─────────────────────────────────────────────────────────────────────────────
 class RegisterForm extends StatefulWidget {
   final String typeBoost;
   const RegisterForm({super.key, required this.typeBoost});
   @override
   State<RegisterForm> createState() => _RegisterFormState();
 }
-
 class _RegisterFormState extends State<RegisterForm> {
   bool _desactive = false;
-  bool loading_formule_gratuit = false;
-  dynamic data;
-  dynamic idFormulBoost = 1;
-  String? boostId;
-
-  List<Map<String, dynamic>> listeDesFormules = [];
-  int value = 0;
-  var label = "";
-  int prix = 0;
-  int jours = 0;
-
-  void listeFormuleBoost() async {
-    bool isConnected = await isConnectedToInternet();
-    if (isConnected) {
-      setState(() {
-        _desactive = true;
-        loading_formule_gratuit = true;
-      });
-
-      var request = http.MultipartRequest(
-          'POST', Uri.parse('$generalRouteForApi/listeFormuleBoost'));
-      request.fields.addAll({});
-
-      http.StreamedResponse response = await request.send();
-
-      if (response.statusCode == 200) {
-        var data1 = await response.stream.bytesToString();
-        var data = convert.jsonDecode(data1);
-        if (data["error"] == false) {
-          setState(() {
-            _desactive = false;
-            loading_formule_gratuit = false;
-            listeDesFormules = (data["listeFormulBoost"] as List<dynamic>)
-                .map((item) => item as Map<String, dynamic>)
-                .toList();
-            listeMethodePaiements =
-                (data["listeMethodePaiements"] as List<dynamic>)
-                    .map((item) => item as Map<String, dynamic>)
-                    .toList();
-          });
-        }
-      }
-    } else {
-      if (langUserPhone != "fr") {
-        dangerNoti(
-            "Mistake!", "You are not connected to the internet.", context);
-      } else {
-        dangerNoti("Erreur!", "Vous n'ètes pas connecté a internet.", context);
-      }
-      setState(() {
-        _desactive = false;
-        loading_formule_gratuit = false;
-      });
-    }
-  }
-
   void newBoost() async {
     if (telIsVerified == true) {
       bool isConnected = await isConnectedToInternet();
       if (isConnected) {
-        setState(() {
-          _desactive = true;
-        });
-
+        setState(() => _desactive = true);
         var request = http.MultipartRequest(
             'POST', Uri.parse('$generalRouteForApi/newBoost'));
         request.fields.addAll({
@@ -294,9 +354,7 @@ class _RegisterFormState extends State<RegisterForm> {
           'langUserPhone': langUserPhone.toString(),
           'typeBoost': widget.typeBoost,
         });
-
         http.StreamedResponse response = await request.send();
-
         if (response.statusCode == 200) {
           var data1 = await response.stream.bytesToString();
           var data = convert.jsonDecode(data1);
@@ -308,151 +366,92 @@ class _RegisterFormState extends State<RegisterForm> {
                 backgroundColor: Colors.green,
                 behavior: SnackBarBehavior.floating,
                 duration: const Duration(seconds: 15),
-                content: Text(
-                  data["message"],
-                  style: GoogleFonts.poppins(
-                    color: Colors.white,
-                  ),
-                ),
+                content: Text(data["message"],
+                    style: GoogleFonts.poppins(color: Colors.white)),
               ));
               Navigator.pop(context);
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => ListeBoostContactPage()),
-              );
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => ListeBoostContactPage()));
             });
           } else {
             dangerNoti(data["titre"], data["message"], context);
-            setState(() {
-              _desactive = false;
-            });
+            setState(() => _desactive = false);
           }
         }
       } else {
-        if (langUserPhone != "fr") {
-          dangerNoti(
-              "Mistake!", "You are not connected to the internet.", context);
-        } else {
-          dangerNoti(
-              "Erreur!", "Vous n'ètes pas connecté a internet.", context);
-        }
-        setState(() {
-          _desactive = false;
-        });
+        dangerNoti(
+            langUserPhone != "fr" ? "Mistake!" : "Erreur!",
+            langUserPhone != "fr"
+                ? "You are not connected to the internet."
+                : "Vous n'êtes pas connecté à internet.",
+            context);
+        setState(() => _desactive = false);
       }
     } else {
-      if (langUserPhone != "fr") {
-        dangerNoti("Access denied !",
-            "Please confirm your WhatsApp number first.", context);
-      } else {
-        dangerNoti("Accès Refusé !",
-            "Veuillez d'abord confirmer votre numéro WhatsApp.", context);
-      }
+      dangerNoti(
+          langUserPhone != "fr" ? "Access denied!" : "Accès Refusé !",
+          langUserPhone != "fr"
+              ? "Please confirm your WhatsApp number first."
+              : "Veuillez d'abord confirmer votre numéro WhatsApp.",
+          context);
     }
   }
-
-  onChangeFormulBoost(val) async {
-    for (var service in listeDesFormules) {
-      if ("$val" == "${service['value']}") {
-        setState(() {
-          value = service['value'];
-          label = service['label'];
-          prix = service['prix'];
-          jours = service['jours'];
-        });
-      }
-    }
-    setState(() {
-      idFormulBoost = val;
-    });
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    // listeFormuleBoost(); // Loading the diary when the app starts
-  }
-
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Column(
-        children: [
-          const SizedBox(height: 20),
-          Text(
-            widget.typeBoost == 'quota'
-                ? (langUserPhone == "fr")
-                    ? "Demander un Boost Contact Gratuit limité à 20 contacts"
-                    : "Request a Free Contact Boost limited to 20 contacts"
-                : (langUserPhone == "fr")
-                    ? "Demander un Boost Contact Gratuit de 05 jours"
-                    : "Request a Free 5-Day Contact Boost",
-            style: GoogleFonts.poppins(fontSize: 16),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 20),
-          SizedBox(
-            width: MediaQuery.of(context).size.width * 0.95,
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: primaryColor,
-                shape: const StadiumBorder(),
-                padding: const EdgeInsets.symmetric(
-                  vertical: 13,
-                ),
-              ),
-              child: Text(
-                _desactive
-                    ? (langUserPhone == "fr")
-                        ? "Patientez..."
-                        : "Wait..."
-                    : (langUserPhone == "fr")
-                        ? "Demander un Boost Gratuit"
-                        : "Request a Free Boost",
-                style: GoogleFonts.poppins(
-                  color: Colors.white,
-                ),
-              ),
-              onPressed: () {
-                if (!telIsVerified) {
-                  showConfNumeroWhatsapp(context);
-                } else {
-                  _desactive ? null : newBoost();
-                }
-              },
+    final bool isFr = langUserPhone == "fr";
+    return Column(
+      children: [
+        const SizedBox(height: 10),
+        SizedBox(
+          width: MediaQuery.of(context).size.width * 0.95,
+          child: ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.green,
+              shape: const StadiumBorder(),
+              padding: const EdgeInsets.symmetric(vertical: 14),
             ),
+            child: Text(
+              _desactive
+                  ? (isFr ? "Patientez..." : "Wait...")
+                  : (isFr ? "Demander un Boost Gratuit" : "Request a Free Boost"),
+              style: GoogleFonts.poppins(
+                  color: Colors.white, fontWeight: FontWeight.w600),
+            ),
+            onPressed: () {
+              if (!telIsVerified) {
+                showConfNumeroWhatsapp(context);
+              } else {
+                _desactive ? null : newBoost();
+              }
+            },
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
-
+// ─────────────────────────────────────────────────────────────────────────────
+// BOOST PAYANT
+// ─────────────────────────────────────────────────────────────────────────────
 class RegisterForm2 extends StatefulWidget {
   final String typeBoost;
   const RegisterForm2({super.key, required this.typeBoost});
   @override
   State<RegisterForm2> createState() => _RegisterForm2State();
 }
-
 class _RegisterForm2State extends State<RegisterForm2> {
   bool _desactive2 = false;
   bool loading_formule_payant = false;
   var _message = "";
-  dynamic data;
   dynamic idFormulBoost = 1;
   dynamic valueMethodePaiement = "mtn";
-  String? boostId;
   final telController = TextEditingController(text: tel);
-
   List<Map<String, dynamic>> listeDesFormules = [];
   int value = 0;
   var label = "";
   int prix = 0;
   int jours = 0;
   int? nbContactsMax;
-
   void listeFormuleBoost() async {
     bool isConnected = await isConnectedToInternet();
     if (isConnected) {
@@ -460,13 +459,10 @@ class _RegisterForm2State extends State<RegisterForm2> {
         _desactive2 = true;
         loading_formule_payant = true;
       });
-
       var request = http.MultipartRequest(
           'POST', Uri.parse('$generalRouteForApi/listeFormuleBoost'));
-      request.fields.addAll({});
-
+      request.fields.addAll({'typeBoost': widget.typeBoost});
       http.StreamedResponse response = await request.send();
-
       if (response.statusCode == 200) {
         var data1 = await response.stream.bytesToString();
         var data = convert.jsonDecode(data1);
@@ -474,11 +470,8 @@ class _RegisterForm2State extends State<RegisterForm2> {
           setState(() {
             _desactive2 = false;
             loading_formule_payant = false;
-            final toutes = (data["listeFormulBoost"] as List<dynamic>)
+            listeDesFormules = (data["listeFormulBoost"] as List<dynamic>)
                 .map((item) => item as Map<String, dynamic>)
-                .toList();
-            listeDesFormules = toutes
-                .where((f) => f['typeBoost'] == widget.typeBoost && f['prix'] > 0)
                 .toList();
             listeMethodePaiements =
                 (data["listeMethodePaiements"] as List<dynamic>)
@@ -491,19 +484,18 @@ class _RegisterForm2State extends State<RegisterForm2> {
         }
       }
     } else {
-      if (langUserPhone != "fr") {
-        dangerNoti(
-            "Mistake!", "You are not connected to the internet.", context);
-      } else {
-        dangerNoti("Erreur!", "Vous n'ètes pas connecté a internet.", context);
-      }
+      dangerNoti(
+          langUserPhone != "fr" ? "Mistake!" : "Erreur!",
+          langUserPhone != "fr"
+              ? "You are not connected to the internet."
+              : "Vous n'êtes pas connecté à internet.",
+          context);
       setState(() {
         _desactive2 = false;
         loading_formule_payant = false;
       });
     }
   }
-
   onChangeFormulBoost(val) async {
     for (var service in listeDesFormules) {
       if ("$val" == "${service['value']}") {
@@ -529,21 +521,14 @@ class _RegisterForm2State extends State<RegisterForm2> {
       }
     });
   }
-
   onChangeMethodePaiement(val) async {
-    setState(() {
-      valueMethodePaiement = val;
-    });
+    setState(() => valueMethodePaiement = val);
   }
-
   void newBoostPayant() async {
     if (telIsVerified == true) {
       bool isConnected = await isConnectedToInternet();
       if (isConnected) {
-        setState(() {
-          _desactive2 = true;
-        });
-
+        setState(() => _desactive2 = true);
         var request = http.MultipartRequest(
             'POST', Uri.parse('$generalRouteForApi/newBoostPayant'));
         request.fields.addAll({
@@ -554,16 +539,12 @@ class _RegisterForm2State extends State<RegisterForm2> {
           'tel': telController.text,
           'typeBoost': widget.typeBoost,
         });
-
         http.StreamedResponse response = await request.send();
-
         if (response.statusCode == 200) {
           var data1 = await response.stream.bytesToString();
           var data = convert.jsonDecode(data1);
           if (data["error"] == false) {
-            setState(() {
-              _desactive2 = false;
-            });
+            setState(() => _desactive2 = false);
             if (data["direct"] == true) {
               dangerNoti(
                   (langUserPhone == "fr") ? "Attention !!!" : "Attention !!!",
@@ -582,48 +563,35 @@ class _RegisterForm2State extends State<RegisterForm2> {
                       ? "Après confirmation du paiement, veuillez consulter la liste de vos boosts."
                       : "After payment confirmation, please view the list of your boosts.");
             }
-            // var idTransaction = data["idTransaction"];
           } else {
             dangerNoti(data["titre"], data["message"], context);
-            setState(() {
-              _desactive2 = false;
-            });
+            setState(() => _desactive2 = false);
           }
         }
       } else {
-        if (langUserPhone != "fr") {
-          dangerNoti(
-              "Mistake!", "You are not connected to the internet.", context);
-        } else {
-          dangerNoti(
-              "Erreur!", "Vous n'ètes pas connecté a internet.", context);
-        }
-        setState(() {
-          _desactive2 = false;
-        });
+        dangerNoti(
+            langUserPhone != "fr" ? "Mistake!" : "Erreur!",
+            langUserPhone != "fr"
+                ? "You are not connected to the internet."
+                : "Vous n'êtes pas connecté à internet.",
+            context);
+        setState(() => _desactive2 = false);
       }
     } else {
-      if (langUserPhone != "fr") {
-        dangerNoti("Access denied !",
-            "Please confirm your WhatsApp number first.", context);
-      } else {
-        dangerNoti("Accès Refusé !",
-            "Veuillez d'abord confirmer votre numéro WhatsApp.", context);
-      }
-      setState(() {
-        _desactive2 = false;
-      });
+      dangerNoti(
+          langUserPhone != "fr" ? "Access denied!" : "Accès Refusé !",
+          langUserPhone != "fr"
+              ? "Please confirm your WhatsApp number first."
+              : "Veuillez d'abord confirmer votre numéro WhatsApp.",
+          context);
+      setState(() => _desactive2 = false);
     }
   }
-
   void checkTransaction(idTransaction) async {
     if (telIsVerified == true) {
       bool isConnected = await isConnectedToInternet();
       if (isConnected) {
-        setState(() {
-          _desactive2 = true;
-        });
-
+        setState(() => _desactive2 = true);
         var request = http.MultipartRequest(
             'POST', Uri.parse('$generalRouteForApi/checkTransaction'));
         request.fields.addAll({
@@ -631,156 +599,134 @@ class _RegisterForm2State extends State<RegisterForm2> {
           'langUserPhone': langUserPhone.toString(),
           'idTransaction': idTransaction.toString()
         });
-
         http.StreamedResponse response = await request.send();
-
         if (response.statusCode == 200) {
           var data1 = await response.stream.bytesToString();
           var data = convert.jsonDecode(data1);
           if (data["error"] == false) {
             if (data["transaction"] == false) {
               dangerNoti(data["titre"], data["message"], context);
-
-              setState(() {
-                _desactive2 = false;
-              });
+              setState(() => _desactive2 = false);
             } else if (data["transaction"] == true) {
               successNoti(data["titre"], data["message"], context);
-
               ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                 behavior: SnackBarBehavior.floating,
                 content: Text(data["message"]),
               ));
-
-              setState(() {
-                _desactive2 = false;
-              });
+              setState(() => _desactive2 = false);
             }
           } else {
             dangerNoti(data["titre"], data["message"], context);
-            setState(() {
-              _desactive2 = false;
-            });
+            setState(() => _desactive2 = false);
           }
         }
       } else {
-        if (langUserPhone != "fr") {
-          dangerNoti(
-              "Mistake!", "You are not connected to the internet.", context);
-        } else {
-          dangerNoti(
-              "Erreur!", "Vous n'ètes pas connecté a internet.", context);
-        }
-        setState(() {
-          _desactive2 = false;
-        });
+        dangerNoti(
+            langUserPhone != "fr" ? "Mistake!" : "Erreur!",
+            langUserPhone != "fr"
+                ? "You are not connected to the internet."
+                : "Vous n'êtes pas connecté à internet.",
+            context);
+        setState(() => _desactive2 = false);
       }
     } else {
-      if (langUserPhone != "fr") {
-        dangerNoti("Access denied !",
-            "Please confirm your WhatsApp number first.", context);
-      } else {
-        dangerNoti("Accès Refusé !",
-            "Veuillez d'abord confirmer votre numéro WhatsApp.", context);
-      }
-      setState(() {
-        _desactive2 = false;
-      });
+      dangerNoti(
+          langUserPhone != "fr" ? "Access denied!" : "Accès Refusé !",
+          langUserPhone != "fr"
+              ? "Please confirm your WhatsApp number first."
+              : "Veuillez d'abord confirmer votre numéro WhatsApp.",
+          context);
+      setState(() => _desactive2 = false);
     }
   }
-
   @override
   void initState() {
-    super.initState(); // Loading the diary when the app starts
+    super.initState();
     listeFormuleBoost();
   }
-
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Column(
-        children: [
-          loading_formule_payant
-              ? const Center(
-                  child: CircularProgressIndicator(color: primaryColor),
-                )
-              : SelectFormField(
-                  decoration: const InputDecoration(
-                    labelText: 'Formules de Boost Payant',
-                    border: OutlineInputBorder(),
-                  ),
-                  type: SelectFormFieldType.dropdown,
-                  initialValue: '0',
-                  labelText: 'Formules de Boost Payant',
-                  items: listeDesFormules,
-                  onChanged: (val) => onChangeFormulBoost(val),
-                  onSaved: (val) => print(val),
+    final bool isFr = langUserPhone == "fr";
+    return Column(
+      children: [
+        loading_formule_payant
+            ? const Center(
+                child: CircularProgressIndicator(color: primaryColor))
+            : SelectFormField(
+                decoration: InputDecoration(
+                  labelText: isFr
+                      ? 'Formules de Boost Payant'
+                      : 'Paid Boost Plans',
+                  border: const OutlineInputBorder(),
                 ),
-          const SizedBox(height: 10),
-          Text(
-            _message,
-            style: GoogleFonts.poppins(
-              fontSize: 16,
-            ),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 10),
-          SelectFormField(
-            decoration: const InputDecoration(
-              labelText: 'Moyen de paiement mobile ou par carte',
-              border: OutlineInputBorder(),
-            ),
-            type: SelectFormFieldType.dropdown,
-            initialValue: 'mtn',
-            labelText: 'Moyen de paiement mobile ou par carte',
-            items: listeMethodePaiements,
-            onChanged: (val) => onChangeMethodePaiement(val),
-            onSaved: (val) => print(val),
-          ),
-          const SizedBox(height: 10),
-          TextField(
-            controller: telController,
-            decoration: InputDecoration(
-              labelStyle: GoogleFonts.poppins(color: Colors.grey[400]),
-              labelText: 'Indicatif + Numéro du paiement',
-              border: const OutlineInputBorder(),
-            ),
-          ),
-          const SizedBox(height: 10),
-          SizedBox(
-            width: MediaQuery.of(context).size.width * 0.95,
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: primaryColor,
-                shape: const StadiumBorder(),
-                padding: const EdgeInsets.symmetric(
-                  vertical: 13,
-                ),
+                type: SelectFormFieldType.dropdown,
+                initialValue: '0',
+                labelText: isFr ? 'Formules de Boost Payant' : 'Paid Boost Plans',
+                items: listeDesFormules,
+                onChanged: (val) => onChangeFormulBoost(val),
+                onSaved: (val) => print(val),
               ),
-              child: Text(
-                _desactive2
-                    ? (langUserPhone == "fr")
-                        ? "Patientez..."
-                        : "Wait..."
-                    : (langUserPhone == "fr")
-                        ? "Payer et Booster"
-                        : "Pay and Boost",
-                style: GoogleFonts.poppins(
-                  color: Colors.white,
-                ),
-              ),
-              onPressed: () {
-                if (!telIsVerified) {
-                  showConfNumeroWhatsapp(context);
-                } else {
-                  _desactive2 ? null : newBoostPayant();
-                }
-              },
-            ),
+        const SizedBox(height: 10),
+        Text(
+          _message,
+          style: GoogleFonts.poppins(fontSize: 14),
+          textAlign: TextAlign.center,
+        ),
+        const SizedBox(height: 10),
+        SelectFormField(
+          decoration: InputDecoration(
+            labelText: isFr
+                ? 'Moyen de paiement mobile ou par carte'
+                : 'Mobile or card payment method',
+            border: const OutlineInputBorder(),
           ),
-          const SizedBox(height: 10),
-        ],
-      ),
+          type: SelectFormFieldType.dropdown,
+          initialValue: 'mtn',
+          labelText: isFr
+              ? 'Moyen de paiement mobile ou par carte'
+              : 'Mobile or card payment method',
+          items: listeMethodePaiements,
+          onChanged: (val) => onChangeMethodePaiement(val),
+          onSaved: (val) => print(val),
+        ),
+        const SizedBox(height: 10),
+        TextField(
+          controller: telController,
+          decoration: InputDecoration(
+            labelStyle: GoogleFonts.poppins(color: Colors.grey[400]),
+            labelText: isFr
+                ? 'Indicatif + Numéro du paiement'
+                : 'Country code + Payment number',
+            border: const OutlineInputBorder(),
+          ),
+        ),
+        const SizedBox(height: 14),
+        SizedBox(
+          width: MediaQuery.of(context).size.width * 0.95,
+          child: ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: primaryColor,
+              shape: const StadiumBorder(),
+              padding: const EdgeInsets.symmetric(vertical: 14),
+            ),
+            child: Text(
+              _desactive2
+                  ? (isFr ? "Patientez..." : "Wait...")
+                  : (isFr ? "Payer et Booster" : "Pay and Boost"),
+              style: GoogleFonts.poppins(
+                  color: Colors.white, fontWeight: FontWeight.w600),
+            ),
+            onPressed: () {
+              if (!telIsVerified) {
+                showConfNumeroWhatsapp(context);
+              } else {
+                _desactive2 ? null : newBoostPayant();
+              }
+            },
+          ),
+        ),
+        const SizedBox(height: 10),
+      ],
     );
   }
 }
