@@ -16,6 +16,35 @@ class NewBoostContactPage extends StatefulWidget {
 class _NewBoostContactPageState extends State<NewBoostContactPage> {
   bool _isPaid = false;
   String _typeBoost = 'date';
+  int _freeNbrJour = 5;
+  int _freeNbContactsMax = 20;
+  bool _loadingFreeInfo = false;
+  @override
+  void initState() {
+    super.initState();
+    _fetchFreeBoostInfo();
+  }
+  Future<void> _fetchFreeBoostInfo() async {
+    setState(() => _loadingFreeInfo = true);
+    try {
+      final response = await http.get(
+        Uri.parse('$generalRouteForApi/freeBoostInfo'),
+      );
+      if (response.statusCode == 200) {
+        final data = convert.jsonDecode(response.body);
+        if (data['error'] == false) {
+          setState(() {
+            _freeNbrJour        = data['date']['nbrJour']          ?? 5;
+            _freeNbContactsMax  = data['quota']['nbContactsMax']   ?? 20;
+          });
+        }
+      }
+    } catch (_) {
+      // Garde les valeurs par défaut en cas d'erreur réseau
+    } finally {
+      setState(() => _loadingFreeInfo = false);
+    }
+  }
   @override
   Widget build(BuildContext context) {
     final bool isFr = langUserPhone == "fr";
@@ -298,6 +327,15 @@ class _NewBoostContactPageState extends State<NewBoostContactPage> {
     );
   }
   Widget _buildDescription(bool isFr) {
+    if (_loadingFreeInfo && !_isPaid) {
+      return const Center(
+        child: SizedBox(
+          height: 20,
+          width: 20,
+          child: CircularProgressIndicator(strokeWidth: 2, color: primaryColor),
+        ),
+      );
+    }
     String text;
     if (_typeBoost == 'quota') {
       text = _isPaid
@@ -305,16 +343,16 @@ class _NewBoostContactPageState extends State<NewBoostContactPage> {
               ? "Choisissez une formule : vous recevrez un nombre précis de contacts. Le boost se termine automatiquement dès que le quota est atteint."
               : "Choose a plan: you will receive a set number of contacts. The boost ends automatically once the quota is reached.")
           : (isFr
-              ? "Boost Gratuit limité à 20 contacts. Le boost se termine automatiquement dès que les 20 contacts sont obtenus."
-              : "Free Boost limited to 20 contacts. The boost ends automatically once the 20 contacts are obtained.");
+              ? "Boost Gratuit limité à $_freeNbContactsMax contacts. Le boost se termine automatiquement dès que les $_freeNbContactsMax contacts sont obtenus."
+              : "Free Boost limited to $_freeNbContactsMax contacts. The boost ends automatically once the $_freeNbContactsMax contacts are obtained.");
     } else {
       text = _isPaid
           ? (isFr
               ? "Choisissez une formule : votre numéro sera visible dans vos pays préférés pendant la durée choisie."
               : "Choose a plan: your number will be visible in your preferred countries for the chosen duration.")
           : (isFr
-              ? "Boost Gratuit de 5 jours : votre numéro sera visible dans vos pays préférés pendant 5 jours."
-              : "Free 5-Day Boost: your number will be visible in your preferred countries for 5 days.");
+              ? "Boost Gratuit de $_freeNbrJour jour(s) : votre numéro sera visible dans vos pays préférés pendant $_freeNbrJour jour(s)."
+              : "Free $_freeNbrJour-day Boost: your number will be visible in your preferred countries for $_freeNbrJour day(s).");
     }
     return Container(
       padding: const EdgeInsets.all(12),
