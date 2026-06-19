@@ -8,19 +8,27 @@ import 'dart:convert' as convert;
 
 class Boost {
   final String id;
+  final String typeBoost;
   final String modeBoostFormule;
   final String statutFormule;
   final String nomFormule;
   final String prixFormule;
   final String dateDebutFormule;
+  final String? dateExp;
+  final int nbContactsObtenus;
+  final int? nbContactsMax;
 
   Boost({
     required this.id,
+    required this.typeBoost,
     required this.modeBoostFormule,
     required this.statutFormule,
     required this.nomFormule,
     required this.prixFormule,
     required this.dateDebutFormule,
+    this.dateExp,
+    required this.nbContactsObtenus,
+    this.nbContactsMax,
   });
 }
 
@@ -47,11 +55,15 @@ class _ListeBoostContactPageState extends State<ListeBoostContactPage> {
         final boosts = jsonData.map((data) {
           return Boost(
             id: data['id'],
+            typeBoost: data['typeBoost'] ?? 'date',
             modeBoostFormule: data['modeBoostFormule'],
             statutFormule: data['statutFormule'],
             nomFormule: data['nomFormule'],
             prixFormule: data['prixFormule'],
             dateDebutFormule: data['dateDebutFormule'],
+            dateExp: data['dateExp'],
+            nbContactsObtenus: data['nbContactsObtenus'] ?? 0,
+            nbContactsMax: data['nbContactsMax'],
           );
         }).toList();
 
@@ -99,6 +111,11 @@ class _ListeBoostContactPageState extends State<ListeBoostContactPage> {
   }
 
   Widget _buildBoostCard(Boost boost) {
+    final bool isQuota = boost.typeBoost == 'quota';
+    final bool isFr = langUserPhone == "fr";
+    final int obtenus = boost.nbContactsObtenus;
+    final int max = boost.nbContactsMax ?? 1;
+    final double progress = isQuota ? (obtenus / max).clamp(0.0, 1.0) : 0.0;
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       child: Padding(
@@ -106,31 +123,95 @@ class _ListeBoostContactPageState extends State<ListeBoostContactPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            // --- Badges : mode | type | statut ---
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                _buildStatusLabel(boost.modeBoostFormule, isMode: true),
+                Row(
+                  children: [
+                    _buildStatusLabel(boost.modeBoostFormule, isMode: true),
+                    const SizedBox(width: 6),
+                    _buildTypeLabel(isQuota, isFr),
+                  ],
+                ),
                 _buildStatusLabel(boost.statutFormule),
               ],
             ),
-            const SizedBox(height: 5),
+            const SizedBox(height: 8),
+            // --- Nom + Prix ---
             Text(
               "${boost.nomFormule} (${boost.prixFormule})",
               style: GoogleFonts.poppins(
                 fontWeight: FontWeight.w600,
-                fontSize: 18,
+                fontSize: 16,
               ),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
-            const SizedBox(height: 5),
-            Text(
-              boost.dateDebutFormule,
-              style: GoogleFonts.poppins(fontSize: 12),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
+            const SizedBox(height: 8),
+            // --- Infos selon le type ---
+            if (isQuota) ...[
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    isFr ? "Contacts reçus" : "Contacts received",
+                    style: GoogleFonts.poppins(fontSize: 12, color: Colors.grey[600]),
+                  ),
+                  Text(
+                    "$obtenus / $max",
+                    style: GoogleFonts.poppins(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                      color: primaryColor,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 6),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(4),
+                child: LinearProgressIndicator(
+                  value: progress,
+                  minHeight: 8,
+                  backgroundColor: Colors.grey[200],
+                  color: progress >= 1.0 ? Colors.green : primaryColor,
+                ),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                boost.dateDebutFormule,
+                style: GoogleFonts.poppins(fontSize: 11, color: Colors.grey[500]),
+              ),
+            ] else ...[
+              Text(
+                boost.dateDebutFormule,
+                style: GoogleFonts.poppins(fontSize: 12),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTypeLabel(bool isQuota, bool isFr) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 1),
+      decoration: BoxDecoration(
+        color: isQuota ? Colors.deepPurple : Colors.blueGrey,
+        borderRadius: BorderRadius.circular(10.0),
+      ),
+      child: Text(
+        isQuota
+            ? (isFr ? "Par contacts" : "By contacts")
+            : (isFr ? "Par durée" : "By duration"),
+        style: GoogleFonts.poppins(
+          fontSize: 11,
+          color: Colors.white,
+          fontWeight: FontWeight.w600,
         ),
       ),
     );
