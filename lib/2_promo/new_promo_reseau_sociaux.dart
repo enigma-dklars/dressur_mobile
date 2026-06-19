@@ -118,9 +118,9 @@ class _PromotionReseauSociauxFormPageState
               padding: const EdgeInsets.symmetric(horizontal: 10),
               child: _buildInfoButton(),
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 16),
             Container(
-              margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+              margin: const EdgeInsets.only(bottom: 10, left: 15, right: 15),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
@@ -134,7 +134,7 @@ class _PromotionReseauSociauxFormPageState
                     ),
                     textAlign: TextAlign.center,
                   ),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 8),
 
                   // Formulaire
                   RegisterForm3(),

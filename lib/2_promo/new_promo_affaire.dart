@@ -127,7 +127,7 @@ class _PromotionFormPageState extends State<PromotionFormPage> {
           children: [
             const SizedBox(height: 10),
             _buildInfoButton(),
-            const SizedBox(height: 10),
+            const SizedBox(height: 16),
             Text(
               (langUserPhone == "fr")
                   ? "Nouvelle Promotion Affaire"
@@ -138,7 +138,7 @@ class _PromotionFormPageState extends State<PromotionFormPage> {
               ),
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 5),
+            const SizedBox(height: 8),
             SelectFormField(
               decoration: const InputDecoration(
                 labelText: 'Type Promotion Affaire',
