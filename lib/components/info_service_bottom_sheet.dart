@@ -68,9 +68,13 @@ class _ServiceInfoBottomSheetState extends State<_ServiceInfoBottomSheet>
     _remaining = widget.totalSeconds;
     _progressCtrl = AnimationController(
       vsync: this,
-      duration: Duration(seconds: widget.totalSeconds),
-      value: 1.0,
+      duration: widget.totalSeconds > 0
+          ? Duration(seconds: widget.totalSeconds)
+          : const Duration(milliseconds: 1),
+      value: widget.totalSeconds > 0 ? 1.0 : 0.0,
     );
+
+    if (widget.totalSeconds == 0) return;
 
     Future.delayed(const Duration(milliseconds: 700), () {
       if (!mounted) return;

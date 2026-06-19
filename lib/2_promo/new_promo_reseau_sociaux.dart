@@ -29,9 +29,10 @@ class _PromotionReseauSociauxFormPageState
     });
   }
 
-  void _showInfoModal() {
+  void _showInfoModal({int countdown = 2}) {
     showServiceInfoModal(
       context,
+      countdownSeconds: countdown,
       titleFr: "Informations Promotion Réseaux Sociaux",
       titleEn: "Social Network Promotion Information",
       items: const [
@@ -67,7 +68,7 @@ class _PromotionReseauSociauxFormPageState
   Widget _buildInfoButton() {
     final bool isFr = langUserPhone == "fr";
     return OutlinedButton.icon(
-      onPressed: _showInfoModal,
+      onPressed: () => _showInfoModal(countdown: 0),
       icon: const FaIcon(FontAwesomeIcons.circleInfo, size: 14),
       label: Text(
         isFr ? "Voir les informations sur le service" : "View service information",
@@ -76,6 +77,7 @@ class _PromotionReseauSociauxFormPageState
       style: OutlinedButton.styleFrom(
         foregroundColor: primaryColor,
         side: BorderSide(color: primaryColor.withOpacity(0.5)),
+        minimumSize: const Size(double.infinity, 48),
         padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       ),

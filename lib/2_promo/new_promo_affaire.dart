@@ -40,9 +40,10 @@ class _PromotionFormPageState extends State<PromotionFormPage> {
     });
   }
 
-  void _showInfoModal() {
+  void _showInfoModal({int countdown = 2}) {
     showServiceInfoModal(
       context,
+      countdownSeconds: countdown,
       titleFr: "Informations Promotion Affaire",
       titleEn: "Business Promotion Information",
       items: const [
@@ -78,7 +79,7 @@ class _PromotionFormPageState extends State<PromotionFormPage> {
   Widget _buildInfoButton() {
     final bool isFr = langUserPhone == "fr";
     return OutlinedButton.icon(
-      onPressed: _showInfoModal,
+      onPressed: () => _showInfoModal(countdown: 0),
       icon: const FaIcon(FontAwesomeIcons.circleInfo, size: 14),
       label: Text(
         isFr ? "Voir les informations sur le service" : "View service information",
@@ -87,6 +88,7 @@ class _PromotionFormPageState extends State<PromotionFormPage> {
       style: OutlinedButton.styleFrom(
         foregroundColor: primaryColor,
         side: BorderSide(color: primaryColor.withOpacity(0.5)),
+        minimumSize: const Size(double.infinity, 48),
         padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       ),

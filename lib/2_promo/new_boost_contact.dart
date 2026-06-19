@@ -29,9 +29,10 @@ class _NewBoostContactPageState extends State<NewBoostContactPage> {
     });
   }
 
-  void _showInfoModal() {
+  void _showInfoModal({int countdown = 2}) {
     showServiceInfoModal(
       context,
+      countdownSeconds: countdown,
       titleFr: "Informations Boost Contact",
       titleEn: "Boost Contact Information",
       items: const [
@@ -161,7 +162,7 @@ class _NewBoostContactPageState extends State<NewBoostContactPage> {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 10),
       child: OutlinedButton.icon(
-        onPressed: _showInfoModal,
+        onPressed: () => _showInfoModal(countdown: 0),
         icon: const FaIcon(FontAwesomeIcons.circleInfo, size: 14),
         label: Text(
           isFr
@@ -172,6 +173,7 @@ class _NewBoostContactPageState extends State<NewBoostContactPage> {
         style: OutlinedButton.styleFrom(
           foregroundColor: primaryColor,
           side: BorderSide(color: primaryColor.withOpacity(0.5)),
+          minimumSize: const Size(double.infinity, 48),
           padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
