@@ -18,6 +18,7 @@ class NewBoostContactPage extends StatefulWidget {
 
 class _NewBoostContactPageState extends State<NewBoostContactPage> {
   bool load = false;
+  String _typeBoost = 'date';
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -101,7 +102,59 @@ class _NewBoostContactPageState extends State<NewBoostContactPage> {
                   ),
 
                   const SizedBox(height: 20),
-
+                  // --- Sélecteur de type ---
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: () => setState(() => _typeBoost = 'date'),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            decoration: BoxDecoration(
+                              color: _typeBoost == 'date' ? primaryColor : Colors.grey[200],
+                              borderRadius: const BorderRadius.only(
+                                topLeft: Radius.circular(25),
+                                bottomLeft: Radius.circular(25),
+                              ),
+                            ),
+                            child: Text(
+                              langUserPhone == "fr" ? "Par durée" : "By duration",
+                              textAlign: TextAlign.center,
+                              style: GoogleFonts.poppins(
+                                fontWeight: FontWeight.w600,
+                                color: _typeBoost == 'date' ? Colors.white : Colors.black54,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: () => setState(() => _typeBoost = 'quota'),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            decoration: BoxDecoration(
+                              color: _typeBoost == 'quota' ? primaryColor : Colors.grey[200],
+                              borderRadius: const BorderRadius.only(
+                                topRight: Radius.circular(25),
+                                bottomRight: Radius.circular(25),
+                              ),
+                            ),
+                            child: Text(
+                              langUserPhone == "fr" ? "Par contacts" : "By contacts",
+                              textAlign: TextAlign.center,
+                              style: GoogleFonts.poppins(
+                                fontWeight: FontWeight.w600,
+                                color: _typeBoost == 'quota' ? Colors.white : Colors.black54,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -148,7 +201,7 @@ class _NewBoostContactPageState extends State<NewBoostContactPage> {
 
                   const SizedBox(height: 20),
                   // Formulaire
-                  load ? RegisterForm2() : RegisterForm(),
+                  load ? RegisterForm2(typeBoost: _typeBoost) : RegisterForm(typeBoost: _typeBoost),
 
                   const SizedBox(height: 10),
                 ],
@@ -162,6 +215,8 @@ class _NewBoostContactPageState extends State<NewBoostContactPage> {
 }
 
 class RegisterForm extends StatefulWidget {
+  final String typeBoost;
+  const RegisterForm({super.key, required this.typeBoost});
   @override
   State<RegisterForm> createState() => _RegisterFormState();
 }
@@ -237,6 +292,7 @@ class _RegisterFormState extends State<RegisterForm> {
         request.fields.addAll({
           'uid': uidUser,
           'langUserPhone': langUserPhone.toString(),
+          'typeBoost': widget.typeBoost,
         });
 
         http.StreamedResponse response = await request.send();
@@ -325,12 +381,14 @@ class _RegisterFormState extends State<RegisterForm> {
         children: [
           const SizedBox(height: 20),
           Text(
-            (langUserPhone == "fr")
-                ? "Demander un Boost Contact Gratuit de 05 jours"
-                : "Request a Free 5-Day Contact Boost",
-            style: GoogleFonts.poppins(
-              fontSize: 16,
-            ),
+            widget.typeBoost == 'quota'
+                ? (langUserPhone == "fr")
+                    ? "Demander un Boost Contact Gratuit limité à 20 contacts"
+                    : "Request a Free Contact Boost limited to 20 contacts"
+                : (langUserPhone == "fr")
+                    ? "Demander un Boost Contact Gratuit de 05 jours"
+                    : "Request a Free 5-Day Contact Boost",
+            style: GoogleFonts.poppins(fontSize: 16),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 20),
@@ -372,6 +430,8 @@ class _RegisterFormState extends State<RegisterForm> {
 }
 
 class RegisterForm2 extends StatefulWidget {
+  final String typeBoost;
+  const RegisterForm2({super.key, required this.typeBoost});
   @override
   State<RegisterForm2> createState() => _RegisterForm2State();
 }
@@ -391,6 +451,7 @@ class _RegisterForm2State extends State<RegisterForm2> {
   var label = "";
   int prix = 0;
   int jours = 0;
+  int? nbContactsMax;
 
   void listeFormuleBoost() async {
     bool isConnected = await isConnectedToInternet();
@@ -413,8 +474,11 @@ class _RegisterForm2State extends State<RegisterForm2> {
           setState(() {
             _desactive2 = false;
             loading_formule_payant = false;
-            listeDesFormules = (data["listeFormulBoost"] as List<dynamic>)
+            final toutes = (data["listeFormulBoost"] as List<dynamic>)
                 .map((item) => item as Map<String, dynamic>)
+                .toList();
+            listeDesFormules = toutes
+                .where((f) => f['typeBoost'] == widget.typeBoost && f['prix'] > 0)
                 .toList();
             listeMethodePaiements =
                 (data["listeMethodePaiements"] as List<dynamic>)
@@ -448,14 +512,21 @@ class _RegisterForm2State extends State<RegisterForm2> {
           label = service['label'];
           prix = service['prix'];
           jours = service['jours'];
+          nbContactsMax = service['nbContactsMax'];
         });
       }
     }
     setState(() {
       idFormulBoost = val;
-      _message = (langUserPhone == "fr")
-          ? "Cette formule vous offre un boost de $jours jour(s) pour $prix FCFA."
-          : "This formula offers you a boost of $jours day(s) for $prix FCFA.";
+      if (widget.typeBoost == 'quota') {
+        _message = (langUserPhone == "fr")
+            ? "Cette formule vous offre un boost de $nbContactsMax contact(s) pour $prix FCFA."
+            : "This plan offers a boost of $nbContactsMax contact(s) for $prix FCFA.";
+      } else {
+        _message = (langUserPhone == "fr")
+            ? "Cette formule vous offre un boost de $jours jour(s) pour $prix FCFA."
+            : "This formula offers you a boost of $jours day(s) for $prix FCFA.";
+      }
     });
   }
 
@@ -480,7 +551,8 @@ class _RegisterForm2State extends State<RegisterForm2> {
           'langUserPhone': langUserPhone.toString(),
           'idFormulBoost': idFormulBoost.toString(),
           'valueMethodePaiement': valueMethodePaiement,
-          'tel': telController.text
+          'tel': telController.text,
+          'typeBoost': widget.typeBoost,
         });
 
         http.StreamedResponse response = await request.send();
