@@ -118,6 +118,14 @@ class _NewBoostContactPageState extends State<NewBoostContactPage> {
             const SizedBox(height: 10),
             _buildInfoButton(isFr),
             const SizedBox(height: 10),
+            Text(
+              isFr ? "Nouveau Boost Contact" : "New Boost Contact",
+              style: GoogleFonts.poppins(
+                fontSize: 20,
+                fontWeight: FontWeight.w600,
+              ),
+              textAlign: TextAlign.center,
+            ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 15),
               child: Column(

@@ -125,9 +125,20 @@ class _PromotionFormPageState extends State<PromotionFormPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const SizedBox(height: 5),
+            const SizedBox(height: 10),
             _buildInfoButton(),
             const SizedBox(height: 10),
+            Text(
+              (langUserPhone == "fr")
+                  ? "Nouvelle Promotion Affaire"
+                  : "New Business Promotion",
+              style: GoogleFonts.poppins(
+                fontSize: 20,
+                fontWeight: FontWeight.w600,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 5),
             SelectFormField(
               decoration: const InputDecoration(
                 labelText: 'Type Promotion Affaire',

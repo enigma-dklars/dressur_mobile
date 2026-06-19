@@ -113,12 +113,12 @@ class _PromotionReseauSociauxFormPageState
       body: SingleChildScrollView(
         child: Column(
           children: [
-            const SizedBox(height: 5),
+            const SizedBox(height: 10),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10),
               child: _buildInfoButton(),
             ),
-            const SizedBox(height: 5),
+            const SizedBox(height: 10),
             Container(
               margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
               child: Column(
