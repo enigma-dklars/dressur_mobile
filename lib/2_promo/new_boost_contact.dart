@@ -9,6 +9,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
 import 'package:select_form_field/select_form_field.dart';
 import 'package:dressur/components/noti.dart';
+import 'package:dressur/components/info_service_bottom_sheet.dart';
 class NewBoostContactPage extends StatefulWidget {
   @override
   State<NewBoostContactPage> createState() => _NewBoostContactPageState();
@@ -23,6 +24,54 @@ class _NewBoostContactPageState extends State<NewBoostContactPage> {
   void initState() {
     super.initState();
     _fetchFreeBoostInfo();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _showInfoModal();
+    });
+  }
+
+  void _showInfoModal() {
+    showServiceInfoModal(
+      context,
+      titleFr: "Informations Boost Contact",
+      titleEn: "Boost Contact Information",
+      items: const [
+        ServiceInfoItem(
+          icon: FontAwesomeIcons.clock,
+          textFr: "Par Durée : votre numéro est visible X jours dans vos pays préférés.",
+          textEn: "By Duration: your number is visible for X days in your preferred countries.",
+        ),
+        ServiceInfoItem(
+          icon: FontAwesomeIcons.users,
+          textFr: "Par Contacts : vous recevez un nombre précis de contacts ; le boost se termine automatiquement.",
+          textEn: "By Contacts: you receive a set number of contacts; the boost ends automatically.",
+        ),
+        ServiceInfoItem(
+          icon: FontAwesomeIcons.trophy,
+          textFr: "Les Boosts Payants sont beaucoup plus mis en avant !",
+          textEn: "Paid Boosts are much more prominently featured!",
+        ),
+        ServiceInfoItem(
+          icon: FontAwesomeIcons.calendarDays,
+          textFr: "Vous pouvez programmer plusieurs Boosts Payants.",
+          textEn: "You can schedule several Paid Boosts.",
+        ),
+        ServiceInfoItem(
+          icon: FontAwesomeIcons.clockRotateLeft,
+          textFr: "Votre Boost devient Inactif si votre dernière connexion remonte à plus de 48H.",
+          textEn: "Your Boost becomes inactive if your last login was more than 48 hours ago.",
+        ),
+        ServiceInfoItem(
+          icon: FontAwesomeIcons.arrowsRotate,
+          textFr: "Après un Boost Gratuit, faites au moins un Boost Payant avant d'en refaire un Gratuit.",
+          textEn: "After a Free Boost, complete at least one Paid Boost before getting another Free Boost.",
+        ),
+        ServiceInfoItem(
+          icon: FontAwesomeIcons.rightToBracket,
+          textFr: "Connectez-vous chaque jour pour récupérer les contacts obtenus.",
+          textEn: "Log in every day to retrieve the contacts obtained.",
+        ),
+      ],
+    );
   }
   Future<void> _fetchFreeBoostInfo() async {
     setState(() => _loadingFreeInfo = true);
@@ -65,9 +114,9 @@ class _NewBoostContactPageState extends State<NewBoostContactPage> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            const SizedBox(height: 5),
-            _buildInfoCard(isFr),
-            const SizedBox(height: 16),
+            const SizedBox(height: 10),
+            _buildInfoButton(isFr),
+            const SizedBox(height: 10),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 15),
               child: Column(
@@ -108,42 +157,24 @@ class _NewBoostContactPageState extends State<NewBoostContactPage> {
       ),
     );
   }
-  Widget _buildInfoCard(bool isFr) {
-    return Card(
-      margin: const EdgeInsets.only(left: 10, top: 5, right: 10, bottom: 0),
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(5),
-          gradient: const LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Colors.red, Color.fromARGB(255, 85, 3, 3)],
-          ),
-        ),
-        padding: const EdgeInsets.all(12),
-        child: Text(
+  Widget _buildInfoButton(bool isFr) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 10),
+      child: OutlinedButton.icon(
+        onPressed: _showInfoModal,
+        icon: const FaIcon(FontAwesomeIcons.circleInfo, size: 14),
+        label: Text(
           isFr
-              ? "Informations :\n"
-                  "- Deux types de Boost disponibles :\n"
-                  "  · Par Durée : votre numéro est visible X jours dans vos pays préférés.\n"
-                  "  · Par Contacts : vous recevez un nombre précis de contacts ; le boost se termine automatiquement.\n"
-                  "- Les Boosts Payants sont beaucoup plus mis en avant !\n"
-                  "- Vous pouvez programmer plusieurs Boosts Payants.\n"
-                  "- Votre Boost devient Inactif si votre dernière connexion remonte à plus de 48H.\n"
-                  "- Après un Boost Gratuit, vous devez faire au moins un Boost Payant avant d'en refaire un Gratuit.\n"
-                  "- Connectez-vous chaque jour pour récupérer les contacts obtenus."
-              : "Information:\n"
-                  "- Two Boost types available:\n"
-                  "  · By Duration: your number is visible for X days in your preferred countries.\n"
-                  "  · By Contacts: you receive a set number of contacts; the boost ends automatically.\n"
-                  "- Paid Boosts are much more prominently featured!\n"
-                  "- You can schedule several Paid Boosts.\n"
-                  "- Your Boost becomes inactive if your last login was more than 48 hours ago.\n"
-                  "- After a Free Boost, you must complete at least one Paid Boost before getting another Free Boost.\n"
-                  "- Log in every day to retrieve the contacts obtained.",
-          style: GoogleFonts.poppins(
-              fontWeight: FontWeight.w600, fontSize: 10, color: Colors.white),
-          textAlign: TextAlign.justify,
+              ? "Voir les informations sur le service"
+              : "View service information",
+          style: GoogleFonts.poppins(fontSize: 13, fontWeight: FontWeight.w500),
+        ),
+        style: OutlinedButton.styleFrom(
+          foregroundColor: primaryColor,
+          side: BorderSide(color: primaryColor.withOpacity(0.5)),
+          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         ),
       ),
     );

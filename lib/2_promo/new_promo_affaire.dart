@@ -17,6 +17,7 @@ import 'package:dressur/components/noti.dart';
   import 'package:dressur/components/noti_sys.dart';
   import 'package:dressur/components/noti_sys.dart';
 import 'package:select_form_field/select_form_field.dart';
+import 'package:dressur/components/info_service_bottom_sheet.dart';
 
 class PromotionFormPage extends StatefulWidget {
   @override
@@ -29,6 +30,67 @@ class _PromotionFormPageState extends State<PromotionFormPage> {
     setState(() {
       type_promo_affaire = val;
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _showInfoModal();
+    });
+  }
+
+  void _showInfoModal() {
+    showServiceInfoModal(
+      context,
+      titleFr: "Informations Promotion Affaire",
+      titleEn: "Business Promotion Information",
+      items: const [
+        ServiceInfoItem(
+          icon: FontAwesomeIcons.magnifyingGlass,
+          textFr: "Après envoi, votre promotion sera analysée par les administrateurs de Dressur.",
+          textEn: "After submission, your promotion will be reviewed by Dressur administrators.",
+        ),
+        ServiceInfoItem(
+          icon: FontAwesomeIcons.eye,
+          textFr: "Si acceptée, elle sera visible par des milliers d'utilisateurs correspondant à vos préférences pays.",
+          textEn: "If accepted, it will be visible to thousands of users matching your country preferences.",
+        ),
+        ServiceInfoItem(
+          icon: FontAwesomeIcons.penToSquare,
+          textFr: "Si rejetée, vous aurez la possibilité de la modifier.",
+          textEn: "If rejected, you will have the option to modify it.",
+        ),
+        ServiceInfoItem(
+          icon: FontAwesomeIcons.whatsapp,
+          textFr: "Les utilisateurs intéressés vous contacteront sur votre numéro WhatsApp.",
+          textEn: "Interested users will contact you on your WhatsApp number.",
+        ),
+        ServiceInfoItem(
+          icon: FontAwesomeIcons.gift,
+          textFr: "Les Promotions Affaires (Offre d'emploi et Demande d'emploi) sont gratuites.",
+          textEn: "Business Promotions (Job Offer and Job Application) are free.",
+        ),
+      ],
+    );
+  }
+
+  Widget _buildInfoButton() {
+    final bool isFr = langUserPhone == "fr";
+    return OutlinedButton.icon(
+      onPressed: _showInfoModal,
+      icon: const FaIcon(FontAwesomeIcons.circleInfo, size: 14),
+      label: Text(
+        isFr ? "Voir les informations sur le service" : "View service information",
+        style: GoogleFonts.poppins(fontSize: 13, fontWeight: FontWeight.w500),
+      ),
+      style: OutlinedButton.styleFrom(
+        foregroundColor: primaryColor,
+        side: BorderSide(color: primaryColor.withOpacity(0.5)),
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      ),
+    );
   }
 
   @override
@@ -62,42 +124,7 @@ class _PromotionFormPageState extends State<PromotionFormPage> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             const SizedBox(height: 5),
-            Card(
-              margin:
-                  const EdgeInsets.only(left: 0, top: 0, right: 0, bottom: 5),
-              child: Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(5),
-                  gradient: const LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      Colors.red,
-                      Color.fromARGB(255, 85, 3, 3),
-                    ],
-                  ),
-                ),
-                padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    const SizedBox(height: 10),
-                    Text(
-                      (langUserPhone == "fr")
-                          ? "Informations : \n- Après avoir rempli et envoyer votre promotion, elle sera analysée par les administrateurs de Dressur. Si votre promotion est acceptée, elle sera visible par des milliers d'utilisateurs correspondants à vos préférences pays. \n- Si la promotion est rejetée, vous aurez la possibilité de la modifier. \n- Les utilisateurs intéressés par votre Promotion Affaire vous contacterons sur votre numéro WhatsApp. \n- Les Promotions Affaires (Offre d'emploi et Demande d'emploi) sont gratuites."
-                          : "Information: \n- After completing and submitting your promotion, it will be reviewed by Dressur administrators. If your promotion is accepted, it will be visible to thousands of users matching your country preferences. \n- If the promotion is rejected, you will have the option to modify it. \n- Users interested in your Business Promotion will contact you on your WhatsApp number. \n- Business Promotions (Job Offer and Job Application) are free.",
-                      style: GoogleFonts.poppins(
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
-                        fontSize: 10,
-                      ),
-                      textAlign: TextAlign.justify,
-                    ),
-                    const SizedBox(height: 15),
-                  ],
-                ),
-              ),
-            ),
+            _buildInfoButton(),
             const SizedBox(height: 10),
             SelectFormField(
               decoration: const InputDecoration(

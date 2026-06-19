@@ -11,6 +11,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
 import 'package:dressur/components/noti.dart';
 import 'package:select_form_field/select_form_field.dart';
+import 'package:dressur/components/info_service_bottom_sheet.dart';
 
 class PromotionReseauSociauxFormPage extends StatefulWidget {
   @override
@@ -20,6 +21,67 @@ class PromotionReseauSociauxFormPage extends StatefulWidget {
 
 class _PromotionReseauSociauxFormPageState
     extends State<PromotionReseauSociauxFormPage> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _showInfoModal();
+    });
+  }
+
+  void _showInfoModal() {
+    showServiceInfoModal(
+      context,
+      titleFr: "Informations Promotion Réseaux Sociaux",
+      titleEn: "Social Network Promotion Information",
+      items: const [
+        ServiceInfoItem(
+          icon: FontAwesomeIcons.sliders,
+          textFr: "Vos préférences sur Dressur ne s'appliquent pas aux promotions sur les réseaux sociaux.",
+          textEn: "Your Dressur preferences do not apply to social media promotions.",
+        ),
+        ServiceInfoItem(
+          icon: FontAwesomeIcons.shareNodes,
+          textFr: "Les comptes qui interagiront avec votre promotion seront sélectionnés directement par le réseau social.",
+          textEn: "The accounts that will interact with your promotion will be selected directly by the social network.",
+        ),
+        ServiceInfoItem(
+          icon: FontAwesomeIcons.thumbsUp,
+          textFr: "Ce service peut vous aider à obtenir des votes, likes, commentaires et partages.",
+          textEn: "This service can help you get votes, likes, comments and shares.",
+        ),
+        ServiceInfoItem(
+          icon: FontAwesomeIcons.userGroup,
+          textFr: "Ce service vous permet d'attirer davantage l'attention sur vos réseaux sociaux.",
+          textEn: "This service allows you to attract more attention on your social media.",
+        ),
+        ServiceInfoItem(
+          icon: FontAwesomeIcons.fileLines,
+          textFr: "Lisez correctement la description du service réseau auquel vous voulez souscrire.",
+          textEn: "Read carefully the description of the network service you want to subscribe to.",
+        ),
+      ],
+    );
+  }
+
+  Widget _buildInfoButton() {
+    final bool isFr = langUserPhone == "fr";
+    return OutlinedButton.icon(
+      onPressed: _showInfoModal,
+      icon: const FaIcon(FontAwesomeIcons.circleInfo, size: 14),
+      label: Text(
+        isFr ? "Voir les informations sur le service" : "View service information",
+        style: GoogleFonts.poppins(fontSize: 13, fontWeight: FontWeight.w500),
+      ),
+      style: OutlinedButton.styleFrom(
+        foregroundColor: primaryColor,
+        side: BorderSide(color: primaryColor.withOpacity(0.5)),
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -50,41 +112,9 @@ class _PromotionReseauSociauxFormPageState
         child: Column(
           children: [
             const SizedBox(height: 5),
-            Card(
-              margin:
-                  const EdgeInsets.only(left: 10, top: 5, right: 10, bottom: 5),
-              child: Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(5),
-                  gradient: const LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      Colors.red,
-                      Color.fromARGB(255, 85, 3, 3),
-                    ],
-                  ),
-                ),
-                padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    const SizedBox(height: 10),
-                    Text(
-                      (langUserPhone == "fr")
-                          ? "Informations : \n- Vos préférences sur Dressur ne s’appliquent pas aux promotions sur les réseaux sociaux. \n- Les comptes qui interagiront avec votre promotion seront sélectionnés directement par le réseau social, sans que Dressur puisse intervenir. \n- Ce service peut vous aider à obtenir des votes sur les réseaux sociaux, notamment pour les systèmes de vote basés sur les likes, les commentaires, les partages, etc. \n- Ce service vous permet d’attirer davantage l’attention sur vos réseaux sociaux, car aujourd’hui l’être humain accorde plus facilement sa confiance aux comptes ayant un grand nombre d’abonnés, de likes et d’interactions. \n- Lisez correctement la description du service réseau auquel vous voulez souscrire."
-                          : "Information: \n - Your Dressur preferences do not apply to social media promotions. \n - The accounts that will interact with your promotion will be selected directly by the social network, without Dressur's intervention. \n - This service can help you get votes on social media, especially for voting systems based on likes, comments, shares, etc. \n - This service allows you to attract more attention on your social media, because today people more readily trust accounts with a large number of followers, likes, and interactions. \n- Read carefully the description of the network service you want to subscribe to.",
-                      style: GoogleFonts.poppins(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 10,
-                        color: Colors.white,
-                      ),
-                      textAlign: TextAlign.justify,
-                    ),
-                    const SizedBox(height: 15),
-                  ],
-                ),
-              ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10),
+              child: _buildInfoButton(),
             ),
             const SizedBox(height: 5),
             Container(
