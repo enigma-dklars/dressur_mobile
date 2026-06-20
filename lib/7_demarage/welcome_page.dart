@@ -11,7 +11,9 @@ import 'package:dressur/7_demarage/presentation_ds.dart';
 import 'package:dressur/components/constant.dart';
 import 'package:dressur/components/sql_helper.dart';
 import 'package:dressur/components/bottomBar.dart';
+import 'package:dressur/components/noti_sys.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert' as convert;
 
 class WelcomePage extends StatelessWidget {
@@ -131,6 +133,7 @@ class _PageDepartState extends State<PageDepart> {
       });
 
       await getUserInfo();
+      await _checkSynchroAvanceReminder();
 
       setState(() {
         textChargementEvolution = langUserPhone != "fr"
@@ -160,6 +163,22 @@ class _PageDepartState extends State<PageDepart> {
       return Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(builder: (context) => PresentationPage()),
         (route) => false,
+      );
+    }
+  }
+
+  Future<void> _checkSynchroAvanceReminder() async {
+    final prefs = await SharedPreferences.getInstance();
+    final String? lastDateStr = prefs.getString('lastSynchroAvanceDate');
+    final bool shouldNotify = lastDateStr == null ||
+        DateTime.now().difference(DateTime.parse(lastDateStr)).inDays >= 7;
+    if (shouldNotify) {
+      final bool isFr = langUserPhone == 'fr';
+      await showNotification(
+        isFr ? 'Synchronisation conseillée' : 'Sync recommended',
+        isFr
+            ? 'Mettez à jour vos contacts Dressur en lançant une Synchronisation Avancée.'
+            : 'Update your Dressur contacts by running an Advanced Synchronization.',
       );
     }
   }
