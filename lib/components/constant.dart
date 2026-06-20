@@ -89,6 +89,8 @@ bool telIsVerified = false;
 bool mailIsVerified = false;
 bool ihaveConnexion = false;
 bool admin = false;
+String? selectedContactAccountName;
+String? selectedContactAccountType;
 bool permissionAdd = false;
 bool boostEnCours = false;
 bool addPageActu = true;
