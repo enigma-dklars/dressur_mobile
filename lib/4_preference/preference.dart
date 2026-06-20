@@ -497,59 +497,73 @@ class _PreferencePageState extends State<PreferencePage> {
           onTap: () {
             showModalBottomSheet(
               context: context,
-              builder: (ctx) => FutureBuilder<List<Map<String, String?>>>(
-                future: _fetchAccountsList(),
-                builder: (ctx, snap) {
-                  return Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(16, 20, 16, 12),
-                        child: Text(
-                          langUserPhone == 'fr'
-                              ? 'Choisir le compte de sauvegarde'
-                              : 'Choose storage account',
-                          style: GoogleFonts.poppins(
-                              fontWeight: FontWeight.bold, fontSize: 16),
-                        ),
-                      ),
-                      Divider(height: 1),
-                      if (!snap.hasData)
+              isScrollControlled: true,
+              builder: (ctx) => DraggableScrollableSheet(
+                initialChildSize: 0.5,
+                minChildSize: 0.3,
+                maxChildSize: 0.85,
+                expand: false,
+                builder: (ctx, scrollController) =>
+                    FutureBuilder<List<Map<String, String?>>>(
+                  future: _fetchAccountsList(),
+                  builder: (ctx, snap) {
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
                         Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 48),
-                          child: Center(
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
+                          padding: const EdgeInsets.fromLTRB(16, 20, 16, 12),
+                          child: Text(
+                            langUserPhone == 'fr'
+                                ? 'Choisir le compte de sauvegarde'
+                                : 'Choose storage account',
+                            style: GoogleFonts.poppins(
+                                fontWeight: FontWeight.bold, fontSize: 16),
+                          ),
+                        ),
+                        Divider(height: 1),
+                        if (!snap.hasData)
+                          Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 48),
+                            child: Center(
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  CircularProgressIndicator(color: primaryColor),
+                                  SizedBox(height: 20),
+                                  Text(
+                                    langUserPhone == 'fr'
+                                        ? 'Chargement en cours…'
+                                        : 'Loading…',
+                                    style: GoogleFonts.poppins(
+                                        fontSize: 13, color: Colors.grey),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          )
+                        else
+                          Expanded(
+                            child: ListView(
+                              controller: scrollController,
                               children: [
-                                CircularProgressIndicator(color: primaryColor),
-                                SizedBox(height: 20),
-                                Text(
-                                  langUserPhone == 'fr'
-                                      ? 'Chargement en cours…'
-                                      : 'Loading…',
-                                  style: GoogleFonts.poppins(
-                                      fontSize: 13, color: Colors.grey),
-                                ),
+                                ...snap.data!.map((acc) => RadioListTile<String?>(
+                                      value: acc['name'],
+                                      groupValue: _selectedAccountName,
+                                      title: Text(acc['label'] ?? '',
+                                          style: GoogleFonts.poppins()),
+                                      onChanged: (val) {
+                                        Navigator.pop(ctx);
+                                        _saveAccountPreference(val, acc['type']);
+                                      },
+                                    )),
+                                SizedBox(height: 12),
                               ],
                             ),
                           ),
-                        )
-                      else
-                        ...snap.data!.map((acc) => RadioListTile<String?>(
-                              value: acc['name'],
-                              groupValue: _selectedAccountName,
-                              title: Text(acc['label'] ?? '',
-                                  style: GoogleFonts.poppins()),
-                              onChanged: (val) {
-                                Navigator.pop(ctx);
-                                _saveAccountPreference(val, acc['type']);
-                              },
-                            )),
-                      SizedBox(height: 12),
-                    ],
-                  );
-                },
+                      ],
+                    );
+                  },
+                ),
               ),
             );
           },
