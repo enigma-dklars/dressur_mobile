@@ -35,7 +35,15 @@ class _PreferencePageState extends State<PreferencePage> {
   Future<void> _loadAvailableAccounts() async {
     setState(() => _loadingAccounts = true);
     try {
-      final contacts = await FlutterContacts.getContacts(withAccounts: true);
+      final granted = await FlutterContacts.requestPermission();
+      if (!granted) {
+        setState(() => _loadingAccounts = false);
+        return;
+      }
+      final contacts = await FlutterContacts.getContacts(
+        withAccounts: true,
+        includeNonVisible: true,
+      );
       final seen = <String>{};
       final accounts = <Map<String, String?>>[];
       accounts.add({'name': null, 'type': null, 'label': langUserPhone == 'fr' ? 'Téléphone (local)' : 'Phone (local)'});
@@ -44,7 +52,8 @@ class _PreferencePageState extends State<PreferencePage> {
           final key = '${acc.name}__${acc.type}';
           if (acc.name.isNotEmpty && !seen.contains(key)) {
             seen.add(key);
-            accounts.add({'name': acc.name, 'type': acc.type, 'label': acc.name});
+            final label = acc.name.contains('@') ? acc.name : '${acc.name} (${acc.type.split('.').last})';
+            accounts.add({'name': acc.name, 'type': acc.type, 'label': label});
           }
         }
       }
@@ -52,7 +61,8 @@ class _PreferencePageState extends State<PreferencePage> {
         _availableAccounts = accounts;
         _loadingAccounts = false;
       });
-    } catch (_) {
+    } catch (e) {
+      debugPrint('[Accounts] erreur chargement comptes: $e');
       setState(() => _loadingAccounts = false);
     }
   }
