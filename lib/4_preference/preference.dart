@@ -100,7 +100,6 @@ class _PreferencePageState extends State<PreferencePage> {
     super.initState();
     _selectedAccountName = selectedContactAccountName;
     _selectedAccountType = selectedContactAccountType;
-    _loadAvailableAccounts();
   }
 
   @override
@@ -491,7 +490,9 @@ class _PreferencePageState extends State<PreferencePage> {
           ],
         ),
         child: InkWell(
-          onTap: _loadingAccounts || _availableAccounts.isEmpty ? null : () {
+          onTap: _loadingAccounts ? null : () async {
+            await _loadAvailableAccounts();
+            if (!mounted) return;
             showModalBottomSheet(
               context: context,
               builder: (_) => ListView(
