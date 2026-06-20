@@ -303,10 +303,13 @@ class SynchroAvanceService extends ChangeNotifier {
         if ((await SQLHelper.getOneNumsTelUser(tel)).isEmpty) {
           final newContact = Contact()
             ..name.first = expectedName
-            ..phones = phonesList;
+            ..phones = phonesList
+            ..accounts = (selectedContactAccountName != null && selectedContactAccountType != null)
+                ? [Account(selectedContactAccountName!, selectedContactAccountType!)]
+                : [];
           await newContact.insert().timeout(
             const Duration(seconds: 15),
-            onTimeout: () => Contact(),
+            onTimeout: () {},
           );
           if (_cancelRequested) { _applyCancel(isFr); return null; }
           await insertNumTelUserIntoDataBase(tel);
@@ -323,9 +326,12 @@ class SynchroAvanceService extends ChangeNotifier {
             if (fullContact != null) {
               fullContact.name.first = expectedName;
               fullContact.phones = phonesList;
+              if (selectedContactAccountName != null && selectedContactAccountType != null) {
+                fullContact.accounts = [Account(selectedContactAccountName!, selectedContactAccountType!)];
+              }
               await fullContact.update().timeout(
                 const Duration(seconds: 15),
-                onTimeout: () => Contact(),
+                onTimeout: () {},
               );
               if (_cancelRequested) { _applyCancel(isFr); return null; }
               nbUpdated++;
