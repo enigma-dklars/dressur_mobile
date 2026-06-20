@@ -255,8 +255,8 @@ class _PreferencePageState extends State<PreferencePage> {
                   Expanded(
                     child: Text(
                       (langUserPhone == "fr")
-                          ? "Suggestion des contacts disponibles"
-                          : "Available contact suggestions",
+                          ? "Contacts Dressur dans l'Actu"
+                          : "Dressur contacts in the Feed",
                       style: GoogleFonts.poppins(
                         color: isDark ? Colors.white : Colors.black87,
                         fontWeight: FontWeight.w600,
@@ -292,8 +292,8 @@ class _PreferencePageState extends State<PreferencePage> {
                 ),
                 child: Text(
                   (langUserPhone == "fr")
-                      ? "Affiche le nombre de contacts disponibles, ainsi qu'un rappel pour booster vos contacts."
-                      : "Shows the number of available contacts, along with a reminder to boost your contacts.",
+                      ? "Affiche le nombre de contacts Dressur disponibles dans votre fil Actu, ainsi qu'un rappel pour booster vos contacts. Active également le bouton « Enregistrer » pour sauvegarder vos contacts Dressur directement depuis l'Actu."
+                      : "Shows the number of available Dressur contacts in your feed, along with a reminder to boost your contacts. Also enables the \"Save\" button to save your Dressur contacts directly from the Feed.",
                   style: GoogleFonts.poppins(
                     color: isDark ? Colors.grey[300] : Colors.grey[700],
                     fontSize: 13,
@@ -567,8 +567,8 @@ class _PreferencePageState extends State<PreferencePage> {
                   ),
                   child: Text(
                     langUserPhone == 'fr'
-                        ? 'Compte actuel : ${_selectedAccountName ?? "Téléphone (local)"}'
-                        : 'Current account: ${_selectedAccountName ?? "Phone (local)"}',
+                        ? 'Choisissez sur quel compte vos contacts Dressur seront enregistrés (Google, Samsung, téléphone local…). Ce réglage s\'applique à toutes les synchronisations.\n\nCompte actuel : ${_selectedAccountName ?? "Téléphone (local)"}'
+                        : 'Choose which account your Dressur contacts will be saved to (Google, Samsung, local phone…). This setting applies to all synchronizations.\n\nCurrent account: ${_selectedAccountName ?? "Phone (local)"}',
                     style: GoogleFonts.poppins(
                       color: isDark ? Colors.grey[300] : Colors.grey[700],
                       fontSize: 13,
