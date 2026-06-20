@@ -438,7 +438,7 @@ class _ActuPageState extends State<ActuPage> {
   }
 
   Future<List<Advertisement>> fetchAdvertisements() async {
-    if (nbrAffichageAvertissement == 0) {
+    if (nbrAffichageAvertissement == 0 && !admin) {
       Future.delayed(const Duration(milliseconds: 2500), () {
         if (mounted) showWarningDialog(context);
       });
