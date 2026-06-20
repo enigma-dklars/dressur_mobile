@@ -132,7 +132,7 @@ class _DeletecompteFormState extends State<DeletecompteForm> {
           // Logique de nettoyage local
           if (contactsEnregistrer.isNotEmpty) {
             List<Contact> contacts =
-                await FlutterContacts.getContacts(withProperties: true);
+                await FlutterContacts.getContacts(withProperties: true, withAccounts: true);
             for (var contact in contacts) {
               for (var phone in contact.phones) {
                 if (contactsEnregistrer.contains(
