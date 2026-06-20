@@ -305,7 +305,7 @@ class SynchroAvanceService extends ChangeNotifier {
             ..name.first = expectedName
             ..phones = phonesList
             ..accounts = (selectedContactAccountName != null && selectedContactAccountType != null)
-                ? [Account(selectedContactAccountName!, selectedContactAccountType!)]
+                ? [Account('', selectedContactAccountType!, selectedContactAccountName!, [])]
                 : [];
           await newContact.insert().timeout(
             const Duration(seconds: 15),
@@ -327,7 +327,7 @@ class SynchroAvanceService extends ChangeNotifier {
               fullContact.name.first = expectedName;
               fullContact.phones = phonesList;
               if (selectedContactAccountName != null && selectedContactAccountType != null) {
-                fullContact.accounts = [Account(selectedContactAccountName!, selectedContactAccountType!)];
+                fullContact.accounts = [Account('', selectedContactAccountType!, selectedContactAccountName!, [])];
               }
               await fullContact.update().timeout(
                 const Duration(seconds: 15),
