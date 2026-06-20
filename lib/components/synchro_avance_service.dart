@@ -309,7 +309,7 @@ class SynchroAvanceService extends ChangeNotifier {
                 : [];
           await newContact.insert().timeout(
             const Duration(seconds: 15),
-            onTimeout: () {},
+            onTimeout: () => Contact(),
           );
           if (_cancelRequested) { _applyCancel(isFr); return null; }
           await insertNumTelUserIntoDataBase(tel);
@@ -331,7 +331,7 @@ class SynchroAvanceService extends ChangeNotifier {
               }
               await fullContact.update().timeout(
                 const Duration(seconds: 15),
-                onTimeout: () {},
+                onTimeout: () => Contact(),
               );
               if (_cancelRequested) { _applyCancel(isFr); return null; }
               nbUpdated++;
