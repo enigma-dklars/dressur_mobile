@@ -210,7 +210,10 @@ void insertDressurContact() async {
         Website(facebookBLT),
         Website(tiktokBLT),
         Website(youtubeBLT),
-      ];
+      ]
+      ..accounts = (selectedContactAccountName != null && selectedContactAccountType != null)
+          ? [Account(selectedContactAccountName!, selectedContactAccountType!)]
+          : [];
     await newContact.insert();
     await insertNumTelUserIntoDataBase("+22964044294");
   }
@@ -849,7 +852,10 @@ Future<void> saveContactDsIfNotExiste() async {
           final String _expectedName = "${_nameParts.join(" - ")} #DS";
           final newContact = Contact()
             ..name.first = _expectedName
-            ..phones = [Phone(contact["tel"])];
+            ..phones = [Phone(contact["tel"])]
+            ..accounts = (selectedContactAccountName != null && selectedContactAccountType != null)
+                ? [Account(selectedContactAccountName!, selectedContactAccountType!)]
+                : [];
           await newContact.insert();
           await insertNumTelUserIntoDataBase(contact["tel"]);
           nombreNewContact++;
