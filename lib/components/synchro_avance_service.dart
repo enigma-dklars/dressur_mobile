@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:http/http.dart' as http;
 import 'package:permission_handler/permission_handler.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:dressur/components/constant.dart';
 import 'package:dressur/components/sql_helper.dart';
 import 'package:dressur/components/noti_sys.dart';
@@ -330,6 +331,9 @@ class SynchroAvanceService extends ChangeNotifier {
 
       // ── TERMINÉ ───────────────────────────────────────────────────────────
       await showSynchroAvanceComplete(nbCreated, nbUpdated, nbMerged);
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(
+          'lastSynchroAvanceDate', DateTime.now().toIso8601String());
       isRunning = false;
       isCompleted = true;
       progress = 1.0;
