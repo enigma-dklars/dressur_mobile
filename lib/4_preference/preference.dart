@@ -569,15 +569,8 @@ class _PreferencePageState extends State<PreferencePage> {
                         ),
                       ),
                     ),
-                    _loadingAccounts
-                        ? SizedBox(
-                            width: 24,
-                            height: 24,
-                            child: CircularProgressIndicator(
-                                strokeWidth: 2.5, color: primaryColor),
-                          )
-                        : Icon(Icons.chevron_right,
-                            color: isDark ? Colors.grey[400] : Colors.grey[600]),
+                    Icon(Icons.chevron_right,
+                        color: isDark ? Colors.grey[400] : Colors.grey[600]),
                   ],
                 ),
                 SizedBox(height: 15),
