@@ -136,7 +136,7 @@ class _BottomBarState extends State<BottomBar> with WidgetsBindingObserver {
     await SQLHelper.viderLaBaseDeDonneeLocalTelUser();
     await Future.delayed(const Duration(seconds: 3), () {});
     List<Contact> contacts =
-        await FlutterContacts.getContacts(withProperties: true);
+        await FlutterContacts.getContacts(withProperties: true, withAccounts: true);
     for (var contact in contacts) {
       for (var phone in contact.phones) {
         var displayNameTel = contact.displayName;
