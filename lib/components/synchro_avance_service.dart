@@ -184,7 +184,7 @@ class SynchroAvanceService extends ChangeNotifier {
       notifyListeners();
 
       List<Contact> allContacts =
-          await FlutterContacts.getContacts(withProperties: true);
+          await FlutterContacts.getContacts(withProperties: true, withAccounts: true);
 
       if (_cancelRequested) { _applyCancel(isFr); return null; }
 
@@ -243,7 +243,7 @@ class SynchroAvanceService extends ChangeNotifier {
       notifyListeners();
 
       await SQLHelper.viderLaBaseDeDonneeLocalTelUser();
-      allContacts = await FlutterContacts.getContacts(withProperties: true);
+      allContacts = await FlutterContacts.getContacts(withProperties: true, withAccounts: true);
 
       if (_cancelRequested) { _applyCancel(isFr); return null; }
 
