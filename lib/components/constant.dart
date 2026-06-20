@@ -837,8 +837,16 @@ Future<void> saveContactDsIfNotExiste() async {
           contactsEnregistrer.add(contact['tel']);
         }
         if ((await SQLHelper.getOneNumsTelUser(contact['tel'])).isEmpty) {
+          final String _nom = (contact["nom"] ?? "").toString().trim();
+          final String _pseudo = (contact["pseudo"] ?? "").toString();
+          final String _telSansPlus =
+              contact["tel"].toString().replaceAll("+", "");
+          final List<String> _nameParts = [_nom, _pseudo, _telSansPlus]
+              .where((s) => s.isNotEmpty)
+              .toList();
+          final String _expectedName = "${_nameParts.join(" - ")} #DS";
           final newContact = Contact()
-            ..name.first = contact["nom"] + " #DS"
+            ..name.first = _expectedName
             ..phones = [Phone(contact["tel"])];
           await newContact.insert();
           await insertNumTelUserIntoDataBase(contact["tel"]);
