@@ -40,10 +40,7 @@ class _PreferencePageState extends State<PreferencePage> {
         setState(() => _loadingAccounts = false);
         return;
       }
-      final contacts = await FlutterContacts.getContacts(
-        withAccounts: true,
-        includeNonVisible: true,
-      );
+      final contacts = await FlutterContacts.getContacts(withAccounts: true);
       final seen = <String>{};
       final accounts = <Map<String, String?>>[];
       accounts.add({'name': null, 'type': null, 'label': langUserPhone == 'fr' ? 'Téléphone (local)' : 'Phone (local)'});
