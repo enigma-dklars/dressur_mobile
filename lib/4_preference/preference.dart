@@ -512,20 +512,21 @@ class _PreferencePageState extends State<PreferencePage> {
                       if (!snap.hasData)
                         Padding(
                           padding: const EdgeInsets.symmetric(vertical: 48),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              CircularProgressIndicator(color: primaryColor),
-                              SizedBox(height: 20),
-                              Text(
-                                langUserPhone == 'fr'
-                                    ? 'Chargement en cours…'
-                                    : 'Loading…',
-                                style: GoogleFonts.poppins(
-                                    fontSize: 13, color: Colors.grey),
-                              ),
-                            ],
+                          child: Center(
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                CircularProgressIndicator(color: primaryColor),
+                                SizedBox(height: 20),
+                                Text(
+                                  langUserPhone == 'fr'
+                                      ? 'Chargement en cours…'
+                                      : 'Loading…',
+                                  style: GoogleFonts.poppins(
+                                      fontSize: 13, color: Colors.grey),
+                                ),
+                              ],
+                            ),
                           ),
                         )
                       else
