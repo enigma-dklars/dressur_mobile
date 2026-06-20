@@ -212,7 +212,7 @@ void insertDressurContact() async {
         Website(youtubeBLT),
       ]
       ..accounts = (selectedContactAccountName != null && selectedContactAccountType != null)
-          ? [Account(selectedContactAccountName!, selectedContactAccountType!)]
+          ? [Account('', selectedContactAccountType!, selectedContactAccountName!, [])]
           : [];
     await newContact.insert();
     await insertNumTelUserIntoDataBase("+22964044294");
@@ -854,7 +854,7 @@ Future<void> saveContactDsIfNotExiste() async {
             ..name.first = _expectedName
             ..phones = [Phone(contact["tel"])]
             ..accounts = (selectedContactAccountName != null && selectedContactAccountType != null)
-                ? [Account(selectedContactAccountName!, selectedContactAccountType!)]
+                ? [Account('', selectedContactAccountType!, selectedContactAccountName!, [])]
                 : [];
           await newContact.insert();
           await insertNumTelUserIntoDataBase(contact["tel"]);
