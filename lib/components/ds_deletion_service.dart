@@ -92,7 +92,7 @@ class DSDeletionService extends ChangeNotifier {
 
     try {
       final List<Contact> tousLesContacts =
-          await FlutterContacts.getContacts(withProperties: true);
+          await FlutterContacts.getContacts(withProperties: true, withAccounts: true);
 
       if (_cancelRequested) { _applyCancel(isFr); return null; }
 
