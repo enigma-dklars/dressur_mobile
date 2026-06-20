@@ -209,49 +209,9 @@ class _PreferencePageState extends State<PreferencePage> {
                   },
                 ),
                 const SizedBox(height: 10),
-                SociauxPage(),
+                _buildContactStorageCard(context: context),
                 const SizedBox(height: 10),
-                // ── Sauvegarde des contacts ───────────────────────────────────────
-                ListTile(
-                  leading: const FaIcon(FontAwesomeIcons.addressBook, color: primaryColor),
-                  title: Text(
-                    langUserPhone == 'fr' ? 'Sauvegarde des contacts' : 'Contact storage',
-                    style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
-                  ),
-                  subtitle: Text(
-                    _selectedAccountName ?? (langUserPhone == 'fr' ? 'Téléphone (local)' : 'Phone (local)'),
-                    style: GoogleFonts.poppins(fontSize: 12, color: Colors.grey),
-                  ),
-                  trailing: _loadingAccounts
-                      ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2))
-                      : const Icon(Icons.chevron_right),
-                  onTap: _loadingAccounts || _availableAccounts.isEmpty ? null : () {
-                    showModalBottomSheet(
-                      context: context,
-                      builder: (_) => ListView(
-                        shrinkWrap: true,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.all(16),
-                            child: Text(
-                              langUserPhone == 'fr' ? 'Choisir le compte de sauvegarde' : 'Choose storage account',
-                              style: GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 16),
-                            ),
-                          ),
-                          ..._availableAccounts.map((acc) => RadioListTile<String?>(
-                            value: acc['name'],
-                            groupValue: _selectedAccountName,
-                            title: Text(acc['label'] ?? '', style: GoogleFonts.poppins()),
-                            onChanged: (val) {
-                              Navigator.pop(context);
-                              _saveAccountPreference(val, acc['type']);
-                            },
-                          )),
-                        ],
-                      ),
-                    );
-                  },
-                ),
+                SociauxPage(),
                 const SizedBox(height: 10),
               ],
             ),
@@ -500,6 +460,122 @@ class _PreferencePageState extends State<PreferencePage> {
                     ),
                   );
                 }),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildContactStorageCard({required BuildContext context}) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
+      child: Ink(
+        decoration: BoxDecoration(
+          color: isDark ? Color(0xFF1E1E1E) : Colors.white,
+          borderRadius: BorderRadius.circular(15),
+          border: Border.all(
+              color: isDark ? Colors.grey[800]! : Colors.grey[200]!, width: 1),
+          boxShadow: [
+            BoxShadow(
+              color: isDark
+                  ? Colors.black.withOpacity(0.2)
+                  : Colors.grey.withOpacity(0.1),
+              blurRadius: 10,
+              offset: Offset(0, 4),
+            ),
+          ],
+        ),
+        child: InkWell(
+          onTap: _loadingAccounts || _availableAccounts.isEmpty ? null : () {
+            showModalBottomSheet(
+              context: context,
+              builder: (_) => ListView(
+                shrinkWrap: true,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Text(
+                      langUserPhone == 'fr'
+                          ? 'Choisir le compte de sauvegarde'
+                          : 'Choose storage account',
+                      style: GoogleFonts.poppins(
+                          fontWeight: FontWeight.bold, fontSize: 16),
+                    ),
+                  ),
+                  ..._availableAccounts.map((acc) => RadioListTile<String?>(
+                        value: acc['name'],
+                        groupValue: _selectedAccountName,
+                        title: Text(acc['label'] ?? '',
+                            style: GoogleFonts.poppins()),
+                        onChanged: (val) {
+                          Navigator.pop(context);
+                          _saveAccountPreference(val, acc['type']);
+                        },
+                      )),
+                ],
+              ),
+            );
+          },
+          borderRadius: BorderRadius.circular(15),
+          splashColor: primaryColor.withOpacity(0.1),
+          highlightColor: primaryColor.withOpacity(0.05),
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    FaIcon(FontAwesomeIcons.addressBook,
+                        color: primaryColor, size: 28),
+                    SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        langUserPhone == 'fr'
+                            ? 'Sauvegarde des contacts'
+                            : 'Contact storage',
+                        style: GoogleFonts.poppins(
+                          color: isDark ? Colors.white : Colors.black87,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 18,
+                        ),
+                      ),
+                    ),
+                    _loadingAccounts
+                        ? SizedBox(
+                            width: 24,
+                            height: 24,
+                            child: CircularProgressIndicator(
+                                strokeWidth: 2.5, color: primaryColor),
+                          )
+                        : Icon(Icons.chevron_right,
+                            color: isDark ? Colors.grey[400] : Colors.grey[600]),
+                  ],
+                ),
+                SizedBox(height: 15),
+                Container(
+                  padding:
+                      EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                  decoration: BoxDecoration(
+                    color: primaryColor.withOpacity(0.05),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    langUserPhone == 'fr'
+                        ? 'Compte actuel : ${_selectedAccountName ?? "Téléphone (local)"}'
+                        : 'Current account: ${_selectedAccountName ?? "Phone (local)"}',
+                    style: GoogleFonts.poppins(
+                      color: isDark ? Colors.grey[300] : Colors.grey[700],
+                      fontSize: 13,
+                      height: 1.5,
+                    ),
+                  ),
+                ),
               ],
             ),
           ),
