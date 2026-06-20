@@ -511,11 +511,13 @@ class _PreferencePageState extends State<PreferencePage> {
                       Divider(height: 1),
                       if (!snap.hasData)
                         Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 32),
+                          padding: const EdgeInsets.symmetric(vertical: 48),
                           child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
                               CircularProgressIndicator(color: primaryColor),
-                              SizedBox(height: 16),
+                              SizedBox(height: 20),
                               Text(
                                 langUserPhone == 'fr'
                                     ? 'Chargement en cours…'
