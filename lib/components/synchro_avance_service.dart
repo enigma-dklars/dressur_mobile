@@ -289,7 +289,7 @@ class SynchroAvanceService extends ChangeNotifier {
         final String tel = (contactData["tel"] as String);
         final String telSansPlus = tel.replaceAll("+", "");
         final String nom = (contactData["nom"] ?? "").toString().trim();
-        final String pseudo = contactData["pseudo"] as String;
+        final String pseudo = (contactData["pseudo"] ?? "").toString().trim();
         final List<String> nameParts =
             [nom, pseudo, telSansPlus].where((s) => s.isNotEmpty).toList();
         final String expectedName = "${nameParts.join(" - ")} #DS";
@@ -304,7 +304,10 @@ class SynchroAvanceService extends ChangeNotifier {
           final newContact = Contact()
             ..name.first = expectedName
             ..phones = phonesList;
-          await newContact.insert();
+          await newContact.insert().timeout(
+            const Duration(seconds: 15),
+            onTimeout: () {},
+          );
           if (_cancelRequested) { _applyCancel(isFr); return null; }
           await insertNumTelUserIntoDataBase(tel);
           nbCreated++;
@@ -314,7 +317,10 @@ class SynchroAvanceService extends ChangeNotifier {
           if (existing != null && existing.name.first != expectedName) {
             existing.name.first = expectedName;
             existing.phones = phonesList;
-            await existing.update();
+            await existing.update().timeout(
+              const Duration(seconds: 15),
+              onTimeout: () {},
+            );
             if (_cancelRequested) { _applyCancel(isFr); return null; }
             nbUpdated++;
           }
