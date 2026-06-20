@@ -15,6 +15,8 @@ import 'package:http/http.dart' as http;
 import 'package:dressur/8_admin/admin.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+const _accountsChannel = MethodChannel('com.dressur.ds/accounts');
+
 class PreferencePage extends StatefulWidget {
   PreferencePage({Key? key}) : super(key: key);
 
@@ -36,19 +38,20 @@ class _PreferencePageState extends State<PreferencePage> {
       final granted = await FlutterContacts.requestPermission();
       if (!granted) return [defaultEntry];
 
-      // getAccounts() interroge directement l'AccountManager Android et retourne
-      // TOUS les comptes du téléphone (Google, etc.), même sans contacts synchronisés.
-      // Contrairement à getContacts(withAccounts: true) qui ne trouve que les comptes
-      // ayant au moins un contact déjà enregistré.
-      final allAccounts = await FlutterContacts.getAccounts();
+      // Interroge Android AccountManager directement via MethodChannel pour
+      // lister TOUS les comptes du téléphone (Google, Exchange, etc.),
+      // indépendamment des contacts synchronisés.
+      final raw = await _accountsChannel.invokeMethod<List>('getDeviceAccounts');
       final seen = <String>{};
       final accounts = <Map<String, String?>>[defaultEntry];
-      for (final acc in allAccounts) {
-        final key = '${acc.name}__${acc.type}';
-        if (acc.name.isNotEmpty && !seen.contains(key)) {
+      for (final item in raw ?? []) {
+        final name = item['name'] as String? ?? '';
+        final type = item['type'] as String? ?? '';
+        final key = '${name}__${type}';
+        if (name.isNotEmpty && !seen.contains(key)) {
           seen.add(key);
-          final label = acc.name.contains('@') ? acc.name : '${acc.name} (${acc.type.split('.').last})';
-          accounts.add({'name': acc.name, 'type': acc.type, 'label': label});
+          final label = name.contains('@') ? name : '$name (${type.split('.').last})';
+          accounts.add({'name': name, 'type': type, 'label': label});
         }
       }
       return accounts;
