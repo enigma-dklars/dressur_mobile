@@ -494,31 +494,12 @@ class _PreferencePageState extends State<PreferencePage> {
               builder: (ctx) => FutureBuilder<List<Map<String, String?>>>(
                 future: _fetchAccountsList(),
                 builder: (ctx, snap) {
-                  if (!snap.hasData) {
-                    return SizedBox(
-                      height: 140,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          CircularProgressIndicator(color: primaryColor),
-                          SizedBox(height: 16),
-                          Text(
-                            langUserPhone == 'fr'
-                                ? 'Recherche des comptes…'
-                                : 'Looking for accounts…',
-                            style: GoogleFonts.poppins(
-                                fontSize: 13, color: Colors.grey),
-                          ),
-                        ],
-                      ),
-                    );
-                  }
-                  final accounts = snap.data!;
-                  return ListView(
-                    shrinkWrap: true,
+                  return Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Padding(
-                        padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+                        padding: const EdgeInsets.fromLTRB(16, 20, 16, 12),
                         child: Text(
                           langUserPhone == 'fr'
                               ? 'Choisir le compte de sauvegarde'
@@ -527,17 +508,36 @@ class _PreferencePageState extends State<PreferencePage> {
                               fontWeight: FontWeight.bold, fontSize: 16),
                         ),
                       ),
-                      ...accounts.map((acc) => RadioListTile<String?>(
-                            value: acc['name'],
-                            groupValue: _selectedAccountName,
-                            title: Text(acc['label'] ?? '',
-                                style: GoogleFonts.poppins()),
-                            onChanged: (val) {
-                              Navigator.pop(ctx);
-                              _saveAccountPreference(val, acc['type']);
-                            },
-                          )),
-                      SizedBox(height: 8),
+                      Divider(height: 1),
+                      if (!snap.hasData)
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 32),
+                          child: Column(
+                            children: [
+                              CircularProgressIndicator(color: primaryColor),
+                              SizedBox(height: 16),
+                              Text(
+                                langUserPhone == 'fr'
+                                    ? 'Chargement en cours…'
+                                    : 'Loading…',
+                                style: GoogleFonts.poppins(
+                                    fontSize: 13, color: Colors.grey),
+                              ),
+                            ],
+                          ),
+                        )
+                      else
+                        ...snap.data!.map((acc) => RadioListTile<String?>(
+                              value: acc['name'],
+                              groupValue: _selectedAccountName,
+                              title: Text(acc['label'] ?? '',
+                                  style: GoogleFonts.poppins()),
+                              onChanged: (val) {
+                                Navigator.pop(ctx);
+                                _saveAccountPreference(val, acc['type']);
+                              },
+                            )),
+                      SizedBox(height: 12),
                     ],
                   );
                 },
