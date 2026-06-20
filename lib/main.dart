@@ -186,6 +186,8 @@ void main() async {
   // Charger le thème sauvegardé
   final prefs = await SharedPreferences.getInstance();
   final savedTheme = prefs.getString('themeMode') ?? 'system';
+  selectedContactAccountName = prefs.getString('selectedContactAccountName');
+  selectedContactAccountType = prefs.getString('selectedContactAccountType');
   MyApp.themeNotifier.value = savedTheme == 'light'
       ? ThemeMode.light
       : savedTheme == 'dark'
