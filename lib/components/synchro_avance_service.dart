@@ -325,7 +325,7 @@ class SynchroAvanceService extends ChangeNotifier {
               fullContact.phones = phonesList;
               await fullContact.update().timeout(
                 const Duration(seconds: 15),
-                onTimeout: () {},
+                onTimeout: () => Contact(),
               );
               if (_cancelRequested) { _applyCancel(isFr); return null; }
               nbUpdated++;
