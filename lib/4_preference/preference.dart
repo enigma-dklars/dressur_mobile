@@ -255,8 +255,8 @@ class _PreferencePageState extends State<PreferencePage> {
                   Expanded(
                     child: Text(
                       (langUserPhone == "fr")
-                          ? "Contacts Dressur dans l'Actu"
-                          : "Dressur contacts in the Feed",
+                          ? "Contacts Dressur"
+                          : "Dressur contacts",
                       style: GoogleFonts.poppins(
                         color: isDark ? Colors.white : Colors.black87,
                         fontWeight: FontWeight.w600,
@@ -374,7 +374,7 @@ class _PreferencePageState extends State<PreferencePage> {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: primaryColor,
                         foregroundColor: Colors.white,
-                        padding: EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                        padding: EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                       ),
                     ),
