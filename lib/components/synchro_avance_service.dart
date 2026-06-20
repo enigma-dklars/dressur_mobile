@@ -184,7 +184,7 @@ class SynchroAvanceService extends ChangeNotifier {
       notifyListeners();
 
       List<Contact> allContacts =
-          await FlutterContacts.getContacts(withProperties: true, withAccounts: true);
+          await FlutterContacts.getContacts(withProperties: true);
 
       if (_cancelRequested) { _applyCancel(isFr); return null; }
 
@@ -243,7 +243,7 @@ class SynchroAvanceService extends ChangeNotifier {
       notifyListeners();
 
       await SQLHelper.viderLaBaseDeDonneeLocalTelUser();
-      allContacts = await FlutterContacts.getContacts(withProperties: true, withAccounts: true);
+      allContacts = await FlutterContacts.getContacts(withProperties: true);
 
       if (_cancelRequested) { _applyCancel(isFr); return null; }
 
@@ -315,14 +315,21 @@ class SynchroAvanceService extends ChangeNotifier {
           final Contact? existing =
               _findDSContactByTel(freshDSContacts, tel);
           if (existing != null && existing.name.first != expectedName) {
-            existing.name.first = expectedName;
-            existing.phones = phonesList;
-            await existing.update().timeout(
-              const Duration(seconds: 15),
-              onTimeout: () => Contact(),
+            final Contact? fullContact = await FlutterContacts.getContact(
+              existing.id,
+              withProperties: true,
+              withAccounts: true,
             );
-            if (_cancelRequested) { _applyCancel(isFr); return null; }
-            nbUpdated++;
+            if (fullContact != null) {
+              fullContact.name.first = expectedName;
+              fullContact.phones = phonesList;
+              await fullContact.update().timeout(
+                const Duration(seconds: 15),
+                onTimeout: () {},
+              );
+              if (_cancelRequested) { _applyCancel(isFr); return null; }
+              nbUpdated++;
+            }
           }
         }
 
