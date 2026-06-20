@@ -27,23 +27,17 @@ class _PreferencePageState extends State<PreferencePage> {
   bool _addPageActuLocal = addPageActu;
   bool _updatingAddPageActu = false;
 
-  List<Map<String, String?>> _availableAccounts = [];
   String? _selectedAccountName;
   String? _selectedAccountType;
-  bool _loadingAccounts = false;
 
-  Future<void> _loadAvailableAccounts() async {
-    setState(() => _loadingAccounts = true);
+  Future<List<Map<String, String?>>> _fetchAccountsList() async {
+    final defaultEntry = {'name': null, 'type': null, 'label': langUserPhone == 'fr' ? 'Téléphone (local)' : 'Phone (local)'};
     try {
       final granted = await FlutterContacts.requestPermission();
-      if (!granted) {
-        setState(() => _loadingAccounts = false);
-        return;
-      }
+      if (!granted) return [defaultEntry];
       final contacts = await FlutterContacts.getContacts(withAccounts: true);
       final seen = <String>{};
-      final accounts = <Map<String, String?>>[];
-      accounts.add({'name': null, 'type': null, 'label': langUserPhone == 'fr' ? 'Téléphone (local)' : 'Phone (local)'});
+      final accounts = <Map<String, String?>>[defaultEntry];
       for (final c in contacts) {
         for (final acc in c.accounts) {
           final key = '${acc.name}__${acc.type}';
@@ -54,13 +48,10 @@ class _PreferencePageState extends State<PreferencePage> {
           }
         }
       }
-      setState(() {
-        _availableAccounts = accounts;
-        _loadingAccounts = false;
-      });
+      return accounts;
     } catch (e) {
-      debugPrint('[Accounts] erreur chargement comptes: $e');
-      setState(() => _loadingAccounts = false);
+      debugPrint('[Accounts] erreur: $e');
+      return [defaultEntry];
     }
   }
 
@@ -497,35 +488,59 @@ class _PreferencePageState extends State<PreferencePage> {
           ],
         ),
         child: InkWell(
-          onTap: _loadingAccounts ? null : () async {
-            await _loadAvailableAccounts();
-            if (!mounted) return;
+          onTap: () {
             showModalBottomSheet(
               context: context,
-              builder: (_) => ListView(
-                shrinkWrap: true,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Text(
-                      langUserPhone == 'fr'
-                          ? 'Choisir le compte de sauvegarde'
-                          : 'Choose storage account',
-                      style: GoogleFonts.poppins(
-                          fontWeight: FontWeight.bold, fontSize: 16),
-                    ),
-                  ),
-                  ..._availableAccounts.map((acc) => RadioListTile<String?>(
-                        value: acc['name'],
-                        groupValue: _selectedAccountName,
-                        title: Text(acc['label'] ?? '',
-                            style: GoogleFonts.poppins()),
-                        onChanged: (val) {
-                          Navigator.pop(context);
-                          _saveAccountPreference(val, acc['type']);
-                        },
-                      )),
-                ],
+              builder: (ctx) => FutureBuilder<List<Map<String, String?>>>(
+                future: _fetchAccountsList(),
+                builder: (ctx, snap) {
+                  if (!snap.hasData) {
+                    return SizedBox(
+                      height: 140,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          CircularProgressIndicator(color: primaryColor),
+                          SizedBox(height: 16),
+                          Text(
+                            langUserPhone == 'fr'
+                                ? 'Recherche des comptes…'
+                                : 'Looking for accounts…',
+                            style: GoogleFonts.poppins(
+                                fontSize: 13, color: Colors.grey),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+                  final accounts = snap.data!;
+                  return ListView(
+                    shrinkWrap: true,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+                        child: Text(
+                          langUserPhone == 'fr'
+                              ? 'Choisir le compte de sauvegarde'
+                              : 'Choose storage account',
+                          style: GoogleFonts.poppins(
+                              fontWeight: FontWeight.bold, fontSize: 16),
+                        ),
+                      ),
+                      ...accounts.map((acc) => RadioListTile<String?>(
+                            value: acc['name'],
+                            groupValue: _selectedAccountName,
+                            title: Text(acc['label'] ?? '',
+                                style: GoogleFonts.poppins()),
+                            onChanged: (val) {
+                              Navigator.pop(ctx);
+                              _saveAccountPreference(val, acc['type']);
+                            },
+                          )),
+                      SizedBox(height: 8),
+                    ],
+                  );
+                },
               ),
             );
           },
