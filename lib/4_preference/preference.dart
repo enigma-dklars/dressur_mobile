@@ -35,17 +35,20 @@ class _PreferencePageState extends State<PreferencePage> {
     try {
       final granted = await FlutterContacts.requestPermission();
       if (!granted) return [defaultEntry];
-      final contacts = await FlutterContacts.getContacts(withAccounts: true);
+
+      // getAccounts() interroge directement l'AccountManager Android et retourne
+      // TOUS les comptes du téléphone (Google, etc.), même sans contacts synchronisés.
+      // Contrairement à getContacts(withAccounts: true) qui ne trouve que les comptes
+      // ayant au moins un contact déjà enregistré.
+      final allAccounts = await FlutterContacts.getAccounts();
       final seen = <String>{};
       final accounts = <Map<String, String?>>[defaultEntry];
-      for (final c in contacts) {
-        for (final acc in c.accounts) {
-          final key = '${acc.name}__${acc.type}';
-          if (acc.name.isNotEmpty && !seen.contains(key)) {
-            seen.add(key);
-            final label = acc.name.contains('@') ? acc.name : '${acc.name} (${acc.type.split('.').last})';
-            accounts.add({'name': acc.name, 'type': acc.type, 'label': label});
-          }
+      for (final acc in allAccounts) {
+        final key = '${acc.name}__${acc.type}';
+        if (acc.name.isNotEmpty && !seen.contains(key)) {
+          seen.add(key);
+          final label = acc.name.contains('@') ? acc.name : '${acc.name} (${acc.type.split('.').last})';
+          accounts.add({'name': acc.name, 'type': acc.type, 'label': label});
         }
       }
       return accounts;
