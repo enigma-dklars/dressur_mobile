@@ -3,6 +3,7 @@
 import 'package:dressur/components/padding_and_divider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:dressur/4_preference/choix_pays.dart';
@@ -12,6 +13,7 @@ import 'package:dressur/components/sociaux.dart';
 import 'package:dressur/5_autre/support_assistance.dart';
 import 'package:http/http.dart' as http;
 import 'package:dressur/8_admin/admin.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class PreferencePage extends StatefulWidget {
   PreferencePage({Key? key}) : super(key: key);
@@ -24,6 +26,53 @@ class _PreferencePageState extends State<PreferencePage> {
   var data;
   bool _addPageActuLocal = addPageActu;
   bool _updatingAddPageActu = false;
+
+  List<Map<String, String?>> _availableAccounts = [];
+  String? _selectedAccountName;
+  String? _selectedAccountType;
+  bool _loadingAccounts = false;
+
+  Future<void> _loadAvailableAccounts() async {
+    setState(() => _loadingAccounts = true);
+    try {
+      final contacts = await FlutterContacts.getContacts(withAccounts: true);
+      final seen = <String>{};
+      final accounts = <Map<String, String?>>[];
+      accounts.add({'name': null, 'type': null, 'label': langUserPhone == 'fr' ? 'Téléphone (local)' : 'Phone (local)'});
+      for (final c in contacts) {
+        for (final acc in c.accounts) {
+          final key = '${acc.name}__${acc.type}';
+          if (acc.name.isNotEmpty && !seen.contains(key)) {
+            seen.add(key);
+            accounts.add({'name': acc.name, 'type': acc.type, 'label': acc.name});
+          }
+        }
+      }
+      setState(() {
+        _availableAccounts = accounts;
+        _loadingAccounts = false;
+      });
+    } catch (_) {
+      setState(() => _loadingAccounts = false);
+    }
+  }
+
+  Future<void> _saveAccountPreference(String? name, String? type) async {
+    final prefs = await SharedPreferences.getInstance();
+    if (name == null) {
+      await prefs.remove('selectedContactAccountName');
+      await prefs.remove('selectedContactAccountType');
+    } else {
+      await prefs.setString('selectedContactAccountName', name);
+      if (type != null) await prefs.setString('selectedContactAccountType', type);
+    }
+    setState(() {
+      _selectedAccountName = name;
+      _selectedAccountType = type;
+    });
+    selectedContactAccountName = name;
+    selectedContactAccountType = type;
+  }
 
   @override
   void dispose() {
@@ -49,6 +98,9 @@ class _PreferencePageState extends State<PreferencePage> {
   @override
   void initState() {
     super.initState();
+    _selectedAccountName = selectedContactAccountName;
+    _selectedAccountType = selectedContactAccountType;
+    _loadAvailableAccounts();
   }
 
   @override
@@ -158,6 +210,48 @@ class _PreferencePageState extends State<PreferencePage> {
                 ),
                 const SizedBox(height: 10),
                 SociauxPage(),
+                const SizedBox(height: 10),
+                // ── Sauvegarde des contacts ───────────────────────────────────────
+                ListTile(
+                  leading: const FaIcon(FontAwesomeIcons.addressBook, color: primaryColor),
+                  title: Text(
+                    langUserPhone == 'fr' ? 'Sauvegarde des contacts' : 'Contact storage',
+                    style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+                  ),
+                  subtitle: Text(
+                    _selectedAccountName ?? (langUserPhone == 'fr' ? 'Téléphone (local)' : 'Phone (local)'),
+                    style: GoogleFonts.poppins(fontSize: 12, color: Colors.grey),
+                  ),
+                  trailing: _loadingAccounts
+                      ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2))
+                      : const Icon(Icons.chevron_right),
+                  onTap: _loadingAccounts || _availableAccounts.isEmpty ? null : () {
+                    showModalBottomSheet(
+                      context: context,
+                      builder: (_) => ListView(
+                        shrinkWrap: true,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(16),
+                            child: Text(
+                              langUserPhone == 'fr' ? 'Choisir le compte de sauvegarde' : 'Choose storage account',
+                              style: GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 16),
+                            ),
+                          ),
+                          ..._availableAccounts.map((acc) => RadioListTile<String?>(
+                            value: acc['name'],
+                            groupValue: _selectedAccountName,
+                            title: Text(acc['label'] ?? '', style: GoogleFonts.poppins()),
+                            onChanged: (val) {
+                              Navigator.pop(context);
+                              _saveAccountPreference(val, acc['type']);
+                            },
+                          )),
+                        ],
+                      ),
+                    );
+                  },
+                ),
                 const SizedBox(height: 10),
               ],
             ),
