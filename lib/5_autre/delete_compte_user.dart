@@ -134,11 +134,16 @@ class _DeletecompteFormState extends State<DeletecompteForm> {
             List<Contact> contacts =
                 await FlutterContacts.getContacts(withProperties: true, withAccounts: true);
             for (var contact in contacts) {
+              bool shouldDelete = false;
               for (var phone in contact.phones) {
                 if (contactsEnregistrer.contains(
                     (phone.number).replaceAll(" ", "").replaceAll("-", ""))) {
-                  await contact.delete();
+                  shouldDelete = true;
+                  break;
                 }
+              }
+              if (shouldDelete) {
+                await contact.delete();
               }
             }
           }
