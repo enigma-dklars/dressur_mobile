@@ -243,7 +243,7 @@ class SynchroAvanceService extends ChangeNotifier {
       notifyListeners();
 
       await SQLHelper.viderLaBaseDeDonneeLocalTelUser();
-      allContacts = await FlutterContacts.getContacts(withProperties: true);
+      allContacts = await FlutterContacts.getContacts(withProperties: true, withAccounts: true);
 
       if (_cancelRequested) { _applyCancel(isFr); return null; }
 
