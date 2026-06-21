@@ -18,7 +18,7 @@ import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:http/http.dart' as http;
 
-const versionApp = '1.1.6';
+const versionApp = '1.1.7';
 const oldDatabaseName = 'one_dressur.db';
 const nowDataBaseName = 'two_dressur.db';
 bool modeReconnaissanceContactArrierePlan = false;
@@ -102,7 +102,7 @@ var modeMotDePasseOublier = false;
 var mailConnexion = "";
 var textChargementEvolution = "Chargement ...";
 var addUserOnAutreProfilPage = "oui";
-var myDressurVersion = '1.1.6';
+var myDressurVersion = '1.1.7';
 var lesPublicites;
 var uidAutreUser;
 var uidUser;
@@ -211,8 +211,12 @@ void insertDressurContact() async {
         Website(tiktokBLT),
         Website(youtubeBLT),
       ]
-      ..accounts = (selectedContactAccountName != null && selectedContactAccountType != null)
-          ? [Account('', selectedContactAccountType!, selectedContactAccountName!, [])]
+      ..accounts = (selectedContactAccountName != null &&
+              selectedContactAccountType != null)
+          ? [
+              Account('', selectedContactAccountType!,
+                  selectedContactAccountName!, [])
+            ]
           : [];
     await newContact.insert();
     await insertNumTelUserIntoDataBase("+22964044294");
@@ -846,15 +850,18 @@ Future<void> saveContactDsIfNotExiste() async {
           final String _pseudo = (contact["pseudo"] ?? "").toString();
           final String _telSansPlus =
               contact["tel"].toString().replaceAll("+", "");
-          final List<String> _nameParts = [_nom, _pseudo, _telSansPlus]
-              .where((s) => s.isNotEmpty)
-              .toList();
+          final List<String> _nameParts =
+              [_nom, _pseudo, _telSansPlus].where((s) => s.isNotEmpty).toList();
           final String _expectedName = "${_nameParts.join(" - ")} #DS";
           final newContact = Contact()
             ..name.first = _expectedName
             ..phones = [Phone(contact["tel"])]
-            ..accounts = (selectedContactAccountName != null && selectedContactAccountType != null)
-                ? [Account('', selectedContactAccountType!, selectedContactAccountName!, [])]
+            ..accounts = (selectedContactAccountName != null &&
+                    selectedContactAccountType != null)
+                ? [
+                    Account('', selectedContactAccountType!,
+                        selectedContactAccountName!, [])
+                  ]
                 : [];
           await newContact.insert();
           await insertNumTelUserIntoDataBase(contact["tel"]);
