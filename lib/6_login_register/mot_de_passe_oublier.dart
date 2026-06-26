@@ -111,7 +111,14 @@ class _RecuperationFormState extends State<RecuperationForm> {
 
       http.StreamedResponse response = await request.send();
       var responseBody = await response.stream.bytesToString();
-      var data = convert.jsonDecode(responseBody);
+      late Map<String, dynamic> data;
+      try {
+        data = convert.jsonDecode(responseBody);
+      } catch (_) {
+        throw Exception((langUserPhone == "fr")
+            ? "Le serveur est temporairement indisponible. Veuillez réessayer."
+            : "The server is temporarily unavailable. Please try again.");
+      }
 
       if (response.statusCode == 200 && data["error"] == false) {
         modeMotDePasseOublier = true;
