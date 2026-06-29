@@ -242,7 +242,7 @@ class _ContactPageState extends State<ContactPage> {
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
-              title: const Text('Erreur'),
+              title: Text((langUserPhone == "fr") ? 'Erreur' : 'Error'),
               content: (langUserPhone == "fr")
                   ? Text(
                       'Échec de récupération des contacts. Code d\'erreur: ${response.statusCode}')

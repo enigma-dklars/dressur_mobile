@@ -66,7 +66,6 @@ class _ProgrammeRecompenseDashboardState
               '$generalRouteForApi/getMyProgrammeRecompenseInformations'));
       request.fields.addAll({
         'uid': uidUser,
-        
       });
 
       http.StreamedResponse response = await request.send();
@@ -118,13 +117,14 @@ class _ProgrammeRecompenseDashboardState
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final bool isFr = langUserPhone == "fr";
 
     return Scaffold(
       appBar: AppBar(
         backgroundColor: primaryColor,
         elevation: 0,
         title: Text(
-          "Mon Programme",
+          isFr ? "Mon Programme" : "My Program",
           style: GoogleFonts.poppins(
             color: Colors.white,
             fontWeight: FontWeight.w400,
@@ -143,8 +143,7 @@ class _ProgrammeRecompenseDashboardState
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // 1. CARTE PORTEFEUILLE (WALLET)
-            _buildWalletCard(context),
+            _buildWalletCard(context, isFr),
             SizedBox(height: 10),
 
             Padding(
@@ -152,35 +151,47 @@ class _ProgrammeRecompenseDashboardState
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // 1. BOUTON ACCÈS PROGRAMME
-                  _buildAccessProgramButton(context, theme),
+                  _buildAccessProgramButton(context, theme, isFr),
 
                   SizedBox(height: 10),
 
-                  // 2. BOUTON PROMOTIONS AFFAIRES (DÉPLACÉ ICI)
-                  _buildBusinessPromotionsButton(context, theme),
+                  _buildBusinessPromotionsButton(context, theme, isFr),
 
                   SizedBox(height: 15),
 
-                  // 3. STATISTIQUES RAPIDES
-                  _sectionTitle(context, "Mes Statistiques", 10),
+                  _sectionTitle(context,
+                      isFr ? "Mes Statistiques" : "My Statistics", 10),
                   Row(
                     children: [
-                      _statItem(context, "Vues Totales", "$vuesTotales",
-                          FontAwesomeIcons.eye, Colors.blue, theme),
+                      _statItem(
+                          context,
+                          isFr ? "Vues Totales" : "Total Views",
+                          "$vuesTotales",
+                          FontAwesomeIcons.eye,
+                          Colors.blue,
+                          theme),
                       SizedBox(width: 15),
-                      _statItem(context, "Gains Totales", "$gainsTotales F",
-                          FontAwesomeIcons.wallet, Colors.green, theme),
+                      _statItem(
+                          context,
+                          isFr ? "Gains Totaux" : "Total Earnings",
+                          "$gainsTotales F",
+                          FontAwesomeIcons.wallet,
+                          Colors.green,
+                          theme),
                     ],
                   ),
 
                   SizedBox(height: 10),
 
-                  // 4. PROMOTIONS EN COURS
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      _sectionTitle(context, "Historique de participation…", 0),
+                      _sectionTitle(
+                          context,
+                          isFr
+                              ? "Historique de participation…"
+                              : "Participation history…",
+                          0),
                       TextButton(
                         onPressed: () {
                           Navigator.push(
@@ -193,7 +204,7 @@ class _ProgrammeRecompenseDashboardState
                           );
                         },
                         child: Text(
-                          "Voir tout",
+                          isFr ? "Voir tout" : "See all",
                           style: GoogleFonts.poppins(
                             color: primaryColor,
                             fontSize: 12,
@@ -205,7 +216,9 @@ class _ProgrammeRecompenseDashboardState
                   Padding(
                     padding: const EdgeInsets.only(bottom: 10),
                     child: Text(
-                      "Sélectionnez un historique pour voir les options possibles…",
+                      isFr
+                          ? "Sélectionnez un historique pour voir les options possibles…"
+                          : "Select a history entry to see available options…",
                       style: GoogleFonts.poppins(
                         fontSize: 12,
                         fontWeight: FontWeight.w400,
@@ -223,13 +236,18 @@ class _ProgrammeRecompenseDashboardState
                       }
 
                       if (snapshot.hasError) {
-                        return Center(child: Text("Erreur de chargement"));
+                        return Center(
+                            child: Text(isFr
+                                ? "Erreur de chargement"
+                                : "Loading error"));
                       }
 
                       if (!snapshot.hasData || snapshot.data!.isEmpty) {
                         return Center(
                           child: Text(
-                            "Aucun historique disponible",
+                            isFr
+                                ? "Aucun historique disponible"
+                                : "No history available",
                             style: GoogleFonts.poppins(fontSize: 12),
                           ),
                         );
@@ -237,13 +255,11 @@ class _ProgrammeRecompenseDashboardState
 
                       return ListView.builder(
                         itemCount: snapshot.data!.length,
-                        shrinkWrap: true, // 🔑 IMPORTANT
-                        physics:
-                            const NeverScrollableScrollPhysics(), // 🔑 IMPORTANT
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
                         itemBuilder: (context, index) {
                           final item = snapshot.data![index];
-
-                          return _promotionItem(context, item);
+                          return _promotionItem(context, item, isFr);
                         },
                       );
                     },
@@ -254,7 +270,6 @@ class _ProgrammeRecompenseDashboardState
           ],
         ),
       ),
-      // BOUTON FLOTTANT POUR AJOUTER UNE PROMO
     );
   }
 
@@ -262,11 +277,10 @@ class _ProgrammeRecompenseDashboardState
   // COMPOSANTS
   // ---------------------------------------------------------------------------
 
-  // Bouton pour accéder à ProgrammeRecompensePage
-  Widget _buildAccessProgramButton(BuildContext context, ThemeData theme) {
+  Widget _buildAccessProgramButton(
+      BuildContext context, ThemeData theme, bool isFr) {
     return InkWell(
       onTap: () {
-        // Navigation vers ProgrammeRecompensePage
         Navigator.push(
             context,
             MaterialPageRoute(
@@ -289,7 +303,7 @@ class _ProgrammeRecompenseDashboardState
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "Conditions du programme",
+                    isFr ? "Conditions du programme" : "Program conditions",
                     style: GoogleFonts.poppins(
                       fontWeight: FontWeight.bold,
                       fontSize: 14,
@@ -298,7 +312,9 @@ class _ProgrammeRecompenseDashboardState
                   ),
                   SizedBox(height: 2),
                   Text(
-                    "Relire les conditions ou quitter le programme",
+                    isFr
+                        ? "Relire les conditions ou quitter le programme"
+                        : "Review conditions or leave the program",
                     style: GoogleFonts.poppins(
                       fontSize: 11,
                       color: Colors.grey[600],
@@ -315,11 +331,10 @@ class _ProgrammeRecompenseDashboardState
     );
   }
 
-  // Bouton pour voir les promotions affaire
-  Widget _buildBusinessPromotionsButton(BuildContext context, theme) {
+  Widget _buildBusinessPromotionsButton(
+      BuildContext context, theme, bool isFr) {
     return InkWell(
       onTap: () {
-        // Navigation vers ProgrammeRecompensePage
         Navigator.push(context,
             MaterialPageRoute(builder: (context) => BusinessPromotionsPage()));
       },
@@ -339,7 +354,9 @@ class _ProgrammeRecompenseDashboardState
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "Explorer les promotions affaires",
+                    isFr
+                        ? "Explorer les promotions affaires"
+                        : "Explore business promotions",
                     style: GoogleFonts.poppins(
                       fontWeight: FontWeight.bold,
                       fontSize: 14,
@@ -348,7 +365,9 @@ class _ProgrammeRecompenseDashboardState
                   ),
                   SizedBox(height: 2),
                   Text(
-                    "Découvrez les offres du programme de récompenses",
+                    isFr
+                        ? "Découvrez les offres du programme de récompenses"
+                        : "Discover the rewards program offers",
                     style: GoogleFonts.poppins(
                       fontSize: 11,
                       color: Colors.grey[600],
@@ -365,7 +384,7 @@ class _ProgrammeRecompenseDashboardState
     );
   }
 
-  Widget _buildWalletCard(BuildContext context) {
+  Widget _buildWalletCard(BuildContext context, bool isFr) {
     return Container(
       width: double.infinity,
       margin: EdgeInsets.fromLTRB(10, 12, 10, 0),
@@ -381,12 +400,11 @@ class _ProgrammeRecompenseDashboardState
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // HEADER
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                "Solde disponible",
+                isFr ? "Solde disponible" : "Available balance",
                 style: GoogleFonts.poppins(
                   color: Colors.white.withOpacity(0.85),
                   fontSize: 14,
@@ -404,7 +422,7 @@ class _ProgrammeRecompenseDashboardState
                         color: Colors.white, size: 13),
                     SizedBox(width: 4),
                     Text(
-                      "Automatique",
+                      isFr ? "Automatique" : "Automatic",
                       style: GoogleFonts.poppins(
                         color: Colors.white,
                         fontSize: 10,
@@ -419,7 +437,6 @@ class _ProgrammeRecompenseDashboardState
 
           SizedBox(height: 8),
 
-          // SOLDE
           Text(
             "$soldeProgrammeRecompense FCFA",
             style: GoogleFonts.poppins(
@@ -433,9 +450,10 @@ class _ProgrammeRecompenseDashboardState
           Divider(color: Colors.white.withOpacity(0.2)),
           SizedBox(height: 10),
 
-          // TEXTE INFO
           Text(
-            "Les retraits sont automatiques à partir de 1 000 FCFA vers votre numéro configuré.",
+            isFr
+                ? "Les retraits sont automatiques à partir de 1 000 FCFA vers votre numéro configuré."
+                : "Withdrawals are automatic from 1,000 FCFA to your configured number.",
             style: GoogleFonts.poppins(
               color: Colors.white.withOpacity(0.75),
               fontSize: 12.5,
@@ -445,7 +463,6 @@ class _ProgrammeRecompenseDashboardState
 
           SizedBox(height: 12),
 
-          // ACTIONS EN BAS
           Row(
             children: [
               Expanded(
@@ -458,7 +475,7 @@ class _ProgrammeRecompenseDashboardState
                   },
                   icon: FaIcon(FontAwesomeIcons.gear, size: 18),
                   label: Text(
-                    "Configuration",
+                    isFr ? "Configuration" : "Configuration",
                     style: GoogleFonts.poppins(
                       fontWeight: FontWeight.bold,
                       fontSize: 13,
@@ -484,7 +501,7 @@ class _ProgrammeRecompenseDashboardState
                   icon: FaIcon(FontAwesomeIcons.clockRotateLeft,
                       size: 18, color: Colors.white),
                   label: Text(
-                    "Historique",
+                    isFr ? "Historique" : "History",
                     style: GoogleFonts.poppins(
                       fontWeight: FontWeight.w600,
                       fontSize: 13,
@@ -559,7 +576,8 @@ class _ProgrammeRecompenseDashboardState
     );
   }
 
-  Widget _promotionItem(BuildContext context, HistoriqueRecompense item) {
+  Widget _promotionItem(
+      BuildContext context, HistoriqueRecompense item, bool isFr) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final statusConfig = getStatusBadgeConfig(item.status);
 
@@ -587,7 +605,6 @@ class _ProgrammeRecompenseDashboardState
                 ),
                 child: Stack(
                   children: [
-                    // ✅ Image avec cache
                     ClipRRect(
                       borderRadius: BorderRadius.circular(12),
                       child: CachedNetworkImage(
@@ -603,8 +620,6 @@ class _ProgrammeRecompenseDashboardState
                             fit: BoxFit.cover),
                       ),
                     ),
-
-                    // ✅ Badge de statut
                     Positioned(
                       bottom: 2,
                       right: 2,
@@ -641,7 +656,6 @@ class _ProgrammeRecompenseDashboardState
               ),
               const SizedBox(width: 10),
 
-              // --- INFOS CENTRALES ---
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -683,7 +697,6 @@ class _ProgrammeRecompenseDashboardState
                 ),
               ),
 
-              // --- MONTANT & BOUTON PARTAGE ---
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
@@ -703,8 +716,6 @@ class _ProgrammeRecompenseDashboardState
                     ),
                   ),
                   const SizedBox(height: 5),
-                  // Bouton de partage compact avec Spinner
-
                   Container(
                     padding:
                         const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -743,6 +754,7 @@ class _ProgrammeRecompenseDashboardState
 
   void _showStatusDetailsBottomSheet(
       BuildContext context, HistoriqueRecompense item) {
+    final bool isFr = langUserPhone == "fr";
     setState(() {
       _proofImage1 = null;
       _proofImage2 = null;
@@ -755,7 +767,6 @@ class _ProgrammeRecompenseDashboardState
       ),
       builder: (context) {
         return StatefulBuilder(
-          // Utiliser StatefulBuilder pour mettre à jour le BottomSheet
           builder: (context, setModalState) {
             return DraggableScrollableSheet(
               initialChildSize: 0.7,
@@ -788,7 +799,9 @@ class _ProgrammeRecompenseDashboardState
                         ),
                       ),
                       Text(
-                        "Récompense : ${item.amount} FCFA",
+                        isFr
+                            ? "Récompense : ${item.amount} FCFA"
+                            : "Reward: ${item.amount} FCFA",
                         style: GoogleFonts.poppins(
                           fontSize: 14,
                           color: primaryColor,
@@ -796,12 +809,12 @@ class _ProgrammeRecompenseDashboardState
                         ),
                       ),
                       const Divider(height: 30),
-                      _buildStatusContent(item, setModalState),
+                      _buildStatusContent(item, setModalState, isFr),
                       const SizedBox(height: 30),
                       if (item.status == "terminer" ||
                           item.status == "en_cours" ||
                           item.status == "en_attente")
-                        _buildWhatsAppButton(),
+                        _buildWhatsAppButton(isFr),
                     ],
                   ),
                 );
@@ -814,14 +827,16 @@ class _ProgrammeRecompenseDashboardState
   }
 
   Widget _buildStatusContent(
-      HistoriqueRecompense item, StateSetter setModalState) {
+      HistoriqueRecompense item, StateSetter setModalState, bool isFr) {
     switch (item.status) {
       case "en_attente":
         return _statusInfo(
           FontAwesomeIcons.hourglassEmpty,
           Colors.orange,
-          "En attente d'approbation",
-          "Vous avez soumis vos preuves de participation. Notre équipe examine actuellement votre demande.\n\nSi vous ne l'avez pas encore fait, veuillez envoyer la capture vidéo comme dernière preuve par WhatsApp au numéro d'assistance de Dressur.",
+          isFr ? "En attente d'approbation" : "Awaiting approval",
+          isFr
+              ? "Vous avez soumis vos preuves de participation. Notre équipe examine actuellement votre demande.\n\nSi vous ne l'avez pas encore fait, veuillez envoyer la capture vidéo comme dernière preuve par WhatsApp au numéro d'assistance de Dressur."
+              : "You have submitted your participation proofs. Our team is currently reviewing your request.\n\nIf you haven't done so yet, please send the video capture as final proof via WhatsApp to Dressur's support number.",
         );
       case "terminer":
         return Column(
@@ -829,33 +844,43 @@ class _ProgrammeRecompenseDashboardState
             _statusInfo(
               FontAwesomeIcons.clock,
               Colors.green,
-              "Temps écoulé - Soumission requise",
-              "Le temps de participation est terminé. Vous devez maintenant soumettre vos preuves (les deux captures d'écran) via le formulaire ci-dessous.\n\nNote : La capture vidéo doit être envoyée séparément par WhatsApp.",
+              isFr
+                  ? "Temps écoulé - Soumission requise"
+                  : "Time elapsed - Submission required",
+              isFr
+                  ? "Le temps de participation est terminé. Vous devez maintenant soumettre vos preuves (les deux captures d'écran) via le formulaire ci-dessous.\n\nNote : La capture vidéo doit être envoyée séparément par WhatsApp."
+                  : "The participation time has ended. You must now submit your proofs (both screenshots) via the form below.\n\nNote: The video capture must be sent separately via WhatsApp.",
             ),
             const SizedBox(height: 20),
-            _buildSubmissionForm(item, setModalState),
+            _buildSubmissionForm(item, setModalState, isFr),
           ],
         );
       case "echouer":
         return _statusInfo(
           FontAwesomeIcons.circleExclamation,
           Colors.red,
-          "Participation échouée",
-          "Malheureusement, vous n'avez pas soumis vos preuves de participation dans les délais impartis. Il est désormais trop tard pour le faire pour cette promotion.",
+          isFr ? "Participation échouée" : "Participation failed",
+          isFr
+              ? "Malheureusement, vous n'avez pas soumis vos preuves de participation dans les délais impartis. Il est désormais trop tard pour le faire pour cette promotion."
+              : "Unfortunately, you did not submit your participation proofs within the required time. It is now too late to do so for this promotion.",
         );
       case "refuser":
         return _statusInfo(
           FontAwesomeIcons.slash,
           Colors.red,
-          "Preuves refusées",
-          "Les preuves que vous avez fournies n'ont pas été jugées recevables par notre équipe de modération. En conséquence, la récompense ne peut pas être accordée.",
+          isFr ? "Preuves refusées" : "Proofs rejected",
+          isFr
+              ? "Les preuves que vous avez fournies n'ont pas été jugées recevables par notre équipe de modération. En conséquence, la récompense ne peut pas être accordée."
+              : "The proofs you provided were not deemed acceptable by our moderation team. As a result, the reward cannot be granted.",
         );
       case "approuver":
         return _statusInfo(
           FontAwesomeIcons.solidCircleCheck,
           Colors.green,
-          "Félicitations ! Approuvé",
-          "Vos preuves de participation ont été vérifiées et validées. La récompense a été créditée sur votre solde Dressur.",
+          isFr ? "Félicitations ! Approuvé" : "Congratulations! Approved",
+          isFr
+              ? "Vos preuves de participation ont été vérifiées et validées. La récompense a été créditée sur votre solde Dressur."
+              : "Your participation proofs have been verified and validated. The reward has been credited to your Dressur balance.",
         );
       case "en_cours":
         return Column(
@@ -863,15 +888,17 @@ class _ProgrammeRecompenseDashboardState
             _statusInfo(
               FontAwesomeIcons.arrowsRotate,
               Colors.blue,
-              "Participation en cours",
-              "Le temps de soumission n'est pas encore arrivé. Cependant, si vous estimez avoir déjà atteint votre objectif, vous pouvez soumettre vos preuves dès maintenant.",
+              isFr ? "Participation en cours" : "Participation in progress",
+              isFr
+                  ? "Le temps de soumission n'est pas encore arrivé. Cependant, si vous estimez avoir déjà atteint votre objectif, vous pouvez soumettre vos preuves dès maintenant."
+                  : "The submission time has not yet arrived. However, if you believe you have already reached your goal, you can submit your proofs now.",
             ),
             const SizedBox(height: 20),
-            _buildSubmissionForm(item, setModalState),
+            _buildSubmissionForm(item, setModalState, isFr),
           ],
         );
       default:
-        return Text("Statut inconnu");
+        return Text(isFr ? "Statut inconnu" : "Unknown status");
     }
   }
 
@@ -910,7 +937,7 @@ class _ProgrammeRecompenseDashboardState
   }
 
   Widget _buildSubmissionForm(
-      HistoriqueRecompense item, StateSetter setModalState) {
+      HistoriqueRecompense item, StateSetter setModalState, bool isFr) {
     return Container(
       padding: const EdgeInsets.all(15),
       decoration: BoxDecoration(
@@ -920,28 +947,34 @@ class _ProgrammeRecompenseDashboardState
       child: Column(
         children: [
           Text(
-            "Formulaire de soumission",
+            isFr ? "Formulaire de soumission" : "Submission form",
             style: GoogleFonts.poppins(fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 15),
 
-          // Capture 1
           _proofCard(
               "1",
-              "Capture – Liste des statuts",
-              "• Affiche la liste des statuts WhatsApp\n• Le statut de la promotion doit être visible",
+              isFr
+                  ? "Capture – Liste des statuts"
+                  : "Screenshot – Status list",
+              isFr
+                  ? "• Affiche la liste des statuts WhatsApp\n• Le statut de la promotion doit être visible"
+                  : "• Shows the WhatsApp status list\n• The promotion status must be visible",
               _proofImage1,
-              () => _pickImage(1, setModalState)),
+              () => _pickImage(1, setModalState),
+              isFr),
 
           const SizedBox(height: 15),
 
-          // Capture 2
           _proofCard(
               "2",
-              "Capture – Statut ouvert",
-              "• Image complète\n• Texte descriptif complet\n• Nombre de vues, date et heure visibles",
+              isFr ? "Capture – Statut ouvert" : "Screenshot – Open status",
+              isFr
+                  ? "• Image complète\n• Texte descriptif complet\n• Nombre de vues, date et heure visibles"
+                  : "• Full image\n• Complete descriptive text\n• Number of views, date and time visible",
               _proofImage2,
-              () => _pickImage(2, setModalState)),
+              () => _pickImage(2, setModalState),
+              isFr),
 
           const SizedBox(height: 20),
 
@@ -950,7 +983,7 @@ class _ProgrammeRecompenseDashboardState
             child: ElevatedButton(
               onPressed: _isSubmitting
                   ? null
-                  : () => _submitProofs(item, setModalState),
+                  : () => _submitProofs(item, setModalState, isFr),
               style: ElevatedButton.styleFrom(
                 backgroundColor: primaryColor,
                 shape: RoundedRectangleBorder(
@@ -963,7 +996,8 @@ class _ProgrammeRecompenseDashboardState
                       height: 20,
                       child: CircularProgressIndicator(
                           color: Colors.white, strokeWidth: 2))
-                  : Text("Soumettre les preuves",
+                  : Text(
+                      isFr ? "Soumettre les preuves" : "Submit proofs",
                       style: GoogleFonts.poppins(
                           color: Colors.white, fontWeight: FontWeight.bold)),
             ),
@@ -974,7 +1008,7 @@ class _ProgrammeRecompenseDashboardState
   }
 
   Widget _proofCard(String number, String title, String instructions,
-      File? image, VoidCallback onTap) {
+      File? image, VoidCallback onTap, bool isFr) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -1015,7 +1049,7 @@ class _ProgrammeRecompenseDashboardState
                       FaIcon(FontAwesomeIcons.camera,
                           color: primaryColor, size: 30),
                       const SizedBox(height: 5),
-                      Text("Cliquez pour choisir",
+                      Text(isFr ? "Cliquez pour choisir" : "Tap to choose",
                           style: GoogleFonts.poppins(
                               fontSize: 12, color: Colors.grey)),
                     ],
@@ -1049,15 +1083,20 @@ class _ProgrammeRecompenseDashboardState
         else
           _proofImage2 = File(pickedFile.path);
       });
-      setModalState(() {}); // Mettre à jour le BottomSheet
+      setModalState(() {});
     }
   }
 
   Future<void> _submitProofs(
-      HistoriqueRecompense item, StateSetter setModalState) async {
+      HistoriqueRecompense item, StateSetter setModalState, bool isFr) async {
     if (_proofImage1 == null || _proofImage2 == null) {
-      dangerNoti("Attention",
-          "Veuillez sélectionner les deux captures d'écran.", context);
+      dangerNoti(
+        isFr ? "Attention" : "Warning",
+        isFr
+            ? "Veuillez sélectionner les deux captures d'écran."
+            : "Please select both screenshots.",
+        context,
+      );
       return;
     }
 
@@ -1081,28 +1120,43 @@ class _ProgrammeRecompenseDashboardState
       var data = jsonDecode(responseData);
 
       if (response.statusCode == 200 && data['error'] == false) {
-        Navigator.pop(context); // Fermer le BottomSheet
-        successNoti("Succès",
-            data['message'] ?? "Preuves soumises avec succès !", context);
-        // Rafraîchir l'historique
+        Navigator.pop(context);
+        successNoti(
+          isFr ? "Succès" : "Success",
+          data['message'] ??
+              (isFr
+                  ? "Preuves soumises avec succès !"
+                  : "Proofs submitted successfully!"),
+          context,
+        );
         setState(() {
           _futureHistoriqueRecompense = partageInProgrammeRecompense();
         });
       } else {
         dangerNoti(
-            "Erreur",
-            data['message'] ?? "Une erreur est survenue lors de l'envoi.",
-            context);
+          isFr ? "Erreur" : "Error",
+          data['message'] ??
+              (isFr
+                  ? "Une erreur est survenue lors de l'envoi."
+                  : "An error occurred while sending."),
+          context,
+        );
       }
     } catch (e) {
-      dangerNoti("Erreur", "Impossible de contacter le serveur.", context);
+      dangerNoti(
+        isFr ? "Erreur" : "Error",
+        isFr
+            ? "Impossible de contacter le serveur."
+            : "Unable to contact the server.",
+        context,
+      );
     } finally {
       setModalState(() => _isSubmitting = false);
       setState(() => _isSubmitting = false);
     }
   }
 
-  Widget _buildWhatsAppButton() {
+  Widget _buildWhatsAppButton(bool isFr) {
     return SizedBox(
       width: double.infinity,
       child: OutlinedButton.icon(
@@ -1112,7 +1166,8 @@ class _ProgrammeRecompenseDashboardState
           }
         },
         icon: FaIcon(FontAwesomeIcons.solidComment, size: 18),
-        label: Text("Envoyer la vidéo sur WhatsApp"),
+        label: Text(
+            isFr ? "Envoyer la vidéo sur WhatsApp" : "Send video on WhatsApp"),
         style: OutlinedButton.styleFrom(
           foregroundColor: Colors.green,
           side: BorderSide(color: Colors.green),
@@ -1125,46 +1180,47 @@ class _ProgrammeRecompenseDashboardState
   }
 
   Map<String, dynamic> getStatusBadgeConfig(String status) {
+    final bool isFr = langUserPhone == "fr";
     switch (status) {
       case "en_attente":
         return {
-          "label": "Attente validation",
+          "label": isFr ? "Attente validation" : "Awaiting validation",
           "icon": FontAwesomeIcons.clock,
           "color": Colors.orange,
         };
       case "terminer":
         return {
-          "label": "Preuves requises",
+          "label": isFr ? "Preuves requises" : "Proofs required",
           "icon": FontAwesomeIcons.solidCircleCheck,
           "color": Colors.green,
         };
       case "echouer":
         return {
-          "label": "Échoué",
+          "label": isFr ? "Échoué" : "Failed",
           "icon": FontAwesomeIcons.xmark,
           "color": Colors.red,
         };
       case "refuser":
         return {
-          "label": "Refusé",
+          "label": isFr ? "Refusé" : "Rejected",
           "icon": FontAwesomeIcons.xmark,
           "color": Colors.red,
         };
       case "approuver":
         return {
-          "label": "Approuvé",
+          "label": isFr ? "Approuvé" : "Approved",
           "icon": FontAwesomeIcons.solidCircleCheck,
           "color": Colors.green,
         };
       case "en_cours":
         return {
-          "label": "En cours",
+          "label": isFr ? "En cours" : "In progress",
           "icon": FontAwesomeIcons.arrowsRotate,
           "color": Colors.blue,
         };
       default:
         return {
-          "label": "Inconnu",
+          "label": isFr ? "Inconnu" : "Unknown",
           "icon": FontAwesomeIcons.circleQuestion,
           "color": Colors.grey,
         };

@@ -34,7 +34,6 @@ class _ProgrammeRecompensePageState extends State<ProgrammeRecompensePage> {
           'POST', Uri.parse('$generalRouteForApi/addToRecompenseProgramme'));
       request.fields.addAll({
         'uid': uidUser,
-        
       });
 
       http.StreamedResponse response = await request.send();
@@ -83,6 +82,7 @@ class _ProgrammeRecompensePageState extends State<ProgrammeRecompensePage> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final bool isFr = langUserPhone == "fr";
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -90,7 +90,7 @@ class _ProgrammeRecompensePageState extends State<ProgrammeRecompensePage> {
         backgroundColor: primaryColor,
         elevation: 0,
         title: Text(
-          "Programme des récompenses",
+          isFr ? "Programme des récompenses" : "Rewards Program",
           style: GoogleFonts.poppins(
             color: Colors.white,
             fontWeight: FontWeight.w400,
@@ -117,13 +117,14 @@ class _ProgrammeRecompensePageState extends State<ProgrammeRecompensePage> {
   Widget _pagePresentationProgramme(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
+    final bool isFr = langUserPhone == "fr";
 
     return SingleChildScrollView(
       physics: BouncingScrollPhysics(),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header TikTok Style
+          // Header
           Container(
             width: double.infinity,
             padding: EdgeInsets.all(24),
@@ -140,7 +141,9 @@ class _ProgrammeRecompensePageState extends State<ProgrammeRecompensePage> {
                 FaIcon(FontAwesomeIcons.star, size: 48, color: Colors.white),
                 SizedBox(height: 16),
                 Text(
-                  "Gagnez des récompenses avec Dressur",
+                  isFr
+                      ? "Gagnez des récompenses avec Dressur"
+                      : "Earn rewards with Dressur",
                   style: GoogleFonts.poppins(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
@@ -149,7 +152,9 @@ class _ProgrammeRecompensePageState extends State<ProgrammeRecompensePage> {
                 ),
                 SizedBox(height: 8),
                 Text(
-                  "Partagez des promotions sur votre statut WhatsApp et soyez récompensé.",
+                  isFr
+                      ? "Partagez des promotions sur votre statut WhatsApp et soyez récompensé."
+                      : "Share promotions on your WhatsApp status and get rewarded.",
                   style: GoogleFonts.poppins(
                     fontSize: 14,
                     color: Colors.white.withOpacity(0.9),
@@ -165,227 +170,443 @@ class _ProgrammeRecompensePageState extends State<ProgrammeRecompensePage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // 1. Présentation
-                _sectionTitle(context, "Présentation"),
-                _paragraph(context,
-                    "Le Programme des récompenses Dressur est une opportunité de gain occasionnelle destinée aux utilisateurs qui partagent des promotions d’affaires (produits et services) directement depuis l’application Dressur sur WhatsApp Statut."),
-                _paragraph(context,
-                    "Ce programme permet aux annonceurs de faire connaître leurs offres et aux utilisateurs de recevoir une récompense après validation des preuves et selon le quota disponible."),
+                _sectionTitle(
+                    context, isFr ? "Présentation" : "Presentation"),
+                _paragraph(
+                  context,
+                  isFr
+                      ? "Le Programme des récompenses Dressur est une opportunité de gain occasionnelle destinée aux utilisateurs qui partagent des promotions d'affaires (produits et services) directement depuis l'application Dressur sur WhatsApp Statut."
+                      : "The Dressur Rewards Program is an occasional earning opportunity for users who share business promotions (products and services) directly from the Dressur app on WhatsApp Status.",
+                ),
+                _paragraph(
+                  context,
+                  isFr
+                      ? "Ce programme permet aux annonceurs de faire connaître leurs offres et aux utilisateurs de recevoir une récompense après validation des preuves et selon le quota disponible."
+                      : "This program allows advertisers to promote their offers and users to receive a reward after proof validation and according to the available quota.",
+                ),
 
                 _divider(context),
 
                 // 2. Réseau concerné
-                _sectionTitle(context, "Réseau concerné"),
-                _bulletItem(context, FontAwesomeIcons.solidCircleCheck,
-                    "WhatsApp – Statut uniquement", Colors.green),
-                _bulletItem(context, FontAwesomeIcons.xmark,
-                    "Autres réseaux non pris en charge", Colors.red),
+                _sectionTitle(context,
+                    isFr ? "Réseau concerné" : "Supported network"),
+                _bulletItem(
+                  context,
+                  FontAwesomeIcons.solidCircleCheck,
+                  isFr
+                      ? "WhatsApp – Statut uniquement"
+                      : "WhatsApp – Status only",
+                  Colors.green,
+                ),
+                _bulletItem(
+                  context,
+                  FontAwesomeIcons.xmark,
+                  isFr
+                      ? "Autres réseaux non pris en charge"
+                      : "Other networks not supported",
+                  Colors.red,
+                ),
 
                 _divider(context),
 
                 // 3. Principe de fonctionnement
-                _sectionTitle(context, "Principe de fonctionnement"),
+                _sectionTitle(context,
+                    isFr ? "Principe de fonctionnement" : "How it works"),
                 _stepItem(context, "1",
-                    "Identifiez une promotion éligible au programme."),
+                    isFr
+                        ? "Identifiez une promotion éligible au programme."
+                        : "Identify a promotion eligible for the program."),
                 _stepItem(context, "2",
-                    "Partagez la promotion directement depuis l’application Dressur vers votre statut WhatsApp."),
+                    isFr
+                        ? "Partagez la promotion directement depuis l'application Dressur vers votre statut WhatsApp."
+                        : "Share the promotion directly from the Dressur app to your WhatsApp status."),
                 _stepItem(context, "3",
-                    "Le contenu partagé (image + texte) est officiel et validé par Dressur."),
+                    isFr
+                        ? "Le contenu partagé (image + texte) est officiel et validé par Dressur."
+                        : "The shared content (image + text) is official and validated by Dressur."),
                 _stepItem(context, "4",
-                    "Aucune modification n’est autorisée (image, texte, description)."),
+                    isFr
+                        ? "Aucune modification n'est autorisée (image, texte, description)."
+                        : "No modifications are allowed (image, text, description)."),
                 _stepItem(context, "5",
-                    "Après 20 heures, vous pouvez soumettre vos preuves."),
-                _stepItem(context, "6", "Les preuves sont analysées."),
+                    isFr
+                        ? "Après 20 heures, vous pouvez soumettre vos preuves."
+                        : "After 20 hours, you can submit your proofs."),
+                _stepItem(context, "6",
+                    isFr
+                        ? "Les preuves sont analysées."
+                        : "The proofs are reviewed."),
                 _stepItem(context, "7",
-                    "Si elles sont validées et que le quota n’est pas atteint, votre solde est crédité."),
+                    isFr
+                        ? "Si elles sont validées et que le quota n'est pas atteint, votre solde est crédité."
+                        : "If validated and the quota is not reached, your balance is credited."),
 
                 _divider(context),
 
                 // 4. Niveaux de vues et récompenses
-                _sectionTitle(context, "Niveaux de vues et récompenses"),
-                _paragraph(context,
-                    "Gagnez plus d'argent en atteignant des paliers de vues plus élevés sur votre statut."),
+                _sectionTitle(
+                  context,
+                  isFr
+                      ? "Niveaux de vues et récompenses"
+                      : "View levels and rewards",
+                ),
+                _paragraph(
+                  context,
+                  isFr
+                      ? "Gagnez plus d'argent en atteignant des paliers de vues plus élevés sur votre statut."
+                      : "Earn more money by reaching higher view thresholds on your status.",
+                ),
                 _rewardRow(context, "250 vues", "100", Colors.green),
                 _rewardRow(context, "500 vues", "200", Colors.blue),
                 _rewardRow(context, "1 000 vues", "500", Colors.purple),
                 _rewardRow(context, "2 000 vues", "1 000", Colors.orange),
                 _rewardRow(context, "4 000 vues", "2 500", Colors.red),
-                _infoText(context,
-                    "👉 Vous êtes rémunéré au niveau correspondant au plus haut seuil atteint."),
+                _infoText(
+                  context,
+                  isFr
+                      ? "👉 Vous êtes rémunéré au niveau correspondant au plus haut seuil atteint."
+                      : "👉 You are paid at the level corresponding to the highest threshold reached.",
+                ),
 
                 _divider(context),
 
                 // 5. Règles essentielles
-                _sectionTitle(context, "Règles essentielles"),
-                _bulletItem(context, FontAwesomeIcons.circleInfo,
-                    "Le partage doit être effectué uniquement depuis Dressur."),
-                _bulletItem(context, FontAwesomeIcons.stopwatch,
-                    "Le statut doit rester visible au moins 20 heures."),
-                _bulletItem(context, FontAwesomeIcons.slash,
-                    "Toute modification du contenu annule automatiquement la récompense."),
-                _bulletItem(context, FontAwesomeIcons.solidCircleCheck,
-                    "Les preuves doivent être authentiques, complètes et personnelles."),
-                _bulletItem(context, FontAwesomeIcons.users,
-                    "Seuls les premiers utilisateurs ayant fourni des preuves valides sont récompensés."),
+                _sectionTitle(context,
+                    isFr ? "Règles essentielles" : "Essential rules"),
+                _bulletItem(
+                  context,
+                  FontAwesomeIcons.circleInfo,
+                  isFr
+                      ? "Le partage doit être effectué uniquement depuis Dressur."
+                      : "Sharing must only be done from Dressur.",
+                ),
+                _bulletItem(
+                  context,
+                  FontAwesomeIcons.stopwatch,
+                  isFr
+                      ? "Le statut doit rester visible au moins 20 heures."
+                      : "The status must remain visible for at least 20 hours.",
+                ),
+                _bulletItem(
+                  context,
+                  FontAwesomeIcons.slash,
+                  isFr
+                      ? "Toute modification du contenu annule automatiquement la récompense."
+                      : "Any modification of the content automatically cancels the reward.",
+                ),
+                _bulletItem(
+                  context,
+                  FontAwesomeIcons.solidCircleCheck,
+                  isFr
+                      ? "Les preuves doivent être authentiques, complètes et personnelles."
+                      : "Proofs must be authentic, complete and personal.",
+                ),
+                _bulletItem(
+                  context,
+                  FontAwesomeIcons.users,
+                  isFr
+                      ? "Seuls les premiers utilisateurs ayant fourni des preuves valides sont récompensés."
+                      : "Only the first users to provide valid proofs are rewarded.",
+                ),
 
                 SizedBox(height: 8),
-                _infoText(context,
-                    "👉 Cliquer sur « Participer » vaut acceptation totale de ces règles."),
+                _infoText(
+                  context,
+                  isFr
+                      ? "👉 Cliquer sur « Participer » vaut acceptation totale de ces règles."
+                      : "👉 Clicking \"Participate\" constitutes full acceptance of these rules.",
+                ),
 
                 _divider(context),
 
                 // 6. Délais importants
-                _sectionTitle(context, "Délais importants"),
-                _bulletItem(context, FontAwesomeIcons.hourglassHalf,
-                    "Délai minimum : 20 heures après le partage"),
-                _bulletItem(context, FontAwesomeIcons.hourglass,
-                    "Délai maximum : avant 24 heures (expiration WhatsApp)"),
-                _bulletItem(context, FontAwesomeIcons.arrowsRotate,
-                    "En cas de preuve incomplète, une reprise peut être demandée dans la limite du délai"),
-
-                _divider(context),
-
-                // 7. Preuves à fournir
-                _sectionTitle(context, "Preuves à fournir (obligatoires)"),
-                _paragraph(context,
-                    "Pour être éligible, vous devez fournir les trois preuves suivantes :"),
-                SizedBox(height: 15),
-                _proofCard(context, "1", "Capture – Liste des statuts",
-                    "• Affiche la liste des statuts WhatsApp\n• Le statut de la promotion doit être visible"),
-                _proofCard(context, "2", "Capture – Statut ouvert",
-                    "• Image complète\n• Texte descriptif complet\n• Nombre de vues, date et heure visibles"),
-                _proofCard(context, "3", "Vidéo – Preuve principale",
-                    "La vidéo doit montrer : \n• l’ouverture de WhatsApp, \n• la liste des statuts, \n• l’ouverture du statut, \n• la lecture de la description, \n• le défilement des vues, \n• la date/heure et les paramètres WhatsApp (numéro)."),
-                SizedBox(height: 10),
-                _warningBox(context,
-                    "Toute vidéo incomplète, modifiée ou incohérente sera rejetée."),
-
-                _divider(context),
-
-                // 8. Validation et quota
-                _sectionTitle(context, "Validation et quota"),
-                _bulletItem(context, FontAwesomeIcons.chartSimple,
-                    "Les preuves sont analysées par le système et/ou l’équipe Dressur."),
-                _bulletItem(context, FontAwesomeIcons.clipboardCheck,
-                    "La validation dépend de la conformité et du quota disponible."),
-
-                _infoText(context,
-                    "📌 Atteindre un seuil de vues ne garantit pas automatiquement le paiement."),
-
-                _divider(context),
-
-                // 9. Récompense et solde
-                _sectionTitle(context, "Récompense et solde"),
-                _bulletItem(context, FontAwesomeIcons.wallet,
-                    "Ajoutée à votre solde Programme des récompenses"),
-                _bulletItem(context, FontAwesomeIcons.clockRotateLeft,
-                    "Enregistrée dans votre historique avec la promotion"),
-
-                _divider(context),
-
-                // 10. Retrait des gains
-                _sectionTitle(context, "Retrait des gains"),
-                _bulletItem(context, FontAwesomeIcons.moneyBillTrendUp,
-                    "Montant minimum : 1 000 FCFA"),
-                _bulletItem(context, FontAwesomeIcons.mobileScreen,
-                    "Méthodes : Mobile Money (MTN, Moov, Orange, etc.)"),
-                _bulletItem(context, FontAwesomeIcons.shield,
-                    "Soumis aux contrôles de sécurité habituels."),
-
-                _divider(context),
-
-                // 11. Politique anti-fraude
-                _sectionTitle(context, "Politique anti-fraude"),
-                _paragraph(context, "Toute tentative de fraude entraîne :"),
-                _bulletItem(context, FontAwesomeIcons.slash,
-                    "Annulation immédiate des gains", Colors.red),
-                _bulletItem(context, FontAwesomeIcons.userSlash,
-                    "Suspension ou suppression du compte", Colors.red),
-                _bulletItem(context, FontAwesomeIcons.gavel,
-                    "Interdiction définitive de participation", Colors.red),
-
-                _paragraph(context,
-                    "Dressur se réserve le droit de refuser toute preuve jugée douteuse."),
-
-                _divider(context),
-
-                // ---------------------------------------------------------------------------
-// 14. Retrait automatique et moyens de paiement
-// ---------------------------------------------------------------------------
-                _sectionTitle(
-                    context, "Retrait automatique et moyens de paiement"),
-
-                _paragraph(
+                _sectionTitle(context,
+                    isFr ? "Délais importants" : "Important deadlines"),
+                _bulletItem(
                   context,
-                  "Les retraits des gains du Programme des récompenses se font automatiquement "
-                  "lorsque votre solde atteint ou dépasse 1 000 FCFA.",
+                  FontAwesomeIcons.hourglassHalf,
+                  isFr
+                      ? "Délai minimum : 20 heures après le partage"
+                      : "Minimum deadline: 20 hours after sharing",
+                ),
+                _bulletItem(
+                  context,
+                  FontAwesomeIcons.hourglass,
+                  isFr
+                      ? "Délai maximum : avant 24 heures (expiration WhatsApp)"
+                      : "Maximum deadline: before 24 hours (WhatsApp expiration)",
                 ),
                 _bulletItem(
                   context,
                   FontAwesomeIcons.arrowsRotate,
-                  "Les retraits sont déclenchés automatiquement dès que le seuil minimum est atteint.",
+                  isFr
+                      ? "En cas de preuve incomplète, une reprise peut être demandée dans la limite du délai"
+                      : "In case of incomplete proof, a resubmission may be requested within the deadline",
+                ),
+
+                _divider(context),
+
+                // 7. Preuves à fournir
+                _sectionTitle(
+                  context,
+                  isFr
+                      ? "Preuves à fournir (obligatoires)"
+                      : "Required proofs (mandatory)",
+                ),
+                _paragraph(
+                  context,
+                  isFr
+                      ? "Pour être éligible, vous devez fournir les trois preuves suivantes :"
+                      : "To be eligible, you must provide the following three proofs:",
+                ),
+                SizedBox(height: 15),
+                _proofCard(
+                  context,
+                  "1",
+                  isFr
+                      ? "Capture – Liste des statuts"
+                      : "Screenshot – Status list",
+                  isFr
+                      ? "• Affiche la liste des statuts WhatsApp\n• Le statut de la promotion doit être visible"
+                      : "• Shows the WhatsApp status list\n• The promotion status must be visible",
+                ),
+                _proofCard(
+                  context,
+                  "2",
+                  isFr ? "Capture – Statut ouvert" : "Screenshot – Open status",
+                  isFr
+                      ? "• Image complète\n• Texte descriptif complet\n• Nombre de vues, date et heure visibles"
+                      : "• Full image\n• Complete descriptive text\n• Number of views, date and time visible",
+                ),
+                _proofCard(
+                  context,
+                  "3",
+                  isFr ? "Vidéo – Preuve principale" : "Video – Main proof",
+                  isFr
+                      ? "La vidéo doit montrer : \n• l'ouverture de WhatsApp, \n• la liste des statuts, \n• l'ouverture du statut, \n• la lecture de la description, \n• le défilement des vues, \n• la date/heure et les paramètres WhatsApp (numéro)."
+                      : "The video must show: \n• opening WhatsApp, \n• the status list, \n• opening the status, \n• reading the description, \n• scrolling through views, \n• the date/time and WhatsApp settings (number).",
+                ),
+                SizedBox(height: 10),
+                _warningBox(
+                  context,
+                  isFr
+                      ? "Toute vidéo incomplète, modifiée ou incohérente sera rejetée."
+                      : "Any incomplete, modified or inconsistent video will be rejected.",
+                ),
+
+                _divider(context),
+
+                // 8. Validation et quota
+                _sectionTitle(context,
+                    isFr ? "Validation et quota" : "Validation and quota"),
+                _bulletItem(
+                  context,
+                  FontAwesomeIcons.chartSimple,
+                  isFr
+                      ? "Les preuves sont analysées par le système et/ou l'équipe Dressur."
+                      : "Proofs are reviewed by the system and/or the Dressur team.",
+                ),
+                _bulletItem(
+                  context,
+                  FontAwesomeIcons.clipboardCheck,
+                  isFr
+                      ? "La validation dépend de la conformité et du quota disponible."
+                      : "Validation depends on compliance and the available quota.",
+                ),
+
+                _infoText(
+                  context,
+                  isFr
+                      ? "📌 Atteindre un seuil de vues ne garantit pas automatiquement le paiement."
+                      : "📌 Reaching a view threshold does not automatically guarantee payment.",
+                ),
+
+                _divider(context),
+
+                // 9. Récompense et solde
+                _sectionTitle(context,
+                    isFr ? "Récompense et solde" : "Reward and balance"),
+                _bulletItem(
+                  context,
+                  FontAwesomeIcons.wallet,
+                  isFr
+                      ? "Ajoutée à votre solde Programme des récompenses"
+                      : "Added to your Rewards Program balance",
+                ),
+                _bulletItem(
+                  context,
+                  FontAwesomeIcons.clockRotateLeft,
+                  isFr
+                      ? "Enregistrée dans votre historique avec la promotion"
+                      : "Recorded in your history with the promotion",
+                ),
+
+                _divider(context),
+
+                // 10. Retrait des gains
+                _sectionTitle(context,
+                    isFr ? "Retrait des gains" : "Withdrawal of earnings"),
+                _bulletItem(
+                  context,
+                  FontAwesomeIcons.moneyBillTrendUp,
+                  isFr
+                      ? "Montant minimum : 1 000 FCFA"
+                      : "Minimum amount: 1,000 FCFA",
                 ),
                 _bulletItem(
                   context,
                   FontAwesomeIcons.mobileScreen,
-                  "Les paiements sont envoyés vers les réseaux Mobile Money suivants :",
+                  isFr
+                      ? "Méthodes : Mobile Money (MTN, Moov, Orange, etc.)"
+                      : "Methods: Mobile Money (MTN, Moov, Orange, etc.)",
+                ),
+                _bulletItem(
+                  context,
+                  FontAwesomeIcons.shield,
+                  isFr
+                      ? "Soumis aux contrôles de sécurité habituels."
+                      : "Subject to standard security checks.",
+                ),
+
+                _divider(context),
+
+                // 11. Politique anti-fraude
+                _sectionTitle(context,
+                    isFr ? "Politique anti-fraude" : "Anti-fraud policy"),
+                _paragraph(
+                  context,
+                  isFr
+                      ? "Toute tentative de fraude entraîne :"
+                      : "Any attempt at fraud results in:",
+                ),
+                _bulletItem(
+                  context,
+                  FontAwesomeIcons.slash,
+                  isFr
+                      ? "Annulation immédiate des gains"
+                      : "Immediate cancellation of earnings",
+                  Colors.red,
+                ),
+                _bulletItem(
+                  context,
+                  FontAwesomeIcons.userSlash,
+                  isFr
+                      ? "Suspension ou suppression du compte"
+                      : "Account suspension or deletion",
+                  Colors.red,
+                ),
+                _bulletItem(
+                  context,
+                  FontAwesomeIcons.gavel,
+                  isFr
+                      ? "Interdiction définitive de participation"
+                      : "Permanent ban from participation",
+                  Colors.red,
+                ),
+
+                _paragraph(
+                  context,
+                  isFr
+                      ? "Dressur se réserve le droit de refuser toute preuve jugée douteuse."
+                      : "Dressur reserves the right to reject any proof deemed suspicious.",
+                ),
+
+                _divider(context),
+
+                // 12. Retrait automatique et moyens de paiement
+                _sectionTitle(
+                  context,
+                  isFr
+                      ? "Retrait automatique et moyens de paiement"
+                      : "Automatic withdrawal and payment methods",
+                ),
+
+                _paragraph(
+                  context,
+                  isFr
+                      ? "Les retraits des gains du Programme des récompenses se font automatiquement lorsque votre solde atteint ou dépasse 1 000 FCFA."
+                      : "Earnings from the Rewards Program are withdrawn automatically when your balance reaches or exceeds 1,000 FCFA.",
+                ),
+                _bulletItem(
+                  context,
+                  FontAwesomeIcons.arrowsRotate,
+                  isFr
+                      ? "Les retraits sont déclenchés automatiquement dès que le seuil minimum est atteint."
+                      : "Withdrawals are triggered automatically once the minimum threshold is reached.",
+                ),
+                _bulletItem(
+                  context,
+                  FontAwesomeIcons.mobileScreen,
+                  isFr
+                      ? "Les paiements sont envoyés vers les réseaux Mobile Money suivants :"
+                      : "Payments are sent to the following Mobile Money networks:",
                 ),
 
                 _paddingMobileMoney(context),
 
                 _infoText(
                   context,
-                  "📌 Si vous n'avez pas accès aux moyens de paiement Mobile Money pris en charge "
-                  "et que vous ne souhaitez pas utiliser vos gains pour payer des services sur Dressur "
-                  "(Boost Contact, promotions affaires, promotions réseaux sociaux, etc.), "
-                  "nous vous recommandons de ne pas participer au Programme des récompenses pour le moment. "
-                  "Vous pourrez rejoindre le programme plus tard lorsque de nouveaux moyens de paiement "
-                  "seront ajoutés et compatibles avec votre pays ou votre réseau.",
+                  isFr
+                      ? "📌 Si vous n'avez pas accès aux moyens de paiement Mobile Money pris en charge et que vous ne souhaitez pas utiliser vos gains pour payer des services sur Dressur (Boost Contact, promotions affaires, promotions réseaux sociaux, etc.), nous vous recommandons de ne pas participer au Programme des récompenses pour le moment. Vous pourrez rejoindre le programme plus tard lorsque de nouveaux moyens de paiement seront ajoutés et compatibles avec votre pays ou votre réseau."
+                      : "📌 If you do not have access to the supported Mobile Money payment methods and do not wish to use your earnings to pay for services on Dressur (Boost Contact, business promotions, social media promotions, etc.), we recommend not joining the Rewards Program for now. You can join later when new payment methods compatible with your country or network are added.",
                 ),
 
                 SizedBox(height: 10),
 
                 _infoText(
                   context,
-                  "📌 Si vous faites partie du Programme des récompenses et que vous souhaitez "
-                  "payer un service sur Dressur (Boost Contact, promotions affaires, promotions "
-                  "réseaux sociaux, etc.), votre solde de récompense sera automatiquement utilisé "
-                  "pour régler la facture si le montant du service est inférieur ou égal à votre "
-                  "solde disponible. Dans ce cas, aucun paiement supplémentaire ne vous sera demandé.",
+                  isFr
+                      ? "📌 Si vous faites partie du Programme des récompenses et que vous souhaitez payer un service sur Dressur (Boost Contact, promotions affaires, promotions réseaux sociaux, etc.), votre solde de récompense sera automatiquement utilisé pour régler la facture si le montant du service est inférieur ou égal à votre solde disponible. Dans ce cas, aucun paiement supplémentaire ne vous sera demandé."
+                      : "📌 If you are part of the Rewards Program and wish to pay for a service on Dressur (Boost Contact, business promotions, social media promotions, etc.), your reward balance will be automatically used to settle the bill if the service amount is less than or equal to your available balance. In that case, no additional payment will be required.",
                 ),
 
                 _divider(context),
 
-                // ---------------------------------------------------------------------------
-                // 15. Configuration du numéro de paiement
-                // ---------------------------------------------------------------------------
-                _sectionTitle(context, "Configuration du numéro de paiement"),
+                // 13. Configuration du numéro de paiement
+                _sectionTitle(
+                  context,
+                  isFr
+                      ? "Configuration du numéro de paiement"
+                      : "Payment number configuration",
+                ),
 
                 _paragraph(
                   context,
-                  "Après avoir accepté de participer au programme, vous devrez sélectionner "
-                  "votre réseau Mobile Money et renseigner le numéro correspondant. "
-                  "Les gains seront envoyés directement sur ce numéro.",
+                  isFr
+                      ? "Après avoir accepté de participer au programme, vous devrez sélectionner votre réseau Mobile Money et renseigner le numéro correspondant. Les gains seront envoyés directement sur ce numéro."
+                      : "After agreeing to participate in the program, you will need to select your Mobile Money network and enter the corresponding number. Earnings will be sent directly to this number.",
                 ),
 
                 _bulletItem(
                   context,
                   FontAwesomeIcons.pen,
-                  "Vous pouvez modifier votre réseau et votre numéro de paiement à tout moment.",
+                  isFr
+                      ? "Vous pouvez modifier votre réseau et votre numéro de paiement à tout moment."
+                      : "You can change your network and payment number at any time.",
                 ),
 
                 _divider(context),
 
-                // 12. Message important
-                _sectionTitle(context, "Message important"),
-                _paragraph(context,
-                    "Le Programme des récompenses est une opportunité de gain complémentaire, non un revenu garanti. Il vise également à aider les utilisateurs à faire connaître des promotions utiles au-delà de la plateforme."),
+                // 14. Message important
+                _sectionTitle(
+                    context, isFr ? "Message important" : "Important message"),
+                _paragraph(
+                  context,
+                  isFr
+                      ? "Le Programme des récompenses est une opportunité de gain complémentaire, non un revenu garanti. Il vise également à aider les utilisateurs à faire connaître des promotions utiles au-delà de la plateforme."
+                      : "The Rewards Program is a supplementary earning opportunity, not a guaranteed income. It also aims to help users promote useful offers beyond the platform.",
+                ),
 
                 _divider(context),
 
-                // 13. Action finale
-                _sectionTitle(context, "Action"),
-                _paragraph(context,
-                    "En cliquant sur « Participer », vous confirmez avoir compris le fonctionnement, accepter les règles et être prêt à fournir les preuves demandées."),
+                // 15. Action finale
+                _sectionTitle(context, isFr ? "Action" : "Action"),
+                _paragraph(
+                  context,
+                  isFr
+                      ? "En cliquant sur « Participer », vous confirmez avoir compris le fonctionnement, accepter les règles et être prêt à fournir les preuves demandées."
+                      : "By clicking \"Participate\", you confirm that you have understood how it works, accept the rules and are ready to provide the required proofs.",
+                ),
 
                 SizedBox(height: 20),
                 if (isInscritProgrammeRecompense == false) ...[
@@ -414,7 +635,9 @@ class _ProgrammeRecompensePageState extends State<ProgrammeRecompensePage> {
                               ),
                             )
                           : Text(
-                              "Participer au programme",
+                              isFr
+                                  ? "Participer au programme"
+                                  : "Join the program",
                               style: GoogleFonts.poppins(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,
@@ -429,7 +652,6 @@ class _ProgrammeRecompensePageState extends State<ProgrammeRecompensePage> {
                     children: [
                       SizedBox(height: 10),
 
-                      // Icône de succès stylisée
                       Container(
                         padding: EdgeInsets.all(20),
                         decoration: BoxDecoration(
@@ -446,7 +668,9 @@ class _ProgrammeRecompensePageState extends State<ProgrammeRecompensePage> {
                       SizedBox(height: 24),
 
                       Text(
-                        "Vous participez déjà au programme",
+                        isFr
+                            ? "Vous participez déjà au programme"
+                            : "You are already in the program",
                         textAlign: TextAlign.center,
                         style: GoogleFonts.poppins(
                           fontSize: 22,
@@ -458,7 +682,9 @@ class _ProgrammeRecompensePageState extends State<ProgrammeRecompensePage> {
                       SizedBox(height: 12),
 
                       Text(
-                        "Votre compte est actif. Vous pouvez commencer à partager des promotions pour gagner des récompenses.",
+                        isFr
+                            ? "Votre compte est actif. Vous pouvez commencer à partager des promotions pour gagner des récompenses."
+                            : "Your account is active. You can start sharing promotions to earn rewards.",
                         textAlign: TextAlign.center,
                         style: GoogleFonts.poppins(
                           fontSize: 15,
@@ -468,7 +694,6 @@ class _ProgrammeRecompensePageState extends State<ProgrammeRecompensePage> {
 
                       SizedBox(height: 40),
 
-                      // Carte d'information pour quitter le programme
                       Container(
                         width: double.infinity,
                         padding: EdgeInsets.all(20),
@@ -484,7 +709,9 @@ class _ProgrammeRecompensePageState extends State<ProgrammeRecompensePage> {
                         child: Column(
                           children: [
                             Text(
-                              "Besoin de quitter le programme ?",
+                              isFr
+                                  ? "Besoin de quitter le programme ?"
+                                  : "Need to leave the program?",
                               textAlign: TextAlign.center,
                               style: GoogleFonts.poppins(
                                 fontSize: 15,
@@ -495,7 +722,9 @@ class _ProgrammeRecompensePageState extends State<ProgrammeRecompensePage> {
                             SizedBox(height: 10),
 
                             Text(
-                              "Pour vous désinscrire du programme des récompenses, veuillez contacter notre équipe d'assistance.",
+                              isFr
+                                  ? "Pour vous désinscrire du programme des récompenses, veuillez contacter notre équipe d'assistance."
+                                  : "To unsubscribe from the rewards program, please contact our support team.",
                               textAlign: TextAlign.center,
                               style: GoogleFonts.poppins(
                                 fontSize: 13,
@@ -507,7 +736,6 @@ class _ProgrammeRecompensePageState extends State<ProgrammeRecompensePage> {
 
                             SizedBox(height: 20),
 
-                            // Lien WhatsApp stylisé
                             InkWell(
                               onTap: () {
                                 // TODO: ouvrir WhatsApp / support
@@ -535,7 +763,9 @@ class _ProgrammeRecompensePageState extends State<ProgrammeRecompensePage> {
                                     ),
                                     SizedBox(width: 10),
                                     Text(
-                                      "Contacter l'assistance",
+                                      isFr
+                                          ? "Contacter l'assistance"
+                                          : "Contact support",
                                       style: GoogleFonts.poppins(
                                         color: Color(0xFF25D366),
                                         fontWeight: FontWeight.bold,
@@ -575,7 +805,7 @@ class _ProgrammeRecompensePageState extends State<ProgrammeRecompensePage> {
               context, FontAwesomeIcons.check, "MTN Mobile Money Bénin"),
           _bulletItem(context, FontAwesomeIcons.check, "MOOV Money Bénin"),
           _bulletItem(context, FontAwesomeIcons.check,
-              "MTN Mobile Money Côte d’Ivoire"),
+              "MTN Mobile Money Côte d'Ivoire"),
           _bulletItem(context, FontAwesomeIcons.check, "MOOV Togo"),
           _bulletItem(context, FontAwesomeIcons.check, "TOGOCEL T-Money"),
         ],
@@ -588,6 +818,7 @@ class _ProgrammeRecompensePageState extends State<ProgrammeRecompensePage> {
   // ---------------------------------------------------------------------------
   Widget _pageInformationApresInscription(BuildContext context) {
     final theme = Theme.of(context);
+    final bool isFr = langUserPhone == "fr";
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(30),
@@ -598,7 +829,7 @@ class _ProgrammeRecompensePageState extends State<ProgrammeRecompensePage> {
               size: 80, color: Colors.green),
           SizedBox(height: 24),
           Text(
-            "Inscription confirmée",
+            isFr ? "Inscription confirmée" : "Registration confirmed",
             style: GoogleFonts.poppins(
               fontSize: 22,
               fontWeight: FontWeight.bold,
@@ -607,7 +838,9 @@ class _ProgrammeRecompensePageState extends State<ProgrammeRecompensePage> {
           ),
           SizedBox(height: 12),
           Text(
-            "Vous pouvez maintenant commencer à promouvoir des offres et soumettre vos preuves.",
+            isFr
+                ? "Vous pouvez maintenant commencer à promouvoir des offres et soumettre vos preuves."
+                : "You can now start promoting offers and submitting your proofs.",
             textAlign: TextAlign.center,
             style: GoogleFonts.poppins(fontSize: 14),
           ),
@@ -629,9 +862,11 @@ class _ProgrammeRecompensePageState extends State<ProgrammeRecompensePage> {
                   ),
                 );
               },
-              child: Text("Commencer",
-                  style: GoogleFonts.poppins(
-                      color: Colors.white, fontWeight: FontWeight.w600)),
+              child: Text(
+                isFr ? "Commencer" : "Get started",
+                style: GoogleFonts.poppins(
+                    color: Colors.white, fontWeight: FontWeight.w600),
+              ),
             ),
           ),
         ],

@@ -8,10 +8,9 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
 
-// Classe modèle pour représenter un réseau de paiement
 class ReseauPaiement {
-  final String id; // Ex: 'mtn_benin'
-  final String nom; // Ex: 'MTN Mobile Money (Bénin )'
+  final String id;
+  final String nom;
 
   ReseauPaiement({required this.id, required this.nom});
 }
@@ -28,11 +27,10 @@ class _ConfigurationRetraitPageState extends State<ConfigurationRetraitPage> {
   final _formKey = GlobalKey<FormState>();
   final _numeroController = TextEditingController();
 
-  // Liste des réseaux disponibles
   final List<ReseauPaiement> _reseauxDisponibles = [
     ReseauPaiement(id: 'mtn_open', nom: 'MTN Mobile Money (Bénin)'),
     ReseauPaiement(id: 'moov', nom: 'Moov Money (Bénin)'),
-    ReseauPaiement(id: 'mtn_ci', nom: 'MTN Mobile Money (Côte d’Ivoire)'),
+    ReseauPaiement(id: 'mtn_ci', nom: "MTN Mobile Money (Côte d'Ivoire)"),
     ReseauPaiement(id: 'moov_tg', nom: 'Moov Money (Togo)'),
     ReseauPaiement(id: 'togocel', nom: 'T-Money (Togo)')
   ];
@@ -60,7 +58,6 @@ class _ConfigurationRetraitPageState extends State<ConfigurationRetraitPage> {
           'POST', Uri.parse('$generalRouteForApi/getRetraitConfiguration'));
       request.fields.addAll({
         'uid': uidUser,
-        
       });
 
       http.StreamedResponse response = await request.send();
@@ -77,7 +74,6 @@ class _ConfigurationRetraitPageState extends State<ConfigurationRetraitPage> {
 
           if (reseauId != null) {
             final match = _reseauxDisponibles.where((r) => r.id == reseauId);
-
             if (match.isNotEmpty) {
               _reseauSelectionne = match.first;
             } else {
@@ -90,7 +86,12 @@ class _ConfigurationRetraitPageState extends State<ConfigurationRetraitPage> {
       }
     } catch (e) {
       dangerNoti(
-          "Erreur", "Impossible de charger votre configuration.", context);
+        (langUserPhone == "fr") ? "Erreur" : "Error",
+        (langUserPhone == "fr")
+            ? "Impossible de charger votre configuration."
+            : "Unable to load your configuration.",
+        context,
+      );
     } finally {
       setState(() => _isLoading = false);
     }
@@ -108,7 +109,6 @@ class _ConfigurationRetraitPageState extends State<ConfigurationRetraitPage> {
           'POST', Uri.parse('$generalRouteForApi/saveRetraitConfiguration'));
       request.fields.addAll({
         'uid': uidUser,
-        
         'reseauRetrait': _reseauSelectionne!.id,
         'numeroRetrait': "+${_numeroController.text}",
       });
@@ -121,11 +121,13 @@ class _ConfigurationRetraitPageState extends State<ConfigurationRetraitPage> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              'Votre configuration de retrait a été mise à jour.',
+              (langUserPhone == "fr")
+                  ? 'Votre configuration de retrait a été mise à jour.'
+                  : 'Your withdrawal configuration has been updated.',
               style: GoogleFonts.poppins(color: Colors.white),
             ),
-            backgroundColor: Colors.green[600], // Une couleur de succès
-            behavior: SnackBarBehavior.floating, // Style moderne
+            backgroundColor: Colors.green[600],
+            behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10),
             ),
@@ -135,21 +137,32 @@ class _ConfigurationRetraitPageState extends State<ConfigurationRetraitPage> {
         Navigator.pop(context);
       } else {
         dangerNoti(
-            "Erreur", data['message'] ?? "Une erreur est survenue.", context);
+          (langUserPhone == "fr") ? "Erreur" : "Error",
+          data['message'] ??
+              ((langUserPhone == "fr")
+                  ? "Une erreur est survenue."
+                  : "An error occurred."),
+          context,
+        );
       }
     } catch (e) {
-      dangerNoti("Erreur", "Impossible de contacter le serveur.", context);
+      dangerNoti(
+        (langUserPhone == "fr") ? "Erreur" : "Error",
+        (langUserPhone == "fr")
+            ? "Impossible de contacter le serveur."
+            : "Unable to contact the server.",
+        context,
+      );
     } finally {
       setState(() => _isSaving = false);
     }
   }
 
-  // --- INTERFACE UTILISATEUR ---
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
+    final bool isFr = langUserPhone == "fr";
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -157,7 +170,7 @@ class _ConfigurationRetraitPageState extends State<ConfigurationRetraitPage> {
         backgroundColor: primaryColor,
         elevation: 0,
         title: Text(
-          "Configuration du Retrait",
+          isFr ? "Configuration du Retrait" : "Withdrawal Configuration",
           style: GoogleFonts.poppins(
             color: Colors.white,
             fontWeight: FontWeight.w400,
@@ -180,30 +193,32 @@ class _ConfigurationRetraitPageState extends State<ConfigurationRetraitPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _buildInfoCard(isDark),
+                    _buildInfoCard(isDark, isFr),
                     SizedBox(height: 30),
 
-                    _sectionTitle("Votre réseau de paiement"),
+                    _sectionTitle(isFr
+                        ? "Votre réseau de paiement"
+                        : "Your payment network"),
                     SizedBox(height: 10),
 
-                    _buildReseauDropdown(theme),
+                    _buildReseauDropdown(theme, isFr),
                     SizedBox(height: 15),
 
-                    _sectionTitle("Numéro de téléphone associé"),
+                    _sectionTitle(isFr
+                        ? "Numéro de téléphone associé"
+                        : "Associated phone number"),
                     SizedBox(height: 10),
 
-                    _buildNumeroInput(theme),
-                    SizedBox(height: 5), // Espace réduit
+                    _buildNumeroInput(theme, isFr),
+                    SizedBox(height: 5),
 
-                    // NOUVEAU : Indication du format
-                    _buildFormatHint(),
+                    _buildFormatHint(isFr),
                     SizedBox(height: 15),
 
-                    // NOUVEAU : Boîte d'avertissement
-                    _buildWarningBox(),
+                    _buildWarningBox(isFr),
                     SizedBox(height: 15),
 
-                    _buildSaveButton(),
+                    _buildSaveButton(isFr),
                   ],
                 ),
               ),
@@ -211,7 +226,7 @@ class _ConfigurationRetraitPageState extends State<ConfigurationRetraitPage> {
     );
   }
 
-  Widget _buildInfoCard(bool isDark) {
+  Widget _buildInfoCard(bool isDark, bool isFr) {
     return Container(
       padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -225,7 +240,9 @@ class _ConfigurationRetraitPageState extends State<ConfigurationRetraitPage> {
           SizedBox(width: 15),
           Expanded(
             child: Text(
-              "Ce numéro sera utilisé pour tous les retraits automatiques de vos gains.",
+              isFr
+                  ? "Ce numéro sera utilisé pour tous les retraits automatiques de vos gains."
+                  : "This number will be used for all automatic withdrawals of your earnings.",
               style: GoogleFonts.poppins(
                 fontSize: 13,
                 color: isDark ? Colors.white70 : Colors.black87,
@@ -249,7 +266,7 @@ class _ConfigurationRetraitPageState extends State<ConfigurationRetraitPage> {
     );
   }
 
-  Widget _buildReseauDropdown(ThemeData theme) {
+  Widget _buildReseauDropdown(ThemeData theme, bool isFr) {
     return DropdownButtonFormField<ReseauPaiement>(
       value: _reseauSelectionne,
       items: _reseauxDisponibles.map((ReseauPaiement reseau) {
@@ -265,12 +282,14 @@ class _ConfigurationRetraitPageState extends State<ConfigurationRetraitPage> {
       },
       validator: (value) {
         if (value == null) {
-          return 'Veuillez sélectionner un réseau.';
+          return isFr
+              ? 'Veuillez sélectionner un réseau.'
+              : 'Please select a network.';
         }
         return null;
       },
       decoration: InputDecoration(
-        hintText: 'Choisissez un réseau',
+        hintText: isFr ? 'Choisissez un réseau' : 'Choose a network',
         prefixIcon: Padding(
           padding: const EdgeInsets.only(left: 20, right: 13, top: 14),
           child: FaIcon(FontAwesomeIcons.wallet, color: primaryColor, size: 20),
@@ -288,18 +307,17 @@ class _ConfigurationRetraitPageState extends State<ConfigurationRetraitPage> {
     );
   }
 
-  Widget _buildNumeroInput(ThemeData theme) {
+  Widget _buildNumeroInput(ThemeData theme, bool isFr) {
     return TextFormField(
       controller: _numeroController,
       keyboardType: TextInputType.phone,
       style: GoogleFonts.poppins(fontWeight: FontWeight.w500),
       decoration: InputDecoration(
         hintText: 'Ex: 2290199000000',
-        // Utilisez `prefix` au lieu de `prefixIcon`
         prefixIcon: Padding(
           padding: const EdgeInsets.only(left: 20, right: 13, top: 14),
           child: FaIcon(FontAwesomeIcons.mobileScreen,
-              color: primaryColor, size: 20), // Ajustez la taille au besoin
+              color: primaryColor, size: 20),
         ),
         filled: true,
         fillColor: Theme.of(context).dividerColor.withOpacity(0.05),
@@ -311,22 +329,25 @@ class _ConfigurationRetraitPageState extends State<ConfigurationRetraitPage> {
       ),
       validator: (value) {
         if (value == null || value.trim().isEmpty) {
-          return 'Veuillez entrer votre numéro.';
+          return isFr
+              ? 'Veuillez entrer votre numéro.'
+              : 'Please enter your number.';
         }
         if (!RegExp(r'^[0-9]{10,15}$').hasMatch(value)) {
-          return 'Format de numéro invalide.';
+          return isFr ? 'Format de numéro invalide.' : 'Invalid number format.';
         }
         return null;
       },
     );
   }
 
-  // NOUVEAU WIDGET
-  Widget _buildFormatHint() {
+  Widget _buildFormatHint(bool isFr) {
     return Padding(
       padding: const EdgeInsets.only(left: 12.0),
       child: Text(
-        "Saisissez le numéro au format international, sans le '+' (ex: 229XXXXXXXX).",
+        isFr
+            ? "Saisissez le numéro au format international, sans le '+' (ex: 229XXXXXXXX)."
+            : "Enter the number in international format, without '+' (e.g. 229XXXXXXXX).",
         style: GoogleFonts.poppins(
           fontSize: 12,
           color: Colors.grey[600],
@@ -335,8 +356,7 @@ class _ConfigurationRetraitPageState extends State<ConfigurationRetraitPage> {
     );
   }
 
-  // NOUVEAU WIDGET
-  Widget _buildWarningBox() {
+  Widget _buildWarningBox(bool isFr) {
     return Container(
       padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -354,7 +374,9 @@ class _ConfigurationRetraitPageState extends State<ConfigurationRetraitPage> {
               SizedBox(width: 12),
               Expanded(
                 child: Text(
-                  "Vérifiez attentivement vos informations",
+                  isFr
+                      ? "Vérifiez attentivement vos informations"
+                      : "Please verify your information carefully",
                   style: GoogleFonts.poppins(
                     fontWeight: FontWeight.bold,
                     fontSize: 14,
@@ -365,14 +387,18 @@ class _ConfigurationRetraitPageState extends State<ConfigurationRetraitPage> {
             ],
           ),
           SizedBox(height: 12),
-          _warningListItem(
-              "Assurez-vous que le numéro saisi est correct et vous appartient."),
+          _warningListItem(isFr
+              ? "Assurez-vous que le numéro saisi est correct et vous appartient."
+              : "Make sure the number you entered is correct and belongs to you."),
           SizedBox(height: 8),
-          _warningListItem(
-              "Vérifiez que le numéro correspond bien au réseau de paiement sélectionné."),
+          _warningListItem(isFr
+              ? "Vérifiez que le numéro correspond bien au réseau de paiement sélectionné."
+              : "Verify that the number matches the selected payment network."),
           SizedBox(height: 12),
           Text(
-            "Dressur ne pourra être tenu responsable en cas de perte de fonds due à un numéro erroné ou non conforme.",
+            isFr
+                ? "Dressur ne pourra être tenu responsable en cas de perte de fonds due à un numéro erroné ou non conforme."
+                : "Dressur cannot be held responsible for any loss of funds due to an incorrect or non-compliant number.",
             style: GoogleFonts.poppins(
               fontSize: 12,
               fontWeight: FontWeight.w500,
@@ -385,7 +411,6 @@ class _ConfigurationRetraitPageState extends State<ConfigurationRetraitPage> {
     );
   }
 
-  // Helper pour la liste dans la boîte d'avertissement
   Widget _warningListItem(String text) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -406,7 +431,7 @@ class _ConfigurationRetraitPageState extends State<ConfigurationRetraitPage> {
     );
   }
 
-  Widget _buildSaveButton() {
+  Widget _buildSaveButton(bool isFr) {
     return SizedBox(
       width: double.infinity,
       height: 55,
@@ -425,7 +450,7 @@ class _ConfigurationRetraitPageState extends State<ConfigurationRetraitPage> {
                 ),
               )
             : Text(
-                "Enregistrer et Confirmer", // Texte du bouton modifié pour plus d'impact
+                isFr ? "Enregistrer et Confirmer" : "Save and Confirm",
                 style: GoogleFonts.poppins(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,

@@ -305,7 +305,9 @@ class _BusinessPromotionsPageState extends State<BusinessPromotionsPage> {
             FaIcon(FontAwesomeIcons.star, color: primaryColor, size: 50),
             SizedBox(height: 15),
             Text(
-              "Promotion Éligible !",
+              (langUserPhone == "fr")
+                  ? "Promotion Éligible !"
+                  : "Eligible Promotion!",
               style: GoogleFonts.poppins(
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
@@ -314,7 +316,9 @@ class _BusinessPromotionsPageState extends State<BusinessPromotionsPage> {
             ),
             SizedBox(height: 10),
             Text(
-              "Cette promotion fait partie du programme de récompenses Dressur.",
+              (langUserPhone == "fr")
+                  ? "Cette promotion fait partie du programme de récompenses Dressur."
+                  : "This promotion is part of the Dressur rewards program.",
               textAlign: TextAlign.center,
               style: GoogleFonts.poppins(
                 fontSize: 14,
@@ -325,12 +329,27 @@ class _BusinessPromotionsPageState extends State<BusinessPromotionsPage> {
             SizedBox(height: 30),
 
             // Détails fictifs
-            _infoRow(context, FontAwesomeIcons.eye, "Objectif",
-                "Atteindre min. 250 vues"),
-            _infoRow(context, FontAwesomeIcons.wallet, "Gain estimé",
-                "Jusqu'à 2 500 FCFA"),
-            _infoRow(context, FontAwesomeIcons.stopwatch, "Délai",
-                "20 heures de visibilité"),
+            _infoRow(
+                context,
+                FontAwesomeIcons.eye,
+                (langUserPhone == "fr") ? "Objectif" : "Goal",
+                (langUserPhone == "fr")
+                    ? "Atteindre min. 250 vues"
+                    : "Reach min. 250 views"),
+            _infoRow(
+                context,
+                FontAwesomeIcons.wallet,
+                (langUserPhone == "fr") ? "Gain estimé" : "Estimated reward",
+                (langUserPhone == "fr")
+                    ? "Jusqu'à 2 500 FCFA"
+                    : "Up to 2,500 FCFA"),
+            _infoRow(
+                context,
+                FontAwesomeIcons.stopwatch,
+                (langUserPhone == "fr") ? "Délai" : "Duration",
+                (langUserPhone == "fr")
+                    ? "20 heures de visibilité"
+                    : "20 hours of visibility"),
 
             SizedBox(height: 30),
 
@@ -347,7 +366,7 @@ class _BusinessPromotionsPageState extends State<BusinessPromotionsPage> {
                   ),
                 ),
                 child: Text(
-                  "J'ai compris",
+                  (langUserPhone == "fr") ? "J'ai compris" : "Got it",
                   style: GoogleFonts.poppins(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
@@ -392,7 +411,9 @@ class _BusinessPromotionsPageState extends State<BusinessPromotionsPage> {
             );
           } else if (snapshot.hasError) {
             return Center(
-              child: Text('Erreur: ${snapshot.error}'),
+              child: Text((langUserPhone == "fr")
+                  ? 'Erreur: ${snapshot.error}'
+                  : 'Error: ${snapshot.error}'),
             );
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
             return Center(
@@ -404,8 +425,9 @@ class _BusinessPromotionsPageState extends State<BusinessPromotionsPage> {
                     FaIcon(FontAwesomeIcons.clock,
                         size: 50, color: Colors.grey[300]),
                     const SizedBox(height: 10),
-                    Text(
-                      "Aucune promotion d’affaires disponible pour le programme de récompenses selon vos préférences de pays.",
+                    Text((langUserPhone == "fr")
+                          ? "Aucune promotion d'affaires disponible pour le programme de récompenses selon vos préférences de pays."
+                          : "No business promotions available for the rewards program based on your country preferences.",
                       textAlign: TextAlign.center,
                       style: GoogleFonts.poppins(
                         fontSize: 14,

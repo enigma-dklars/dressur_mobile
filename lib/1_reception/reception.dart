@@ -128,7 +128,7 @@ class _ReceptionPageState extends State<ReceptionPage> {
               _buildNavigationItem(
                 context: context,
                 icon: FontAwesomeIcons.trophy,
-                title: "Récompenses",
+                title: (langUserPhone == "fr") ? "Récompenses" : "Rewards",
                 subtitle: (langUserPhone == "fr")
                     ? "Gagnez et suivez vos récompenses"
                     : "Earn and track your rewards",

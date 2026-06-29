@@ -63,9 +63,7 @@ class _HistoriqueCompletPageState extends State<HistoriqueCompletPage> {
 
       return dataList.map((data) {
         return HistoriqueRecompense(
-          // Correction : On s'assure que l'URL de l'image est bien construite
           imageUrl: generalRouteForPromotionImage + (data['imageUrl'] ?? ""),
-          // Correction : Conversion forcée en String pour éviter les erreurs de type
           id: data['id']?.toString() ?? "0",
           title: data['title'] ?? "",
           amount: data['amount']?.toString() ?? "0",
@@ -90,7 +88,6 @@ class _HistoriqueCompletPageState extends State<HistoriqueCompletPage> {
               '$generalRouteForApi/getMyProgrammeRecompenseInformations'));
       request.fields.addAll({
         'uid': uidUser,
-        
       });
 
       http.StreamedResponse response = await request.send();
@@ -125,12 +122,13 @@ class _HistoriqueCompletPageState extends State<HistoriqueCompletPage> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isFr = langUserPhone == "fr";
     return Scaffold(
         appBar: AppBar(
           backgroundColor: primaryColor,
           elevation: 0,
           title: Text(
-            "Historique complet",
+            isFr ? "Historique complet" : "Complete History",
             style: GoogleFonts.poppins(
               color: Colors.white,
               fontWeight: FontWeight.w400,
@@ -156,7 +154,8 @@ class _HistoriqueCompletPageState extends State<HistoriqueCompletPage> {
               }
 
               if (snapshot.hasError) {
-                return Center(child: Text("Erreur de chargement"));
+                return Center(
+                    child: Text(isFr ? "Erreur de chargement" : "Loading error"));
               }
 
               if (!snapshot.hasData || snapshot.data!.isEmpty) {
@@ -168,7 +167,9 @@ class _HistoriqueCompletPageState extends State<HistoriqueCompletPage> {
                           size: 50, color: Colors.grey[300]),
                       const SizedBox(height: 10),
                       Text(
-                        "Aucun historique disponible",
+                        isFr
+                            ? "Aucun historique disponible"
+                            : "No history available",
                         style: GoogleFonts.poppins(
                             fontSize: 14, color: Colors.grey),
                       ),
@@ -345,6 +346,7 @@ class _HistoriqueCompletPageState extends State<HistoriqueCompletPage> {
 
   void _showStatusDetailsBottomSheet(
       BuildContext context, HistoriqueRecompense item) {
+    final bool isFr = langUserPhone == "fr";
     setState(() {
       _proofImage1 = null;
       _proofImage2 = null;
@@ -390,7 +392,9 @@ class _HistoriqueCompletPageState extends State<HistoriqueCompletPage> {
                         ),
                       ),
                       Text(
-                        "Récompense : ${item.amount} FCFA",
+                        isFr
+                            ? "Récompense : ${item.amount} FCFA"
+                            : "Reward: ${item.amount} FCFA",
                         style: GoogleFonts.poppins(
                           fontSize: 14,
                           color: primaryColor,
@@ -398,12 +402,12 @@ class _HistoriqueCompletPageState extends State<HistoriqueCompletPage> {
                         ),
                       ),
                       const Divider(height: 30),
-                      _buildStatusContent(item, setModalState),
+                      _buildStatusContent(item, setModalState, isFr),
                       const SizedBox(height: 30),
                       if (item.status == "terminer" ||
                           item.status == "en_cours" ||
                           item.status == "en_attente")
-                        _buildWhatsAppButton(),
+                        _buildWhatsAppButton(isFr),
                     ],
                   ),
                 );
@@ -416,14 +420,16 @@ class _HistoriqueCompletPageState extends State<HistoriqueCompletPage> {
   }
 
   Widget _buildStatusContent(
-      HistoriqueRecompense item, StateSetter setModalState) {
+      HistoriqueRecompense item, StateSetter setModalState, bool isFr) {
     switch (item.status) {
       case "en_attente":
         return _statusInfo(
           FontAwesomeIcons.hourglassEmpty,
           Colors.orange,
-          "En attente d'approbation",
-          "Vous avez soumis vos preuves de participation. Notre équipe examine actuellement votre demande.\n\nSi vous ne l'avez pas encore fait, veuillez envoyer la capture vidéo comme dernière preuve par WhatsApp au numéro d'assistance de Dressur.",
+          isFr ? "En attente d'approbation" : "Awaiting approval",
+          isFr
+              ? "Vous avez soumis vos preuves de participation. Notre équipe examine actuellement votre demande.\n\nSi vous ne l'avez pas encore fait, veuillez envoyer la capture vidéo comme dernière preuve par WhatsApp au numéro d'assistance de Dressur."
+              : "You have submitted your participation proofs. Our team is currently reviewing your request.\n\nIf you haven't done so yet, please send the video capture as final proof via WhatsApp to Dressur's support number.",
         );
       case "terminer":
         return Column(
@@ -431,33 +437,43 @@ class _HistoriqueCompletPageState extends State<HistoriqueCompletPage> {
             _statusInfo(
               FontAwesomeIcons.clock,
               Colors.green,
-              "Temps écoulé - Soumission requise",
-              "Le temps de participation est terminé. Vous devez maintenant soumettre vos preuves (les deux captures d'écran) via le formulaire ci-dessous.\n\nNote : La capture vidéo doit être envoyée séparément par WhatsApp.",
+              isFr
+                  ? "Temps écoulé - Soumission requise"
+                  : "Time elapsed - Submission required",
+              isFr
+                  ? "Le temps de participation est terminé. Vous devez maintenant soumettre vos preuves (les deux captures d'écran) via le formulaire ci-dessous.\n\nNote : La capture vidéo doit être envoyée séparément par WhatsApp."
+                  : "The participation time has ended. You must now submit your proofs (both screenshots) via the form below.\n\nNote: The video capture must be sent separately via WhatsApp.",
             ),
             const SizedBox(height: 20),
-            _buildSubmissionForm(item, setModalState),
+            _buildSubmissionForm(item, setModalState, isFr),
           ],
         );
       case "echouer":
         return _statusInfo(
           FontAwesomeIcons.circleExclamation,
           Colors.red,
-          "Participation échouée",
-          "Malheureusement, vous n'avez pas soumis vos preuves de participation dans les délais impartis. Il est désormais trop tard pour le faire pour cette promotion.",
+          isFr ? "Participation échouée" : "Participation failed",
+          isFr
+              ? "Malheureusement, vous n'avez pas soumis vos preuves de participation dans les délais impartis. Il est désormais trop tard pour le faire pour cette promotion."
+              : "Unfortunately, you did not submit your participation proofs within the required time. It is now too late to do so for this promotion.",
         );
       case "refuser":
         return _statusInfo(
           FontAwesomeIcons.slash,
           Colors.red,
-          "Preuves refusées",
-          "Les preuves que vous avez fournies n'ont pas été jugées recevables par notre équipe de modération. En conséquence, la récompense ne peut pas être accordée.",
+          isFr ? "Preuves refusées" : "Proofs rejected",
+          isFr
+              ? "Les preuves que vous avez fournies n'ont pas été jugées recevables par notre équipe de modération. En conséquence, la récompense ne peut pas être accordée."
+              : "The proofs you provided were not deemed acceptable by our moderation team. As a result, the reward cannot be granted.",
         );
       case "approuver":
         return _statusInfo(
           FontAwesomeIcons.solidCircleCheck,
           Colors.green,
-          "Félicitations ! Approuvé",
-          "Vos preuves de participation ont été vérifiées et validées. La récompense a été créditée sur votre solde Dressur.",
+          isFr ? "Félicitations ! Approuvé" : "Congratulations! Approved",
+          isFr
+              ? "Vos preuves de participation ont été vérifiées et validées. La récompense a été créditée sur votre solde Dressur."
+              : "Your participation proofs have been verified and validated. The reward has been credited to your Dressur balance.",
         );
       case "en_cours":
         return Column(
@@ -465,15 +481,17 @@ class _HistoriqueCompletPageState extends State<HistoriqueCompletPage> {
             _statusInfo(
               FontAwesomeIcons.arrowsRotate,
               Colors.blue,
-              "Participation en cours",
-              "Le temps de soumission n'est pas encore arrivé. Cependant, si vous estimez avoir déjà atteint votre objectif, vous pouvez soumettre vos preuves dès maintenant.",
+              isFr ? "Participation en cours" : "Participation in progress",
+              isFr
+                  ? "Le temps de soumission n'est pas encore arrivé. Cependant, si vous estimez avoir déjà atteint votre objectif, vous pouvez soumettre vos preuves dès maintenant."
+                  : "The submission time has not yet arrived. However, if you believe you have already reached your goal, you can submit your proofs now.",
             ),
             const SizedBox(height: 20),
-            _buildSubmissionForm(item, setModalState),
+            _buildSubmissionForm(item, setModalState, isFr),
           ],
         );
       default:
-        return Text("Statut inconnu");
+        return Text(isFr ? "Statut inconnu" : "Unknown status");
     }
   }
 
@@ -512,7 +530,7 @@ class _HistoriqueCompletPageState extends State<HistoriqueCompletPage> {
   }
 
   Widget _buildSubmissionForm(
-      HistoriqueRecompense item, StateSetter setModalState) {
+      HistoriqueRecompense item, StateSetter setModalState, bool isFr) {
     return Container(
       padding: const EdgeInsets.all(15),
       decoration: BoxDecoration(
@@ -522,30 +540,36 @@ class _HistoriqueCompletPageState extends State<HistoriqueCompletPage> {
       child: Column(
         children: [
           Text(
-            "Formulaire de soumission",
+            isFr ? "Formulaire de soumission" : "Submission form",
             style: GoogleFonts.poppins(fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 15),
           _proofCard(
               "1",
-              "Capture – Liste des statuts",
-              "• Affiche la liste des statuts WhatsApp\n• Le statut de la promotion doit être visible",
+              isFr ? "Capture – Liste des statuts" : "Screenshot – Status list",
+              isFr
+                  ? "• Affiche la liste des statuts WhatsApp\n• Le statut de la promotion doit être visible"
+                  : "• Shows the WhatsApp status list\n• The promotion status must be visible",
               _proofImage1,
-              () => _pickImage(1, setModalState)),
+              () => _pickImage(1, setModalState),
+              isFr),
           const SizedBox(height: 15),
           _proofCard(
               "2",
-              "Capture – Statut ouvert",
-              "• Image complète\n• Texte descriptif complet\n• Nombre de vues, date et heure visibles",
+              isFr ? "Capture – Statut ouvert" : "Screenshot – Open status",
+              isFr
+                  ? "• Image complète\n• Texte descriptif complet\n• Nombre de vues, date et heure visibles"
+                  : "• Full image\n• Complete descriptive text\n• Number of views, date and time visible",
               _proofImage2,
-              () => _pickImage(2, setModalState)),
+              () => _pickImage(2, setModalState),
+              isFr),
           const SizedBox(height: 20),
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(
               onPressed: _isSubmitting
                   ? null
-                  : () => _submitProofs(item, setModalState),
+                  : () => _submitProofs(item, setModalState, isFr),
               style: ElevatedButton.styleFrom(
                 backgroundColor: primaryColor,
                 shape: RoundedRectangleBorder(
@@ -558,7 +582,8 @@ class _HistoriqueCompletPageState extends State<HistoriqueCompletPage> {
                       height: 20,
                       child: CircularProgressIndicator(
                           color: Colors.white, strokeWidth: 2))
-                  : Text("Soumettre les preuves",
+                  : Text(
+                      isFr ? "Soumettre les preuves" : "Submit proofs",
                       style: GoogleFonts.poppins(
                           color: Colors.white, fontWeight: FontWeight.bold)),
             ),
@@ -569,7 +594,7 @@ class _HistoriqueCompletPageState extends State<HistoriqueCompletPage> {
   }
 
   Widget _proofCard(String number, String title, String instructions,
-      File? image, VoidCallback onTap) {
+      File? image, VoidCallback onTap, bool isFr) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -610,7 +635,8 @@ class _HistoriqueCompletPageState extends State<HistoriqueCompletPage> {
                       FaIcon(FontAwesomeIcons.camera,
                           color: primaryColor, size: 30),
                       const SizedBox(height: 5),
-                      Text("Cliquez pour choisir",
+                      Text(
+                          isFr ? "Cliquez pour choisir" : "Tap to choose",
                           style: GoogleFonts.poppins(
                               fontSize: 12, color: Colors.grey)),
                     ],
@@ -637,10 +663,15 @@ class _HistoriqueCompletPageState extends State<HistoriqueCompletPage> {
   }
 
   Future<void> _submitProofs(
-      HistoriqueRecompense item, StateSetter setModalState) async {
+      HistoriqueRecompense item, StateSetter setModalState, bool isFr) async {
     if (_proofImage1 == null || _proofImage2 == null) {
-      dangerNoti("Attention",
-          "Veuillez sélectionner les deux captures d'écran.", context);
+      dangerNoti(
+        isFr ? "Attention" : "Warning",
+        isFr
+            ? "Veuillez sélectionner les deux captures d'écran."
+            : "Please select both screenshots.",
+        context,
+      );
       return;
     }
 
@@ -663,36 +694,52 @@ class _HistoriqueCompletPageState extends State<HistoriqueCompletPage> {
 
       if (response.statusCode == 200 && data['error'] == false) {
         Navigator.pop(context);
-        successNoti("Succès",
-            data['message'] ?? "Preuves soumises avec succès !", context);
+        successNoti(
+          isFr ? "Succès" : "Success",
+          data['message'] ??
+              (isFr
+                  ? "Preuves soumises avec succès !"
+                  : "Proofs submitted successfully!"),
+          context,
+        );
 
         setModalState(() => _isSubmitting = false);
         setState(() => _isSubmitting = false);
         await getMyProgrammeRecompenseInformations();
       } else {
         dangerNoti(
-            "Erreur", data['message'] ?? "Une erreur est survenue.", context);
+          isFr ? "Erreur" : "Error",
+          data['message'] ??
+              (isFr ? "Une erreur est survenue." : "An error occurred."),
+          context,
+        );
       }
     } catch (e) {
-      dangerNoti("Erreur", "Impossible de contacter le serveur.", context);
+      dangerNoti(
+        isFr ? "Erreur" : "Error",
+        isFr
+            ? "Impossible de contacter le serveur."
+            : "Unable to contact the server.",
+        context,
+      );
     } finally {
       setModalState(() => _isSubmitting = false);
       setState(() => _isSubmitting = false);
     }
   }
 
-  Widget _buildWhatsAppButton() {
+  Widget _buildWhatsAppButton(bool isFr) {
     return SizedBox(
       width: double.infinity,
       child: OutlinedButton.icon(
         onPressed: () async {
           final Uri _url = Uri.parse(whatsappDSURL);
           if (!await launchUrl(_url, mode: LaunchMode.externalApplication)) {
-            // Gérer l'erreur
           }
         },
         icon: FaIcon(FontAwesomeIcons.solidComment, size: 18),
-        label: Text("Envoyer la vidéo sur WhatsApp"),
+        label: Text(
+            isFr ? "Envoyer la vidéo sur WhatsApp" : "Send video on WhatsApp"),
         style: OutlinedButton.styleFrom(
           foregroundColor: Colors.green,
           side: BorderSide(color: Colors.green),
@@ -705,46 +752,47 @@ class _HistoriqueCompletPageState extends State<HistoriqueCompletPage> {
   }
 
   Map<String, dynamic> getStatusBadgeConfig(String status) {
+    final bool isFr = langUserPhone == "fr";
     switch (status) {
       case "en_attente":
         return {
-          "label": "Attente validation",
+          "label": isFr ? "Attente validation" : "Awaiting validation",
           "icon": FontAwesomeIcons.clock,
           "color": Colors.orange
         };
       case "terminer":
         return {
-          "label": "Preuves requises",
+          "label": isFr ? "Preuves requises" : "Proofs required",
           "icon": FontAwesomeIcons.solidCircleCheck,
           "color": Colors.green
         };
       case "echouer":
         return {
-          "label": "Échoué",
+          "label": isFr ? "Échoué" : "Failed",
           "icon": FontAwesomeIcons.xmark,
           "color": Colors.red
         };
       case "refuser":
         return {
-          "label": "Refusé",
+          "label": isFr ? "Refusé" : "Rejected",
           "icon": FontAwesomeIcons.xmark,
           "color": Colors.red
         };
       case "approuver":
         return {
-          "label": "Approuvé",
+          "label": isFr ? "Approuvé" : "Approved",
           "icon": FontAwesomeIcons.solidCircleCheck,
           "color": Colors.green
         };
       case "en_cours":
         return {
-          "label": "En cours",
+          "label": isFr ? "En cours" : "In progress",
           "icon": FontAwesomeIcons.arrowsRotate,
           "color": Colors.blue
         };
       default:
         return {
-          "label": "Inconnu",
+          "label": isFr ? "Inconnu" : "Unknown",
           "icon": FontAwesomeIcons.circleQuestion,
           "color": Colors.grey
         };
