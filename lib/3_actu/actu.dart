@@ -10,8 +10,6 @@ import 'package:dressur/2_promo/new_boost_contact.dart';
 import 'package:dressur/5_autre/profil_user.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -25,7 +23,6 @@ import 'package:dressur/components/sociaux.dart';
 import 'package:dressur/components/sql_helper.dart';
 import 'package:dressur/5_autre/support_assistance.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:share_plus/share_plus.dart';
 import 'package:dressur/8_admin/admin.dart';
 
 class AnimatedRewardBadge extends StatefulWidget {
@@ -207,7 +204,6 @@ class _ActuPageState extends State<ActuPage> {
   late Future<List<Advertisement>> _futureAdvertisements;
   bool _firstLoad = true;
   List<StoryModel> _stories = [];
-  bool _storiesLoading = false;
 
   @override
   void initState() {
@@ -1779,7 +1775,6 @@ class AdvertisementDetailPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     final Map<String, dynamic> infoMap = (advertisement.annotherInfo != "")
         ? jsonDecode(advertisement.annotherInfo)
         : {};
