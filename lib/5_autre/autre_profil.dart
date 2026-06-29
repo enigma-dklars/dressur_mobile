@@ -42,7 +42,7 @@ class _AutreProfilPageState extends State<AutreProfilPage> {
     var request = http.MultipartRequest(
         'POST', Uri.parse('$generalRouteForApi/getUserInfo'));
     request.fields.addAll(
-        {'uid': uidAutreUser, 'langUserPhone': langUserPhone.toString()});
+        {'uid': uidAutreUser,});
 
     http.StreamedResponse response = await request.send();
 

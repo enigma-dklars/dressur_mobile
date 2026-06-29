@@ -316,7 +316,6 @@ class _ProduitsServicesState extends State<ProduitsServices> {
     request.fields['idFormulePromoAffaire'] = idFormulBoost.toString();
     request.fields['text'] = _textEditingController.text;
     request.fields['uid'] = uidUser;
-    request.fields['langUserPhone'] = langUserPhone.toString();
     request.fields['mode'] = "payant";
     request.fields['paymentMethod'] = valueMethodePaiement;
     request.fields['tel'] = telController.text;
@@ -794,7 +793,7 @@ class _DemandesEmploiState extends State<DemandesEmploi> {
           'POST', Uri.parse('$generalRouteForApi/newDmdEmploi'));
       request.fields.addAll({
         'uid': uidUser,
-        'langUserPhone': langUserPhone.toString(),
+        
         'titre_demande_poste_rechercher': titre_demande_poste_rechercher,
         'description_profil_demandeur': description_profil_demandeur,
         'competence_qualification': competence_qualification,
@@ -1114,7 +1113,7 @@ class _OffresEmploiState extends State<OffresEmploi> {
           'POST', Uri.parse('$generalRouteForApi/newOffreEmploi'));
       request.fields.addAll({
         'uid': uidUser,
-        'langUserPhone': langUserPhone.toString(),
+        
         'titre_poste': titre_poste,
         'description_poste': description_poste,
         'competences_requises': competences_requises,

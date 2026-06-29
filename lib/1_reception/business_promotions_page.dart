@@ -150,7 +150,6 @@ class _BusinessPromotionsPageState extends State<BusinessPromotionsPage> {
             '$generalRouteForApi/getPromotionAffaireInProgrammeRecompense'));
     request.fields.addAll({
       'uid': uidUser,
-      'langUserPhone': langUserPhone.toString(),
     });
 
     http.StreamedResponse response = await request.send();
@@ -204,7 +203,7 @@ class _BusinessPromotionsPageState extends State<BusinessPromotionsPage> {
       request.fields.addAll({
         'uid': uidUser,
         'idPromoAffaire': "${advertisement.id}",
-        'langUserPhone': langUserPhone.toString(),
+        
       });
 
       http.StreamedResponse response = await request.send();

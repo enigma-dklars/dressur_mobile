@@ -521,8 +521,7 @@ void launchPaiement(String urlPaiement) async {
   }
 }
 
-Future<void> shareMessageWithImage(
-    BuildContext context, String langUserPhone) async {
+Future<void> shareMessageWithImage(BuildContext context) async {
   var messageShare = (langUserPhone == "fr")
       ? "ADD WhatsApp Gratuitement.\nUtilisez simplement la fonctionnalité Boost Contact de Dressur après votre inscription.\nPour Android : https://play.google.com/store/apps/details?id=com.dressur.ds \nPour iPhone : https://dressur.site/inscription"
       : "Add WhatsApp for free.\nSimply use Dressur's Boost Contact feature after registering.\nFor Android: https://play.google.com/store/apps/details?id=com.dressur.ds \nFor iPhone: https://dressur.site/inscription";
@@ -543,9 +542,15 @@ Future<void> shareMessageWithImage(
   final file2 = await File('${tempDir.path}/flyers_dressur_en.png').create();
   file2.writeAsBytesSync(list2);
 
-  // Share the image and the message
-  await Share.shareXFiles([XFile(file.path), XFile(file2.path)],
-      text: messageShare, subject: 'Partager Dressur!');
+  if (langUserPhone == "fr") {
+    // Share the image and the message
+    await Share.shareXFiles([XFile(file.path)],
+        text: messageShare, subject: 'Partager Dressur!');
+  } else {
+    // Share the image and the message
+    await Share.shareXFiles([XFile(file2.path)],
+        text: messageShare, subject: 'Share Dressur!');
+  }
 }
 
 Future<void> sharePromotion(BuildContext context, String imageLink,
@@ -832,8 +837,7 @@ Future<void> saveContactDsIfNotExiste() async {
   int nombreNewContact = 0;
   nombreNewContact = 0;
   contactsEnregistrer = [];
-  final url =
-      Uri.parse('$generalRouteForApi/listContactDS/$uidUser/$langUserPhone');
+  final url = Uri.parse('$generalRouteForApi/listContactDS/$uidUser/fr');
   final response = await http.get(url);
   if (response.statusCode == 200) {
     final jsonData = jsonDecode(response.body) as List<dynamic>;

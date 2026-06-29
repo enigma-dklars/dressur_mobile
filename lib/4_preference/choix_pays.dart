@@ -31,8 +31,8 @@ class _ChoixDesPaysState extends State<ChoixDesPays> {
   var paysChoisieJson;
 
   Future<void> fetchCountries() async {
-    final response = await http.get(Uri.parse(
-        '$generalRouteForApi/listPaysChoisies/$uidUser/$langUserPhone'));
+    final response = await http
+        .get(Uri.parse('$generalRouteForApi/listPaysChoisies/$uidUser/fr'));
 
     if (response.statusCode == 200) {
       setState(() {
@@ -134,7 +134,7 @@ class _ChoixDesPaysState extends State<ChoixDesPays> {
     });
 
     final response = await http.get(Uri.parse(
-        '$generalRouteForApi/updateUserPaysChoisies/$uidUser/$langUserPhone/$paysChoisieJson'));
+        '$generalRouteForApi/updateUserPaysChoisies/$uidUser/fr/$paysChoisieJson'));
 
     if (response.statusCode == 200) {
       // Mise à jour réussie, mettez à jour l'état du pays dans la liste

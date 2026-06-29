@@ -246,7 +246,7 @@ class _RegisterForm3State extends State<RegisterForm3> {
       var request = http.MultipartRequest(
           'POST', Uri.parse('$generalRouteForApi/listeFormulePromoReseau'));
       request.fields.addAll({
-        'langUserPhone': langUserPhone.toString(),
+        
       });
 
       http.StreamedResponse response = await request.send();
@@ -292,7 +292,7 @@ class _RegisterForm3State extends State<RegisterForm3> {
         var request = http.MultipartRequest(
             'POST', Uri.parse('$generalRouteForApi/newPromoReseau'));
         request.fields.addAll({
-          'langUserPhone': langUserPhone.toString(),
+          
           'uid': uidUser,
           'idFormulePromoReseau': idFormulePromoReseau.toString(),
           'qteDemander': quantityController.text,

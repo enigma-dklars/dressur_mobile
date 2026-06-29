@@ -119,7 +119,7 @@ class _DeletecompteFormState extends State<DeletecompteForm> {
           'POST', Uri.parse('$generalRouteForApi/deleteCompteDS'));
       request.fields.addAll({
         'uid': uidUser,
-        'langUserPhone': langUserPhone.toString(),
+        
         'motifDeleted': motifController.text
       });
       http.StreamedResponse httpResponse = await request.send();

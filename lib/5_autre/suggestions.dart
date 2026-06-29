@@ -103,7 +103,7 @@ class _SuggestionsFormState extends State<SuggestionsForm> {
           'POST', Uri.parse('$generalRouteForApi/addSuggestion'));
       request.fields.addAll({
         'uid': uidUser,
-        'langUserPhone': langUserPhone.toString(),
+        
         'suggestion': motifController.text
       });
       http.StreamedResponse response = await request.send();

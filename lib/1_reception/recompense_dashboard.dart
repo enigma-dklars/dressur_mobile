@@ -66,7 +66,7 @@ class _ProgrammeRecompenseDashboardState
               '$generalRouteForApi/getMyProgrammeRecompenseInformations'));
       request.fields.addAll({
         'uid': uidUser,
-        'langUserPhone': langUserPhone.toString(),
+        
       });
 
       http.StreamedResponse response = await request.send();
@@ -1069,7 +1069,6 @@ class _ProgrammeRecompenseDashboardState
           Uri.parse('$generalRouteForApi/submitProgrammeRecompenseProofs'));
 
       request.fields['uid'] = uidUser;
-      request.fields['langUserPhone'] = langUserPhone.toString();
       request.fields['idHistorique'] = item.id.toString();
 
       request.files.add(

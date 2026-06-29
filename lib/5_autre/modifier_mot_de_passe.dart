@@ -97,7 +97,7 @@ class _PasswordChangeFormState extends State<PasswordChangeForm> {
           'POST', Uri.parse('$generalRouteForApi/updateUserPassword'));
       request.fields.addAll({
         'uid': uidUser,
-        'langUserPhone': langUserPhone.toString(),
+        
         'currentPassword': ancienPasswordController.text,
         'newPassword': passwordController.text,
         'confirmNewPassword': passwordVerifController.text,
@@ -144,7 +144,7 @@ class _PasswordChangeFormState extends State<PasswordChangeForm> {
       var request = http.MultipartRequest('POST',
           Uri.parse('$generalRouteForApi/sendMailPassForgotWithConnecte'));
       request.fields
-          .addAll({'uid': uidUser, 'langUserPhone': langUserPhone.toString()});
+          .addAll({'uid': uidUser,});
 
       http.StreamedResponse response = await request.send();
 

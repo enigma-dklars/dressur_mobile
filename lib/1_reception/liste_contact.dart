@@ -98,11 +98,9 @@ class _ContactCard extends StatelessWidget {
     return Card(
       elevation: 0,
       margin: const EdgeInsets.only(bottom: 8),
-      shape:
-          RoundedRectangleBorder(borderRadius: BorderRadius.circular(13)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(13)),
       child: Padding(
-        padding:
-            const EdgeInsets.symmetric(horizontal: 10.0, vertical: 8.0),
+        padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 8.0),
         child: Column(
           children: [
             Row(
@@ -139,8 +137,8 @@ class _ContactCard extends StatelessWidget {
                   onPressed: () {
                     uidAutreUser = contact.id;
                     addUserOnAutreProfilPage = "non";
-                    Navigator.of(context).push(MaterialPageRoute(
-                        builder: (_) => AutreProfilPage()));
+                    Navigator.of(context).push(
+                        MaterialPageRoute(builder: (_) => AutreProfilPage()));
                   },
                 ),
               ],
@@ -207,8 +205,7 @@ class _ContactPageState extends State<ContactPage> {
       _isLoading = true;
       nombreContacts = 0;
     });
-    final url =
-        Uri.parse('$generalRouteForApi/listContactDS/$uidUser/$langUserPhone');
+    final url = Uri.parse('$generalRouteForApi/listContactDS/$uidUser/fr');
 
     final response = await http.get(url);
 
@@ -356,8 +353,7 @@ class _ContactPageState extends State<ContactPage> {
               if (value == 3) {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                      builder: (_) => const SynchroAvance()),
+                  MaterialPageRoute(builder: (_) => const SynchroAvance()),
                 );
               }
               if (value == 4) {
@@ -463,8 +459,7 @@ class _ContactPageState extends State<ContactPage> {
                 : ((langUserPhone == "fr")
                     ? "Aucun contact trouvé"
                     : "No contact found"),
-            style:
-                GoogleFonts.poppins(fontSize: 16, color: Colors.grey[600]),
+            style: GoogleFonts.poppins(fontSize: 16, color: Colors.grey[600]),
           ),
         ],
       ),

@@ -26,7 +26,6 @@ class BoostPage extends StatefulWidget {
 }
 
 class _BoostPageState extends State<BoostPage> {
-
   @override
   void initState() {
     super.initState();
@@ -36,9 +35,9 @@ class _BoostPageState extends State<BoostPage> {
   Future<void> _fetchCounts() async {
     try {
       final results = await Future.wait([
-        http.get(Uri.parse('$generalRouteForApi/listBoost/$uidUser/$langUserPhone')),
-        http.get(Uri.parse('$generalRouteForApi/listPromotion/$uidUser/$langUserPhone')),
-        http.get(Uri.parse('$generalRouteForApi/listPromoReseau/$uidUser/$langUserPhone')),
+        http.get(Uri.parse('$generalRouteForApi/listBoost/$uidUser/fr')),
+        http.get(Uri.parse('$generalRouteForApi/listPromotion/$uidUser/fr')),
+        http.get(Uri.parse('$generalRouteForApi/listPromoReseau/$uidUser/fr')),
       ]);
       if (!mounted) return;
       setState(() {
@@ -83,8 +82,8 @@ class _BoostPageState extends State<BoostPage> {
             ),
             const Padding(
               padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
-              child: VerticalDivider(
-                  width: 0, color: Colors.white, thickness: 1),
+              child:
+                  VerticalDivider(width: 0, color: Colors.white, thickness: 1),
             ),
           ],
           IconButton(
@@ -114,12 +113,13 @@ class _BoostPageState extends State<BoostPage> {
             ],
             offset: const Offset(0, 60),
             color: primaryColor,
-            icon: const FaIcon(FontAwesomeIcons.bars, color: Colors.white, size: 20),
+            icon: const FaIcon(FontAwesomeIcons.bars,
+                color: Colors.white, size: 20),
             elevation: 2,
             onSelected: (value) {
               if (value == 1) {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (_) => SupportPage()));
+                Navigator.push(
+                    context, MaterialPageRoute(builder: (_) => SupportPage()));
               }
             },
           ),
@@ -178,8 +178,9 @@ class _BoostPageState extends State<BoostPage> {
                         context,
                         MaterialPageRoute(
                             builder: (context) => PromotionFormPage())),
-                    secondaryActionText:
-                        (langUserPhone == "fr") ? "Voir la liste" : "See the list",
+                    secondaryActionText: (langUserPhone == "fr")
+                        ? "Voir la liste"
+                        : "See the list",
                     onSecondaryAction: () => Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -258,7 +259,9 @@ class _BoostPageState extends State<BoostPage> {
             ),
           ),
           Container(
-            height: 50, width: 1, color: Colors.white24,
+            height: 50,
+            width: 1,
+            color: Colors.white24,
             margin: const EdgeInsets.symmetric(horizontal: 4),
           ),
           Expanded(
@@ -269,7 +272,9 @@ class _BoostPageState extends State<BoostPage> {
             ),
           ),
           Container(
-            height: 50, width: 1, color: Colors.white24,
+            height: 50,
+            width: 1,
+            color: Colors.white24,
             margin: const EdgeInsets.symmetric(horizontal: 4),
           ),
           Expanded(

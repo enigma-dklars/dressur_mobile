@@ -118,7 +118,6 @@ class _ModificationProduitServicesPageState
     request.fields['idPromoAffaire'] = widget.promotion.id;
     request.fields['text'] = _textEditingController.text;
     request.fields['uid'] = uidUser;
-    request.fields['langUserPhone'] = langUserPhone.toString();
 
     if (_imageFile != null) {
       final tempDir = await getTemporaryDirectory();

@@ -305,7 +305,7 @@ class _ActuPageState extends State<ActuPage> {
       final request = http.MultipartRequest(
           'POST', Uri.parse('$generalRouteForApi/getUserInfo'));
       request.fields
-          .addAll({'uid': uidUser, 'langUserPhone': langUserPhone.toString()});
+          .addAll({'uid': uidUser,});
       final response = await request.send();
       if (response.statusCode == 200) {
         final data1 = await response.stream.bytesToString();
@@ -349,7 +349,7 @@ class _ActuPageState extends State<ActuPage> {
     var request = http.MultipartRequest(
         'POST', Uri.parse('$generalRouteForApi/getUserInfo'));
     request.fields
-        .addAll({'uid': uidUser, 'langUserPhone': langUserPhone.toString()});
+        .addAll({'uid': uidUser, });
 
     http.StreamedResponse response = await request.send();
 
@@ -552,7 +552,7 @@ class _ActuPageState extends State<ActuPage> {
             '$generalRouteForApi/addTousUserContact/$uidUser/${langUserPhone.toString()}'));
     request.fields.addAll({
       'uid': uidUser,
-      'langUserPhone': langUserPhone.toString(),
+      
     });
 
     http.StreamedResponse response = await request.send();

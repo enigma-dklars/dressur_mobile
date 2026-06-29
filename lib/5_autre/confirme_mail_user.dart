@@ -32,7 +32,7 @@ class _CodeMailConfirmePageState extends State<CodeMailConfirmePage> {
       var request = http.MultipartRequest(
           'POST', Uri.parse('$generalRouteForApi/sendMailVerification'));
       request.fields
-          .addAll({'uid': uidUser, 'langUserPhone': langUserPhone.toString()});
+          .addAll({'uid': uidUser, });
       http.StreamedResponse response = await request.send();
 
       if (response.statusCode == 200) {
@@ -67,7 +67,7 @@ class _CodeMailConfirmePageState extends State<CodeMailConfirmePage> {
           'POST', Uri.parse('$generalRouteForApi/mailVerification'));
       request.fields.addAll({
         'uid': uidUser,
-        'langUserPhone': langUserPhone.toString(),
+        
         'codeForVerifMail': pin
       });
       http.StreamedResponse response = await request.send();

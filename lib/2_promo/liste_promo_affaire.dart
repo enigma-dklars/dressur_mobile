@@ -66,8 +66,7 @@ class _PromotionListPageState extends State<PromotionListPage> {
       _loading = true;
     });
     try {
-      final url = Uri.parse(
-          '$generalRouteForApi/listPromotion/$uidUser/$langUserPhone');
+      final url = Uri.parse('$generalRouteForApi/listPromotion/$uidUser/fr');
       final response = await http.get(url);
 
       if (response.statusCode == 200) {
@@ -560,8 +559,8 @@ class _PromotionListPageState extends State<PromotionListPage> {
                     physics: const BouncingScrollPhysics(
                         parent: AlwaysScrollableScrollPhysics()),
                     cacheExtent: 500,
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 10, vertical: 4),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     itemCount: _promotions.length,
                     itemBuilder: (BuildContext context, int index) {
                       return RepaintBoundary(
@@ -988,7 +987,7 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
         request.fields.addAll({
           'uid': uidUser,
           'idPromotion': widget.promotion.id,
-          'langUserPhone': langUserPhone.toString(),
+
           'idFormulBoost': idFormulBoost.toString(),
           'valueMethodePaiement': valueMethodePaiement,
           'tel': telController.text,
@@ -1147,7 +1146,8 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             loading_formule_payant
-                ? const Center(child: CircularProgressIndicator(color: primaryColor))
+                ? const Center(
+                    child: CircularProgressIndicator(color: primaryColor))
                 : SelectFormField(
                     decoration: const InputDecoration(
                         labelText: 'Formule de Boost',

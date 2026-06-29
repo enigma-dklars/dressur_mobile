@@ -46,8 +46,7 @@ class _ListeBoostContactPageState extends State<ListeBoostContactPage> {
       _loading = true;
     });
     try {
-      final url =
-          Uri.parse('$generalRouteForApi/listBoost/$uidUser/$langUserPhone');
+      final url = Uri.parse('$generalRouteForApi/listBoost/$uidUser/fr');
       final response = await http.get(url);
 
       if (response.statusCode == 200) {
@@ -156,7 +155,8 @@ class _ListeBoostContactPageState extends State<ListeBoostContactPage> {
                 children: [
                   Text(
                     isFr ? "Contacts reçus" : "Contacts received",
-                    style: GoogleFonts.poppins(fontSize: 12, color: Colors.grey[600]),
+                    style: GoogleFonts.poppins(
+                        fontSize: 12, color: Colors.grey[600]),
                   ),
                   Text(
                     "$obtenus / $max",
@@ -181,7 +181,8 @@ class _ListeBoostContactPageState extends State<ListeBoostContactPage> {
               const SizedBox(height: 6),
               Text(
                 boost.dateDebutFormule,
-                style: GoogleFonts.poppins(fontSize: 11, color: Colors.grey[500]),
+                style:
+                    GoogleFonts.poppins(fontSize: 11, color: Colors.grey[500]),
               ),
             ] else ...[
               Text(
@@ -344,8 +345,8 @@ class _ListeBoostContactPageState extends State<ListeBoostContactPage> {
                     physics: const BouncingScrollPhysics(
                         parent: AlwaysScrollableScrollPhysics()),
                     cacheExtent: 500,
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 10, vertical: 4),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     itemCount: _boosts.length,
                     itemBuilder: (BuildContext context, int index) {
                       return RepaintBoundary(

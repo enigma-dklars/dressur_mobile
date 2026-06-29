@@ -124,7 +124,7 @@ class _RegisterFormState extends State<RegisterForm> {
           'POST', Uri.parse('$generalRouteForApi/updateUserInfo'));
       request.fields.addAll({
         'uid': uidUser,
-        'langUserPhone': langUserPhone.toString(),
+        
         'tel': telController.text,
         'mail': emailController.text,
         'nom': nameController.text,

@@ -142,17 +142,20 @@ class SynchroAvanceService extends ChangeNotifier {
     nbMerged = 0;
     errorText = null;
     etendreAuxNonDS = etendreOption;
-    statusText =
-        isFr ? "Recherche de vos contacts DS..." : "Finding your DS contacts...";
+    statusText = isFr
+        ? "Recherche de vos contacts DS..."
+        : "Finding your DS contacts...";
     textChargementEvolution = statusText;
     notifyListeners();
 
     try {
-      final url = Uri.parse(
-          '$generalRouteForApi/listContactDS/$uidUser/$langUserPhone');
+      final url = Uri.parse('$generalRouteForApi/listContactDS/$uidUser/fr');
       final response = await http.get(url);
 
-      if (_cancelRequested) { _applyCancel(isFr); return null; }
+      if (_cancelRequested) {
+        _applyCancel(isFr);
+        return null;
+      }
 
       if (response.statusCode != 200) {
         throw Exception("Erreur API: ${response.statusCode}");
@@ -175,7 +178,10 @@ class SynchroAvanceService extends ChangeNotifier {
       final int totalDSContacts = jsonData.length;
 
       // ── ÉTAPE 1 : Fusion des doublons ────────────────────────────────────
-      if (_cancelRequested) { _applyCancel(isFr); return null; }
+      if (_cancelRequested) {
+        _applyCancel(isFr);
+        return null;
+      }
 
       statusText = isFr
           ? "Détection des doublons${etendreAuxNonDS ? '' : ' DS'}..."
@@ -183,33 +189,41 @@ class SynchroAvanceService extends ChangeNotifier {
       textChargementEvolution = statusText;
       notifyListeners();
 
-      List<Contact> allContacts =
-          await FlutterContacts.getContacts(withProperties: true, withAccounts: true);
+      List<Contact> allContacts = await FlutterContacts.getContacts(
+          withProperties: true, withAccounts: true);
 
-      if (_cancelRequested) { _applyCancel(isFr); return null; }
+      if (_cancelRequested) {
+        _applyCancel(isFr);
+        return null;
+      }
 
       final List<Contact> dsContacts =
           allContacts.where((c) => c.name.first.endsWith("#DS")).toList();
 
       final Set<String> dsToDeleteIds = _computeDuplicatesToDelete(dsContacts);
       final Set<String> nonDSToDeleteIds = etendreAuxNonDS
-          ? _computeDuplicatesToDelete(allContacts
-              .where((c) => !c.name.first.endsWith("#DS"))
-              .toList())
+          ? _computeDuplicatesToDelete(
+              allContacts.where((c) => !c.name.first.endsWith("#DS")).toList())
           : {};
       final List<String> toDeleteList =
           {...dsToDeleteIds, ...nonDSToDeleteIds}.toList();
 
       int deletedCount = 0;
       for (int i = 0; i < toDeleteList.length; i++) {
-        if (_cancelRequested) { _applyCancel(isFr); return null; }
+        if (_cancelRequested) {
+          _applyCancel(isFr);
+          return null;
+        }
 
         final Contact? toDelete = allContacts
             .cast<Contact?>()
             .firstWhere((x) => x?.id == toDeleteList[i], orElse: () => null);
         if (toDelete != null) {
           await FlutterContacts.deleteContacts([toDelete]);
-          if (_cancelRequested) { _applyCancel(isFr); return null; }
+          if (_cancelRequested) {
+            _applyCancel(isFr);
+            return null;
+          }
           deletedCount++;
         }
         final double p =
@@ -233,7 +247,10 @@ class SynchroAvanceService extends ChangeNotifier {
       notifyListeners();
 
       // ── ÉTAPE 2 : Analyse contacts locaux ────────────────────────────────
-      if (_cancelRequested) { _applyCancel(isFr); return null; }
+      if (_cancelRequested) {
+        _applyCancel(isFr);
+        return null;
+      }
 
       statusText = isFr
           ? "Analyse de vos contacts locaux..."
@@ -243,14 +260,21 @@ class SynchroAvanceService extends ChangeNotifier {
       notifyListeners();
 
       await SQLHelper.viderLaBaseDeDonneeLocalTelUser();
-      allContacts = await FlutterContacts.getContacts(withProperties: true, withAccounts: true);
+      allContacts = await FlutterContacts.getContacts(
+          withProperties: true, withAccounts: true);
 
-      if (_cancelRequested) { _applyCancel(isFr); return null; }
+      if (_cancelRequested) {
+        _applyCancel(isFr);
+        return null;
+      }
 
       final int totalLocalContacts = allContacts.length;
 
       for (int i = 0; i < totalLocalContacts; i++) {
-        if (_cancelRequested) { _applyCancel(isFr); return null; }
+        if (_cancelRequested) {
+          _applyCancel(isFr);
+          return null;
+        }
 
         final contact = allContacts[i];
         for (final phone in contact.phones) {
@@ -270,7 +294,10 @@ class SynchroAvanceService extends ChangeNotifier {
       }
 
       // ── ÉTAPE 3 : Synchronisation DS ─────────────────────────────────────
-      if (_cancelRequested) { _applyCancel(isFr); return null; }
+      if (_cancelRequested) {
+        _applyCancel(isFr);
+        return null;
+      }
 
       statusText = isFr
           ? "Synchronisation des contacts DS..."
@@ -283,7 +310,10 @@ class SynchroAvanceService extends ChangeNotifier {
           allContacts.where((c) => c.name.first.endsWith("#DS")).toList();
 
       for (int i = 0; i < totalDSContacts; i++) {
-        if (_cancelRequested) { _applyCancel(isFr); return null; }
+        if (_cancelRequested) {
+          _applyCancel(isFr);
+          return null;
+        }
 
         final contactData = jsonData[i];
         final String tel = (contactData["tel"] as String);
@@ -304,19 +334,25 @@ class SynchroAvanceService extends ChangeNotifier {
           final newContact = Contact()
             ..name.first = expectedName
             ..phones = phonesList
-            ..accounts = (selectedContactAccountName != null && selectedContactAccountType != null)
-                ? [Account('', selectedContactAccountType!, selectedContactAccountName!, [])]
+            ..accounts = (selectedContactAccountName != null &&
+                    selectedContactAccountType != null)
+                ? [
+                    Account('', selectedContactAccountType!,
+                        selectedContactAccountName!, [])
+                  ]
                 : [];
           await newContact.insert().timeout(
-            const Duration(seconds: 15),
-            onTimeout: () => Contact(),
-          );
-          if (_cancelRequested) { _applyCancel(isFr); return null; }
+                const Duration(seconds: 15),
+                onTimeout: () => Contact(),
+              );
+          if (_cancelRequested) {
+            _applyCancel(isFr);
+            return null;
+          }
           await insertNumTelUserIntoDataBase(tel);
           nbCreated++;
         } else {
-          final Contact? existing =
-              _findDSContactByTel(freshDSContacts, tel);
+          final Contact? existing = _findDSContactByTel(freshDSContacts, tel);
           if (existing != null && existing.name.first != expectedName) {
             final Contact? fullContact = await FlutterContacts.getContact(
               existing.id,
@@ -326,14 +362,21 @@ class SynchroAvanceService extends ChangeNotifier {
             if (fullContact != null) {
               fullContact.name.first = expectedName;
               fullContact.phones = phonesList;
-              if (selectedContactAccountName != null && selectedContactAccountType != null) {
-                fullContact.accounts = [Account('', selectedContactAccountType!, selectedContactAccountName!, [])];
+              if (selectedContactAccountName != null &&
+                  selectedContactAccountType != null) {
+                fullContact.accounts = [
+                  Account('', selectedContactAccountType!,
+                      selectedContactAccountName!, [])
+                ];
               }
               await fullContact.update().timeout(
-                const Duration(seconds: 15),
-                onTimeout: () => Contact(),
-              );
-              if (_cancelRequested) { _applyCancel(isFr); return null; }
+                    const Duration(seconds: 15),
+                    onTimeout: () => Contact(),
+                  );
+              if (_cancelRequested) {
+                _applyCancel(isFr);
+                return null;
+              }
               nbUpdated++;
             }
           }

@@ -94,7 +94,7 @@ class _SignalerFormState extends State<SignalerForm> {
           'POST', Uri.parse('$generalRouteForApi/addSignalement'));
       request.fields.addAll({
         'uid': uidUser,
-        'langUserPhone': langUserPhone.toString(),
+        
         'telSignaler': telController.text,
         'motifSignaler': motifController.text,
       });

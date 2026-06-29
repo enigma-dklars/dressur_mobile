@@ -134,7 +134,7 @@ class SociauxPage extends StatelessWidget {
                 ),
               ),
               onPressed: () async {
-                shareMessageWithImage(context, "$langUserPhone");
+                shareMessageWithImage(context);
               },
             ),
           ),

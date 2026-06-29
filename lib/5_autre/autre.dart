@@ -43,6 +43,9 @@ class _SettingPageState extends State<SettingPage> {
   }
 
   Future<void> _setLang(String lang) async {
+    setState(() {
+      langUserPhone = lang;
+    });
     try {
       final request = http.MultipartRequest(
         'POST',
@@ -54,11 +57,11 @@ class _SettingPageState extends State<SettingPage> {
       final response = await http.Response.fromStream(streamedResponse);
       if (response.statusCode == 200) {
         final body = response.body;
-        if (body.contains('"error":false')) {
-          setState(() {
-            langUserPhone = lang;
-          });
-        }
+        // if (body.contains('"error":false')) {
+        //   setState(() {
+        //     langUserPhone = lang;
+        //   });
+        // }
       }
     } catch (_) {}
   }

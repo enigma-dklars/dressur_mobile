@@ -81,7 +81,9 @@ void main() async {
   // Correction: await initializeNotifications();
   // Correction: await flutterLocalNotificationsPlugin.initialize(...);
 
-  const AndroidInitializationSettings initializationSettingsAndroid = AndroidInitializationSettings('@mipmap/ic_launcher'); // Assurez-vous que cette ressource existe
+  const AndroidInitializationSettings initializationSettingsAndroid =
+      AndroidInitializationSettings(
+          '@mipmap/ic_launcher'); // Assurez-vous que cette ressource existe
 
   final List<DarwinNotificationCategory> darwinNotificationCategories =
       <DarwinNotificationCategory>[
@@ -151,8 +153,7 @@ void main() async {
   final LinuxInitializationSettings initializationSettingsLinux =
       LinuxInitializationSettings(
     defaultActionName: 'Open notification',
-    defaultIcon: AssetsLinuxIcon(
-        'images/dressur_logo.png'),
+    defaultIcon: AssetsLinuxIcon('images/dressur_logo.png'),
   );
   final InitializationSettings initializationSettings = InitializationSettings(
     android: initializationSettingsAndroid,
@@ -227,11 +228,6 @@ class MyApp extends StatelessWidget {
           title: 'Dressur',
           darkTheme: ThemeData.dark(),
           themeMode: currentMode,
-          // home: WelcomePage(notificationAppLaunchDetails),
-          localeResolutionCallback: (deviceLocale, supportedLocales) {
-            langUserPhone = deviceLocale?.languageCode;
-            return null;
-          },
         );
       },
     );

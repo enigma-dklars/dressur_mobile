@@ -60,7 +60,7 @@ class _ConfigurationRetraitPageState extends State<ConfigurationRetraitPage> {
           'POST', Uri.parse('$generalRouteForApi/getRetraitConfiguration'));
       request.fields.addAll({
         'uid': uidUser,
-        'langUserPhone': langUserPhone.toString(),
+        
       });
 
       http.StreamedResponse response = await request.send();
@@ -108,7 +108,7 @@ class _ConfigurationRetraitPageState extends State<ConfigurationRetraitPage> {
           'POST', Uri.parse('$generalRouteForApi/saveRetraitConfiguration'));
       request.fields.addAll({
         'uid': uidUser,
-        'langUserPhone': langUserPhone.toString(),
+        
         'reseauRetrait': _reseauSelectionne!.id,
         'numeroRetrait': "+${_numeroController.text}",
       });

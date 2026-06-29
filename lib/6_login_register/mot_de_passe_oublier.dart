@@ -106,7 +106,6 @@ class _RecuperationFormState extends State<RecuperationForm> {
           'POST', Uri.parse('$generalRouteForApi/sendMailPassForgot'));
       request.fields.addAll({
         'mail': _emailController.text.trim(),
-        'langUserPhone': langUserPhone.toString()
       });
 
       http.StreamedResponse response = await request.send();

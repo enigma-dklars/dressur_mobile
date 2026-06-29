@@ -144,7 +144,7 @@ class _RegisterFormState extends State<RegisterForm> {
       var request = http.MultipartRequest(
           'POST', Uri.parse('$generalRouteForApi/inscriptionDS'));
       request.fields.addAll({
-        'langUserPhone': langUserPhone.toString(),
+        
         'tel': "+$fullPhoneNumber",
         'mail': _emailController.text.trim(),
         'password': _passwordController.text,

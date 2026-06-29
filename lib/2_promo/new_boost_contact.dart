@@ -431,7 +431,7 @@ class _RegisterFormState extends State<RegisterForm> {
             'POST', Uri.parse('$generalRouteForApi/newBoost'));
         request.fields.addAll({
           'uid': uidUser,
-          'langUserPhone': langUserPhone.toString(),
+          
           'typeBoost': widget.typeBoost,
         });
         http.StreamedResponse response = await request.send();
@@ -613,7 +613,7 @@ class _RegisterForm2State extends State<RegisterForm2> {
             'POST', Uri.parse('$generalRouteForApi/newBoostPayant'));
         request.fields.addAll({
           'uid': uidUser,
-          'langUserPhone': langUserPhone.toString(),
+          
           'idFormulBoost': idFormulBoost.toString(),
           'valueMethodePaiement': valueMethodePaiement,
           'tel': telController.text,

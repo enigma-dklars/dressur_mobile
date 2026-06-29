@@ -34,7 +34,7 @@ class _ProgrammeRecompensePageState extends State<ProgrammeRecompensePage> {
           'POST', Uri.parse('$generalRouteForApi/addToRecompenseProgramme'));
       request.fields.addAll({
         'uid': uidUser,
-        'langUserPhone': langUserPhone.toString(),
+        
       });
 
       http.StreamedResponse response = await request.send();

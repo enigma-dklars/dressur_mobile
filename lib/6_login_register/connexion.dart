@@ -107,7 +107,6 @@ class _LoginFormState extends State<LoginForm> {
       request.fields.addAll({
         'mail': _emailController.text,
         'password': _passwordController.text,
-        'langUserPhone': langUserPhone.toString()
       });
 
       http.StreamedResponse response = await request.send();

@@ -90,7 +90,7 @@ class _HistoriqueCompletPageState extends State<HistoriqueCompletPage> {
               '$generalRouteForApi/getMyProgrammeRecompenseInformations'));
       request.fields.addAll({
         'uid': uidUser,
-        'langUserPhone': langUserPhone.toString(),
+        
       });
 
       http.StreamedResponse response = await request.send();

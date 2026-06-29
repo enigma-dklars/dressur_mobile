@@ -162,7 +162,7 @@ class _BottomBarState extends State<BottomBar> with WidgetsBindingObserver {
     var request = http.MultipartRequest(
         'POST', Uri.parse('$generalRouteForApi/getUserInfo'));
     request.fields
-        .addAll({'uid': uidUser, 'langUserPhone': langUserPhone.toString()});
+        .addAll({'uid': uidUser,});
 
     http.StreamedResponse response = await request.send();
 

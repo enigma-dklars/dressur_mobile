@@ -53,8 +53,7 @@ class _PromotionReseauSociauxListePageState
     setState(() {
       _isLoading = true;
     });
-    final url = Uri.parse(
-        '$generalRouteForApi/listPromoReseau/$uidUser/$langUserPhone');
+    final url = Uri.parse('$generalRouteForApi/listPromoReseau/$uidUser/fr');
 
     final response = await http.get(url);
 
@@ -174,7 +173,8 @@ class _PromotionReseauSociauxListePageState
             color: primaryColor,
             icon: const FaIcon(
               FontAwesomeIcons.bars,
-              color: Colors.white,size: 20,
+              color: Colors.white,
+              size: 20,
             ),
             elevation: 2,
             onSelected: (value) {
@@ -501,7 +501,8 @@ class _PromotionReseauSociauxListePageState
   }
 
   Widget _buildShimmerList() {
-    /* ... */ return Center(child: CircularProgressIndicator(color: primaryColor));
+    /* ... */ return Center(
+        child: CircularProgressIndicator(color: primaryColor));
   }
 }
 
