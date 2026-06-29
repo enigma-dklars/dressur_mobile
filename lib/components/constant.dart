@@ -78,7 +78,7 @@ int nbrAffichageAvertissement = 0;
 List<dynamic> userChatInfo = [];
 List<dynamic> contactsUserBeforeDS = [];
 List<dynamic> contactsEnregistrer = [];
-String? langUserPhone = "en";
+String? langUserPhone = "fr";
 String preferencePaysText = "";
 int nombreContacts = 0;
 int nombreContactDispo = 0;
@@ -462,21 +462,22 @@ Map<String, String> countryCodes = {
 };
 
 List<Map<String, dynamic>> listeTypePromoAffaire() => [
-  {
-    'value': 'produit_service',
-    'label': (langUserPhone == "fr")
-        ? 'Produits, Services, Événements etc.'
-        : 'Products, Services, Events, etc.',
-  },
-  {
-    'value': 'dmd_emploi',
-    'label': (langUserPhone == "fr") ? "Demandes d'emploi" : "Job Applications",
-  },
-  {
-    'value': 'offre_emploi',
-    'label': (langUserPhone == "fr") ? "Offres d'emploi" : "Job Offers",
-  },
-];
+      {
+        'value': 'produit_service',
+        'label': (langUserPhone == "fr")
+            ? 'Produits, Services, Événements etc.'
+            : 'Products, Services, Events, etc.',
+      },
+      {
+        'value': 'dmd_emploi',
+        'label':
+            (langUserPhone == "fr") ? "Demandes d'emploi" : "Job Applications",
+      },
+      {
+        'value': 'offre_emploi',
+        'label': (langUserPhone == "fr") ? "Offres d'emploi" : "Job Offers",
+      },
+    ];
 
 String getCurrentYear() {
   // Obtenez la date actuelle
@@ -575,14 +576,19 @@ Future<void> sharePromotion(BuildContext context, String imageLink,
 
     // Partager l'image et le message
     await Share.shareXFiles([XFile(file.path)],
-        text: messageShare, subject: (langUserPhone == 'fr') ? 'Partager Promotion!' : 'Share Promotion!');
+        text: messageShare,
+        subject: (langUserPhone == 'fr')
+            ? 'Partager Promotion!'
+            : 'Share Promotion!');
   } else {
     // Gérer les erreurs de téléchargement
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         backgroundColor: Colors.red,
         behavior: SnackBarBehavior.floating,
         content: Text(
-          (langUserPhone == 'fr') ? 'Erreur de téléchargement de l\'image' : 'Image download error',
+          (langUserPhone == 'fr')
+              ? 'Erreur de téléchargement de l\'image'
+              : 'Image download error',
           style: GoogleFonts.poppins(
             color: Colors.white,
           ),
@@ -890,13 +896,21 @@ Future<void> saveContactDsIfNotExiste() async {
       }
       if (nombreNewContact == 1) {
         showNotification(
-          (langUserPhone == "fr") ? "ADD Contacts Dressur" : "ADD Dressur Contacts",
-          (langUserPhone == "fr") ? "$nombreNewContact nouveau contact enregistré par Dressur." : "$nombreNewContact new contact saved by Dressur.",
+          (langUserPhone == "fr")
+              ? "ADD Contacts Dressur"
+              : "ADD Dressur Contacts",
+          (langUserPhone == "fr")
+              ? "$nombreNewContact nouveau contact enregistré par Dressur."
+              : "$nombreNewContact new contact saved by Dressur.",
         );
       } else if (nombreNewContact > 1) {
         showNotification(
-          (langUserPhone == "fr") ? "ADD Contacts Dressur" : "ADD Dressur Contacts",
-          (langUserPhone == "fr") ? "$nombreNewContact nouveaux contacts enregistrés par Dressur." : "$nombreNewContact new contacts saved by Dressur.",
+          (langUserPhone == "fr")
+              ? "ADD Contacts Dressur"
+              : "ADD Dressur Contacts",
+          (langUserPhone == "fr")
+              ? "$nombreNewContact nouveaux contacts enregistrés par Dressur."
+              : "$nombreNewContact new contacts saved by Dressur.",
         );
       }
     }
