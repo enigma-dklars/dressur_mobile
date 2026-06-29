@@ -13,7 +13,6 @@ import 'package:dressur/components/noti.dart';
 import 'package:dressur/components/bottomBar.dart';
 import 'package:dressur/5_autre/support_assistance.dart';
 
-
 class LoginPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -140,8 +139,6 @@ class _LoginFormState extends State<LoginForm> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
     return Form(
       key: _formKey,
       child: Column(
@@ -177,8 +174,7 @@ class _LoginFormState extends State<LoginForm> {
               controller: _passwordController,
               obscureText: _isPasswordObscured,
               decoration: _buildInputDecoration(
-                label:
-                    (langUserPhone == "fr") ? 'Mot de passe' : 'Password',
+                label: (langUserPhone == "fr") ? 'Mot de passe' : 'Password',
                 icon: FontAwesomeIcons.lock,
                 suffixIcon: IconButton(
                   icon: FaIcon(
@@ -240,8 +236,7 @@ class _LoginFormState extends State<LoginForm> {
                         height: 24,
                         child: CircularProgressIndicator(
                             color: Colors.white, strokeWidth: 2))
-                    : Text(
-                        (langUserPhone == "fr") ? "Se Connecter" : "Log In"),
+                    : Text((langUserPhone == "fr") ? "Se Connecter" : "Log In"),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: primaryColor,
                   foregroundColor: Colors.white,

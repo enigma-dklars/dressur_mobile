@@ -1,6 +1,5 @@
 // ignore_for_file: use_build_context_synchronously, prefer_const_constructors
 
-import 'package:animate_do/animate_do.dart';
 import 'package:dressur/5_autre/suggestions.dart';
 import 'package:dressur/5_autre/supprimer_contacts_ds.dart';
 import 'package:dressur/components/sociaux.dart';
@@ -93,211 +92,204 @@ class _SettingPageState extends State<SettingPage> {
     final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
-        backgroundColor: isDark ? Color(0xFF121212) : Color(0xFFF8F9FA),
-        appBar: AppBar(
-          automaticallyImplyLeading: false,
-          elevation: 0,
-          backgroundColor: primaryColor,
-          title: Text(
-            (langUserPhone == "fr") ? "Paramètres" : "Settings",
-            style: GoogleFonts.poppins(
+      backgroundColor: isDark ? Color(0xFF121212) : Color(0xFFF8F9FA),
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        elevation: 0,
+        backgroundColor: primaryColor,
+        title: Text(
+          (langUserPhone == "fr") ? "Paramètres" : "Settings",
+          style: GoogleFonts.poppins(
+            color: Colors.white,
+            fontWeight: FontWeight.w400,
+            fontSize: 18,
+          ),
+        ),
+        actions: [
+          IconButton(
+            icon: const FaIcon(
+              FontAwesomeIcons.solidBell,
+              size: 20,
               color: Colors.white,
-              fontWeight: FontWeight.w400,
-              fontSize: 18,
+            ),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ListeNotification(),
+                ),
+              );
+            },
+          ),
+          const Padding(
+            padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
+            child: VerticalDivider(
+              width: 0,
+              color: Colors.white,
+              thickness: 1,
             ),
           ),
-          actions: [
-            IconButton(
-              icon: const FaIcon(
-                FontAwesomeIcons.solidBell,
-                size: 20,
-                color: Colors.white,
+          PopupMenuButton<int>(
+            itemBuilder: (context) => [
+              PopupMenuItem(
+                value: 1,
+                child: Row(
+                  children: [
+                    Text(
+                      (langUserPhone == "fr") ? "Aide" : "Help",
+                      style: GoogleFonts.poppins(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-              onPressed: () {
+            ],
+            offset: const Offset(0, 60),
+            color: primaryColor,
+            icon: const FaIcon(
+              FontAwesomeIcons.bars,
+              color: Colors.white,
+              size: 20,
+            ),
+            elevation: 2,
+            onSelected: (value) {
+              if (value == 1) {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                    builder: (context) => ListeNotification(),
-                  ),
+                  MaterialPageRoute(builder: (context) => SupportPage()),
                 );
-              },
-            ),
-            const Padding(
-              padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
-              child: VerticalDivider(
-                width: 0,
-                color: Colors.white,
-                thickness: 1,
-              ),
-            ),
-            PopupMenuButton<int>(
-              itemBuilder: (context) => [
-                PopupMenuItem(
-                  value: 1,
-                  child: Row(
-                    children: [
-                      Text(
-                        (langUserPhone == "fr") ? "Aide" : "Help",
-                        style: GoogleFonts.poppins(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-              offset: const Offset(0, 60),
-              color: primaryColor,
-              icon: const FaIcon(
-                FontAwesomeIcons.bars,
-                color: Colors.white,
-                size: 20,
-              ),
-              elevation: 2,
-              onSelected: (value) {
-                if (value == 1) {
-                  Navigator.push(
+              }
+            },
+          ),
+        ],
+      ),
+      body: SingleChildScrollView(
+        physics: BouncingScrollPhysics(),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // --- SECTION ADMINISTRATION (admins uniquement) ---
+            if (admin) ...[
+              _buildSectionTitle("Administration"),
+              _buildMenuContainer(isDark, [
+                _buildMenuRow(
+                    FontAwesomeIcons.userShield,
+                    (langUserPhone == "fr")
+                        ? "Panneau Administrateur"
+                        : "Admin Panel",
+                    () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => AdministrationPage()))),
+              ]),
+            ],
+
+            // --- SECTION COMPTE ---
+            _buildSectionTitle(
+                (langUserPhone == "fr") ? "Mon Compte" : "My Account"),
+            _buildMenuContainer(isDark, [
+              _buildMenuRow(
+                  FontAwesomeIcons.user,
+                  (langUserPhone == "fr") ? "Profil" : "Profile",
+                  () => Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => ProfilPage()))),
+              _buildMenuRow(
+                  FontAwesomeIcons.lock,
+                  (langUserPhone == "fr")
+                      ? "Modifier le mot de passe"
+                      : "Change Password",
+                  () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => ModifierMdpPage()))),
+            ]),
+
+            // --- SECTION ASSISTANCE & FEEDBACK ---
+            _buildSectionTitle((langUserPhone == "fr")
+                ? "Assistance & Avis"
+                : "Support & Feedback"),
+            _buildMenuContainer(isDark, [
+              _buildMenuRow(
+                  FontAwesomeIcons.headset,
+                  (langUserPhone == "fr")
+                      ? "Support Technique"
+                      : "Technical Support",
+                  () => Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => SupportPage()))),
+              _buildMenuRow(
+                  FontAwesomeIcons.lightbulb,
+                  "Suggestions",
+                  () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => SuggestionsPage()))),
+              _buildMenuRow(
+                  FontAwesomeIcons.triangleExclamation,
+                  (langUserPhone == "fr")
+                      ? "Signaler un utilisateur"
+                      : "Report a User",
+                  () => Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => SignalerPage()))),
+            ]),
+
+            // --- SECTION ACTIONS AVANCÉES ---
+            _buildSectionTitle((langUserPhone == "fr")
+                ? "Actions Avancées"
+                : "Advanced Actions"),
+            _buildMenuContainer(isDark, [
+              _buildMenuRow(
+                FontAwesomeIcons.broom,
+                (langUserPhone == "fr")
+                    ? "Supprimer les contacts DS"
+                    : "Delete DS Contacts",
+                () => Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => SupportPage()),
-                  );
-                }
-              },
-            ),
+                    MaterialPageRoute(
+                        builder: (context) => const SupprimerContactsDSPage())),
+                color: Colors.orange[700],
+              ),
+              _buildMenuRow(
+                FontAwesomeIcons.trash,
+                (langUserPhone == "fr")
+                    ? "Supprimer mon compte"
+                    : "Delete My Account",
+                () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => DeletecomptePage())),
+                color: Colors.red,
+              ),
+            ]),
+
+            // --- SECTION APPLICATION ---
+            _buildSectionTitle("Application"),
+            _buildMenuContainer(isDark, [
+              _buildLanguageSelector(isDark),
+              _buildThemeSelector(isDark),
+              _buildMenuRow(
+                  FontAwesomeIcons.circleInfo,
+                  (langUserPhone == "fr") ? "À Propos" : "About Us",
+                  () => Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => AproposPage()))),
+              _buildMenuRow(
+                  FontAwesomeIcons.rightFromBracket,
+                  (langUserPhone == "fr") ? "Se déconnecter" : "Sign Out",
+                  _handleLogout,
+                  showChevron: false),
+            ]),
+
+            // --- SECTION ABONNEMENT & PARTAGE ---
+            _buildSectionTitle((langUserPhone == "fr")
+                ? "Abonnement et Partage"
+                : "Subscription & Sharing"),
+            SociauxPage(),
+
+            SizedBox(height: 20),
           ],
         ),
-        body: SingleChildScrollView(
-          physics: BouncingScrollPhysics(),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // --- SECTION ADMINISTRATION (admins uniquement) ---
-              if (admin) ...[
-                _buildSectionTitle("Administration"),
-                _buildMenuContainer(isDark, [
-                  _buildMenuRow(
-                      FontAwesomeIcons.userShield,
-                      (langUserPhone == "fr")
-                          ? "Panneau Administrateur"
-                          : "Admin Panel",
-                      () => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => AdministrationPage()))),
-                ]),
-              ],
-
-              // --- SECTION COMPTE ---
-              _buildSectionTitle(
-                  (langUserPhone == "fr") ? "Mon Compte" : "My Account"),
-              _buildMenuContainer(isDark, [
-                _buildMenuRow(
-                    FontAwesomeIcons.user,
-                    (langUserPhone == "fr") ? "Profil" : "Profile",
-                    () => Navigator.push(context,
-                        MaterialPageRoute(builder: (context) => ProfilPage()))),
-                _buildMenuRow(
-                    FontAwesomeIcons.lock,
-                    (langUserPhone == "fr")
-                        ? "Modifier le mot de passe"
-                        : "Change Password",
-                    () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => ModifierMdpPage()))),
-              ]),
-
-              // --- SECTION ASSISTANCE & FEEDBACK ---
-              _buildSectionTitle((langUserPhone == "fr")
-                  ? "Assistance & Avis"
-                  : "Support & Feedback"),
-              _buildMenuContainer(isDark, [
-                _buildMenuRow(
-                    FontAwesomeIcons.headset,
-                    (langUserPhone == "fr")
-                        ? "Support Technique"
-                        : "Technical Support",
-                    () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => SupportPage()))),
-                _buildMenuRow(
-                    FontAwesomeIcons.lightbulb,
-                    "Suggestions",
-                    () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => SuggestionsPage()))),
-                _buildMenuRow(
-                    FontAwesomeIcons.triangleExclamation,
-                    (langUserPhone == "fr")
-                        ? "Signaler un utilisateur"
-                        : "Report a User",
-                    () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => SignalerPage()))),
-              ]),
-
-              // --- SECTION ACTIONS AVANCÉES ---
-              _buildSectionTitle((langUserPhone == "fr")
-                  ? "Actions Avancées"
-                  : "Advanced Actions"),
-              _buildMenuContainer(isDark, [
-                _buildMenuRow(
-                  FontAwesomeIcons.broom,
-                  (langUserPhone == "fr")
-                      ? "Supprimer les contacts DS"
-                      : "Delete DS Contacts",
-                  () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) =>
-                              const SupprimerContactsDSPage())),
-                  color: Colors.orange[700],
-                ),
-                _buildMenuRow(
-                  FontAwesomeIcons.trash,
-                  (langUserPhone == "fr")
-                      ? "Supprimer mon compte"
-                      : "Delete My Account",
-                  () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => DeletecomptePage())),
-                  color: Colors.red,
-                ),
-              ]),
-
-              // --- SECTION APPLICATION ---
-              _buildSectionTitle("Application"),
-              _buildMenuContainer(isDark, [
-                _buildLanguageSelector(isDark),
-                _buildThemeSelector(isDark),
-                _buildMenuRow(
-                    FontAwesomeIcons.circleInfo,
-                    (langUserPhone == "fr") ? "À Propos" : "About Us",
-                    () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => AproposPage()))),
-                _buildMenuRow(
-                    FontAwesomeIcons.rightFromBracket,
-                    (langUserPhone == "fr") ? "Se déconnecter" : "Sign Out",
-                    _handleLogout,
-                    showChevron: false),
-              ]),
-
-              // --- SECTION ABONNEMENT & PARTAGE ---
-              _buildSectionTitle((langUserPhone == "fr")
-                  ? "Abonnement et Partage"
-                  : "Subscription & Sharing"),
-              SociauxPage(),
-
-              SizedBox(height: 20),
-            ],
-          ),
-        ),
+      ),
     );
   }
 
@@ -363,7 +355,9 @@ class _SettingPageState extends State<SettingPage> {
                             size: 14,
                             color: isSelected
                                 ? Colors.white
-                                : (isDark ? Colors.grey[400] : Colors.grey[600]),
+                                : (isDark
+                                    ? Colors.grey[400]
+                                    : Colors.grey[600]),
                           ),
                           SizedBox(height: 4),
                           Text(
@@ -373,7 +367,9 @@ class _SettingPageState extends State<SettingPage> {
                               fontWeight: FontWeight.w600,
                               color: isSelected
                                   ? Colors.white
-                                  : (isDark ? Colors.grey[400] : Colors.grey[600]),
+                                  : (isDark
+                                      ? Colors.grey[400]
+                                      : Colors.grey[600]),
                             ),
                           ),
                         ],
@@ -456,7 +452,9 @@ class _SettingPageState extends State<SettingPage> {
                             size: 14,
                             color: isSelected
                                 ? Colors.white
-                                : (isDark ? Colors.grey[400] : Colors.grey[600]),
+                                : (isDark
+                                    ? Colors.grey[400]
+                                    : Colors.grey[600]),
                           ),
                           SizedBox(height: 4),
                           Text(
@@ -466,7 +464,9 @@ class _SettingPageState extends State<SettingPage> {
                               fontWeight: FontWeight.w600,
                               color: isSelected
                                   ? Colors.white
-                                  : (isDark ? Colors.grey[400] : Colors.grey[600]),
+                                  : (isDark
+                                      ? Colors.grey[400]
+                                      : Colors.grey[600]),
                             ),
                           ),
                         ],
@@ -478,40 +478,6 @@ class _SettingPageState extends State<SettingPage> {
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildStatCard(BuildContext context,
-      {required IconData icon,
-      required String value,
-      required String label,
-      required bool hasIncreased}) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    return Expanded(
-      child: Container(
-        padding: EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: isDark ? Color(0xFF1E1E1E) : Colors.white,
-          borderRadius: BorderRadius.circular(15),
-        ),
-        child: Column(
-          children: [
-            FaIcon(icon, color: primaryColor, size: 24),
-            SizedBox(height: 10),
-            Text(label,
-                style: GoogleFonts.poppins(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: isDark ? Colors.grey[300] : Colors.grey[700])),
-            SizedBox(height: 8),
-            Text(value,
-                style: GoogleFonts.poppins(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: isDark ? Colors.white : Colors.black87)),
-          ],
-        ),
       ),
     );
   }
