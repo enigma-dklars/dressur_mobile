@@ -236,16 +236,6 @@ class _ProduitsServicesState extends State<ProduitsServices> {
     return (jours * _dressurStatusPricePer7Days) / 7;
   }
 
-  double get _fedapayCommission {
-    // Commission Fedapay estimée à 3% + fixe (ajustez selon les besoins réels)
-    if (_subTotal == 0) return 0.0;
-    return (_subTotal * 0.03) + 100;
-  }
-
-  double get _totalAmount {
-    return _subTotal + _fedapayCommission;
-  }
-
   bool isImageSquare(File imageFile) {
     final image = img.decodeImage(File(imageFile.path).readAsBytesSync());
     if (image == null) return false;
@@ -253,25 +243,6 @@ class _ProduitsServicesState extends State<ProduitsServices> {
     final height = image.height;
     final aspectRatio = width / height;
     return aspectRatio >= 0.8 && aspectRatio <= 1.2;
-  }
-
-  void _onFormuleChanged(val) {
-    final selected = listeDesFormules
-        .firstWhere((e) => e['value'].toString() == val.toString());
-    setState(() {
-      idFormulBoost = int.parse(val.toString());
-      prixBoost = selected['prix'];
-      joursBoost = selected['jours'];
-
-      value = selected['value'];
-      label = selected['label'];
-      prix = selected['prix'];
-      jours = selected['jours'];
-      idFormulBoost = val;
-      _message = (langUserPhone == "fr")
-          ? "Formule de $jours jour(s) pour $prix FCFA."
-          : "Plan of $jours day(s) for $prix FCFA.";
-    });
   }
 
   Future<void> _selectImage() async {
@@ -765,25 +736,6 @@ class _ProduitsServicesState extends State<ProduitsServices> {
                 fontSize: 15,
                 color: isActive ? primaryColor : Colors.grey[700])),
       ],
-    );
-  }
-
-  Widget _priceRow(String label, double amount, {bool isSmall = false}) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 2),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(label,
-              style: GoogleFonts.poppins(
-                  fontSize: isSmall ? 11 : 13,
-                  color: isSmall ? Colors.grey : null)),
-          Text("${amount.toStringAsFixed(0)} F",
-              style: GoogleFonts.poppins(
-                  fontSize: isSmall ? 11 : 13,
-                  fontWeight: isSmall ? FontWeight.normal : FontWeight.w500)),
-        ],
-      ),
     );
   }
 }

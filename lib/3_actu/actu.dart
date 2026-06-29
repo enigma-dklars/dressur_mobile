@@ -1648,9 +1648,6 @@ class _ActuPageState extends State<ActuPage> {
     required String viewCount,
     required VoidCallback onShare,
   }) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-
     return Container(
       // Ajout d'une bordure supérieure pour séparer visuellement le footer du contenu
 
