@@ -157,6 +157,7 @@ Future<void> initUserInformations(userInfos) async {
   youtube = userInfos["youtube"];
   mailIsVerified = userInfos["mailIsVerified"];
   telIsVerified = userInfos["telIsVerified"];
+  langUserPhone = userInfos["lang"];
   createdAt = userInfos["createdAt"];
   admin = userInfos["admin"];
   permissionAdd = userInfos["permissionAdd"];
