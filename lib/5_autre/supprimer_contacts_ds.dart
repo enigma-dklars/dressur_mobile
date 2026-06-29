@@ -125,7 +125,6 @@ class _SupprimerContactsDSPageState extends State<SupprimerContactsDSPage> {
     final bool cancelPending = _service.isCancelPending;
     final double progress = _service.progress;
     final String statusText = _service.statusText;
-    final int totalSupprime = _service.totalSupprime;
 
     return Scaffold(
       appBar: AppBar(

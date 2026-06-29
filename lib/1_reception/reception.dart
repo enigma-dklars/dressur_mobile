@@ -2,7 +2,6 @@ import 'package:dressur/1_reception/liste_contact.dart';
 import 'package:dressur/1_reception/synchronisation_avance.dart';
 import 'package:dressur/1_reception/recompense_dashboard.dart';
 import 'package:dressur/1_reception/recompense_start.dart';
-import 'package:dressur/components/padding_and_divider.dart';
 import 'package:dressur/components/sociaux.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';

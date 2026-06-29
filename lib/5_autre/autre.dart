@@ -56,7 +56,6 @@ class _SettingPageState extends State<SettingPage> {
       final streamedResponse = await request.send();
       final response = await http.Response.fromStream(streamedResponse);
       if (response.statusCode == 200) {
-        final body = response.body;
         // if (body.contains('"error":false')) {
         //   setState(() {
         //     langUserPhone = lang;

@@ -126,7 +126,6 @@ class _BusinessPromotionsPageState extends State<BusinessPromotionsPage> {
   late Future<List<Advertisement>> _futurePromotions;
 
   int? _sharingId; // Stocke l'ID de la promotion en cours de partage
-  bool _desactive = false;
   var data;
 
   @override
@@ -159,10 +158,8 @@ class _BusinessPromotionsPageState extends State<BusinessPromotionsPage> {
       data = convert.jsonDecode(data1);
       if (data["error"] == true) {
         dangerNoti(data["titre"], data["message"], context);
-        _desactive = false;
         return [];
       } else {
-        _desactive = false;
         // 1. On récupère d'abord la liste des promotions depuis le JSON
         final List<dynamic> promoList = data["promotions"];
         print(data["promotions"]);
@@ -187,7 +184,6 @@ class _BusinessPromotionsPageState extends State<BusinessPromotionsPage> {
         }).toList();
       }
     } else {
-      _desactive = false;
       return [];
     }
   }

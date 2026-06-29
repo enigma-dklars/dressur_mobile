@@ -14,8 +14,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:image/image.dart' as img;
 import 'package:dressur/components/constant.dart';
 import 'package:dressur/components/noti.dart';
-  import 'package:dressur/components/noti_sys.dart';
-  import 'package:dressur/components/noti_sys.dart';
+import 'package:dressur/components/noti_sys.dart';
 import 'package:select_form_field/select_form_field.dart';
 import 'package:dressur/components/info_service_bottom_sheet.dart';
 
@@ -49,13 +48,17 @@ class _PromotionFormPageState extends State<PromotionFormPage> {
       items: const [
         ServiceInfoItem(
           icon: FontAwesomeIcons.magnifyingGlass,
-          textFr: "Après envoi, votre promotion sera analysée par les administrateurs de Dressur.",
-          textEn: "After submission, your promotion will be reviewed by Dressur administrators.",
+          textFr:
+              "Après envoi, votre promotion sera analysée par les administrateurs de Dressur.",
+          textEn:
+              "After submission, your promotion will be reviewed by Dressur administrators.",
         ),
         ServiceInfoItem(
           icon: FontAwesomeIcons.eye,
-          textFr: "Si acceptée, elle sera visible par des milliers d'utilisateurs correspondant à vos préférences pays.",
-          textEn: "If accepted, it will be visible to thousands of users matching your country preferences.",
+          textFr:
+              "Si acceptée, elle sera visible par des milliers d'utilisateurs correspondant à vos préférences pays.",
+          textEn:
+              "If accepted, it will be visible to thousands of users matching your country preferences.",
         ),
         ServiceInfoItem(
           icon: FontAwesomeIcons.penToSquare,
@@ -64,13 +67,16 @@ class _PromotionFormPageState extends State<PromotionFormPage> {
         ),
         ServiceInfoItem(
           icon: FontAwesomeIcons.whatsapp,
-          textFr: "Les utilisateurs intéressés vous contacteront sur votre numéro WhatsApp.",
+          textFr:
+              "Les utilisateurs intéressés vous contacteront sur votre numéro WhatsApp.",
           textEn: "Interested users will contact you on your WhatsApp number.",
         ),
         ServiceInfoItem(
           icon: FontAwesomeIcons.gift,
-          textFr: "Les Promotions Affaires (Offre d'emploi et Demande d'emploi) sont gratuites.",
-          textEn: "Business Promotions (Job Offer and Job Application) are free.",
+          textFr:
+              "Les Promotions Affaires (Offre d'emploi et Demande d'emploi) sont gratuites.",
+          textEn:
+              "Business Promotions (Job Offer and Job Application) are free.",
         ),
       ],
     );
@@ -82,7 +88,9 @@ class _PromotionFormPageState extends State<PromotionFormPage> {
       onPressed: () => _showInfoModal(countdown: 0),
       icon: const FaIcon(FontAwesomeIcons.circleInfo, size: 14),
       label: Text(
-        isFr ? "Voir les informations sur le service" : "View service information",
+        isFr
+            ? "Voir les informations sur le service"
+            : "View service information",
         style: GoogleFonts.poppins(fontSize: 13, fontWeight: FontWeight.w500),
       ),
       style: OutlinedButton.styleFrom(
@@ -141,12 +149,16 @@ class _PromotionFormPageState extends State<PromotionFormPage> {
             const SizedBox(height: 8),
             SelectFormField(
               decoration: InputDecoration(
-                labelText: (langUserPhone == "fr") ? 'Type Promotion Affaire' : 'Business Promotion Type',
+                labelText: (langUserPhone == "fr")
+                    ? 'Type Promotion Affaire'
+                    : 'Business Promotion Type',
                 border: const OutlineInputBorder(),
               ),
               type: SelectFormFieldType.dropdown,
               initialValue: 'produit_service',
-              labelText: (langUserPhone == "fr") ? 'Type Promotion Affaire' : 'Business Promotion Type',
+              labelText: (langUserPhone == "fr")
+                  ? 'Type Promotion Affaire'
+                  : 'Business Promotion Type',
               items: listeTypePromoAffaire(),
               onChanged: (val) => onChangeTypePromoAffaire(val),
               onSaved: (val) => print(val),
@@ -198,9 +210,6 @@ class _ProduitsServicesState extends State<ProduitsServices> {
   int joursBoost = 0;
   double get _subTotal =>
       prixBoost + _rewardProgramAmount + _dressurStatusAmount;
-
-  double get _fedapayMax => _subTotal * 0.04;
-  double get _totalWithMaxCommission => _subTotal + _fedapayMax;
 
   bool _publishOnDressurStatus = false;
   final int _dressurStatusPricePer7Days = 5000;
@@ -394,7 +403,8 @@ class _ProduitsServicesState extends State<ProduitsServices> {
         }
       }
     } else {
-      dangerNoti((langUserPhone == "fr") ? "Erreur" : "Error", 'Code : ${response.statusCode}', context);
+      dangerNoti((langUserPhone == "fr") ? "Erreur" : "Error",
+          'Code : ${response.statusCode}', context);
       setState(() => _isSending = false);
     }
   }
@@ -508,9 +518,14 @@ class _ProduitsServicesState extends State<ProduitsServices> {
           border: Border.all(color: Colors.grey[300]!)),
       child: Column(
         children: [
-          _recapRow((langUserPhone == "fr") ? "Formule Boost" : "Boost Plan", prixBoost.toDouble()),
+          _recapRow((langUserPhone == "fr") ? "Formule Boost" : "Boost Plan",
+              prixBoost.toDouble()),
           if (_participateInReward)
-            _recapRow((langUserPhone == "fr") ? "Programme Récompense" : "Reward Program", _rewardProgramAmount),
+            _recapRow(
+                (langUserPhone == "fr")
+                    ? "Programme Récompense"
+                    : "Reward Program",
+                _rewardProgramAmount),
           if (_publishOnDressurStatus)
             _recapRow("Statut Dressur", _dressurStatusAmount),
           Divider(height: 20),
@@ -557,17 +572,20 @@ class _ProduitsServicesState extends State<ProduitsServices> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    Theme.of(context);
     return Container(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           const SizedBox(height: 5),
           loading_formule_gratuit
-              ? const Center(child: CircularProgressIndicator(color: primaryColor))
+              ? const Center(
+                  child: CircularProgressIndicator(color: primaryColor))
               : SelectFormField(
                   decoration: InputDecoration(
-                      labelText: (langUserPhone == "fr") ? 'Formule de Boost' : 'Boost Plan',
+                      labelText: (langUserPhone == "fr")
+                          ? 'Formule de Boost'
+                          : 'Boost Plan',
                       border: const OutlineInputBorder()),
                   type: SelectFormFieldType.dropdown,
                   initialValue: '0',
@@ -610,10 +628,17 @@ class _ProduitsServicesState extends State<ProduitsServices> {
           const SizedBox(height: 10),
 
           // --- SECTION PROGRAMME DE RÉCOMPENSE ---
-          _buildOptionHeader(FontAwesomeIcons.star, (langUserPhone == "fr") ? "Programme de Récompense" : "Reward Program",
+          _buildOptionHeader(
+              FontAwesomeIcons.star,
+              (langUserPhone == "fr")
+                  ? "Programme de Récompense"
+                  : "Reward Program",
               _participateInReward),
           SwitchListTile(
-            title: Text((langUserPhone == "fr") ? "Ajouter votre promotion au programme" : "Add your promotion to the program",
+            title: Text(
+                (langUserPhone == "fr")
+                    ? "Ajouter votre promotion au programme"
+                    : "Add your promotion to the program",
                 style: GoogleFonts.poppins(
                     fontSize: 14, fontWeight: FontWeight.w500)),
             subtitle: Text(
@@ -632,7 +657,9 @@ class _ProduitsServicesState extends State<ProduitsServices> {
                 children: [
                   // --- MODIFICATION : UTILISATION DU CONTROLLER ---
                   _buildNumberInput(
-                    (langUserPhone == "fr") ? "Objectif de vues total (min. 2500)" : "Total views goal (min. 2500)",
+                    (langUserPhone == "fr")
+                        ? "Objectif de vues total (min. 2500)"
+                        : "Total views goal (min. 2500)",
                     _viewsController,
                   ),
                   const SizedBox(height: 10),
@@ -657,12 +684,16 @@ class _ProduitsServicesState extends State<ProduitsServices> {
           ),
           SwitchListTile(
             title: Text(
-              (langUserPhone == "fr") ? "Publier sur le statut de Dressur" : "Publish on Dressur status",
+              (langUserPhone == "fr")
+                  ? "Publier sur le statut de Dressur"
+                  : "Publish on Dressur status",
               style: GoogleFonts.poppins(
                   fontSize: 14, fontWeight: FontWeight.w500),
             ),
             subtitle: Text(
-              (langUserPhone == "fr") ? "Bénéficiez d’une visibilité maximale sur le statut WhatsApp de Dressur pendant toute la durée de votre promotion." : "Get maximum visibility on Dressur’s WhatsApp status for the entire duration of your promotion.",
+              (langUserPhone == "fr")
+                  ? "Bénéficiez d’une visibilité maximale sur le statut WhatsApp de Dressur pendant toute la durée de votre promotion."
+                  : "Get maximum visibility on Dressur’s WhatsApp status for the entire duration of your promotion.",
               style: GoogleFonts.poppins(fontSize: 11),
             ),
             value: _publishOnDressurStatus,
@@ -799,7 +830,6 @@ class _DemandesEmploiState extends State<DemandesEmploi> {
           'POST', Uri.parse('$generalRouteForApi/newDmdEmploi'));
       request.fields.addAll({
         'uid': uidUser,
-        
         'titre_demande_poste_rechercher': titre_demande_poste_rechercher,
         'description_profil_demandeur': description_profil_demandeur,
         'competence_qualification': competence_qualification,
@@ -1119,7 +1149,6 @@ class _OffresEmploiState extends State<OffresEmploi> {
           'POST', Uri.parse('$generalRouteForApi/newOffreEmploi'));
       request.fields.addAll({
         'uid': uidUser,
-        
         'titre_poste': titre_poste,
         'description_poste': description_poste,
         'competences_requises': competences_requises,

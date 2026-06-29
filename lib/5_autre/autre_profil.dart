@@ -15,7 +15,6 @@ class AutreProfilPage extends StatefulWidget {
 }
 
 class _AutreProfilPageState extends State<AutreProfilPage> {
-  static const espaceEntreLesOptionsContact = 10.0;
   bool _loading = false;
   var autre_name_complete;
   var autre_avatar;

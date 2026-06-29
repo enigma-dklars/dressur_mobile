@@ -5,7 +5,6 @@ import 'dart:convert' as convert;
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dressur/2_promo/edit_promo_affaire_produit_service.dart';
 import 'package:dressur/components/noti.dart';
-import 'package:dressur/components/noti_sys.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -590,7 +589,6 @@ class PromotionDetailPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     final Map<String, dynamic> infoMap = (promotion.annotherInfo != "")
         ? jsonDecode(promotion.annotherInfo)
         : {};

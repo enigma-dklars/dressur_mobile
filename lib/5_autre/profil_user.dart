@@ -12,7 +12,6 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart'; // Pour les ic√
 class ProfilPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       appBar: AppBar(
         elevation: 0,

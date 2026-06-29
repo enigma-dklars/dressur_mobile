@@ -32,8 +32,6 @@ class _BottomBarState extends State<BottomBar> with WidgetsBindingObserver {
   int _selectedIndex = 2;
   int nombreNewContact = 0;
   dynamic screens = [];
-  bool _swipeInProgress = false;
-  final Duration _swipeCooldown = const Duration(milliseconds: 300);
 
   final PageController _pageController = PageController(initialPage: 2);
 
@@ -53,14 +51,6 @@ class _BottomBarState extends State<BottomBar> with WidgetsBindingObserver {
     FontAwesomeIcons.briefcase,
     FontAwesomeIcons.newspaper,
     FontAwesomeIcons.heart,
-    FontAwesomeIcons.gear,
-  ];
-
-  final List<IconData> _iconListSelected = [
-    FontAwesomeIcons.inbox,
-    FontAwesomeIcons.briefcase,
-    FontAwesomeIcons.newspaper,
-    FontAwesomeIcons.solidHeart,
     FontAwesomeIcons.gear,
   ];
 
@@ -116,8 +106,8 @@ class _BottomBarState extends State<BottomBar> with WidgetsBindingObserver {
     });
     await SQLHelper.viderLaBaseDeDonneeLocalTelUser();
     await Future.delayed(const Duration(seconds: 3), () {});
-    List<Contact> contacts =
-        await FlutterContacts.getContacts(withProperties: true, withAccounts: true);
+    List<Contact> contacts = await FlutterContacts.getContacts(
+        withProperties: true, withAccounts: true);
     for (var contact in contacts) {
       for (var phone in contact.phones) {
         var displayNameTel = contact.displayName;
@@ -164,8 +154,9 @@ class _BottomBarState extends State<BottomBar> with WidgetsBindingObserver {
 
     var request = http.MultipartRequest(
         'POST', Uri.parse('$generalRouteForApi/getUserInfo'));
-    request.fields
-        .addAll({'uid': uidUser,});
+    request.fields.addAll({
+      'uid': uidUser,
+    });
 
     http.StreamedResponse response = await request.send();
 
@@ -196,7 +187,6 @@ class _BottomBarState extends State<BottomBar> with WidgetsBindingObserver {
       );
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -237,133 +227,63 @@ class _BottomBarState extends State<BottomBar> with WidgetsBindingObserver {
       },
       child: Scaffold(
         // Le corps utilise un PageView pour permettre le swipe
-      body: PageView(
-        controller: _pageController,
-        physics: BouncingScrollPhysics(),
-        onPageChanged: (index) {
-          setState(() => _selectedIndex = index);
-        },
-        children: _screens,
-      ),
-      // La barre de navigation n'a plus de bouton flottant ni d'encoche
-      // Alternative 1: Style "Indicateur Flottant"
-      bottomNavigationBar: AnimatedBottomNavigationBar.builder(
-        itemCount: _iconList.length,
-        tabBuilder: (int index, bool isActive) {
-          // Pour cette version, nous utilisons toujours les icônes "outlined"
-          // pour un look plus épuré.
-          final color = isActive ? primaryColor : Colors.grey[500];
+        body: PageView(
+          controller: _pageController,
+          physics: BouncingScrollPhysics(),
+          onPageChanged: (index) {
+            setState(() => _selectedIndex = index);
+          },
+          children: _screens,
+        ),
+        // La barre de navigation n'a plus de bouton flottant ni d'encoche
+        // Alternative 1: Style "Indicateur Flottant"
+        bottomNavigationBar: AnimatedBottomNavigationBar.builder(
+          itemCount: _iconList.length,
+          tabBuilder: (int index, bool isActive) {
+            // Pour cette version, nous utilisons toujours les icônes "outlined"
+            // pour un look plus épuré.
+            final color = isActive ? primaryColor : Colors.grey[500];
 
-          return Column(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // L'icône
-              FaIcon(
-                _iconList[index],
-                size: isActive ? 24 : 18, // L'icône active est plus grande
-                color: color,
-              ),
-              SizedBox(height: 4),
-              // L'indicateur animé
-              AnimatedContainer(
-                duration: Duration(milliseconds: 200),
-                height: 4,
-                width: isActive ? 12 : 0, // L'indicateur apparaît si actif
-                decoration: BoxDecoration(
-                  color: primaryColor,
-                  borderRadius: BorderRadius.circular(2),
+            return Column(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // L'icône
+                FaIcon(
+                  _iconList[index],
+                  size: isActive ? 24 : 18, // L'icône active est plus grande
+                  color: color,
                 ),
-              )
-            ],
-          );
-        },
-        activeIndex: _selectedIndex,
-        gapLocation: GapLocation.none,
-        notchSmoothness: NotchSmoothness.softEdge,
-        backgroundColor: Theme.of(context).brightness == Brightness.dark
-            ? Color(0xFF1C1C1E)
-            : Colors.white,
-        onTap: (index) {
-          setState(() => _selectedIndex = index);
-          _pageController.animateToPage(
-            index,
-            duration: Duration(milliseconds: 300),
-            curve: Curves.easeInOut,
-          );
-        },
+                SizedBox(height: 4),
+                // L'indicateur animé
+                AnimatedContainer(
+                  duration: Duration(milliseconds: 200),
+                  height: 4,
+                  width: isActive ? 12 : 0, // L'indicateur apparaît si actif
+                  decoration: BoxDecoration(
+                    color: primaryColor,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                )
+              ],
+            );
+          },
+          activeIndex: _selectedIndex,
+          gapLocation: GapLocation.none,
+          notchSmoothness: NotchSmoothness.softEdge,
+          backgroundColor: Theme.of(context).brightness == Brightness.dark
+              ? Color(0xFF1C1C1E)
+              : Colors.white,
+          onTap: (index) {
+            setState(() => _selectedIndex = index);
+            _pageController.animateToPage(
+              index,
+              duration: Duration(milliseconds: 300),
+              curve: Curves.easeInOut,
+            );
+          },
+        ),
       ),
-    ),
-  );
-}
-
-// --- WIDGETS HELPERS POUR LA BARRE DE NAVIGATION ---
-
-  // Bouton normal pour les onglets standards
-  Widget _buildNormalButton(int index, bool isActive) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        FaIcon(
-          isActive ? _iconListSelected[index] : _iconList[index],
-          size: 24,
-          color: isActive ? primaryColor : Colors.grey[600],
-        ),
-        SizedBox(height: 4),
-        Text(
-          _getLabel(index),
-          maxLines: 1,
-          style: GoogleFonts.poppins(
-            fontSize: 11,
-            fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
-            color: isActive ? primaryColor : Colors.grey[600],
-          ),
-        )
-      ],
     );
-  }
-
-  // Bouton spécial pour l'onglet central "Actu"
-  Widget _buildCenterButton(bool isActive) {
-    return Container(
-        width: 60,
-        height: 60,
-        margin: EdgeInsets.only(bottom: 15), // Remonte le bouton
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          color: primaryColor,
-          boxShadow: [
-            BoxShadow(
-              color: primaryColor.withOpacity(0.4),
-              blurRadius: 8,
-              offset: Offset(0, 4),
-            ),
-          ],
-        ),
-        child: FaIcon(
-          FontAwesomeIcons.rss,
-          color: isActive ? Colors.white : Colors.white.withOpacity(0.5),
-          size: 30,
-        ));
-  }
-
-  // Helper pour obtenir le label en fonction de la langue
-  String _getLabel(int index) {
-    final bool isFrench = langUserPhone == "fr";
-    switch (index) {
-      case 0:
-        return isFrench ? "Réception" : "Home";
-      case 1:
-        return isFrench ? "Services" : "Services";
-      case 2:
-        return isFrench ? "Actu" : "News"; // Label pour l'onglet central
-      case 3:
-        return isFrench ? "Préférences" : "Preferences";
-      case 4:
-        return isFrench ? "Autre" : "Other";
-      default:
-        return "";
-    }
   }
 }

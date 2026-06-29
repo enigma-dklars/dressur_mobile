@@ -1,6 +1,5 @@
 // ignore_for_file: use_build_context_synchronously
 
-import 'package:dressur/components/padding_and_divider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
@@ -30,7 +29,6 @@ class _PreferencePageState extends State<PreferencePage> {
   bool _updatingAddPageActu = false;
 
   String? _selectedAccountName;
-  String? _selectedAccountType;
 
   Future<List<Map<String, String?>>> _fetchAccountsList() async {
     final defaultEntry = {'name': null, 'type': null, 'label': langUserPhone == 'fr' ? 'Téléphone (local)' : 'Phone (local)'};
@@ -72,7 +70,6 @@ class _PreferencePageState extends State<PreferencePage> {
     }
     setState(() {
       _selectedAccountName = name;
-      _selectedAccountType = type;
     });
     selectedContactAccountName = name;
     selectedContactAccountType = type;
@@ -103,7 +100,6 @@ class _PreferencePageState extends State<PreferencePage> {
   void initState() {
     super.initState();
     _selectedAccountName = selectedContactAccountName;
-    _selectedAccountType = selectedContactAccountType;
   }
 
   @override

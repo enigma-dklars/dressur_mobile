@@ -7,9 +7,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dressur/1_reception/liste_contact.dart';
 import 'package:dressur/2_promo/new_boost_contact.dart';
-// import 'package:dressur/5_autre/cart_visite.dart';
 import 'package:dressur/5_autre/profil_user.dart';
-import 'package:dressur/components/padding_and_divider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
@@ -230,18 +228,18 @@ class _ActuPageState extends State<ActuPage> {
   }
 
   void showWarningDialog(BuildContext context) {
-      final int duree = isNouvelUtilisateur ? 10 : 5;
-      showModalBottomSheet(
-        context: context,
-        isDismissible: false,
-        enableDrag: false,
-        isScrollControlled: true,
-        backgroundColor: Colors.transparent,
-        builder: (_) => _WarningBottomSheet(totalSeconds: duree),
-      );
-    }
+    final int duree = isNouvelUtilisateur ? 10 : 5;
+    showModalBottomSheet(
+      context: context,
+      isDismissible: false,
+      enableDrag: false,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => _WarningBottomSheet(totalSeconds: duree),
+    );
+  }
 
-    void _scrollListener() {
+  void _scrollListener() {
     if (_scrollController.position.userScrollDirection ==
         ScrollDirection.reverse) {
       _showFabText.value = false;
@@ -304,8 +302,9 @@ class _ActuPageState extends State<ActuPage> {
     try {
       final request = http.MultipartRequest(
           'POST', Uri.parse('$generalRouteForApi/getUserInfo'));
-      request.fields
-          .addAll({'uid': uidUser,});
+      request.fields.addAll({
+        'uid': uidUser,
+      });
       final response = await request.send();
       if (response.statusCode == 200) {
         final data1 = await response.stream.bytesToString();
@@ -348,8 +347,9 @@ class _ActuPageState extends State<ActuPage> {
 
     var request = http.MultipartRequest(
         'POST', Uri.parse('$generalRouteForApi/getUserInfo'));
-    request.fields
-        .addAll({'uid': uidUser, });
+    request.fields.addAll({
+      'uid': uidUser,
+    });
 
     http.StreamedResponse response = await request.send();
 
@@ -552,7 +552,6 @@ class _ActuPageState extends State<ActuPage> {
             '$generalRouteForApi/addTousUserContact/$uidUser/${langUserPhone.toString()}'));
     request.fields.addAll({
       'uid': uidUser,
-      
     });
 
     http.StreamedResponse response = await request.send();
@@ -600,7 +599,8 @@ class _ActuPageState extends State<ActuPage> {
           }
           final String nom = (contactAdd["nom"] ?? "").toString().trim();
           final String pseudo = contactAdd["pseudo"] as String;
-          final List<String> nameParts = [nom, pseudo, telSansPlus].where((s) => s.isNotEmpty).toList();
+          final List<String> nameParts =
+              [nom, pseudo, telSansPlus].where((s) => s.isNotEmpty).toList();
           final newContact = Contact()
             ..name.first = "${nameParts.join(" - ")} #DS"
             ..phones = phonesList;
@@ -627,7 +627,6 @@ class _ActuPageState extends State<ActuPage> {
       ));
     }
   }
-
 
   void _showPasDeContactAdd(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -816,7 +815,9 @@ class _ActuPageState extends State<ActuPage> {
             FaIcon(FontAwesomeIcons.star, color: primaryColor, size: 50),
             SizedBox(height: 15),
             Text(
-              (langUserPhone == "fr") ? "Promotion Éligible !" : "Eligible Promotion!",
+              (langUserPhone == "fr")
+                  ? "Promotion Éligible !"
+                  : "Eligible Promotion!",
               style: GoogleFonts.poppins(
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
@@ -838,15 +839,27 @@ class _ActuPageState extends State<ActuPage> {
             SizedBox(height: 30),
 
             // Détails fictifs
-            _infoRow(context, FontAwesomeIcons.eye,
+            _infoRow(
+                context,
+                FontAwesomeIcons.eye,
                 (langUserPhone == "fr") ? "Objectif" : "Goal",
-                (langUserPhone == "fr") ? "Atteindre min. 250 vues" : "Reach min. 250 views"),
-            _infoRow(context, FontAwesomeIcons.wallet,
+                (langUserPhone == "fr")
+                    ? "Atteindre min. 250 vues"
+                    : "Reach min. 250 views"),
+            _infoRow(
+                context,
+                FontAwesomeIcons.wallet,
                 (langUserPhone == "fr") ? "Gain estimé" : "Estimated Gain",
-                (langUserPhone == "fr") ? "Jusqu'à 2 500 FCFA" : "Up to 2,500 FCFA"),
-            _infoRow(context, FontAwesomeIcons.stopwatch,
+                (langUserPhone == "fr")
+                    ? "Jusqu'à 2 500 FCFA"
+                    : "Up to 2,500 FCFA"),
+            _infoRow(
+                context,
+                FontAwesomeIcons.stopwatch,
                 (langUserPhone == "fr") ? "Délai" : "Duration",
-                (langUserPhone == "fr") ? "20 heures de visibilité" : "20 hours of visibility"),
+                (langUserPhone == "fr")
+                    ? "20 heures de visibilité"
+                    : "20 hours of visibility"),
 
             SizedBox(height: 30),
 
@@ -930,360 +943,360 @@ class _ActuPageState extends State<ActuPage> {
       });
     }
     return Scaffold(
-        appBar: AppBar(
-          automaticallyImplyLeading: false,
-          elevation: 0,
-          backgroundColor: primaryColor,
-          title: Text(
-            (langUserPhone == "fr") ? "Actu" : "News",
-            style: GoogleFonts.poppins(
-              color: Colors.white,
-              fontWeight: FontWeight.w400,
-              fontSize: 18,
-            ),
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        elevation: 0,
+        backgroundColor: primaryColor,
+        title: Text(
+          (langUserPhone == "fr") ? "Actu" : "News",
+          style: GoogleFonts.poppins(
+            color: Colors.white,
+            fontWeight: FontWeight.w400,
+            fontSize: 18,
           ),
-          actions: [
-            if (admin) ...[
-              IconButton(
-                icon: const FaIcon(FontAwesomeIcons.userShield,
-                    size: 20, color: Colors.amber),
-                onPressed: () => Navigator.push(context,
-                    MaterialPageRoute(builder: (_) => AdministrationPage())),
-              ),
-              const Padding(
-                padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
-                child: VerticalDivider(
-                    width: 0, color: Colors.white, thickness: 1),
-              ),
-            ],
+        ),
+        actions: [
+          if (admin) ...[
             IconButton(
-              icon: const FaIcon(
-                FontAwesomeIcons.solidBell,
-                size: 20,
-                color: Colors.white,
-              ),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => ListeNotification(),
-                  ),
-                );
-              },
+              icon: const FaIcon(FontAwesomeIcons.userShield,
+                  size: 20, color: Colors.amber),
+              onPressed: () => Navigator.push(context,
+                  MaterialPageRoute(builder: (_) => AdministrationPage())),
             ),
             const Padding(
               padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
-              child: VerticalDivider(
-                width: 0,
-                color: Colors.white,
-                thickness: 1,
-              ),
-            ),
-            PopupMenuButton<int>(
-              itemBuilder: (context) => [
-                PopupMenuItem(
-                  value: 1,
-                  onTap: () {
-                    _loading ? '' : actualise(true);
-                  },
-                  child: Row(
-                    children: [
-                      Text(
-                        (langUserPhone == "fr") ? "Actualiser" : "Refresh",
-                        style: GoogleFonts.poppins(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                PopupMenuItem(
-                  value: 2,
-                  child: Row(
-                    children: [
-                      Text(
-                        (langUserPhone == "fr") ? "Aide" : "Help",
-                        style: GoogleFonts.poppins(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-              offset: const Offset(0, 60),
-              color: primaryColor,
-              icon: const FaIcon(
-                FontAwesomeIcons.bars,
-                color: Colors.white,
-                size: 20,
-              ),
-              elevation: 2,
-              onSelected: (value) {
-                if (value == 2) {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => SupportPage()),
-                  );
-                }
-              },
+              child:
+                  VerticalDivider(width: 0, color: Colors.white, thickness: 1),
             ),
           ],
-        ),
-        body: Column(
-          children: [
-            Expanded(
-              child: RefreshIndicator(
-                onRefresh: _refreshData,
-                child: ListView(
-                  controller: _scrollController,
+          IconButton(
+            icon: const FaIcon(
+              FontAwesomeIcons.solidBell,
+              size: 20,
+              color: Colors.white,
+            ),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ListeNotification(),
+                ),
+              );
+            },
+          ),
+          const Padding(
+            padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
+            child: VerticalDivider(
+              width: 0,
+              color: Colors.white,
+              thickness: 1,
+            ),
+          ),
+          PopupMenuButton<int>(
+            itemBuilder: (context) => [
+              PopupMenuItem(
+                value: 1,
+                onTap: () {
+                  _loading ? '' : actualise(true);
+                },
+                child: Row(
                   children: [
-                    const SizedBox(height: 15),
-                    // ── Strip de Stories ──────────────────────────────
-                    if (_stories.isNotEmpty)
-                      _StoryStrip(
-                        stories: _stories,
-                        routeStoryImage: generalRouteForStoryImage,
-                      ),
-                    Container(
-                      width: double.infinity,
-                      margin: const EdgeInsets.fromLTRB(10, 10, 10, 0),
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).brightness == Brightness.dark
-                            ? Colors.white.withOpacity(0.05)
-                            : Colors.black.withOpacity(0.04),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Text(
-                        (langUserPhone == "fr")
-                            ? "Pour ajouter quelque chose à la story, veuillez contacter le support via WhatsApp."
-                            : "To add something to the story, please contact support via WhatsApp.",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 13,
-                          height: 1.4,
-                          color: Theme.of(context).brightness == Brightness.dark
-                              ? Colors.white70
-                              : Colors.black87,
-                        ),
+                    Text(
+                      (langUserPhone == "fr") ? "Actualiser" : "Refresh",
+                      style: GoogleFonts.poppins(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
-
-                    // ── Fin Strip de Stories ───────────────────────────
-
-                    // Affiche la carte de mise à jour si nécessaire
-                    if (int.parse(versionApp.toString().replaceAll(".", "")) <
-                        int.parse(myDressurVersion
-                            .toString()
-                            .replaceAll(".", ""))) ...[
-                      _buildUpdateCard(
-                        context: context,
-                        onUpdate: () async {
-                          final Uri _url = Uri.parse(dressurUrlPlaystore);
-                          if (!await launchUrl(_url,
-                              mode: LaunchMode.externalApplication)) {
-                            throw 'Could not launch $_url';
-                          }
-                        },
-                      ),
-                    ],
-
-                    _buildActionChecklist(
-                      context: context,
-                      showTel: !telIsVerified && mailIsVerified,
-                      showMail: !mailIsVerified,
-                      showProfile:
-                          (nom.toString().replaceAll(' ', '').isEmpty ||
-                              nom == null),
-                      showBoost: (addPageActu &&
-                          nombreContactDispo <= 100 &&
-                          boostEnCours == false &&
-                          telIsVerified &&
-                          mailIsVerified),
-                    ),
-                    const SizedBox(height: 10),
-
-                    if (addPageActu && nombreContactDispo > 0) ...[
-                      const SizedBox(height: 5),
-                      _buildAvailableContactsCard(
-                        context: context,
-                        contactCount: nombreContactDispo,
-                        isLoading: _loading,
-                        onRefresh: () => actualise(true),
-                        onSaveAll: () {
-                          if (!telIsVerified) {
-                            showConfNumeroWhatsapp(context);
-                          } else {
-                            addTousLesContacts();
-                          }
-                        },
-                        onGoToContacts: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => ContactPage()),
-                          );
-                        },
-                      ),
-                      const SizedBox(height: 10),
-                    ],
-                    if (havePublicites == true)
-                      FutureBuilder<List<Advertisement>>(
-                        future: _futureAdvertisements,
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState ==
-                              ConnectionState.waiting) {
-                            return const Center(
-                              child: CircularProgressIndicator(color: primaryColor),
-                            );
-                          } else if (snapshot.hasError) {
-                            return Center(
-                              child: Text((langUserPhone == "fr") ? 'Erreur: ${snapshot.error}' : 'Error: ${snapshot.error}'),
-                            );
-                          } else if (!snapshot.hasData ||
-                              snapshot.data!.isEmpty) {
-                            return const Center(
-                              child: null,
-                            );
-                          } else {
-                            return ListView.builder(
-                              shrinkWrap: true,
-                              physics: const NeverScrollableScrollPhysics(),
-                              itemCount: snapshot.data!.length,
-                              itemBuilder: (context, index) {
-                                Advertisement advertisement =
-                                    snapshot.data![index];
-                                return Container(
-                                  margin: const EdgeInsets.only(
-                                      left: 7, top: 0, right: 7, bottom: 0),
-                                  child: Column(
-                                    children: [
-                                      Card(
-                                        child: Column(
-                                          children: [
-                                            GestureDetector(
-                                              onTap: () {
-                                                setPromotionToWatch(
-                                                    advertisement);
-                                                Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        AdvertisementDetailPage(
-                                                      advertisement:
-                                                          advertisement,
-                                                    ),
-                                                  ),
-                                                );
-                                              },
-                                              child: Column(
-                                                children: [
-                                                  Stack(
-                                                    children: [
-                                                      ClipRRect(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(10),
-                                                        child:
-                                                            CachedNetworkImage(
-                                                          imageUrl:
-                                                              advertisement
-                                                                  .image,
-                                                          placeholder: (context,
-                                                                  url) =>
-                                                              Image.asset(
-                                                                  'images/placeholder.png'),
-                                                          errorWidget: (context,
-                                                                  url, error) =>
-                                                              Image.asset(
-                                                                  'images/error_image.png'),
-                                                          fit: BoxFit.cover,
-                                                        ),
-                                                      ),
-
-                                                      // BADGE ÉLIGIBILITÉ (Affiche si inProgrammeRecompense est vrai)
-                                                      if (advertisement
-                                                          .inProgrammeRecompense)
-                                                        Positioned(
-                                                          top: 10,
-                                                          right: 10,
-                                                          child:
-                                                              AnimatedRewardBadge(
-                                                            onTap: () =>
-                                                                _showRewardInfo(
-                                                                    context),
-                                                          ),
-                                                        ),
-                                                    ],
-                                                  ),
-                                                  const SizedBox(height: 10),
-                                                  Padding(
-                                                    padding: const EdgeInsets
-                                                        .fromLTRB(12, 0, 12, 5),
-                                                    child: Column(
-                                                      children: [
-                                                        Text(
-                                                          advertisement
-                                                              .description
-                                                              .replaceAll(
-                                                                  '\n', ' '),
-                                                          maxLines: 4,
-                                                          overflow: TextOverflow
-                                                              .ellipsis,
-                                                          style: GoogleFonts
-                                                              .poppins(
-                                                                  fontSize: 15,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w400),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                            // les icons
-                                            _buildActionFooter(
-                                              context: context,
-                                              impressionCount: advertisement
-                                                  .nombreImpression,
-                                              viewCount:
-                                                  advertisement.nombreDeVues,
-                                              onShare: () {
-                                                sharePromotion(
-                                                  context,
-                                                  advertisement.image,
-                                                  advertisement.imageName,
-                                                  advertisement.description,
-                                                );
-                                              },
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      const SizedBox(height: 5),
-                                    ],
-                                  ),
-                                );
-                              },
-                            );
-                          }
-                        },
-                      ),
-                    const SizedBox(height: 5),
-                    SociauxPage(),
-                    const SizedBox(height: 10),
-                    // essai notification
                   ],
                 ),
               ),
+              PopupMenuItem(
+                value: 2,
+                child: Row(
+                  children: [
+                    Text(
+                      (langUserPhone == "fr") ? "Aide" : "Help",
+                      style: GoogleFonts.poppins(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+            offset: const Offset(0, 60),
+            color: primaryColor,
+            icon: const FaIcon(
+              FontAwesomeIcons.bars,
+              color: Colors.white,
+              size: 20,
             ),
-          ],
-        ),
+            elevation: 2,
+            onSelected: (value) {
+              if (value == 2) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => SupportPage()),
+                );
+              }
+            },
+          ),
+        ],
+      ),
+      body: Column(
+        children: [
+          Expanded(
+            child: RefreshIndicator(
+              onRefresh: _refreshData,
+              child: ListView(
+                controller: _scrollController,
+                children: [
+                  const SizedBox(height: 15),
+                  // ── Strip de Stories ──────────────────────────────
+                  if (_stories.isNotEmpty)
+                    _StoryStrip(
+                      stories: _stories,
+                      routeStoryImage: generalRouteForStoryImage,
+                    ),
+                  Container(
+                    width: double.infinity,
+                    margin: const EdgeInsets.fromLTRB(10, 10, 10, 0),
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? Colors.white.withOpacity(0.05)
+                          : Colors.black.withOpacity(0.04),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      (langUserPhone == "fr")
+                          ? "Pour ajouter quelque chose à la story, veuillez contacter le support via WhatsApp."
+                          : "To add something to the story, please contact support via WhatsApp.",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 13,
+                        height: 1.4,
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? Colors.white70
+                            : Colors.black87,
+                      ),
+                    ),
+                  ),
+
+                  // ── Fin Strip de Stories ───────────────────────────
+
+                  // Affiche la carte de mise à jour si nécessaire
+                  if (int.parse(versionApp.toString().replaceAll(".", "")) <
+                      int.parse(
+                          myDressurVersion.toString().replaceAll(".", ""))) ...[
+                    _buildUpdateCard(
+                      context: context,
+                      onUpdate: () async {
+                        final Uri _url = Uri.parse(dressurUrlPlaystore);
+                        if (!await launchUrl(_url,
+                            mode: LaunchMode.externalApplication)) {
+                          throw 'Could not launch $_url';
+                        }
+                      },
+                    ),
+                  ],
+
+                  _buildActionChecklist(
+                    context: context,
+                    showTel: !telIsVerified && mailIsVerified,
+                    showMail: !mailIsVerified,
+                    showProfile: (nom.toString().replaceAll(' ', '').isEmpty ||
+                        nom == null),
+                    showBoost: (addPageActu &&
+                        nombreContactDispo <= 100 &&
+                        boostEnCours == false &&
+                        telIsVerified &&
+                        mailIsVerified),
+                  ),
+                  const SizedBox(height: 10),
+
+                  if (addPageActu && nombreContactDispo > 0) ...[
+                    const SizedBox(height: 5),
+                    _buildAvailableContactsCard(
+                      context: context,
+                      contactCount: nombreContactDispo,
+                      isLoading: _loading,
+                      onRefresh: () => actualise(true),
+                      onSaveAll: () {
+                        if (!telIsVerified) {
+                          showConfNumeroWhatsapp(context);
+                        } else {
+                          addTousLesContacts();
+                        }
+                      },
+                      onGoToContacts: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => ContactPage()),
+                        );
+                      },
+                    ),
+                    const SizedBox(height: 10),
+                  ],
+                  if (havePublicites == true)
+                    FutureBuilder<List<Advertisement>>(
+                      future: _futureAdvertisements,
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return const Center(
+                            child:
+                                CircularProgressIndicator(color: primaryColor),
+                          );
+                        } else if (snapshot.hasError) {
+                          return Center(
+                            child: Text((langUserPhone == "fr")
+                                ? 'Erreur: ${snapshot.error}'
+                                : 'Error: ${snapshot.error}'),
+                          );
+                        } else if (!snapshot.hasData ||
+                            snapshot.data!.isEmpty) {
+                          return const Center(
+                            child: null,
+                          );
+                        } else {
+                          return ListView.builder(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            itemCount: snapshot.data!.length,
+                            itemBuilder: (context, index) {
+                              Advertisement advertisement =
+                                  snapshot.data![index];
+                              return Container(
+                                margin: const EdgeInsets.only(
+                                    left: 7, top: 0, right: 7, bottom: 0),
+                                child: Column(
+                                  children: [
+                                    Card(
+                                      child: Column(
+                                        children: [
+                                          GestureDetector(
+                                            onTap: () {
+                                              setPromotionToWatch(
+                                                  advertisement);
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      AdvertisementDetailPage(
+                                                    advertisement:
+                                                        advertisement,
+                                                  ),
+                                                ),
+                                              );
+                                            },
+                                            child: Column(
+                                              children: [
+                                                Stack(
+                                                  children: [
+                                                    ClipRRect(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              10),
+                                                      child: CachedNetworkImage(
+                                                        imageUrl:
+                                                            advertisement.image,
+                                                        placeholder: (context,
+                                                                url) =>
+                                                            Image.asset(
+                                                                'images/placeholder.png'),
+                                                        errorWidget: (context,
+                                                                url, error) =>
+                                                            Image.asset(
+                                                                'images/error_image.png'),
+                                                        fit: BoxFit.cover,
+                                                      ),
+                                                    ),
+
+                                                    // BADGE ÉLIGIBILITÉ (Affiche si inProgrammeRecompense est vrai)
+                                                    if (advertisement
+                                                        .inProgrammeRecompense)
+                                                      Positioned(
+                                                        top: 10,
+                                                        right: 10,
+                                                        child:
+                                                            AnimatedRewardBadge(
+                                                          onTap: () =>
+                                                              _showRewardInfo(
+                                                                  context),
+                                                        ),
+                                                      ),
+                                                  ],
+                                                ),
+                                                const SizedBox(height: 10),
+                                                Padding(
+                                                  padding:
+                                                      const EdgeInsets.fromLTRB(
+                                                          12, 0, 12, 5),
+                                                  child: Column(
+                                                    children: [
+                                                      Text(
+                                                        advertisement
+                                                            .description
+                                                            .replaceAll(
+                                                                '\n', ' '),
+                                                        maxLines: 4,
+                                                        overflow: TextOverflow
+                                                            .ellipsis,
+                                                        style:
+                                                            GoogleFonts.poppins(
+                                                                fontSize: 15,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w400),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          // les icons
+                                          _buildActionFooter(
+                                            context: context,
+                                            impressionCount:
+                                                advertisement.nombreImpression,
+                                            viewCount:
+                                                advertisement.nombreDeVues,
+                                            onShare: () {
+                                              sharePromotion(
+                                                context,
+                                                advertisement.image,
+                                                advertisement.imageName,
+                                                advertisement.description,
+                                              );
+                                            },
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    const SizedBox(height: 5),
+                                  ],
+                                ),
+                              );
+                            },
+                          );
+                        }
+                      },
+                    ),
+                  const SizedBox(height: 5),
+                  SociauxPage(),
+                  const SizedBox(height: 10),
+                  // essai notification
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -1750,11 +1763,16 @@ class AdvertisementDetailPage extends StatelessWidget {
           children: [
             FaIcon(FontAwesomeIcons.star, color: primaryColor, size: 40),
             SizedBox(height: 10),
-            Text((langUserPhone == "fr") ? "Promotion Éligible" : "Eligible Promotion",
+            Text(
+                (langUserPhone == "fr")
+                    ? "Promotion Éligible"
+                    : "Eligible Promotion",
                 style: GoogleFonts.poppins(
                     fontWeight: FontWeight.bold, fontSize: 18)),
             SizedBox(height: 10),
-            Text((langUserPhone == "fr") ? "Partagez cette promotion pour gagner des récompenses !" : "Share this promotion to earn rewards!"),
+            Text((langUserPhone == "fr")
+                ? "Partagez cette promotion pour gagner des récompenses !"
+                : "Share this promotion to earn rewards!"),
             SizedBox(height: 20),
           ],
         ),
@@ -2356,7 +2374,9 @@ class _StoryViewerState extends State<_StoryViewer>
                                     color: Colors.white, size: 16),
                                 const SizedBox(width: 6),
                                 Text(
-                                  (langUserPhone == "fr") ? 'Voir le lien' : 'View link',
+                                  (langUserPhone == "fr")
+                                      ? 'Voir le lien'
+                                      : 'View link',
                                   style: GoogleFonts.poppins(
                                       color: Colors.white,
                                       fontSize: 13,
@@ -2386,7 +2406,9 @@ class _StoryViewerState extends State<_StoryViewer>
                               setState(() => _expanded = true);
                             },
                             child: Text(
-                              (langUserPhone == "fr") ? 'Lire la suite' : 'Read more',
+                              (langUserPhone == "fr")
+                                  ? 'Lire la suite'
+                                  : 'Read more',
                               style: GoogleFonts.poppins(
                                   color: Colors.lightBlueAccent,
                                   fontSize: 12,
@@ -2416,254 +2438,261 @@ class _StoryViewerState extends State<_StoryViewer>
       ),
     );
   }
-  }
+}
 
+// ─── Bottom sheet avertissement ───────────────────────────────────────────────
 
-  // ─── Bottom sheet avertissement ───────────────────────────────────────────────
+class _WarningBottomSheet extends StatefulWidget {
+  final int totalSeconds;
+  const _WarningBottomSheet({required this.totalSeconds});
 
-  class _WarningBottomSheet extends StatefulWidget {
-    final int totalSeconds;
-    const _WarningBottomSheet({required this.totalSeconds});
+  @override
+  State<_WarningBottomSheet> createState() => _WarningBottomSheetState();
+}
 
-    @override
-    State<_WarningBottomSheet> createState() => _WarningBottomSheetState();
-  }
+class _WarningBottomSheetState extends State<_WarningBottomSheet>
+    with SingleTickerProviderStateMixin {
+  late int _remaining;
+  Timer? _timer;
+  late AnimationController _progressCtrl;
 
-  class _WarningBottomSheetState extends State<_WarningBottomSheet>
-      with SingleTickerProviderStateMixin {
-    late int _remaining;
-    Timer? _timer;
-    late AnimationController _progressCtrl;
+  @override
+  void initState() {
+    super.initState();
+    _remaining = widget.totalSeconds;
+    _progressCtrl = AnimationController(
+      vsync: this,
+      duration: Duration(seconds: widget.totalSeconds),
+      value: 1.0,
+    );
 
-    @override
-    void initState() {
-      super.initState();
-      _remaining = widget.totalSeconds;
-      _progressCtrl = AnimationController(
-        vsync: this,
-        duration: Duration(seconds: widget.totalSeconds),
-        value: 1.0,
-      );
-
-      // Attendre que le bottom sheet ait fini de monter avant de démarrer
-      Future.delayed(const Duration(milliseconds: 700), () {
-        if (!mounted) return;
-        _progressCtrl.animateTo(0.0, curve: Curves.linear);
-        _timer = Timer.periodic(const Duration(seconds: 1), (t) {
-          if (!mounted) { t.cancel(); return; }
-          if (_remaining <= 1) {
-            t.cancel();
-            setState(() => _remaining = 0);
-          } else {
-            setState(() => _remaining--);
-          }
-        });
+    // Attendre que le bottom sheet ait fini de monter avant de démarrer
+    Future.delayed(const Duration(milliseconds: 700), () {
+      if (!mounted) return;
+      _progressCtrl.animateTo(0.0, curve: Curves.linear);
+      _timer = Timer.periodic(const Duration(seconds: 1), (t) {
+        if (!mounted) {
+          t.cancel();
+          return;
+        }
+        if (_remaining <= 1) {
+          t.cancel();
+          setState(() => _remaining = 0);
+        } else {
+          setState(() => _remaining--);
+        }
       });
-    }
+    });
+  }
 
-    @override
-    void dispose() {
-      _timer?.cancel();
-      _progressCtrl.dispose();
-      super.dispose();
-    }
+  @override
+  void dispose() {
+    _timer?.cancel();
+    _progressCtrl.dispose();
+    super.dispose();
+  }
 
-    Widget _buildItem(IconData icon, String text) {
-        return Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            width: 38,
-            height: 38,
-            decoration: BoxDecoration(
-              color: Colors.red[50],
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Center(
-              child: FaIcon(icon, size: 16, color: Colors.red[700]),
-            ),
+  Widget _buildItem(IconData icon, String text) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          width: 38,
+          height: 38,
+          decoration: BoxDecoration(
+            color: Colors.red[50],
+            borderRadius: BorderRadius.circular(10),
           ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.only(top: 7),
-              child: Text(
-                text,
-                style: GoogleFonts.poppins(
-                  fontSize: 13,
-                  color: Colors.grey[700],
-                  height: 1.5,
-                ),
-              ),
-            ),
-          ),
-        ],
-      );
-    }
-
-    @override
-    Widget build(BuildContext context) {
-      final bool canClose = _remaining == 0;
-      final bool isFr = langUserPhone == "fr";
-
-      return WillPopScope(
-        onWillPop: () async => false,
-        child: Container(
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
-          ),
-          padding: EdgeInsets.fromLTRB(
-            24, 12, 24, MediaQuery.of(context).padding.bottom + 28,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Barre de poignée
-              Container(
-                width: 44,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: Colors.grey[300],
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
-              const SizedBox(height: 24),
-
-              // Icône centrale
-              Container(
-                width: 76,
-                height: 76,
-                decoration: BoxDecoration(
-                  color: Colors.red[50],
-                  shape: BoxShape.circle,
-                ),
-                child: Center(
-                  child: FaIcon(
-                    FontAwesomeIcons.triangleExclamation,
-                    color: Colors.red[700],
-                    size: 34,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-
-              // Titre
-              Text(
-                isFr ? "Avertissement important" : "Important Warning",
-                style: GoogleFonts.poppins(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.red[700],
-                ),
-              ),
-              const SizedBox(height: 6),
-              Text(
-                isFr
-                    ? "Lis attentivement avant de continuer"
-                    : "Read carefully before continuing",
-                style: GoogleFonts.poppins(
-                  fontSize: 13,
-                  color: Colors.grey[500],
-                ),
-              ),
-
-              const SizedBox(height: 24),
-
-              // Points d'avertissement
-              _buildItem(
-                FontAwesomeIcons.userShield,
-                isFr
-                    ? "Dressur ne peut garantir la fiabilité ou la moralité des utilisateurs."
-                    : "Dressur cannot guarantee the reliability or integrity of users.",
-              ),
-              const SizedBox(height: 14),
-              _buildItem(
-                FontAwesomeIcons.moneyBillWave,
-                isFr
-                    ? "Ne jamais envoyer d'argent pour un service sans être certain de ce que vous recevrez en retour."
-                    : "Never send money for a service without being certain of what you will receive.",
-              ),
-              const SizedBox(height: 14),
-              _buildItem(
-                FontAwesomeIcons.scaleBalanced,
-                isFr
-                    ? "Dressur décline toute responsabilité en cas d'arnaque ou de perte financière causée par un utilisateur."
-                    : "Dressur disclaims all liability for scams or financial losses caused by another user.",
-              ),
-
-              const SizedBox(height: 24),
-
-              // Barre de progression
-              AnimatedBuilder(
-                animation: _progressCtrl,
-                builder: (_, __) => Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(6),
-                      child: LinearProgressIndicator(
-                        value: _progressCtrl.value,
-                        backgroundColor: Colors.grey[200],
-                        valueColor: AlwaysStoppedAnimation<Color>(
-                          canClose ? Colors.green : Colors.red,
-                        ),
-                        minHeight: 6,
-                      ),
-                    ),
-                    if (!canClose) ...[
-                      const SizedBox(height: 6),
-                      Text(
-                        isFr
-                            ? "Disponible dans $_remaining s"
-                            : "Available in $_remaining s",
-                        style: GoogleFonts.poppins(
-                          fontSize: 11,
-                          color: Colors.grey[400],
-                        ),
-                      ),
-                    ],
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 16),
-
-              // Bouton
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: canClose ? () => Navigator.of(context).pop() : null,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.red[700],
-                    disabledBackgroundColor: Colors.red[100],
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 15),
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                  ),
-                  child: Text(
-                    canClose
-                        ? (isFr ? "J'ai compris ✓" : "I understand ✓")
-                        : (isFr ? "J'ai compris ($_remaining)" : "I understand ($_remaining)"),
-                    style: GoogleFonts.poppins(
-                      fontWeight: FontWeight.w600,
-                      fontSize: 15,
-                      color: canClose ? Colors.white : Colors.red[300],
-                    ),
-                  ),
-                ),
-              ),
-            ],
+          child: Center(
+            child: FaIcon(icon, size: 16, color: Colors.red[700]),
           ),
         ),
-      );
-    }
+        const SizedBox(width: 12),
+        Expanded(
+          child: Padding(
+            padding: const EdgeInsets.only(top: 7),
+            child: Text(
+              text,
+              style: GoogleFonts.poppins(
+                fontSize: 13,
+                color: Colors.grey[700],
+                height: 1.5,
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
   }
 
-  extension StringExtension on String {
+  @override
+  Widget build(BuildContext context) {
+    final bool canClose = _remaining == 0;
+    final bool isFr = langUserPhone == "fr";
+
+    return WillPopScope(
+      onWillPop: () async => false,
+      child: Container(
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+        ),
+        padding: EdgeInsets.fromLTRB(
+          24,
+          12,
+          24,
+          MediaQuery.of(context).padding.bottom + 28,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Barre de poignée
+            Container(
+              width: 44,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            const SizedBox(height: 24),
+
+            // Icône centrale
+            Container(
+              width: 76,
+              height: 76,
+              decoration: BoxDecoration(
+                color: Colors.red[50],
+                shape: BoxShape.circle,
+              ),
+              child: Center(
+                child: FaIcon(
+                  FontAwesomeIcons.triangleExclamation,
+                  color: Colors.red[700],
+                  size: 34,
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+
+            // Titre
+            Text(
+              isFr ? "Avertissement important" : "Important Warning",
+              style: GoogleFonts.poppins(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.red[700],
+              ),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              isFr
+                  ? "Lis attentivement avant de continuer"
+                  : "Read carefully before continuing",
+              style: GoogleFonts.poppins(
+                fontSize: 13,
+                color: Colors.grey[500],
+              ),
+            ),
+
+            const SizedBox(height: 24),
+
+            // Points d'avertissement
+            _buildItem(
+              FontAwesomeIcons.userShield,
+              isFr
+                  ? "Dressur ne peut garantir la fiabilité ou la moralité des utilisateurs."
+                  : "Dressur cannot guarantee the reliability or integrity of users.",
+            ),
+            const SizedBox(height: 14),
+            _buildItem(
+              FontAwesomeIcons.moneyBillWave,
+              isFr
+                  ? "Ne jamais envoyer d'argent pour un service sans être certain de ce que vous recevrez en retour."
+                  : "Never send money for a service without being certain of what you will receive.",
+            ),
+            const SizedBox(height: 14),
+            _buildItem(
+              FontAwesomeIcons.scaleBalanced,
+              isFr
+                  ? "Dressur décline toute responsabilité en cas d'arnaque ou de perte financière causée par un utilisateur."
+                  : "Dressur disclaims all liability for scams or financial losses caused by another user.",
+            ),
+
+            const SizedBox(height: 24),
+
+            // Barre de progression
+            AnimatedBuilder(
+              animation: _progressCtrl,
+              builder: (_, __) => Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(6),
+                    child: LinearProgressIndicator(
+                      value: _progressCtrl.value,
+                      backgroundColor: Colors.grey[200],
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        canClose ? Colors.green : Colors.red,
+                      ),
+                      minHeight: 6,
+                    ),
+                  ),
+                  if (!canClose) ...[
+                    const SizedBox(height: 6),
+                    Text(
+                      isFr
+                          ? "Disponible dans $_remaining s"
+                          : "Available in $_remaining s",
+                      style: GoogleFonts.poppins(
+                        fontSize: 11,
+                        color: Colors.grey[400],
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 16),
+
+            // Bouton
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: canClose ? () => Navigator.of(context).pop() : null,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red[700],
+                  disabledBackgroundColor: Colors.red[100],
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 15),
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                ),
+                child: Text(
+                  canClose
+                      ? (isFr ? "J'ai compris ✓" : "I understand ✓")
+                      : (isFr
+                          ? "J'ai compris ($_remaining)"
+                          : "I understand ($_remaining)"),
+                  style: GoogleFonts.poppins(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 15,
+                    color: canClose ? Colors.white : Colors.red[300],
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+extension StringExtension on String {
   String capitalize() {
     if (this.isEmpty) return "";
     return "${this[0].toUpperCase()}${this.substring(1)}";

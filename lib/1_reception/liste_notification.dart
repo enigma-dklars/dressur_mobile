@@ -25,12 +25,6 @@ class _ListeNotificationState extends State<ListeNotification> {
     super.initState();
   }
 
-  Future<void> _refreshData() async {
-    setState(() {
-      // actualise();
-    });
-  }
-
   void dispose() {
     _scrollController.removeListener(_scrollListener);
     _scrollController.dispose();
@@ -49,13 +43,6 @@ class _ListeNotificationState extends State<ListeNotification> {
         _scrollController.position.pixels == 0) {
       _showFabText.value = true;
     }
-  }
-
-  void _startTimer() {
-    // Crée un nouveau timer qui exécute la fonction everySecond toutes les secondes
-    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
-      everySecond();
-    });
   }
 
   void _stopTimer() {
