@@ -19,6 +19,7 @@ class AdminPromosDressurStatusPage extends StatefulWidget {
 class _AdminPromosDressurStatusPageState
     extends State<AdminPromosDressurStatusPage> {
   bool _loading = true;
+  bool _hasError = false;
   List<dynamic> _promotions = [];
   final Set<int> _sharing = {};
 
@@ -29,18 +30,30 @@ class _AdminPromosDressurStatusPageState
   }
 
   Future<void> _fetchPromos() async {
-    setState(() => _loading = true);
+    if (mounted) setState(() { _loading = true; _hasError = false; });
     try {
       final response = await http.get(
         Uri.parse('$generalRouteForApi/getPromotionsDressurStatus?uid=$uidUser'),
-      );
+      ).timeout(const Duration(seconds: 20));
+
+      if (!mounted) return;
+
       if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
+        final data = jsonDecode(response.body) as Map<String, dynamic>;
         if (data['error'] == false) {
-          setState(() => _promotions = data['promotions'] ?? []);
+          setState(() {
+            _promotions = (data['promotions'] as List<dynamic>?) ?? [];
+            _hasError = false;
+          });
+        } else {
+          setState(() => _hasError = true);
         }
+      } else {
+        setState(() => _hasError = true);
       }
-    } catch (_) {}
+    } catch (_) {
+      if (mounted) setState(() => _hasError = true);
+    }
     if (mounted) setState(() => _loading = false);
   }
 
@@ -113,7 +126,7 @@ class _AdminPromosDressurStatusPageState
   }
 
   Widget _buildCard(Map<String, dynamic> p, bool isDark) {
-    final int id = p['id'];
+    final int id = p['id'] is int ? p['id'] as int : int.tryParse('${p['id']}') ?? 0;
     final bool isSharing = _sharing.contains(id);
     final String imageUrl = '$generalRouteForPromotionImage${p['image']}';
     final String pseudo = p['pseudo'] ?? '';
@@ -292,37 +305,69 @@ class _AdminPromosDressurStatusPageState
       ),
       body: _loading
           ? const Center(child: CircularProgressIndicator(color: primaryColor))
-          : _promotions.isEmpty
+          : _hasError
               ? Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      FaIcon(FontAwesomeIcons.broadcastTower,
-                          size: 52,
-                          color: isDark ? Colors.grey[600] : Colors.grey[400]),
+                      FaIcon(FontAwesomeIcons.triangleExclamation,
+                          size: 52, color: Colors.orange),
                       const SizedBox(height: 16),
                       Text(
                         (langUserPhone == "fr")
-                            ? 'Aucune promotion à partager'
-                            : 'No promotions to share',
+                            ? 'Erreur de chargement'
+                            : 'Loading error',
                         style: GoogleFonts.poppins(
-                          fontSize: 16,
-                          color:
-                              isDark ? Colors.grey[400] : Colors.grey[600],
+                            fontSize: 16,
+                            color: isDark ? Colors.grey[400] : Colors.grey[600]),
+                      ),
+                      const SizedBox(height: 16),
+                      ElevatedButton.icon(
+                        onPressed: _fetchPromos,
+                        icon: const FaIcon(FontAwesomeIcons.arrowsRotate, size: 14),
+                        label: Text(
+                          (langUserPhone == "fr") ? 'Réessayer' : 'Retry',
+                          style: GoogleFonts.poppins(fontWeight: FontWeight.bold),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: primaryColor,
+                          foregroundColor: Colors.white,
+                          shape: const StadiumBorder(),
                         ),
                       ),
                     ],
                   ),
                 )
-              : RefreshIndicator(
-                  onRefresh: _fetchPromos,
-                  child: ListView.builder(
-                    padding: const EdgeInsets.symmetric(vertical: 8),
-                    itemCount: _promotions.length,
-                    itemBuilder: (_, i) =>
-                        _buildCard(_promotions[i] as Map<String, dynamic>, isDark),
-                  ),
-                ),
+              : _promotions.isEmpty
+                  ? Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          FaIcon(FontAwesomeIcons.broadcastTower,
+                              size: 52,
+                              color: isDark ? Colors.grey[600] : Colors.grey[400]),
+                          const SizedBox(height: 16),
+                          Text(
+                            (langUserPhone == "fr")
+                                ? 'Aucune promotion à partager'
+                                : 'No promotions to share',
+                            style: GoogleFonts.poppins(
+                              fontSize: 16,
+                              color: isDark ? Colors.grey[400] : Colors.grey[600],
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  : RefreshIndicator(
+                      onRefresh: _fetchPromos,
+                      child: ListView.builder(
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        itemCount: _promotions.length,
+                        itemBuilder: (_, i) =>
+                            _buildCard(_promotions[i] as Map<String, dynamic>, isDark),
+                      ),
+                    ),
     );
   }
 }
