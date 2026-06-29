@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:dressur/8_admin/promo_en_attente_admin.dart';
+import 'package:dressur/8_admin/promos_dressur_status_admin.dart';
 
 class AdministrationPage extends StatelessWidget {
   const AdministrationPage({Key? key}) : super(key: key);
@@ -49,6 +50,21 @@ class AdministrationPage extends StatelessWidget {
               context,
               MaterialPageRoute(
                 builder: (_) => const AdminPromoEnAttentePage(),
+              ),
+            ),
+          ),
+          _buildAdminTile(
+            context,
+            isDark: isDark,
+            icon: FontAwesomeIcons.broadcastTower,
+            iconColor: Colors.deepPurple,
+            title: 'Statut Dressur',
+            subtitle:
+                'Partager les promotions affaire publiées sur le statut Dressur',
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => const AdminPromosDressurStatusPage(),
               ),
             ),
           ),
