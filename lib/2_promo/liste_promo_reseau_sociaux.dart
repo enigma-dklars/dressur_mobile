@@ -85,7 +85,7 @@ class _PromotionReseauSociauxListePageState
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: const Text('Erreur'),
+            title: Text((langUserPhone == "fr") ? 'Erreur' : 'Error'),
             content: Text((langUserPhone == "fr")
                 ? "Échec de récupération des promotionReseauSociaux. Code d'erreur:"
                 : "Failed to retrieve promotionReseauSociaux. Error code:"
@@ -289,7 +289,7 @@ class _PromotionReseauSociauxListePageState
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      "Référence: ${promo.reference}",
+                      "${(langUserPhone == "fr") ? "Référence" : "Reference"}: ${promo.reference}",
                       style: GoogleFonts.poppins(
                           fontSize: 13, color: Colors.grey[600]),
                     ),
@@ -306,7 +306,7 @@ class _PromotionReseauSociauxListePageState
                         ),
                         SizedBox(width: 8),
                         Text(
-                          "Autres Détails",
+                          (langUserPhone == "fr") ? "Autres Détails" : "Other Details",
                           style: GoogleFonts.poppins(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
@@ -366,47 +366,47 @@ class _PromotionReseauSociauxListePageState
                   style: GoogleFonts.poppins(
                       fontSize: 22, fontWeight: FontWeight.bold)),
               SizedBox(height: 20),
-              _buildSectionTitle("Détails de la Commande"),
+              _buildSectionTitle((langUserPhone == "fr") ? "Détails de la Commande" : "Order Details"),
               _buildDetailRow(
                 icon: FontAwesomeIcons.boxOpen,
-                label: "Quantité Demandée",
+                label: (langUserPhone == "fr") ? "Quantité Demandée" : "Requested Quantity",
                 value: promo.qteDemander,
               ),
               _buildDetailRow(
                 icon: FontAwesomeIcons.moneyBillTrendUp,
-                label: "Prix Fixé",
+                label: (langUserPhone == "fr") ? "Prix Fixé" : "Fixed Price",
                 value: promo.prixFixer,
               ),
               SizedBox(height: 15),
-              _buildSectionTitle("Suivi de la Campagne"),
+              _buildSectionTitle((langUserPhone == "fr") ? "Suivi de la Campagne" : "Campaign Tracking"),
               _buildDetailRow(
                 icon: FontAwesomeIcons.flag,
-                label: "Compteur au Début",
+                label: (langUserPhone == "fr") ? "Compteur au Début" : "Starting Count",
                 value: promo.compteurDebut,
               ),
               _buildDetailRow(
                 icon: FontAwesomeIcons.hourglass,
-                label: "Compteur Restant",
+                label: (langUserPhone == "fr") ? "Compteur Restant" : "Remaining Count",
                 value: promo.compteurRestant,
               ),
               SizedBox(height: 15),
-              _buildSectionTitle("Informations Techniques"),
+              _buildSectionTitle((langUserPhone == "fr") ? "Informations Techniques" : "Technical Information"),
               _buildDetailRow(
                 icon: FontAwesomeIcons.tag,
-                label: "Référence",
+                label: (langUserPhone == "fr") ? "Référence" : "Reference",
                 value: promo.reference,
               ),
               _buildUrlItem(promo.url),
               SizedBox(height: 15),
-              _buildSectionTitle("Historique"),
+              _buildSectionTitle((langUserPhone == "fr") ? "Historique" : "History"),
               _buildDetailRow(
                 icon: FontAwesomeIcons.calendar,
-                label: "Créé le",
+                label: (langUserPhone == "fr") ? "Créé le" : "Created on",
                 value: promo.createdAt,
               ),
               _buildDetailRow(
                 icon: FontAwesomeIcons.penToSquare,
-                label: "Modifié le",
+                label: (langUserPhone == "fr") ? "Modifié le" : "Updated on",
                 value: promo.updatedAt,
               ),
             ],
@@ -497,7 +497,7 @@ class _PromotionReseauSociauxListePageState
   }
 
   Widget _buildEmptyState() {
-    /* ... */ return Center(child: Text("Aucune promotion"));
+    /* ... */ return Center(child: Text((langUserPhone == "fr") ? "Aucune promotion" : "No promotions found"));
   }
 
   Widget _buildShimmerList() {

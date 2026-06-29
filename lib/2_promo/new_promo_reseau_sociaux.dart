@@ -503,8 +503,7 @@ class _RegisterForm3State extends State<RegisterForm3> {
                   controller: quantityController,
                   keyboardType: TextInputType.number,
                   decoration: InputDecoration(
-                    labelText:
-                        (langUserPhone == "fr") ? "Quantité" : "Quantity",
+                    labelText: (langUserPhone == "fr") ? "Quantité" : "Quantity",
                     helperText: "Min : $qteMin - Max : $qteMax",
                     border: const OutlineInputBorder(),
                   ),
@@ -520,7 +519,7 @@ class _RegisterForm3State extends State<RegisterForm3> {
                   keyboardType:
                       const TextInputType.numberWithOptions(decimal: true),
                   decoration: InputDecoration(
-                    labelText: "Prix",
+                    labelText: (langUserPhone == "fr") ? "Prix" : "Price",
                     helperText: "FCFA",
                     border: const OutlineInputBorder(),
                     // Définir la couleur du texte lorsque le champ est désactivé
@@ -540,7 +539,7 @@ class _RegisterForm3State extends State<RegisterForm3> {
               border: const OutlineInputBorder(),
               errorText: _isValidLink
                   ? null
-                  : "Veuillez saisir un lien valide.", // Set error text if link is invalid
+                  : (langUserPhone == "fr") ? "Veuillez saisir un lien valide." : "Please enter a valid link.",
             ),
             onChanged: (text) {
               setState(() {
@@ -553,13 +552,13 @@ class _RegisterForm3State extends State<RegisterForm3> {
           ),
           const SizedBox(height: 15),
           SelectFormField(
-            decoration: const InputDecoration(
-              labelText: 'Moyen de paiement mobile ou par carte',
-              border: OutlineInputBorder(),
+            decoration: InputDecoration(
+              labelText: (langUserPhone == "fr") ? 'Moyen de paiement mobile ou par carte' : 'Mobile or card payment method',
+              border: const OutlineInputBorder(),
             ),
             type: SelectFormFieldType.dropdown,
             initialValue: 'mtn',
-            labelText: 'Moyen de paiement mobile ou par carte',
+            labelText: (langUserPhone == "fr") ? 'Moyen de paiement mobile ou par carte' : 'Mobile or card payment method',
             items: listeMethodePaiements,
             onChanged: (val) => onChangeMethodePaiement(val),
             onSaved: (val) => print(val),
@@ -569,7 +568,7 @@ class _RegisterForm3State extends State<RegisterForm3> {
             controller: telController,
             decoration: InputDecoration(
               labelStyle: GoogleFonts.poppins(color: Colors.grey[400]),
-              labelText: 'Indicatif + Numéro du paiement',
+              labelText: (langUserPhone == "fr") ? 'Indicatif + Numéro du paiement' : 'Country code + Payment number',
               border: const OutlineInputBorder(),
             ),
           ),

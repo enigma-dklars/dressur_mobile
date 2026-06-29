@@ -175,13 +175,13 @@ class _PromotionListPageState extends State<PromotionListPage> {
     String typeLabel;
     if (type == "produit_service") {
       backgroundColor = Colors.green;
-      typeLabel = "Produit Service";
+      typeLabel = (langUserPhone == "fr") ? "Produit Service" : "Product / Service";
     } else if (type == "offre_emploi") {
       backgroundColor = Colors.orange;
-      typeLabel = "Offre Emploi";
+      typeLabel = (langUserPhone == "fr") ? "Offre Emploi" : "Job Offer";
     } else {
       backgroundColor = Colors.red;
-      typeLabel = "Demande Emploi";
+      typeLabel = (langUserPhone == "fr") ? "Demande Emploi" : "Job Application";
     }
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 1),
@@ -287,7 +287,7 @@ class _PromotionListPageState extends State<PromotionListPage> {
               if (promotion.inProgrammeRecompense)
                 _buildSpecialBadge(
                   icon: FontAwesomeIcons.star,
-                  text: "Programme Récompense",
+                  text: (langUserPhone == "fr") ? "Programme Récompense" : "Reward Program",
                   gradient: LinearGradient(
                       colors: [Colors.orange[700]!, Colors.orange[400]!]),
                 ),
@@ -334,8 +334,12 @@ class _PromotionListPageState extends State<PromotionListPage> {
   Widget _buildRejectedContent(Promotion promotion) {
     bool canEdit = promotion.typePromotionAffaire == "produit_service";
     String infoText = canEdit
-        ? "Tenez compte du motif de refus pour modifier votre promotion. Merci..."
-        : "Tenez compte du motif de refus pour soumettre une nouvelle promotion. Merci...";
+        ? (langUserPhone == "fr")
+            ? "Tenez compte du motif de refus pour modifier votre promotion. Merci..."
+            : "Please take the rejection reason into account when modifying your promotion. Thank you..."
+        : (langUserPhone == "fr")
+            ? "Tenez compte du motif de refus pour soumettre une nouvelle promotion. Merci..."
+            : "Please take the rejection reason into account when submitting a new promotion. Thank you...";
 
     return Container(
       key: ValueKey('rejected'),
@@ -1127,7 +1131,7 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Relancer la Promotion',
+          (langUserPhone == "fr") ? 'Relancer la Promotion' : 'Relaunch Promotion',
           style: GoogleFonts.poppins(
             color: Colors.white,
             fontWeight: FontWeight.w400,
@@ -1149,9 +1153,9 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
                 ? const Center(
                     child: CircularProgressIndicator(color: primaryColor))
                 : SelectFormField(
-                    decoration: const InputDecoration(
-                        labelText: 'Formule de Boost',
-                        border: OutlineInputBorder()),
+                    decoration: InputDecoration(
+                        labelText: (langUserPhone == "fr") ? 'Formule de Boost' : 'Boost Plan',
+                        border: const OutlineInputBorder()),
                     type: SelectFormFieldType.dropdown,
                     initialValue: '0',
                     items: listeDesFormules,
@@ -1166,13 +1170,13 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
             const SizedBox(height: 20),
 
             // --- SECTION PROGRAMME DE RÉCOMPENSE ---
-            _buildOptionHeader(FontAwesomeIcons.star, "Programme de Récompense",
+            _buildOptionHeader(FontAwesomeIcons.star, (langUserPhone == "fr") ? "Programme de Récompense" : "Reward Program",
                 _participateInReward),
             SwitchListTile(
-              title: Text("Ajouter au programme",
+              title: Text((langUserPhone == "fr") ? "Ajouter au programme" : "Add to program",
                   style: GoogleFonts.poppins(
                       fontSize: 14, fontWeight: FontWeight.w500)),
-              subtitle: Text("Récompensez les partages statut WhatsApp.",
+              subtitle: Text((langUserPhone == "fr") ? "Récompensez les partages statut WhatsApp." : "Reward WhatsApp status shares.",
                   style: GoogleFonts.poppins(fontSize: 11)),
               value: _participateInReward,
               activeColor: primaryColor,
@@ -1186,7 +1190,7 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
                     Row(
                       children: [
                         Expanded(
-                            child: Text("Objectif de vues (min. 2500)",
+                            child: Text((langUserPhone == "fr") ? "Objectif de vues (min. 2500)" : "Views goal (min. 2500)",
                                 style: GoogleFonts.poppins(fontSize: 13))),
                         SizedBox(
                             width: 100,
@@ -1213,10 +1217,10 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
             _buildOptionHeader(FontAwesomeIcons.solidCircleCheck,
                 "Statut Dressur", _publishOnDressurStatus),
             SwitchListTile(
-              title: Text("Publier sur le statut Dressur",
+              title: Text((langUserPhone == "fr") ? "Publier sur le statut Dressur" : "Publish on Dressur status",
                   style: GoogleFonts.poppins(
                       fontSize: 14, fontWeight: FontWeight.w500)),
-              subtitle: Text("Visibilité maximale sur notre statut officiel.",
+              subtitle: Text((langUserPhone == "fr") ? "Visibilité maximale sur notre statut officiel." : "Maximum visibility on our official status.",
                   style: GoogleFonts.poppins(fontSize: 11)),
               value: _publishOnDressurStatus,
               activeColor: primaryColor,
@@ -1239,13 +1243,13 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
                   border: Border.all(color: Colors.grey[300]!)),
               child: Column(
                 children: [
-                  _recapRow("Formule Boost", prix.toDouble()),
+                  _recapRow((langUserPhone == "fr") ? "Formule Boost" : "Boost Plan", prix.toDouble()),
                   if (_participateInReward)
-                    _recapRow("Programme Récompense", _rewardProgramAmount),
+                    _recapRow((langUserPhone == "fr") ? "Programme Récompense" : "Reward Program", _rewardProgramAmount),
                   if (_publishOnDressurStatus)
                     _recapRow("Statut Dressur", _dressurStatusAmount),
                   const Divider(height: 20),
-                  _recapRow("TOTAL ESTIMÉ", _totalWithMaxCommission,
+                  _recapRow((langUserPhone == "fr") ? "TOTAL ESTIMÉ" : "ESTIMATED TOTAL", _totalWithMaxCommission,
                       isBold: true),
                 ],
               ),
@@ -1253,8 +1257,9 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
 
             const SizedBox(height: 20),
             SelectFormField(
-              decoration: const InputDecoration(
-                  labelText: 'Moyen de paiement', border: OutlineInputBorder()),
+              decoration: InputDecoration(
+                  labelText: (langUserPhone == "fr") ? 'Moyen de paiement' : 'Payment method',
+                  border: const OutlineInputBorder()),
               type: SelectFormFieldType.dropdown,
               initialValue: 'mtn',
               items: listeMethodePaiements,
@@ -1263,9 +1268,9 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
             const SizedBox(height: 10),
             TextField(
                 controller: telController,
-                decoration: const InputDecoration(
-                    labelText: 'Numéro du paiement',
-                    border: OutlineInputBorder())),
+                decoration: InputDecoration(
+                    labelText: (langUserPhone == "fr") ? 'Numéro du paiement' : 'Payment number',
+                    border: const OutlineInputBorder())),
 
             const SizedBox(height: 20),
             ElevatedButton(
@@ -1274,7 +1279,7 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
                   shape: const StadiumBorder(),
                   padding: const EdgeInsets.symmetric(vertical: 15)),
               onPressed: _desactive2 ? null : newPromoPayant,
-              child: Text(_desactive2 ? "Patientez..." : "Payer et Relancer",
+              child: Text(_desactive2 ? (langUserPhone == "fr" ? "Patientez..." : "Please wait...") : (langUserPhone == "fr" ? "Payer et Relancer" : "Pay and Relaunch"),
                   style: GoogleFonts.poppins(
                       color: Colors.white, fontWeight: FontWeight.bold)),
             ),

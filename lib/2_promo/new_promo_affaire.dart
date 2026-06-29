@@ -140,13 +140,13 @@ class _PromotionFormPageState extends State<PromotionFormPage> {
             ),
             const SizedBox(height: 8),
             SelectFormField(
-              decoration: const InputDecoration(
-                labelText: 'Type Promotion Affaire',
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                labelText: (langUserPhone == "fr") ? 'Type Promotion Affaire' : 'Business Promotion Type',
+                border: const OutlineInputBorder(),
               ),
               type: SelectFormFieldType.dropdown,
               initialValue: 'produit_service',
-              labelText: 'Type Promotion Affaire',
+              labelText: (langUserPhone == "fr") ? 'Type Promotion Affaire' : 'Business Promotion Type',
               items: listeTypePromoAffaire,
               onChanged: (val) => onChangeTypePromoAffaire(val),
               onSaved: (val) => print(val),
@@ -378,7 +378,7 @@ class _ProduitsServicesState extends State<ProduitsServices> {
         cancelPromoReminderNotification();
         if (data["direct"] == true) {
           successNoti(
-              "Succès",
+              (langUserPhone == "fr") ? "Succès" : "Success",
               (langUserPhone == "fr")
                   ? "Veuillez confirmer le paiement pour finaliser l'enregistrement de votre promotion."
                   : "Please confirm payment to finalize the registration of your promotion.",
@@ -386,7 +386,7 @@ class _ProduitsServicesState extends State<ProduitsServices> {
         } else {
           launchPaiement(data["url"]);
           successNoti(
-              "Succès",
+              (langUserPhone == "fr") ? "Succès" : "Success",
               (langUserPhone == "fr")
                   ? "Veuillez confirmer le paiement pour finaliser l'enregistrement de votre promotion."
                   : "Please confirm payment to finalize the registration of your promotion.",
@@ -394,7 +394,7 @@ class _ProduitsServicesState extends State<ProduitsServices> {
         }
       }
     } else {
-      dangerNoti("Erreur", 'Code : ${response.statusCode}', context);
+      dangerNoti((langUserPhone == "fr") ? "Erreur" : "Error", 'Code : ${response.statusCode}', context);
       setState(() => _isSending = false);
     }
   }
@@ -508,16 +508,16 @@ class _ProduitsServicesState extends State<ProduitsServices> {
           border: Border.all(color: Colors.grey[300]!)),
       child: Column(
         children: [
-          _recapRow("Formule Boost", prixBoost.toDouble()),
+          _recapRow((langUserPhone == "fr") ? "Formule Boost" : "Boost Plan", prixBoost.toDouble()),
           if (_participateInReward)
-            _recapRow("Programme Récompense", _rewardProgramAmount),
+            _recapRow((langUserPhone == "fr") ? "Programme Récompense" : "Reward Program", _rewardProgramAmount),
           if (_publishOnDressurStatus)
             _recapRow("Statut Dressur", _dressurStatusAmount),
           Divider(height: 20),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text("TOTAL",
+              Text((langUserPhone == "fr") ? "TOTAL" : "TOTAL",
                   style: GoogleFonts.poppins(
                     fontWeight: FontWeight.bold,
                     fontSize: 18,
@@ -566,9 +566,9 @@ class _ProduitsServicesState extends State<ProduitsServices> {
           loading_formule_gratuit
               ? const Center(child: CircularProgressIndicator(color: primaryColor))
               : SelectFormField(
-                  decoration: const InputDecoration(
-                      labelText: 'Formule de Boost',
-                      border: OutlineInputBorder()),
+                  decoration: InputDecoration(
+                      labelText: (langUserPhone == "fr") ? 'Formule de Boost' : 'Boost Plan',
+                      border: const OutlineInputBorder()),
                   type: SelectFormFieldType.dropdown,
                   initialValue: '0',
                   items: listeDesFormules,
@@ -610,14 +610,16 @@ class _ProduitsServicesState extends State<ProduitsServices> {
           const SizedBox(height: 10),
 
           // --- SECTION PROGRAMME DE RÉCOMPENSE ---
-          _buildOptionHeader(FontAwesomeIcons.star, "Programme de Récompense",
+          _buildOptionHeader(FontAwesomeIcons.star, (langUserPhone == "fr") ? "Programme de Récompense" : "Reward Program",
               _participateInReward),
           SwitchListTile(
-            title: Text("Ajouter votre promotion au programme",
+            title: Text((langUserPhone == "fr") ? "Ajouter votre promotion au programme" : "Add your promotion to the program",
                 style: GoogleFonts.poppins(
                     fontSize: 14, fontWeight: FontWeight.w500)),
             subtitle: Text(
-                "Attirez plus de vues en récompensant les utilisateurs qui le publieront sur leur statut WhatsApp. Dressur se charge de la mise en application et de la vérification.",
+                (langUserPhone == "fr")
+                    ? "Attirez plus de vues en récompensant les utilisateurs qui le publieront sur leur statut WhatsApp. Dressur se charge de la mise en application et de la vérification."
+                    : "Get more views by rewarding users who share it on their WhatsApp status. Dressur handles the implementation and verification.",
                 style: GoogleFonts.poppins(fontSize: 11)),
             value: _participateInReward,
             activeColor: primaryColor,
@@ -630,12 +632,14 @@ class _ProduitsServicesState extends State<ProduitsServices> {
                 children: [
                   // --- MODIFICATION : UTILISATION DU CONTROLLER ---
                   _buildNumberInput(
-                    "Objectif de vues total (min. 2500)",
+                    (langUserPhone == "fr") ? "Objectif de vues total (min. 2500)" : "Total views goal (min. 2500)",
                     _viewsController,
                   ),
                   const SizedBox(height: 10),
                   _infoBox(
-                    "Montant de récompense : ${_rewardProgramAmount.toStringAsFixed(0)} FCFA",
+                    (langUserPhone == "fr")
+                        ? "Montant de récompense : ${_rewardProgramAmount.toStringAsFixed(0)} FCFA"
+                        : "Reward amount: ${_rewardProgramAmount.toStringAsFixed(0)} FCFA",
                     Colors.orange,
                   ),
                 ],
@@ -653,12 +657,12 @@ class _ProduitsServicesState extends State<ProduitsServices> {
           ),
           SwitchListTile(
             title: Text(
-              "Publier sur le statut de Dressur",
+              (langUserPhone == "fr") ? "Publier sur le statut de Dressur" : "Publish on Dressur status",
               style: GoogleFonts.poppins(
                   fontSize: 14, fontWeight: FontWeight.w500),
             ),
             subtitle: Text(
-              "Bénéficiez d’une visibilité maximale sur le statut WhatsApp de Dressur pendant toute la durée de votre promotion.",
+              (langUserPhone == "fr") ? "Bénéficiez d’une visibilité maximale sur le statut WhatsApp de Dressur pendant toute la durée de votre promotion." : "Get maximum visibility on Dressur’s WhatsApp status for the entire duration of your promotion.",
               style: GoogleFonts.poppins(fontSize: 11),
             ),
             value: _publishOnDressurStatus,

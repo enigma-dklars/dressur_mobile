@@ -71,11 +71,15 @@ class _ListeBoostContactPageState extends State<ListeBoostContactPage> {
         });
       } else {
         _showErrorDialog(
-            'Failed to retrieve boosts. Error code: ${response.statusCode}');
+            (langUserPhone == "fr")
+                ? 'Impossible de récupérer les boosts. Code d\'erreur : ${response.statusCode}'
+                : 'Failed to retrieve boosts. Error code: ${response.statusCode}');
       }
     } catch (e) {
       _showErrorDialog(
-          'An error occurred while fetching boosts. Please try again.');
+          (langUserPhone == "fr")
+              ? 'Une erreur est survenue lors du chargement des boosts. Veuillez réessayer.'
+              : 'An error occurred while fetching boosts. Please try again.');
     } finally {
       setState(() {
         _loading = false;
@@ -88,7 +92,7 @@ class _ListeBoostContactPageState extends State<ListeBoostContactPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Erreur'),
+          title: Text((langUserPhone == "fr") ? 'Erreur' : 'Error'),
           content: Text(message),
           actions: <Widget>[
             TextButton(

@@ -155,7 +155,7 @@ class _ModificationProduitServicesPageState
           MaterialPageRoute(builder: (context) => PromotionListPage()),
         );
         successNoti(
-            "Good",
+            (langUserPhone == "fr") ? "Succès" : "Success",
             (langUserPhone == "fr")
                 ? 'Good. Votre demande de promotion a été enregistrée. Elle sera diffusée si elle est acceptée par un administrateur. Dans le cas contraire, vous devrez la modifier en tenant compte des remarques.'
                 : 'Good. Your promotion request has been saved. It will be released if it is accepted by an administrator. Otherwise, you will need to modify it taking into account the comments.',
