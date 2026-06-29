@@ -51,12 +51,12 @@ class _AdminPromoEnAttentePageState extends State<AdminPromoEnAttentePage> {
         body: {'uid': '$uidUser'},
       );
       final data = jsonDecode(response.body);
-      _showSnack(data['message'] ?? 'Fait', data['error'] == false);
+      _showSnack(data['message'] ?? ((langUserPhone == "fr") ? 'Fait' : 'Done'), data['error'] == false);
       if (data['error'] == false) {
         setState(() => _promotions.removeWhere((p) => p['id'] == id));
       }
     } catch (_) {
-      _showSnack('Erreur réseau', false);
+      _showSnack((langUserPhone == "fr") ? 'Erreur réseau' : 'Network error', false);
     }
     if (mounted) setState(() => _processing.remove(id));
   }
@@ -69,12 +69,12 @@ class _AdminPromoEnAttentePageState extends State<AdminPromoEnAttentePage> {
         body: {'uid': '$uidUser', 'motif': motif},
       );
       final data = jsonDecode(response.body);
-      _showSnack(data['message'] ?? 'Fait', data['error'] == false);
+      _showSnack(data['message'] ?? ((langUserPhone == "fr") ? 'Fait' : 'Done'), data['error'] == false);
       if (data['error'] == false) {
         setState(() => _promotions.removeWhere((p) => p['id'] == id));
       }
     } catch (_) {
-      _showSnack('Erreur réseau', false);
+      _showSnack((langUserPhone == "fr") ? 'Erreur réseau' : 'Network error', false);
     }
     if (mounted) setState(() => _processing.remove(id));
   }
@@ -95,21 +95,21 @@ class _AdminPromoEnAttentePageState extends State<AdminPromoEnAttentePage> {
       builder: (_) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Text(
-          'Motif de refus',
+          (langUserPhone == "fr") ? 'Motif de refus' : 'Reason for rejection',
           style: GoogleFonts.poppins(fontWeight: FontWeight.bold),
         ),
         content: TextField(
           controller: controller,
           maxLines: 3,
-          decoration: const InputDecoration(
-            hintText: 'Expliquer pourquoi cette promotion est refusée...',
-            border: OutlineInputBorder(),
+          decoration: InputDecoration(
+            hintText: (langUserPhone == "fr") ? 'Expliquer pourquoi cette promotion est refusée...' : 'Explain why this promotion is rejected...',
+            border: const OutlineInputBorder(),
           ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('Annuler', style: GoogleFonts.poppins()),
+            child: Text((langUserPhone == "fr") ? 'Annuler' : 'Cancel', style: GoogleFonts.poppins()),
           ),
           ElevatedButton(
             onPressed: () {
@@ -118,7 +118,7 @@ class _AdminPromoEnAttentePageState extends State<AdminPromoEnAttentePage> {
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
             child: Text(
-              'Refuser',
+              (langUserPhone == "fr") ? 'Refuser' : 'Reject',
               style: GoogleFonts.poppins(
                   color: Colors.white, fontWeight: FontWeight.bold),
             ),
@@ -131,9 +131,9 @@ class _AdminPromoEnAttentePageState extends State<AdminPromoEnAttentePage> {
   String _labelType(String? type) {
     switch (type) {
       case 'dmd_emploi':
-        return "Demande d'emploi";
+        return (langUserPhone == "fr") ? "Demande d'emploi" : "Job Application";
       case 'offre_emploi':
-        return "Offre d'emploi";
+        return (langUserPhone == "fr") ? "Offre d'emploi" : "Job Offer";
       default:
         return 'Produit / Service';
     }
@@ -232,7 +232,7 @@ class _AdminPromoEnAttentePageState extends State<AdminPromoEnAttentePage> {
 
                 // ── Date ──
                 Text(
-                  'Soumis le ${p['createdAt'] ?? ''}',
+                  '${(langUserPhone == "fr") ? "Soumis le" : "Submitted on"} ${p['createdAt'] ?? ''}',
                   style: GoogleFonts.poppins(
                       fontSize: 10,
                       color: isDark ? Colors.grey[600] : Colors.grey[400]),
@@ -250,7 +250,7 @@ class _AdminPromoEnAttentePageState extends State<AdminPromoEnAttentePage> {
                           onPressed: () => _accepter(id),
                           icon: const FaIcon(FontAwesomeIcons.check, size: 14),
                           label: Text(
-                            'Accepter',
+                            (langUserPhone == "fr") ? 'Accepter' : 'Accept',
                             style: GoogleFonts.poppins(
                                 fontWeight: FontWeight.bold),
                           ),
@@ -270,7 +270,7 @@ class _AdminPromoEnAttentePageState extends State<AdminPromoEnAttentePage> {
                           icon:
                               const FaIcon(FontAwesomeIcons.xmark, size: 14),
                           label: Text(
-                            'Refuser',
+                            (langUserPhone == "fr") ? 'Refuser' : 'Reject',
                             style: GoogleFonts.poppins(
                                 fontWeight: FontWeight.bold),
                           ),
@@ -342,14 +342,14 @@ class _AdminPromoEnAttentePageState extends State<AdminPromoEnAttentePage> {
           icon: const FaIcon(FontAwesomeIcons.chevronLeft, color: Colors.white),
         ),
         title: Text(
-          'Promotions en attente',
+          (langUserPhone == "fr") ? 'Promotions en attente' : 'Pending Promotions',
           style: GoogleFonts.poppins(
               color: Colors.white, fontWeight: FontWeight.w400, fontSize: 18),
         ),
         actions: [
           IconButton(
             onPressed: _fetchPromos,
-            tooltip: 'Actualiser',
+            tooltip: (langUserPhone == "fr") ? 'Actualiser' : 'Refresh',
             icon: const FaIcon(FontAwesomeIcons.arrowsRotate,
                 color: Colors.white, size: 18),
           ),
@@ -366,7 +366,7 @@ class _AdminPromoEnAttentePageState extends State<AdminPromoEnAttentePage> {
                           size: 52, color: Colors.green),
                       const SizedBox(height: 16),
                       Text(
-                        'Aucune promotion en attente',
+                        (langUserPhone == "fr") ? 'Aucune promotion en attente' : 'No pending promotions',
                         style: GoogleFonts.poppins(
                             fontSize: 16,
                             color: isDark

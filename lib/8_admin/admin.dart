@@ -5,6 +5,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:dressur/8_admin/promo_en_attente_admin.dart';
 import 'package:dressur/8_admin/promos_dressur_status_admin.dart';
+import 'package:dressur/components/constant.dart';
 
 class AdministrationPage extends StatelessWidget {
   const AdministrationPage({Key? key}) : super(key: key);
@@ -43,9 +44,10 @@ class AdministrationPage extends StatelessWidget {
             isDark: isDark,
             icon: FontAwesomeIcons.clock,
             iconColor: Colors.orange,
-            title: 'Promotions en attente',
-            subtitle:
-                'Accepter ou refuser les promotions soumises par les utilisateurs',
+            title: (langUserPhone == "fr") ? 'Promotions en attente' : 'Pending Promotions',
+            subtitle: (langUserPhone == "fr")
+                ? 'Accepter ou refuser les promotions soumises par les utilisateurs'
+                : 'Accept or reject promotions submitted by users',
             onTap: () => Navigator.push(
               context,
               MaterialPageRoute(
@@ -58,9 +60,10 @@ class AdministrationPage extends StatelessWidget {
             isDark: isDark,
             icon: FontAwesomeIcons.broadcastTower,
             iconColor: Colors.deepPurple,
-            title: 'Statut Dressur',
-            subtitle:
-                'Partager les promotions affaire publiées sur le statut Dressur',
+            title: (langUserPhone == "fr") ? 'Statut Dressur' : 'Dressur Status',
+            subtitle: (langUserPhone == "fr")
+                ? 'Partager les promotions affaire publiées sur le statut Dressur'
+                : 'Share published business promotions on Dressur Status',
             onTap: () => Navigator.push(
               context,
               MaterialPageRoute(

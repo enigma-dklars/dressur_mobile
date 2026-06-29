@@ -111,9 +111,9 @@ class _AdminPromosDressurStatusPageState
   String _labelType(String? type) {
     switch (type) {
       case 'dmd_emploi':
-        return "Demande d'emploi";
+        return (langUserPhone == "fr") ? "Demande d'emploi" : "Job Application";
       case 'offre_emploi':
-        return "Offre d'emploi";
+        return (langUserPhone == "fr") ? "Offre d'emploi" : "Job Offer";
       default:
         return 'Produit / Service';
     }
@@ -306,7 +306,7 @@ class _AdminPromosDressurStatusPageState
         actions: [
           IconButton(
             onPressed: _fetchPromos,
-            tooltip: 'Actualiser',
+            tooltip: (langUserPhone == "fr") ? 'Actualiser' : 'Refresh',
             icon: const FaIcon(FontAwesomeIcons.arrowsRotate,
                 color: Colors.white, size: 18),
           ),
