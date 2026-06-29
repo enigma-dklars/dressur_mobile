@@ -61,7 +61,7 @@ class _ModificationProduitServicesPageState
 
     if (fileSizeInMB > 1) {
       dangerNoti(
-          "Attention !!!",
+          (langUserPhone == "fr") ? "Attention !!!" : "Warning!!!",
           langUserPhone == "fr"
               ? "La taille de l'image ne peut pas dépasser 1 Mo."
               : "Image size cannot exceed 1 MB.",
@@ -75,7 +75,7 @@ class _ModificationProduitServicesPageState
       });
     } else {
       dangerNoti(
-          "Attention !!!",
+          (langUserPhone == "fr") ? "Attention !!!" : "Warning!!!",
           langUserPhone == "fr"
               ? "L'image doit être proche d'un carré."
               : "The image should be close to a square.",
@@ -91,7 +91,7 @@ class _ModificationProduitServicesPageState
 
     if (_textEditingController.text.isEmpty && _imageFile == null) {
       dangerNoti(
-          "Attention !!!",
+          (langUserPhone == "fr") ? "Attention !!!" : "Warning!!!",
           (langUserPhone == "fr")
               ? 'Veuillez entrer un texte et sélectionner une image.'
               : 'Please enter a text and select an image.',
@@ -100,7 +100,7 @@ class _ModificationProduitServicesPageState
     }
     if (_textEditingController.text.isEmpty) {
       dangerNoti(
-          "Attention !!!",
+          (langUserPhone == "fr") ? "Attention !!!" : "Warning!!!",
           (langUserPhone == "fr")
               ? 'Veuillez entrer un texte.'
               : 'Please enter a text.',
@@ -167,7 +167,12 @@ class _ModificationProduitServicesPageState
         _isSending = false;
       });
     } else {
-      dangerNoti("Attention !!!", 'Erreur : ${response.statusCode}', context);
+      dangerNoti(
+          (langUserPhone == "fr") ? "Attention !!!" : "Warning!!!",
+          (langUserPhone == "fr")
+              ? 'Erreur : ${response.statusCode}'
+              : 'Error: ${response.statusCode}',
+          context);
     }
   }
 
