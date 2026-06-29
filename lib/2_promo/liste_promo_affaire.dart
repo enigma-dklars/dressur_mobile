@@ -1035,7 +1035,7 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
 
             if (data["direct"] == true) {
               successNoti(
-                  "Succès",
+                  (langUserPhone == "fr") ? "Succès" : "Success",
                   (langUserPhone == "fr")
                       ? "Veuillez confirmer le paiement pour relancer la promotion."
                       : "Please confirm payment to restart the promotion.",
@@ -1043,7 +1043,7 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
             } else {
               launchPaiement(data["url"]);
               successNoti(
-                  "Succès",
+                  (langUserPhone == "fr") ? "Succès" : "Success",
                   (langUserPhone == "fr")
                       ? "Veuillez confirmer le paiement pour finaliser l'enregistrement de votre promotion."
                       : "Please confirm payment to finalize the registration of your promotion.",
