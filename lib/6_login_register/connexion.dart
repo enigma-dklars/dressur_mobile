@@ -126,7 +126,7 @@ class _LoginFormState extends State<LoginForm> {
         Navigator.of(context).pushReplacement(
             MaterialPageRoute(builder: (context) => const BottomBar()));
       } else {
-        throw Exception(data["message"] ?? "Une erreur est survenue.");
+        throw Exception(data["message"] ?? (langUserPhone == "fr") ? "Une erreur est survenue." : "An error occurred.");
       }
     } catch (e) {
       dangerNoti((langUserPhone == "fr") ? "Erreur" : "Error",

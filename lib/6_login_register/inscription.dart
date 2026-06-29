@@ -174,7 +174,7 @@ class _RegisterFormState extends State<RegisterForm> {
         );
       } else {
         throw Exception(data["message"] ??
-            "Une erreur est survenue lors de l'inscription.");
+            ((langUserPhone == "fr") ? "Une erreur est survenue lors de l'inscription." : "An error occurred during registration."));
       }
     } catch (e) {
       dangerNoti((langUserPhone == "fr") ? "Erreur" : "Error",
