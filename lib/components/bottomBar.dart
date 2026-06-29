@@ -85,16 +85,7 @@ class _BottomBarState extends State<BottomBar> with WidgetsBindingObserver {
     Timer.periodic(const Duration(hours: 6), (timer) {
       saveContactDsIfNotExiste();
       actualise(false);
-      // getMessageEnAttente(false);
     });
-
-    // si le user est un admin, il sera notifier des traitement en attente de validation
-    // if (admin) {
-    //   traitementAdmin();
-    //   Timer.periodic(const Duration(minutes: 30), (timer) async {
-    //     await traitementAdmin();
-    //   });
-    // }
   }
 
   @override
@@ -113,19 +104,6 @@ class _BottomBarState extends State<BottomBar> with WidgetsBindingObserver {
       saveContactDsIfNotExiste();
     } else if (state == AppLifecycleState.paused) {
       // showNotificationTimeOutAfter("Cc $name_complete ...", "Dressur est passée à l'arrière-plan.", 300);
-    }
-  }
-
-  Future<void> traitementAdmin() async {
-    final url = Uri.parse('$generalRouteForApi/traitementAdmin');
-    final response = await http.get(url);
-    if (response.statusCode == 200) {
-      final jsonData = jsonDecode(response.body) as List<dynamic>;
-      if (jsonData.isNotEmpty) {
-        for (var element in jsonData) {
-          showNotification(element, "Dressur Admin Traitement");
-        }
-      }
     }
   }
 

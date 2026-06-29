@@ -667,58 +667,7 @@ class _RegisterForm2State extends State<RegisterForm2> {
       setState(() => _desactive2 = false);
     }
   }
-  void checkTransaction(idTransaction) async {
-    if (telIsVerified == true) {
-      bool isConnected = await isConnectedToInternet();
-      if (isConnected) {
-        setState(() => _desactive2 = true);
-        var request = http.MultipartRequest(
-            'POST', Uri.parse('$generalRouteForApi/checkTransaction'));
-        request.fields.addAll({
-          'uid': uidUser,
-          'langUserPhone': langUserPhone.toString(),
-          'idTransaction': idTransaction.toString()
-        });
-        http.StreamedResponse response = await request.send();
-        if (response.statusCode == 200) {
-          var data1 = await response.stream.bytesToString();
-          var data = convert.jsonDecode(data1);
-          if (data["error"] == false) {
-            if (data["transaction"] == false) {
-              dangerNoti(data["titre"], data["message"], context);
-              setState(() => _desactive2 = false);
-            } else if (data["transaction"] == true) {
-              successNoti(data["titre"], data["message"], context);
-              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                behavior: SnackBarBehavior.floating,
-                content: Text(data["message"]),
-              ));
-              setState(() => _desactive2 = false);
-            }
-          } else {
-            dangerNoti(data["titre"], data["message"], context);
-            setState(() => _desactive2 = false);
-          }
-        }
-      } else {
-        dangerNoti(
-            langUserPhone != "fr" ? "Mistake!" : "Erreur!",
-            langUserPhone != "fr"
-                ? "You are not connected to the internet."
-                : "Vous n'êtes pas connecté à internet.",
-            context);
-        setState(() => _desactive2 = false);
-      }
-    } else {
-      dangerNoti(
-          langUserPhone != "fr" ? "Access denied!" : "Accès Refusé !",
-          langUserPhone != "fr"
-              ? "Please confirm your WhatsApp number first."
-              : "Veuillez d'abord confirmer votre numéro WhatsApp.",
-          context);
-      setState(() => _desactive2 = false);
-    }
-  }
+
   @override
   void initState() {
     super.initState();
