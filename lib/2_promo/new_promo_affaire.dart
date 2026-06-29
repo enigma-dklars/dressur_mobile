@@ -696,9 +696,11 @@ class _ProduitsServicesState extends State<ProduitsServices> {
           const SizedBox(height: 10),
           TextField(
               controller: telController,
-              decoration: const InputDecoration(
-                  labelText: 'Numéro du paiement',
-                  border: OutlineInputBorder())),
+              decoration: InputDecoration(
+                  labelText: (langUserPhone == "fr")
+                      ? 'Numéro du paiement'
+                      : 'Payment number',
+                  border: const OutlineInputBorder())),
 
           const SizedBox(height: 15),
           ElevatedButton(
