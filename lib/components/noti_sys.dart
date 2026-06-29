@@ -211,15 +211,17 @@ Future<void> showDSDeletionComplete(int totalSupprime) async {
   final bool isFr = langUserPhone == 'fr';
   await flutterLocalNotificationsPlugin.cancel(_dsDeletionNotifId);
 
-  const AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
+  final AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
     'ds_deletion_channel',
-    'Suppression contacts DS',
-    channelDescription: 'Progression de la suppression des contacts DS',
+    isFr ? 'Suppression contacts DS' : 'DS contact deletion',
+    channelDescription: isFr
+        ? 'Progression de la suppression des contacts DS'
+        : 'DS contact deletion progress',
     importance: Importance.defaultImportance,
     priority: Priority.defaultPriority,
     autoCancel: true,
   );
-  const NotificationDetails notifDetails =
+  final NotificationDetails notifDetails =
       NotificationDetails(android: androidDetails);
 
   await flutterLocalNotificationsPlugin.show(
@@ -283,16 +285,17 @@ Future<void> showSynchroAvanceComplete(
   final bool isFr = langUserPhone == 'fr';
   await flutterLocalNotificationsPlugin.cancel(_synchroAvanceNotifId);
 
-  const AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
+  final AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
     'synchro_avance_channel',
-    'Synchronisation avancée',
-    channelDescription:
-        'Progression de la synchronisation avancée des contacts',
+    isFr ? 'Synchronisation avancée' : 'Advanced synchronization',
+    channelDescription: isFr
+        ? 'Progression de la synchronisation avancée des contacts'
+        : 'Advanced contact synchronization progress',
     importance: Importance.defaultImportance,
     priority: Priority.defaultPriority,
     autoCancel: true,
   );
-  const NotificationDetails notifDetails =
+  final NotificationDetails notifDetails =
       NotificationDetails(android: androidDetails);
 
   final String body = isFr

@@ -147,7 +147,7 @@ class _PromotionFormPageState extends State<PromotionFormPage> {
               type: SelectFormFieldType.dropdown,
               initialValue: 'produit_service',
               labelText: (langUserPhone == "fr") ? 'Type Promotion Affaire' : 'Business Promotion Type',
-              items: listeTypePromoAffaire,
+              items: listeTypePromoAffaire(),
               onChanged: (val) => onChangeTypePromoAffaire(val),
               onSaved: (val) => print(val),
             ),

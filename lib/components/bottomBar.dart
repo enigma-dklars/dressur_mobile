@@ -79,7 +79,10 @@ class _BottomBarState extends State<BottomBar> with WidgetsBindingObserver {
     // Exécute la fonction toutes les 5 heures
     Timer.periodic(const Duration(hours: 6), (timer) {
       showNotification(
-          "Cc $name_complete ...", "Du nouveau sur votre compte Dressur.");
+          "Cc $name_complete ...",
+          (langUserPhone == "fr")
+              ? "Du nouveau sur votre compte Dressur."
+              : "Something new on your Dressur account.");
     });
 
     Timer.periodic(const Duration(hours: 6), (timer) {

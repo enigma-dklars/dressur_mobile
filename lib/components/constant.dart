@@ -99,7 +99,7 @@ int nbrPromoAffaire = 0;
 int nbrPromoReseau = 0;
 var modeMotDePasseOublier = false;
 var mailConnexion = "";
-var textChargementEvolution = "Chargement ...";
+var textChargementEvolution = "Loading...";
 var addUserOnAutreProfilPage = "oui";
 var myDressurVersion = '1.1.8';
 var lesPublicites;
@@ -461,18 +461,20 @@ Map<String, String> countryCodes = {
   '263': 'Zimbabwe',
 };
 
-List<Map<String, dynamic>> listeTypePromoAffaire = [
+List<Map<String, dynamic>> listeTypePromoAffaire() => [
   {
     'value': 'produit_service',
-    'label': 'Produits, Services, Événements etc.',
+    'label': (langUserPhone == "fr")
+        ? 'Produits, Services, Événements etc.'
+        : 'Products, Services, Events, etc.',
   },
   {
     'value': 'dmd_emploi',
-    'label': "Demandes d'emploi",
+    'label': (langUserPhone == "fr") ? "Demandes d'emploi" : "Job Applications",
   },
   {
     'value': 'offre_emploi',
-    'label': "Offres d'emploi",
+    'label': (langUserPhone == "fr") ? "Offres d'emploi" : "Job Offers",
   },
 ];
 
@@ -573,14 +575,14 @@ Future<void> sharePromotion(BuildContext context, String imageLink,
 
     // Partager l'image et le message
     await Share.shareXFiles([XFile(file.path)],
-        text: messageShare, subject: 'Partager Promotion!');
+        text: messageShare, subject: (langUserPhone == 'fr') ? 'Partager Promotion!' : 'Share Promotion!');
   } else {
     // Gérer les erreurs de téléchargement
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         backgroundColor: Colors.red,
         behavior: SnackBarBehavior.floating,
         content: Text(
-          'Erreur de téléchargement de l\'image',
+          (langUserPhone == 'fr') ? 'Erreur de téléchargement de l\'image' : 'Image download error',
           style: GoogleFonts.poppins(
             color: Colors.white,
           ),
@@ -656,7 +658,9 @@ void showWhatsappConfirmation(BuildContext context) {
 
               /// Titre
               Text(
-                "Confirmation du numéro WhatsApp",
+                (langUserPhone == "fr")
+                    ? "Confirmation du numéro WhatsApp"
+                    : "WhatsApp Number Confirmation",
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 20,
@@ -669,10 +673,15 @@ void showWhatsappConfirmation(BuildContext context) {
 
               /// Message
               Text(
-                "Assurez-vous de nous envoyer \"WhatsApp Confirmation\" "
-                "avec le numéro utilisé pour créer votre compte Dressur.\n\n"
-                "Cliquez sur Demander ci-dessous pour envoyer votre demande.\n\n"
-                "Les demandes sont traitées le plus tôt possible.",
+                (langUserPhone == "fr")
+                    ? "Assurez-vous de nous envoyer \"WhatsApp Confirmation\" "
+                        "avec le numéro utilisé pour créer votre compte Dressur.\n\n"
+                        "Cliquez sur Demander ci-dessous pour envoyer votre demande.\n\n"
+                        "Les demandes sont traitées le plus tôt possible."
+                    : "Make sure to send us \"WhatsApp Confirmation\" "
+                        "with the number used to create your Dressur account.\n\n"
+                        "Click Request below to send your request.\n\n"
+                        "Requests are processed as soon as possible.",
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 14.5,
@@ -699,9 +708,9 @@ void showWhatsappConfirmation(BuildContext context) {
                       borderRadius: BorderRadius.circular(15),
                     ),
                   ),
-                  child: const Text(
-                    "Demander",
-                    style: TextStyle(
+                  child: Text(
+                    (langUserPhone == "fr") ? "Demander" : "Request",
+                    style: const TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
                     ),
@@ -714,7 +723,7 @@ void showWhatsappConfirmation(BuildContext context) {
               /// Bouton Fermer
               TextButton(
                 onPressed: () => Navigator.pop(context),
-                child: const Text("Fermer"),
+                child: Text((langUserPhone == "fr") ? "Fermer" : "Close"),
               ),
             ],
           ),
@@ -776,7 +785,9 @@ void showConfNumeroWhatsapp(BuildContext context) {
 
                 /// Titre
                 Text(
-                  "Configuration et Confirmation du Compte",
+                  (langUserPhone == "fr")
+                      ? "Configuration et Confirmation du Compte"
+                      : "Account Setup and Confirmation",
                   textAlign: TextAlign.center,
                   style: GoogleFonts.poppins(
                     fontSize: 20,
@@ -789,10 +800,15 @@ void showConfNumeroWhatsapp(BuildContext context) {
 
                 /// Message principal
                 Text(
-                  "Vous n’avez pas encore terminé la configuration et la confirmation de votre compte.\n\n"
-                  "Veuillez fermer cette fenêtre et consulter la page Actu. "
-                  "Sur la page Actu, vous verrez clairement les étapes à suivre pour finaliser la configuration et la confirmation de votre compte.\n\n"
-                  "Une fois ces étapes complétées, vous pourrez revenir ici et utiliser cette fonctionnalité sans problème.",
+                  (langUserPhone == "fr")
+                      ? "Vous n’avez pas encore terminé la configuration et la confirmation de votre compte.\n\n"
+                          "Veuillez fermer cette fenêtre et consulter la page Actu. "
+                          "Sur la page Actu, vous verrez clairement les étapes à suivre pour finaliser la configuration et la confirmation de votre compte.\n\n"
+                          "Une fois ces étapes complétées, vous pourrez revenir ici et utiliser cette fonctionnalité sans problème."
+                      : "You have not yet completed the setup and confirmation of your account.\n\n"
+                          "Please close this window and visit the News page. "
+                          "On the News page, you will clearly see the steps to follow to finalize your account setup and confirmation.\n\n"
+                          "Once these steps are completed, you can come back here and use this feature without any issues.",
                   textAlign: TextAlign.center,
                   style: GoogleFonts.poppins(
                     fontSize: 14.5,
@@ -815,7 +831,7 @@ void showConfNumeroWhatsapp(BuildContext context) {
                       ),
                     ),
                     child: Text(
-                      "J'ai compris",
+                      (langUserPhone == "fr") ? "J'ai compris" : "I understand",
                       style: GoogleFonts.poppins(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
@@ -874,13 +890,13 @@ Future<void> saveContactDsIfNotExiste() async {
       }
       if (nombreNewContact == 1) {
         showNotification(
-          "ADD Conatcts Dressur",
-          "$nombreNewContact nouveau contact enregistré par Dressur.",
+          (langUserPhone == "fr") ? "ADD Contacts Dressur" : "ADD Dressur Contacts",
+          (langUserPhone == "fr") ? "$nombreNewContact nouveau contact enregistré par Dressur." : "$nombreNewContact new contact saved by Dressur.",
         );
       } else if (nombreNewContact > 1) {
         showNotification(
-          "ADD Conatcts Dressur",
-          "$nombreNewContact nouveaux contacts enregistrés par Dressur.",
+          (langUserPhone == "fr") ? "ADD Contacts Dressur" : "ADD Dressur Contacts",
+          (langUserPhone == "fr") ? "$nombreNewContact nouveaux contacts enregistrés par Dressur." : "$nombreNewContact new contacts saved by Dressur.",
         );
       }
     }
