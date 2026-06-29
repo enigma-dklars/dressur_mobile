@@ -81,7 +81,7 @@ class _ConfigurationRetraitPageState extends State<ConfigurationRetraitPage> {
             }
           }
         } else {
-          print("Aucune configuration trouvée ou erreur serveur.");
+          print((langUserPhone == "fr") ? "Aucune configuration trouvée ou erreur serveur." : "No configuration found or server error.");
         }
       }
     } catch (e) {
