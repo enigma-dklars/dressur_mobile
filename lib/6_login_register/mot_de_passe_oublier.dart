@@ -142,7 +142,7 @@ class _RecuperationFormState extends State<RecuperationForm> {
           Navigator.pop(context);
         }
       } else {
-        throw Exception(data["message"] ?? (langUserPhone == "fr") ? "Une erreur est survenue." : "An error occurred.");
+        throw Exception(data["message"] ?? ((langUserPhone == "fr") ? "Une erreur est survenue." : "An error occurred."));
       }
     } catch (e) {
       dangerNoti((langUserPhone == "fr") ? "Erreur" : "Error",
