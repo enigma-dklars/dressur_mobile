@@ -175,7 +175,7 @@ class _SettingPageState extends State<SettingPage> {
           children: [
             // --- SECTION ADMINISTRATION (admins uniquement) ---
             if (admin) ...[
-              _buildSectionTitle("Administration"),
+              _buildSectionTitle((langUserPhone == "fr") ? "Administration" : "Administration"),
               _buildMenuContainer(isDark, [
                 _buildMenuRow(
                     FontAwesomeIcons.userShield,
@@ -223,7 +223,7 @@ class _SettingPageState extends State<SettingPage> {
                       MaterialPageRoute(builder: (context) => SupportPage()))),
               _buildMenuRow(
                   FontAwesomeIcons.lightbulb,
-                  "Suggestions",
+                  (langUserPhone == "fr") ? "Suggestions" : "Suggestions",
                   () => Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -267,7 +267,7 @@ class _SettingPageState extends State<SettingPage> {
             ]),
 
             // --- SECTION APPLICATION ---
-            _buildSectionTitle("Application"),
+            _buildSectionTitle((langUserPhone == "fr") ? "Application" : "Application"),
             _buildMenuContainer(isDark, [
               _buildLanguageSelector(isDark),
               _buildThemeSelector(isDark),

@@ -49,10 +49,18 @@ class _CodeMailConfirmePageState extends State<CodeMailConfirmePage> {
           );
         }
       } else {
-        dangerNoti("Erreur", "Impossible de renvoyer le code.", context);
+        dangerNoti(
+          (langUserPhone == "fr") ? "Erreur" : "Error",
+          (langUserPhone == "fr") ? "Impossible de renvoyer le code." : "Unable to resend the code.",
+          context,
+        );
       }
     } catch (e) {
-      dangerNoti("Erreur", "Problème de connexion.", context);
+      dangerNoti(
+        (langUserPhone == "fr") ? "Erreur" : "Error",
+        (langUserPhone == "fr") ? "Problème de connexion." : "Connection problem.",
+        context,
+      );
     }
 
     setState(() => _isResending = false);
@@ -79,7 +87,11 @@ class _CodeMailConfirmePageState extends State<CodeMailConfirmePage> {
         } else {
           setState(() => mailIsVerified = true);
           initUserInformations(data['user']);
-          successNoti("Succès !", "Votre e-mail a été confirmé.", context);
+          successNoti(
+            (langUserPhone == "fr") ? "Succès !" : "Success!",
+            (langUserPhone == "fr") ? "Votre e-mail a été confirmé." : "Your email has been confirmed.",
+            context,
+          );
           await Future.delayed(Duration(seconds: 2));
           Navigator.pushAndRemoveUntil(
             context,
@@ -88,10 +100,18 @@ class _CodeMailConfirmePageState extends State<CodeMailConfirmePage> {
           );
         }
       } else {
-        dangerNoti("Erreur", "Impossible de vérifier le code.", context);
+        dangerNoti(
+          (langUserPhone == "fr") ? "Erreur" : "Error",
+          (langUserPhone == "fr") ? "Impossible de vérifier le code." : "Unable to verify the code.",
+          context,
+        );
       }
     } catch (e) {
-      dangerNoti("Erreur", "Problème de connexion.", context);
+      dangerNoti(
+        (langUserPhone == "fr") ? "Erreur" : "Error",
+        (langUserPhone == "fr") ? "Problème de connexion." : "Connection problem.",
+        context,
+      );
     }
 
     setState(() => _isConfirming = false);

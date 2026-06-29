@@ -38,7 +38,11 @@ class _SupprimerContactsDSPageState extends State<SupprimerContactsDSPage> {
   Future<void> _lancer() async {
     final String? erreur = await _service.start();
     if (erreur != null && mounted) {
-      warningNoti("Attention !", erreur, context);
+      warningNoti(
+        (langUserPhone == "fr") ? "Attention !" : "Warning!",
+        erreur,
+        context,
+      );
     }
   }
 

@@ -155,10 +155,18 @@ class _DeletecompteFormState extends State<DeletecompteForm> {
           );
         }
       } else {
-        dangerNoti("Erreur", "Un problème est survenu.", context);
+        dangerNoti(
+          (langUserPhone == "fr") ? "Erreur" : "Error",
+          (langUserPhone == "fr") ? "Un problème est survenu." : "A problem occurred.",
+          context,
+        );
       }
     } catch (e) {
-      dangerNoti("Erreur", "Impossible de se connecter au serveur.", context);
+      dangerNoti(
+        (langUserPhone == "fr") ? "Erreur" : "Error",
+        (langUserPhone == "fr") ? "Impossible de se connecter au serveur." : "Unable to connect to the server.",
+        context,
+      );
     }
 
     if (mounted) {
@@ -167,8 +175,9 @@ class _DeletecompteFormState extends State<DeletecompteForm> {
   }
 
   void _checkCanDelete() {
+    final expected = (langUserPhone == "fr") ? 'supprimer' : 'delete';
     final canDelete = motifController.text.isNotEmpty &&
-        confirmController.text.toLowerCase() == 'supprimer';
+        confirmController.text.toLowerCase() == expected;
     if (canDelete != _canDelete) {
       setState(() {
         _canDelete = canDelete;

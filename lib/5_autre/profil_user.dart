@@ -154,10 +154,18 @@ class _RegisterFormState extends State<RegisterForm> {
           ));
         }
       } else {
-        dangerNoti("Erreur", "Un problème est survenu.", context);
+        dangerNoti(
+          (langUserPhone == "fr") ? "Erreur" : "Error",
+          (langUserPhone == "fr") ? "Un problème est survenu." : "A problem occurred.",
+          context,
+        );
       }
     } catch (e) {
-      dangerNoti("Erreur", "Impossible de se connecter au serveur.", context);
+      dangerNoti(
+        (langUserPhone == "fr") ? "Erreur" : "Error",
+        (langUserPhone == "fr") ? "Impossible de se connecter au serveur." : "Unable to connect to the server.",
+        context,
+      );
     }
 
     setState(() => _isLoading = false);
@@ -229,22 +237,22 @@ class _RegisterFormState extends State<RegisterForm> {
               : "Social Media (Optional)"),
           _buildTextField(
               controller: tiktokController,
-              label: 'Lien TikTok',
+              label: (langUserPhone == "fr") ? 'Lien TikTok' : 'TikTok Link',
               icon: FontAwesomeIcons.tiktok),
           SizedBox(height: 12),
           _buildTextField(
               controller: instagramController,
-              label: 'Lien Instagram',
+              label: (langUserPhone == "fr") ? 'Lien Instagram' : 'Instagram Link',
               icon: FontAwesomeIcons.instagram),
           SizedBox(height: 12),
           _buildTextField(
               controller: facebookController,
-              label: 'Lien Facebook',
+              label: (langUserPhone == "fr") ? 'Lien Facebook' : 'Facebook Link',
               icon: FontAwesomeIcons.facebook),
           SizedBox(height: 12),
           _buildTextField(
               controller: youtubeController,
-              label: 'Lien YouTube',
+              label: (langUserPhone == "fr") ? 'Lien YouTube' : 'YouTube Link',
               icon: FontAwesomeIcons.youtube),
           SizedBox(height: 12),
 

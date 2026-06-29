@@ -78,7 +78,7 @@ class _AutreProfilPageState extends State<AutreProfilPage> {
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
-              title: Text('Erreur'),
+              title: Text((langUserPhone == "fr") ? 'Erreur' : 'Error'),
               content: Text('Erreur AFTER 200: ${response.statusCode}'),
               actions: <Widget>[
                 TextButton(
@@ -100,7 +100,7 @@ class _AutreProfilPageState extends State<AutreProfilPage> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text('Erreur'),
+            title: Text((langUserPhone == "fr") ? 'Erreur' : 'Error'),
             content: Text('Erreur: ${response.statusCode}'),
             actions: <Widget>[
               TextButton(

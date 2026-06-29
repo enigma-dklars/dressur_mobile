@@ -125,10 +125,18 @@ class _SuggestionsFormState extends State<SuggestionsForm> {
           ));
         }
       } else {
-        dangerNoti("Erreur", "Un problème est survenu.", context);
+        dangerNoti(
+          (langUserPhone == "fr") ? "Erreur" : "Error",
+          (langUserPhone == "fr") ? "Un problème est survenu." : "A problem occurred.",
+          context,
+        );
       }
     } catch (e) {
-      dangerNoti("Erreur", "Impossible de se connecter au serveur.", context);
+      dangerNoti(
+        (langUserPhone == "fr") ? "Erreur" : "Error",
+        (langUserPhone == "fr") ? "Impossible de se connecter au serveur." : "Unable to connect to the server.",
+        context,
+      );
     }
 
     setState(() => _isLoading = false);
