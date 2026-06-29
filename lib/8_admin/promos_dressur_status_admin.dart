@@ -58,17 +58,26 @@ class _AdminPromosDressurStatusPageState
   }
 
   Future<void> _partagerPromo(Map<String, dynamic> p) async {
-    final int id = p['id'];
+    final int id = p['id'] is int ? p['id'] as int : int.tryParse('${p['id']}') ?? 0;
     if (_sharing.contains(id)) return;
+
+    final String rawImage = p['image'] as String? ?? '';
+    if (rawImage.isEmpty) {
+      _showSnack(
+        (langUserPhone == "fr") ? 'Image introuvable' : 'Image not found',
+        false,
+      );
+      return;
+    }
 
     setState(() => _sharing.add(id));
 
     try {
-      final String imageUrl = '$generalRouteForPromotionImage${p['image']}';
-      final String imageName = '${p['image']}';
-      final String whatsapp = p['whatsapp'] ?? '';
-      final String description = p['description'] ?? '';
-      final String pseudo = p['pseudo'] ?? '';
+      final String imageUrl = '$generalRouteForPromotionImage$rawImage';
+      final String imageName = rawImage;
+      final String whatsapp = p['whatsapp'] as String? ?? '';
+      final String description = p['description'] as String? ?? '';
+      final String pseudo = p['pseudo'] as String? ?? '';
 
       String message = description;
       if (pseudo.isNotEmpty) {
