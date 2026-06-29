@@ -1204,7 +1204,9 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
                     ),
                     const SizedBox(height: 10),
                     _infoBox(
-                        "Montant Récompense : ${_rewardProgramAmount.toStringAsFixed(0)} FCFA",
+                        (langUserPhone == "fr")
+                            ? "Montant Récompense : ${_rewardProgramAmount.toStringAsFixed(0)} FCFA"
+                            : "Reward amount: ${_rewardProgramAmount.toStringAsFixed(0)} FCFA",
                         Colors.orange),
                   ],
                 ),
