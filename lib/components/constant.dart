@@ -524,8 +524,8 @@ void launchPaiement(String urlPaiement) async {
 Future<void> shareMessageWithImage(
     BuildContext context, String langUserPhone) async {
   var messageShare = (langUserPhone == "fr")
-      ? "Utilise Dressur, une application simple, sûr et fiable pour avoir de la visibilité sur tes différents réseaux sociaux et surtout sur tes statuts WhatsApp.\nGrâce à Dressur, fait la promotion de tes produits et services qui seront visibles par des milliers d'utilisateurs en seulement 24H.\nElle te permet d'avoir plus facilement des contacts WhatsApp selon les pays de ton choix. De plus, ses contacts sont automatiquement enregistrés dans ton téléphone et ton contact dans les leurs, etc.\n\nA téléchargé gratuitement sur Play Store : https://play.google.com/store/apps/details?id=com.dressur.ds\n\nOu la version web si tu n'as pas d'Android : https://dressur.site/inscription"
-      : "Use Dressur, a simple, safe and reliable application to have visibility on your different social networks and especially on your WhatsApp statuses.\nThanks to Dressur, promote your products and services that will be visible to thousands of users in just 24 hours.\nIt allows you to more easily have WhatsApp contacts according to the countries of your choice. In addition, its contacts are automatically saved in your phone and your contact in theirs, etc.\n\nDownloaded for free on Play Store: https://play.google.com/store/apps/details?id=com.dressur.ds\n\nOr the web version if you don't have an Android: https://dressur.site/inscription";
+      ? "ADD WhatsApp Gratuitement.\nUtilisez simplement la fonctionnalité Boost Contact de Dressur après votre inscription.\nPour Android : https://play.google.com/store/apps/details?id=com.dressur.ds \nPour iPhone : https://dressur.site/inscription"
+      : "Add WhatsApp for free.\nSimply use Dressur's Boost Contact feature after registering.\nFor Android: https://play.google.com/store/apps/details?id=com.dressur.ds \nFor iPhone: https://dressur.site/inscription";
 
   // Load the image from assets
   final ByteData bytes = await rootBundle.load('images/flyers_dressur_fr.png');
