@@ -20,6 +20,7 @@ import 'package:dressur/components/sql_helper.dart';
 import 'package:dressur/main.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SettingPage extends StatefulWidget {
@@ -40,6 +41,27 @@ class _SettingPageState extends State<SettingPage> {
             : 'system';
     await prefs.setString('themeMode', key);
     setState(() {});
+  }
+
+  Future<void> _setLang(String lang) async {
+    try {
+      final request = http.MultipartRequest(
+        'POST',
+        Uri.parse('$generalRouteForApi/updateUserLang'),
+      );
+      request.fields['uid'] = uidUser ?? '';
+      request.fields['lang'] = lang;
+      final streamedResponse = await request.send();
+      final response = await http.Response.fromStream(streamedResponse);
+      if (response.statusCode == 200) {
+        final body = response.body;
+        if (body.contains('"error":false')) {
+          setState(() {
+            langUserPhone = lang;
+          });
+        }
+      }
+    } catch (_) {}
   }
 
   void _handleLogout() async {
@@ -250,6 +272,7 @@ class _SettingPageState extends State<SettingPage> {
               // --- SECTION APPLICATION ---
               _buildSectionTitle("Application"),
               _buildMenuContainer(isDark, [
+                _buildLanguageSelector(isDark),
                 _buildThemeSelector(isDark),
                 _buildMenuRow(
                     FontAwesomeIcons.circleInfo,
@@ -279,6 +302,92 @@ class _SettingPageState extends State<SettingPage> {
   }
 
   // --- WIDGETS HELPERS POUR UN DESIGN PROPRE ET RÉUTILISABLE ---
+
+  Widget _buildLanguageSelector(bool isDark) {
+    final options = [
+      (
+        'fr',
+        FontAwesomeIcons.f,
+        'Français',
+      ),
+      (
+        'en',
+        FontAwesomeIcons.e,
+        'English',
+      ),
+    ];
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              FaIcon(FontAwesomeIcons.language, color: primaryColor, size: 18),
+              SizedBox(width: 16),
+              Text(
+                (langUserPhone == "fr") ? "Langue" : "Language",
+                style: GoogleFonts.poppins(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 12),
+          Container(
+            margin: EdgeInsets.only(left: 34),
+            decoration: BoxDecoration(
+              color: isDark ? Color(0xFF2C2C2C) : Color(0xFFF0F0F0),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Row(
+              children: options.map((opt) {
+                final isSelected = langUserPhone == opt.$1;
+                return Expanded(
+                  child: GestureDetector(
+                    onTap: () => _setLang(opt.$1),
+                    child: AnimatedContainer(
+                      duration: Duration(milliseconds: 200),
+                      padding: EdgeInsets.symmetric(vertical: 9),
+                      decoration: BoxDecoration(
+                        color: isSelected ? primaryColor : Colors.transparent,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          FaIcon(
+                            opt.$2,
+                            size: 14,
+                            color: isSelected
+                                ? Colors.white
+                                : (isDark ? Colors.grey[400] : Colors.grey[600]),
+                          ),
+                          SizedBox(height: 4),
+                          Text(
+                            opt.$3,
+                            style: GoogleFonts.poppins(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                              color: isSelected
+                                  ? Colors.white
+                                  : (isDark ? Colors.grey[400] : Colors.grey[600]),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
   Widget _buildThemeSelector(bool isDark) {
     final currentMode = MyApp.themeNotifier.value;
