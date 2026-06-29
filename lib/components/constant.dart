@@ -528,19 +528,19 @@ Future<void> shareMessageWithImage(
       : "Use Dressur, a simple, safe and reliable application to have visibility on your different social networks and especially on your WhatsApp statuses.\nThanks to Dressur, promote your products and services that will be visible to thousands of users in just 24 hours.\nIt allows you to more easily have WhatsApp contacts according to the countries of your choice. In addition, its contacts are automatically saved in your phone and your contact in theirs, etc.\n\nDownloaded for free on Play Store: https://play.google.com/store/apps/details?id=com.dressur.ds\n\nOr the web version if you don't have an Android: https://dressur.site/inscription";
 
   // Load the image from assets
-  final ByteData bytes = await rootBundle.load('images/flyers_dressur_fr.jpg');
+  final ByteData bytes = await rootBundle.load('images/flyers_dressur_fr.png');
   final Uint8List list = bytes.buffer.asUint8List();
 
-  final ByteData bytes2 = await rootBundle.load('images/flyers_dressur_en.jpg');
+  final ByteData bytes2 = await rootBundle.load('images/flyers_dressur_en.png');
   final Uint8List list2 = bytes2.buffer.asUint8List();
 
   // Get the temporary directory
   final tempDir = await getTemporaryDirectory();
 
-  final file = await File('${tempDir.path}/flyers_dressur_fr.jpg').create();
+  final file = await File('${tempDir.path}/flyers_dressur_fr.png').create();
   file.writeAsBytesSync(list);
 
-  final file2 = await File('${tempDir.path}/flyers_dressur_en.jpg').create();
+  final file2 = await File('${tempDir.path}/flyers_dressur_en.png').create();
   file2.writeAsBytesSync(list2);
 
   // Share the image and the message
