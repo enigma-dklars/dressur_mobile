@@ -70,8 +70,8 @@ class _ChoixDesPaysState extends State<ChoixDesPays> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: const Text('Erreur'),
-            content: const Text('Erreur'),
+            title: Text((langUserPhone == "fr") ? 'Erreur' : 'Error'),
+            content: Text((langUserPhone == "fr") ? 'Erreur' : 'Error'),
             actions: <Widget>[
               TextButton(
                 child: const Text('OK'),
