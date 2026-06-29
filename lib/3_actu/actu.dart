@@ -1053,7 +1053,9 @@ class _ActuPageState extends State<ActuPage> {
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Text(
-                        "Pour ajouter quelque chose à la story, veuillez contacter le support via WhatsApp.",
+                        (langUserPhone == "fr")
+                            ? "Pour ajouter quelque chose à la story, veuillez contacter le support via WhatsApp."
+                            : "To add something to the story, please contact support via WhatsApp.",
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 13,
@@ -1134,7 +1136,7 @@ class _ActuPageState extends State<ActuPage> {
                             );
                           } else if (snapshot.hasError) {
                             return Center(
-                              child: Text('Erreur: ${snapshot.error}'),
+                              child: Text((langUserPhone == "fr") ? 'Erreur: ${snapshot.error}' : 'Error: ${snapshot.error}'),
                             );
                           } else if (!snapshot.hasData ||
                               snapshot.data!.isEmpty) {
@@ -1743,11 +1745,11 @@ class AdvertisementDetailPage extends StatelessWidget {
           children: [
             FaIcon(FontAwesomeIcons.star, color: primaryColor, size: 40),
             SizedBox(height: 10),
-            Text("Promotion Éligible",
+            Text((langUserPhone == "fr") ? "Promotion Éligible" : "Eligible Promotion",
                 style: GoogleFonts.poppins(
                     fontWeight: FontWeight.bold, fontSize: 18)),
             SizedBox(height: 10),
-            Text("Partagez cette promotion pour gagner des récompenses !"),
+            Text((langUserPhone == "fr") ? "Partagez cette promotion pour gagner des récompenses !" : "Share this promotion to earn rewards!"),
             SizedBox(height: 20),
           ],
         ),
@@ -2349,7 +2351,7 @@ class _StoryViewerState extends State<_StoryViewer>
                                     color: Colors.white, size: 16),
                                 const SizedBox(width: 6),
                                 Text(
-                                  'Voir le lien',
+                                  (langUserPhone == "fr") ? 'Voir le lien' : 'View link',
                                   style: GoogleFonts.poppins(
                                       color: Colors.white,
                                       fontSize: 13,
@@ -2379,7 +2381,7 @@ class _StoryViewerState extends State<_StoryViewer>
                               setState(() => _expanded = true);
                             },
                             child: Text(
-                              'Lire la suite',
+                              (langUserPhone == "fr") ? 'Lire la suite' : 'Read more',
                               style: GoogleFonts.poppins(
                                   color: Colors.lightBlueAccent,
                                   fontSize: 12,
@@ -2392,7 +2394,7 @@ class _StoryViewerState extends State<_StoryViewer>
                               setState(() => _expanded = false);
                             },
                             child: Text(
-                              'Réduire',
+                              (langUserPhone == "fr") ? 'Réduire' : 'Show less',
                               style: GoogleFonts.poppins(
                                   color: Colors.lightBlueAccent,
                                   fontSize: 12,
