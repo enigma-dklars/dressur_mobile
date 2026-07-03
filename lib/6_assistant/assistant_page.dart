@@ -17,11 +17,20 @@ class _AssistantPageState extends State<AssistantPage> {
   final List<_ChatMsg> _messages = [];
   final TextEditingController _controller = TextEditingController();
   final ScrollController _scrollController = ScrollController();
+  final GlobalKey _lastUserMsgKey = GlobalKey();
 
   bool _isSending = false;       // empêche un double envoi
   bool _isTyping = false;        // affiche la bulle d'animation dans la liste
   bool _historyLoading = true;   // chargement initial de l'historique
   bool _showScrollToBottom = false; // bouton descendre en bas style WhatsApp
+
+  /// Index du dernier message envoyé par l'utilisateur (-1 si aucun).
+  int get _lastUserMsgIndex {
+    for (int i = _messages.length - 1; i >= 0; i--) {
+      if (_messages[i].role == 'user') return i;
+    }
+    return -1;
+  }
 
   // ── Lifecycle ──────────────────────────────────────────────────────────────
 
@@ -71,7 +80,7 @@ class _AssistantPageState extends State<AssistantPage> {
                 ))
             .toList();
         setState(() => _messages.addAll(msgs));
-        if (msgs.isNotEmpty) _scrollToBottom();
+        if (msgs.isNotEmpty) _scrollToLastUserMsg();
       }
     } catch (_) {
       // L'historique est optionnel : on ignore silencieusement les erreurs.
@@ -164,6 +173,38 @@ class _AssistantPageState extends State<AssistantPage> {
     });
   }
 
+  /// Scrolle jusqu'au dernier message envoyé par l'utilisateur.
+  /// Si aucun message user, scrolle en bas.
+  /// Utilisé à l'ouverture de la page et sur le bouton scroll-to-bottom.
+  void _scrollToLastUserMsg() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!_scrollController.hasClients) return;
+      if (_lastUserMsgIndex == -1) {
+        // Aucun message user : simple scroll au bas
+        _scrollController.animateTo(
+          _scrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
+        return;
+      }
+      // Force le rendu des items du bas (ListView.builder est lazy)
+      _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+      // Après le rendu, positionne la base du dernier message user en bas du viewport
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        final ctx = _lastUserMsgKey.currentContext;
+        if (ctx != null) {
+          Scrollable.ensureVisible(
+            ctx,
+            alignment: 1.0,
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeOut,
+          );
+        }
+      });
+    });
+  }
+
   // ── Build ──────────────────────────────────────────────────────────────────
 
   @override
@@ -219,7 +260,12 @@ class _AssistantPageState extends State<AssistantPage> {
                               if (_isTyping && index == _messages.length) {
                                 return _buildTypingBubble(isDark);
                               }
-                              return _buildBubble(_messages[index], isDark);
+                              final isLastUser = index == _lastUserMsgIndex;
+                              return _buildBubble(
+                                _messages[index],
+                                isDark,
+                                key: isLastUser ? _lastUserMsgKey : null,
+                              );
                             },
                           ),
 
@@ -229,15 +275,7 @@ class _AssistantPageState extends State<AssistantPage> {
                     bottom: 12,
                     right: 12,
                     child: GestureDetector(
-                      onTap: () {
-                        if (_scrollController.hasClients) {
-                          _scrollController.animateTo(
-                            _scrollController.position.maxScrollExtent,
-                            duration: const Duration(milliseconds: 300),
-                            curve: Curves.easeOut,
-                          );
-                        }
-                      },
+                      onTap: _scrollToLastUserMsg,
                       child: Container(
                         width: 38,
                         height: 38,
@@ -350,9 +388,10 @@ class _AssistantPageState extends State<AssistantPage> {
 
   // ── Bulle de message ───────────────────────────────────────────────────────
 
-  Widget _buildBubble(_ChatMsg msg, bool isDark) {
+  Widget _buildBubble(_ChatMsg msg, bool isDark, {Key? key}) {
     final isUser = msg.role == 'user';
     return Padding(
+      key: key,
       padding: const EdgeInsets.only(bottom: 10),
       child: Row(
         mainAxisAlignment:
