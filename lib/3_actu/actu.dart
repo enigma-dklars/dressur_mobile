@@ -1123,6 +1123,33 @@ class _ActuPageState extends State<ActuPage> {
                       onSaveAll: () {
                         if (!telIsVerified) {
                           showConfNumeroWhatsapp(context);
+                        } else if (!boostEnCours) {
+                          showDialog(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                              title: const Text('Boost Contact requis'),
+                              content: const Text(
+                                  'Vous devez avoir un Boost Contact en cours pour pouvoir ajouter des contacts. Voulez-vous en démarrer un maintenant ?'),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.pop(context),
+                                  child: const Text('Annuler'),
+                                ),
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              NewBoostContactPage()),
+                                    );
+                                  },
+                                  child: const Text('Démarrer un Boost'),
+                                ),
+                              ],
+                            ),
+                          );
                         } else {
                           addTousLesContacts();
                         }
