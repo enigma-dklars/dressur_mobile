@@ -7,6 +7,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dressur/1_reception/liste_contact.dart';
 import 'package:dressur/2_promo/new_boost_contact.dart';
+import 'package:dressur/6_assistant/assistant_page.dart';
 import 'package:dressur/5_autre/profil_user.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -1021,6 +1022,20 @@ class _ActuPageState extends State<ActuPage> {
                   ],
                 ),
               ),
+              PopupMenuItem(
+                value: 3,
+                child: Row(
+                  children: [
+                    Text(
+                      (langUserPhone == "fr") ? "Assistant IA" : "AI Assistant",
+                      style: GoogleFonts.poppins(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ],
             offset: const Offset(0, 60),
             color: primaryColor,
@@ -1035,6 +1050,11 @@ class _ActuPageState extends State<ActuPage> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => SupportPage()),
+                );
+              } else if (value == 3) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const AssistantPage()),
                 );
               }
             },

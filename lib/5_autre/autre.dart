@@ -13,6 +13,7 @@ import 'package:dressur/5_autre/signaler_user.dart';
 import 'package:dressur/1_reception/liste_notification.dart';
 import 'package:dressur/7_demarage/presentation_ds.dart';
 import 'package:dressur/5_autre/support_assistance.dart';
+import 'package:dressur/6_assistant/assistant_page.dart';
 import 'package:art_sweetalert/art_sweetalert.dart';
 import 'package:dressur/components/constant.dart';
 import 'package:dressur/components/sql_helper.dart';
@@ -213,6 +214,13 @@ class _SettingPageState extends State<SettingPage> {
                 ? "Assistance & Avis"
                 : "Support & Feedback"),
             _buildMenuContainer(isDark, [
+              _buildMenuRow(
+                  FontAwesomeIcons.robot,
+                  (langUserPhone == "fr")
+                      ? "Assistant IA"
+                      : "AI Assistant",
+                  () => Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => const AssistantPage()))),
               _buildMenuRow(
                   FontAwesomeIcons.headset,
                   (langUserPhone == "fr")
