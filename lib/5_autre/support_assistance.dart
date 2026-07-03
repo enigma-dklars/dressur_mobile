@@ -71,6 +71,22 @@ class SupportPage extends StatelessWidget {
             // --- LISTE DES CANAUX DE CONTACT ---
             _buildContactChannel(
               context,
+              icon: FontAwesomeIcons.robot,
+              channelName: (langUserPhone == "fr") ? "Assistant IA" : "AI Assistant",
+              description: (langUserPhone == "fr")
+                  ? "Réponses instantanées 24h/24"
+                  : "Instant answers 24/7",
+              color: primaryColor,
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const AssistantPage()),
+                );
+              },
+            ),
+            SizedBox(height: 15),
+            _buildContactChannel(
+              context,
               icon: FontAwesomeIcons.whatsapp,
               channelName: "WhatsApp",
               description: (langUserPhone == "fr")
@@ -99,22 +115,6 @@ class SupportPage extends StatelessWidget {
                 if (!await launchUrl(_url)) {
                   // Gérer l'erreur
                 }
-              },
-            ),
-            SizedBox(height: 15),
-            _buildContactChannel(
-              context,
-              icon: FontAwesomeIcons.robot,
-              channelName: (langUserPhone == "fr") ? "Assistant IA" : "AI Assistant",
-              description: (langUserPhone == "fr")
-                  ? "Réponses instantanées 24h/24"
-                  : "Instant answers 24/7",
-              color: primaryColor,
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const AssistantPage()),
-                );
               },
             ),
             SizedBox(height: 40),
