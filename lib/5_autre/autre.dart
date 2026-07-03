@@ -215,7 +215,7 @@ class _SettingPageState extends State<SettingPage> {
                 : "Support & Feedback"),
             _buildMenuContainer(isDark, [
               _buildMenuRow(
-                  FontAwesomeIcons.robot,
+                  FontAwesomeIcons.comments,
                   (langUserPhone == "fr")
                       ? "Assistant IA"
                       : "AI Assistant",
