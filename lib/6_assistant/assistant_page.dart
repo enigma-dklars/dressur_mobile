@@ -177,6 +177,10 @@ class _AssistantPageState extends State<AssistantPage> {
   /// Scrolle jusqu'au dernier message envoyé par l'utilisateur.
   /// Si aucun message user, scrolle en bas.
   /// Utilisé à l'ouverture de la page et sur le bouton scroll-to-bottom.
+  ///
+  /// Fonctionne grâce à cacheExtent: double.maxFinite sur le ListView
+  /// qui garde tous les items rendus en permanence → la GlobalKey est
+  /// toujours valide quelle que soit la position de scroll.
   void _scrollToLastUserMsg() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!_scrollController.hasClients) return;
@@ -189,20 +193,23 @@ class _AssistantPageState extends State<AssistantPage> {
         );
         return;
       }
-      // Force le rendu des items du bas (ListView.builder est lazy)
-      _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
-      // Après le rendu, positionne la base du dernier message user en bas du viewport
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        final ctx = _lastUserMsgKey.currentContext;
-        if (ctx != null) {
-          Scrollable.ensureVisible(
-            ctx,
-            alignment: 1.0,
-            duration: const Duration(milliseconds: 300),
-            curve: Curves.easeOut,
-          );
-        }
-      });
+      final ctx = _lastUserMsgKey.currentContext;
+      if (ctx != null) {
+        // Positionne la base du dernier message user en bas du viewport
+        Scrollable.ensureVisible(
+          ctx,
+          alignment: 1.0,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
+      } else {
+        // Fallback (ne devrait pas arriver avec cacheExtent: double.maxFinite)
+        _scrollController.animateTo(
+          _scrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
+      }
     });
   }
 
@@ -256,6 +263,10 @@ class _AssistantPageState extends State<AssistantPage> {
                         ? _buildEmptyState(isDark)
                         : ListView.builder(
                             controller: _scrollController,
+                            // Garde tous les items rendus en permanence :
+                            // indispensable pour que GlobalKey.currentContext
+                            // soit toujours valide lors du scroll ciblé.
+                            cacheExtent: double.maxFinite,
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 12, vertical: 16),
                             // +1 quand la bulle "en train d'écrire" est active
