@@ -229,7 +229,15 @@ class _AssistantPageState extends State<AssistantPage> {
                     bottom: 12,
                     right: 12,
                     child: GestureDetector(
-                      onTap: _scrollToBottom,
+                      onTap: () {
+                        if (_scrollController.hasClients) {
+                          _scrollController.animateTo(
+                            _scrollController.position.maxScrollExtent,
+                            duration: const Duration(milliseconds: 300),
+                            curve: Curves.easeOut,
+                          );
+                        }
+                      },
                       child: Container(
                         width: 38,
                         height: 38,
