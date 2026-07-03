@@ -134,8 +134,8 @@ class _ReceptionPageState extends State<ReceptionPage> {
                 icon: FontAwesomeIcons.solidAddressBook,
                 title: "Contacts",
                 subtitle: (langUserPhone == "fr")
-                    ? "Gérez vos contacts ajoutés et scannés"
-                    : "Manage your added and scanned contacts",
+                    ? "Gérez vos contacts ajoutés"
+                    : "Manage your added contacts",
                 onTap: () {
                   Navigator.push(
                     context,
