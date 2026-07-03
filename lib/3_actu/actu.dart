@@ -1127,13 +1127,24 @@ class _ActuPageState extends State<ActuPage> {
                           showDialog(
                             context: context,
                             builder: (context) => AlertDialog(
-                              title: const Text('Boost Contact requis'),
-                              content: const Text(
-                                  'Vous devez avoir un Boost Contact en cours pour pouvoir ajouter des contacts. Voulez-vous en démarrer un maintenant ?'),
+                              title: Text(
+                                (langUserPhone == "fr")
+                                    ? 'Boost Contact requis'
+                                    : 'Boost Contact required',
+                              ),
+                              content: Text(
+                                (langUserPhone == "fr")
+                                    ? 'Vous devez avoir un Boost Contact en cours pour pouvoir ajouter des contacts. Voulez-vous en démarrer un maintenant ?'
+                                    : 'You must have an active Boost Contact to add contacts. Would you like to start one now?',
+                              ),
                               actions: [
                                 TextButton(
                                   onPressed: () => Navigator.pop(context),
-                                  child: const Text('Annuler'),
+                                  child: Text(
+                                    (langUserPhone == "fr")
+                                        ? 'Annuler'
+                                        : 'Cancel',
+                                  ),
                                 ),
                                 TextButton(
                                   onPressed: () {
@@ -1145,7 +1156,11 @@ class _ActuPageState extends State<ActuPage> {
                                               NewBoostContactPage()),
                                     );
                                   },
-                                  child: const Text('Démarrer un Boost'),
+                                  child: Text(
+                                    (langUserPhone == "fr")
+                                        ? 'Démarrer un Boost'
+                                        : 'Start a Boost',
+                                  ),
                                 ),
                               ],
                             ),
