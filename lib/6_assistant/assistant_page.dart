@@ -111,7 +111,8 @@ class _AssistantPageState extends State<AssistantPage> {
         Uri.parse('$generalRouteForApi/chat'),
       )
         ..fields['uid'] = uidUser ?? ''
-        ..fields['message'] = text;
+        ..fields['message'] = text
+        ..fields['platform'] = 'mobile';
 
       // On attend à la fois la réponse API ET un délai minimum de 1,5 s
       // pour que l'animation "en train d'écrire" reste visible même si l'API
