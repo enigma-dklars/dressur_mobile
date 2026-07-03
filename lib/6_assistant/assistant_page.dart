@@ -18,9 +18,10 @@ class _AssistantPageState extends State<AssistantPage> {
   final TextEditingController _controller = TextEditingController();
   final ScrollController _scrollController = ScrollController();
 
-  bool _isSending = false;     // empêche un double envoi
-  bool _isTyping = false;      // affiche la bulle d'animation dans la liste
-  bool _historyLoading = true; // chargement initial de l'historique
+  bool _isSending = false;       // empêche un double envoi
+  bool _isTyping = false;        // affiche la bulle d'animation dans la liste
+  bool _historyLoading = true;   // chargement initial de l'historique
+  bool _showScrollToBottom = false; // bouton descendre en bas style WhatsApp
 
   // ── Lifecycle ──────────────────────────────────────────────────────────────
 
@@ -28,13 +29,25 @@ class _AssistantPageState extends State<AssistantPage> {
   void initState() {
     super.initState();
     _loadHistory();
+    _scrollController.addListener(_onScroll);
   }
 
   @override
   void dispose() {
+    _scrollController.removeListener(_onScroll);
     _controller.dispose();
     _scrollController.dispose();
     super.dispose();
+  }
+
+  void _onScroll() {
+    if (!_scrollController.hasClients) return;
+    final distanceFromBottom =
+        _scrollController.position.maxScrollExtent - _scrollController.offset;
+    final shouldShow = distanceFromBottom > 120;
+    if (shouldShow != _showScrollToBottom) {
+      setState(() => _showScrollToBottom = shouldShow);
+    }
   }
 
   // ── Chargement de l'historique au démarrage ────────────────────────────────
@@ -188,27 +201,61 @@ class _AssistantPageState extends State<AssistantPage> {
       ),
       body: Column(
         children: [
-          // ── Zone des messages ──────────────────────────────────────────────
+          // ── Zone des messages + bouton scroll-to-bottom ───────────────────
           Expanded(
-            child: _historyLoading
-                ? const Center(
-                    child: CircularProgressIndicator(),
-                  )
-                : showEmpty
-                    ? _buildEmptyState(isDark)
-                    : ListView.builder(
-                        controller: _scrollController,
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 12, vertical: 16),
-                        // +1 quand la bulle "en train d'écrire" est active
-                        itemCount: _messages.length + (_isTyping ? 1 : 0),
-                        itemBuilder: (context, index) {
-                          if (_isTyping && index == _messages.length) {
-                            return _buildTypingBubble(isDark);
-                          }
-                          return _buildBubble(_messages[index], isDark);
-                        },
+            child: Stack(
+              children: [
+                _historyLoading
+                    ? const Center(child: CircularProgressIndicator())
+                    : showEmpty
+                        ? _buildEmptyState(isDark)
+                        : ListView.builder(
+                            controller: _scrollController,
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 12, vertical: 16),
+                            // +1 quand la bulle "en train d'écrire" est active
+                            itemCount: _messages.length + (_isTyping ? 1 : 0),
+                            itemBuilder: (context, index) {
+                              if (_isTyping && index == _messages.length) {
+                                return _buildTypingBubble(isDark);
+                              }
+                              return _buildBubble(_messages[index], isDark);
+                            },
+                          ),
+
+                // ── Bouton descendre en bas (style WhatsApp) ───────────────
+                if (_showScrollToBottom)
+                  Positioned(
+                    bottom: 12,
+                    right: 12,
+                    child: GestureDetector(
+                      onTap: _scrollToBottom,
+                      child: Container(
+                        width: 38,
+                        height: 38,
+                        decoration: BoxDecoration(
+                          color: isDark
+                              ? const Color(0xFF2A2A2A)
+                              : Colors.white,
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.18),
+                              blurRadius: 6,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: Icon(
+                          Icons.keyboard_arrow_down_rounded,
+                          color: primaryColor,
+                          size: 24,
+                        ),
                       ),
+                    ),
+                  ),
+              ],
+            ),
           ),
 
           // ── Champ de saisie ────────────────────────────────────────────────
