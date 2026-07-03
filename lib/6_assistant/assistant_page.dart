@@ -49,6 +49,7 @@ class _AssistantPageState extends State<AssistantPage> {
       final response = await http.Response.fromStream(streamed);
       final data = jsonDecode(response.body);
 
+      if (!mounted) return;
       if (data['error'] == false && data['reply'] != null) {
         setState(() {
           _messages.add(_ChatMsg(role: 'assistant', content: data['reply']));
@@ -57,8 +58,10 @@ class _AssistantPageState extends State<AssistantPage> {
         _showError();
       }
     } catch (_) {
+      if (!mounted) return;
       _showError();
     } finally {
+      if (!mounted) return;
       setState(() => _isLoading = false);
       _scrollToBottom();
     }
@@ -255,7 +258,7 @@ class _AssistantPageState extends State<AssistantPage> {
               radius: 14,
               backgroundColor: primaryColor.withOpacity(0.2),
               child: Text(
-                (nom ?? 'U').substring(0, 1).toUpperCase(),
+                ((nom != null && nom!.isNotEmpty) ? nom! : 'U').substring(0, 1).toUpperCase(),
                 style: GoogleFonts.poppins(
                   fontSize: 12,
                   fontWeight: FontWeight.bold,
