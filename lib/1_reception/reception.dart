@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:dressur/5_autre/support_assistance.dart';
+import 'package:dressur/6_assistant/assistant_page.dart';
 import 'package:dressur/1_reception/liste_notification.dart';
 import 'package:dressur/components/constant.dart';
 import 'package:dressur/8_admin/admin.dart';
@@ -83,6 +84,20 @@ class _ReceptionPageState extends State<ReceptionPage> {
                     ],
                   ),
                 ),
+                PopupMenuItem(
+                  value: 2,
+                  child: Row(
+                    children: [
+                      Text(
+                        (langUserPhone == "fr") ? "Assistant IA" : "AI Assistant",
+                        style: GoogleFonts.poppins(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ],
               offset: const Offset(0, 60),
               color: primaryColor,
@@ -97,6 +112,11 @@ class _ReceptionPageState extends State<ReceptionPage> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) => SupportPage()),
+                  );
+                } else if (value == 2) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const AssistantPage()),
                   );
                 }
               },

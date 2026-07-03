@@ -19,6 +19,7 @@ import 'package:dressur/components/constant.dart';
 import 'package:dressur/components/sociaux.dart';
 import 'package:http/http.dart' as http;
 import 'package:dressur/8_admin/admin.dart';
+import 'package:dressur/6_assistant/assistant_page.dart';
 
 class BoostPage extends StatefulWidget {
   @override
@@ -110,6 +111,18 @@ class _BoostPageState extends State<BoostPage> {
                   ],
                 ),
               ),
+              PopupMenuItem(
+                value: 2,
+                child: Row(
+                  children: [
+                    Text(
+                      (langUserPhone == "fr") ? "Assistant IA" : "AI Assistant",
+                      style: GoogleFonts.poppins(
+                          color: Colors.white, fontWeight: FontWeight.w600),
+                    ),
+                  ],
+                ),
+              ),
             ],
             offset: const Offset(0, 60),
             color: primaryColor,
@@ -120,6 +133,9 @@ class _BoostPageState extends State<BoostPage> {
               if (value == 1) {
                 Navigator.push(
                     context, MaterialPageRoute(builder: (_) => SupportPage()));
+              } else if (value == 2) {
+                Navigator.push(
+                    context, MaterialPageRoute(builder: (_) => const AssistantPage()));
               }
             },
           ),

@@ -2,6 +2,7 @@
 
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:dressur/components/constant.dart';
@@ -216,21 +217,24 @@ class _AssistantPageState extends State<AssistantPage> {
       backgroundColor:
           isDark ? const Color(0xFF121212) : const Color(0xFFF8F9FA),
       appBar: AppBar(
-        backgroundColor: primaryColor,
         elevation: 0,
+        backgroundColor: primaryColor,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => Navigator.pop(context),
+          icon: const FaIcon(
+            FontAwesomeIcons.chevronLeft,
+            color: Colors.white,
+          ),
         ),
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              (langUserPhone == 'fr') ? 'Assistant Dressur' : 'Dressur Assistant',
+              (langUserPhone == 'fr') ? 'Assistant IA' : 'AI Assistant',
               style: GoogleFonts.poppins(
                 color: Colors.white,
-                fontWeight: FontWeight.w600,
-                fontSize: 16,
+                fontWeight: FontWeight.w400,
+                fontSize: 18,
               ),
             ),
             Text(

@@ -10,6 +10,7 @@ import 'package:dressur/1_reception/liste_notification.dart';
 import 'package:dressur/components/constant.dart';
 import 'package:dressur/components/sociaux.dart';
 import 'package:dressur/5_autre/support_assistance.dart';
+import 'package:dressur/6_assistant/assistant_page.dart';
 import 'package:http/http.dart' as http;
 import 'package:dressur/8_admin/admin.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -170,6 +171,20 @@ class _PreferencePageState extends State<PreferencePage> {
                     ],
                   ),
                 ),
+                PopupMenuItem(
+                  value: 2,
+                  child: Row(
+                    children: [
+                      Text(
+                        (langUserPhone == "fr") ? "Assistant IA" : "AI Assistant",
+                        style: GoogleFonts.poppins(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ],
               offset: const Offset(0, 60),
               color: primaryColor,
@@ -184,6 +199,11 @@ class _PreferencePageState extends State<PreferencePage> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) => SupportPage()),
+                  );
+                } else if (value == 2) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const AssistantPage()),
                   );
                 }
               },

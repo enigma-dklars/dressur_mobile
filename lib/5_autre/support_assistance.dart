@@ -3,6 +3,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:dressur/components/constant.dart';
+import 'package:dressur/6_assistant/assistant_page.dart';
 
 class SupportPage extends StatelessWidget {
   @override
@@ -92,13 +93,28 @@ class SupportPage extends StatelessWidget {
               description: (langUserPhone == "fr")
                   ? "Pour les demandes détaillées"
                   : "For detailed requests",
-              color: secondaryColor, // Utilise votre secondaryColor
+              color: secondaryColor,
               onTap: () async {
-                final Uri _url = Uri.parse(
-                    'mailto:dressur.ds@gmail.com'); // Mettez votre email de support
+                final Uri _url = Uri.parse('mailto:dressur.ds@gmail.com');
                 if (!await launchUrl(_url)) {
                   // Gérer l'erreur
                 }
+              },
+            ),
+            SizedBox(height: 15),
+            _buildContactChannel(
+              context,
+              icon: FontAwesomeIcons.robot,
+              channelName: (langUserPhone == "fr") ? "Assistant IA" : "AI Assistant",
+              description: (langUserPhone == "fr")
+                  ? "Réponses instantanées 24h/24"
+                  : "Instant answers 24/7",
+              color: primaryColor,
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const AssistantPage()),
+                );
               },
             ),
             SizedBox(height: 40),
