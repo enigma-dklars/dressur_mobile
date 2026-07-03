@@ -41,10 +41,13 @@ class _AssistantPageState extends State<AssistantPage> {
 
   Future<void> _loadHistory() async {
     try {
-      final uri = Uri.parse('$generalRouteForApi/chat/history')
-          .replace(queryParameters: {'uid': uidUser ?? ''});
-      final response =
-          await http.get(uri).timeout(const Duration(seconds: 10));
+      final request = http.MultipartRequest(
+        'POST',
+        Uri.parse('$generalRouteForApi/chat/history'),
+      )..fields['uid'] = uidUser ?? '';
+      final streamed =
+          await request.send().timeout(const Duration(seconds: 10));
+      final response = await http.Response.fromStream(streamed);
       if (!mounted) return;
       final data = jsonDecode(response.body);
       if (data['error'] == false && data['messages'] is List) {
