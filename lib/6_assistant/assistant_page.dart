@@ -17,7 +17,18 @@ class _AssistantPageState extends State<AssistantPage> {
   final List<_ChatMsg> _messages = [];
   final TextEditingController _controller = TextEditingController();
   final ScrollController _scrollController = ScrollController();
-  bool _isLoading = false;
+
+  bool _isSending = false;     // empêche un double envoi
+  bool _isTyping = false;      // affiche la bulle d'animation dans la liste
+  bool _historyLoading = true; // chargement initial de l'historique
+
+  // ── Lifecycle ──────────────────────────────────────────────────────────────
+
+  @override
+  void initState() {
+    super.initState();
+    _loadHistory();
+  }
 
   @override
   void dispose() {
@@ -26,13 +37,44 @@ class _AssistantPageState extends State<AssistantPage> {
     super.dispose();
   }
 
+  // ── Chargement de l'historique au démarrage ────────────────────────────────
+
+  Future<void> _loadHistory() async {
+    try {
+      final uri = Uri.parse('$generalRouteForApi/chat/history')
+          .replace(queryParameters: {'uid': uidUser ?? ''});
+      final response =
+          await http.get(uri).timeout(const Duration(seconds: 10));
+      if (!mounted) return;
+      final data = jsonDecode(response.body);
+      if (data['error'] == false && data['messages'] is List) {
+        final msgs = (data['messages'] as List)
+            .map((m) => _ChatMsg(
+                  role: m['role'] as String,
+                  content: m['content'] as String,
+                ))
+            .toList();
+        setState(() => _messages.addAll(msgs));
+        if (msgs.isNotEmpty) _scrollToBottom();
+      }
+    } catch (_) {
+      // L'historique est optionnel : on ignore silencieusement les erreurs.
+    } finally {
+      if (!mounted) return;
+      setState(() => _historyLoading = false);
+    }
+  }
+
+  // ── Envoi d'un message ────────────────────────────────────────────────────
+
   Future<void> _sendMessage() async {
     final text = _controller.text.trim();
-    if (text.isEmpty || _isLoading) return;
+    if (text.isEmpty || _isSending) return;
 
     setState(() {
       _messages.add(_ChatMsg(role: 'user', content: text));
-      _isLoading = true;
+      _isSending = true;
+      _isTyping = true;
     });
     _controller.clear();
     _scrollToBottom();
@@ -41,15 +83,27 @@ class _AssistantPageState extends State<AssistantPage> {
       final request = http.MultipartRequest(
         'POST',
         Uri.parse('$generalRouteForApi/chat'),
-      );
-      request.fields['uid'] = uidUser ?? '';
-      request.fields['message'] = text;
+      )
+        ..fields['uid'] = uidUser ?? ''
+        ..fields['message'] = text;
 
-      final streamed = await request.send().timeout(const Duration(seconds: 20));
-      final response = await http.Response.fromStream(streamed);
+      // On attend à la fois la réponse API ET un délai minimum de 1,5 s
+      // pour que l'animation "en train d'écrire" reste visible même si l'API
+      // répond instantanément.
+      final results = await Future.wait<dynamic>([
+        request.send().then((s) => http.Response.fromStream(s)),
+        Future.delayed(const Duration(milliseconds: 1500)),
+      ]);
+
+      final response = results[0] as http.Response;
       final data = jsonDecode(response.body);
 
       if (!mounted) return;
+      // Petit délai après la fin de l'animation avant d'afficher la réponse
+      setState(() => _isTyping = false);
+      await Future.delayed(const Duration(milliseconds: 120));
+      if (!mounted) return;
+
       if (data['error'] == false && data['reply'] != null) {
         setState(() {
           _messages.add(_ChatMsg(role: 'assistant', content: data['reply']));
@@ -59,10 +113,13 @@ class _AssistantPageState extends State<AssistantPage> {
       }
     } catch (_) {
       if (!mounted) return;
+      setState(() => _isTyping = false);
+      await Future.delayed(const Duration(milliseconds: 120));
+      if (!mounted) return;
       _showError();
     } finally {
       if (!mounted) return;
-      setState(() => _isLoading = false);
+      setState(() => _isSending = false);
       _scrollToBottom();
     }
   }
@@ -91,12 +148,16 @@ class _AssistantPageState extends State<AssistantPage> {
     });
   }
 
+  // ── Build ──────────────────────────────────────────────────────────────────
+
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final showEmpty = !_historyLoading && _messages.isEmpty && !_isTyping;
 
     return Scaffold(
-      backgroundColor: isDark ? const Color(0xFF121212) : const Color(0xFFF8F9FA),
+      backgroundColor:
+          isDark ? const Color(0xFF121212) : const Color(0xFFF8F9FA),
       appBar: AppBar(
         backgroundColor: primaryColor,
         elevation: 0,
@@ -117,63 +178,93 @@ class _AssistantPageState extends State<AssistantPage> {
             ),
             Text(
               (langUserPhone == 'fr') ? 'Powered by IA' : 'Powered by AI',
-              style: GoogleFonts.poppins(
-                color: Colors.white70,
-                fontSize: 11,
-              ),
+              style: GoogleFonts.poppins(color: Colors.white70, fontSize: 11),
             ),
           ],
         ),
       ),
       body: Column(
         children: [
-          // Liste des messages
+          // ── Zone des messages ──────────────────────────────────────────────
           Expanded(
-            child: _messages.isEmpty
-                ? _buildEmptyState(isDark)
-                : ListView.builder(
-                    controller: _scrollController,
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
-                    itemCount: _messages.length,
-                    itemBuilder: (context, index) {
-                      return _buildBubble(_messages[index], isDark);
-                    },
-                  ),
+            child: _historyLoading
+                ? const Center(
+                    child: CircularProgressIndicator(),
+                  )
+                : showEmpty
+                    ? _buildEmptyState(isDark)
+                    : ListView.builder(
+                        controller: _scrollController,
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 16),
+                        // +1 quand la bulle "en train d'écrire" est active
+                        itemCount: _messages.length + (_isTyping ? 1 : 0),
+                        itemBuilder: (context, index) {
+                          if (_isTyping && index == _messages.length) {
+                            return _buildTypingBubble(isDark);
+                          }
+                          return _buildBubble(_messages[index], isDark);
+                        },
+                      ),
           ),
 
-          // Indicateur de chargement
-          if (_isLoading)
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-              child: Row(
-                children: [
-                  const SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  ),
-                  const SizedBox(width: 10),
-                  Text(
-                    (langUserPhone == 'fr') ? 'Réponse en cours...' : 'Thinking...',
-                    style: GoogleFonts.poppins(fontSize: 12, color: Colors.grey),
-                  ),
-                ],
-              ),
-            ),
-
-          // Champ de saisie
+          // ── Champ de saisie ────────────────────────────────────────────────
           _buildInputBar(isDark),
         ],
       ),
     );
   }
 
+  // ── Bulle d'animation "en train d'écrire" ─────────────────────────────────
+
+  Widget _buildTypingBubble(bool isDark) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          CircleAvatar(
+            radius: 14,
+            backgroundColor: primaryColor,
+            child: const Icon(Icons.smart_toy, size: 16, color: Colors.white),
+          ),
+          const SizedBox(width: 6),
+          Container(
+            padding:
+                const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+            decoration: BoxDecoration(
+              color: isDark ? const Color(0xFF2A2A2A) : Colors.white,
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(16),
+                topRight: Radius.circular(16),
+                bottomLeft: Radius.circular(4),
+                bottomRight: Radius.circular(16),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.06),
+                  blurRadius: 4,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: const _TypingDots(),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ── État vide ──────────────────────────────────────────────────────────────
+
   Widget _buildEmptyState(bool isDark) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.smart_toy_outlined, size: 64, color: primaryColor.withOpacity(0.5)),
+          Icon(Icons.smart_toy_outlined,
+              size: 64, color: primaryColor.withOpacity(0.5)),
           const SizedBox(height: 16),
           Text(
             (langUserPhone == 'fr')
@@ -192,22 +283,22 @@ class _AssistantPageState extends State<AssistantPage> {
                 ? 'Je réponds uniquement aux questions sur Dressur.'
                 : 'I only answer questions about Dressur.',
             textAlign: TextAlign.center,
-            style: GoogleFonts.poppins(
-              fontSize: 12,
-              color: Colors.grey,
-            ),
+            style: GoogleFonts.poppins(fontSize: 12, color: Colors.grey),
           ),
         ],
       ),
     );
   }
 
+  // ── Bulle de message ───────────────────────────────────────────────────────
+
   Widget _buildBubble(_ChatMsg msg, bool isDark) {
     final isUser = msg.role == 'user';
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
       child: Row(
-        mainAxisAlignment: isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
+        mainAxisAlignment:
+            isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           if (!isUser) ...[
@@ -220,7 +311,8 @@ class _AssistantPageState extends State<AssistantPage> {
           ],
           Flexible(
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
               decoration: BoxDecoration(
                 color: isUser
                     ? primaryColor
@@ -247,7 +339,9 @@ class _AssistantPageState extends State<AssistantPage> {
                   fontSize: 13,
                   color: isUser
                       ? Colors.white
-                      : (msg.isError ? Colors.red : (isDark ? Colors.white : Colors.black87)),
+                      : (msg.isError
+                          ? Colors.red
+                          : (isDark ? Colors.white : Colors.black87)),
                 ),
               ),
             ),
@@ -258,7 +352,9 @@ class _AssistantPageState extends State<AssistantPage> {
               radius: 14,
               backgroundColor: primaryColor.withOpacity(0.2),
               child: Text(
-                ((nom != null && nom!.isNotEmpty) ? nom! : 'U').substring(0, 1).toUpperCase(),
+                ((nom != null && nom!.isNotEmpty) ? nom! : 'U')
+                    .substring(0, 1)
+                    .toUpperCase(),
                 style: GoogleFonts.poppins(
                   fontSize: 12,
                   fontWeight: FontWeight.bold,
@@ -271,6 +367,8 @@ class _AssistantPageState extends State<AssistantPage> {
       ),
     );
   }
+
+  // ── Barre de saisie ────────────────────────────────────────────────────────
 
   Widget _buildInputBar(bool isDark) {
     return Container(
@@ -299,28 +397,37 @@ class _AssistantPageState extends State<AssistantPage> {
                 hintText: (langUserPhone == 'fr')
                     ? 'Posez votre question...'
                     : 'Ask your question...',
-                hintStyle: GoogleFonts.poppins(fontSize: 13, color: Colors.grey),
+                hintStyle:
+                    GoogleFonts.poppins(fontSize: 13, color: Colors.grey),
                 filled: true,
-                fillColor: isDark ? const Color(0xFF2A2A2A) : const Color(0xFFF0F2F5),
+                fillColor: isDark
+                    ? const Color(0xFF2A2A2A)
+                    : const Color(0xFFF0F2F5),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(24),
                   borderSide: BorderSide.none,
                 ),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16, vertical: 10),
               ),
             ),
           ),
           const SizedBox(width: 8),
           GestureDetector(
-            onTap: _sendMessage,
-            child: Container(
+            onTap: _isSending ? null : _sendMessage,
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
               width: 44,
               height: 44,
               decoration: BoxDecoration(
-                color: primaryColor,
+                color: _isSending ? Colors.grey.shade300 : primaryColor,
                 shape: BoxShape.circle,
               ),
-              child: const Icon(Icons.send_rounded, color: Colors.white, size: 20),
+              child: Icon(
+                Icons.send_rounded,
+                color: _isSending ? Colors.grey.shade500 : Colors.white,
+                size: 20,
+              ),
             ),
           ),
         ],
@@ -329,9 +436,88 @@ class _AssistantPageState extends State<AssistantPage> {
   }
 }
 
+// ── Animation trois points style WhatsApp ─────────────────────────────────────
+
+class _TypingDots extends StatefulWidget {
+  const _TypingDots();
+
+  @override
+  State<_TypingDots> createState() => _TypingDotsState();
+}
+
+class _TypingDotsState extends State<_TypingDots>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _ctrl;
+  late List<Animation<double>> _anims;
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1000),
+    )..repeat();
+
+    // Chaque point démarre avec un décalage de 0.2 par rapport au précédent
+    _anims = List.generate(3, (i) {
+      final start = i * 0.2;
+      final end = (start + 0.5).clamp(0.0, 1.0);
+      return TweenSequence<double>([
+        TweenSequenceItem(
+            tween: Tween(begin: 0.0, end: -6.0)
+                .chain(CurveTween(curve: Curves.easeOut)),
+            weight: 1),
+        TweenSequenceItem(
+            tween: Tween(begin: -6.0, end: 0.0)
+                .chain(CurveTween(curve: Curves.easeIn)),
+            weight: 1),
+        TweenSequenceItem(
+            tween: Tween(begin: 0.0, end: 0.0), weight: 1),
+      ]).animate(CurvedAnimation(
+        parent: _ctrl,
+        curve: Interval(start, end),
+      ));
+    });
+  }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _ctrl,
+      builder: (_, __) => Row(
+        mainAxisSize: MainAxisSize.min,
+        children: List.generate(
+          3,
+          (i) => Transform.translate(
+            offset: Offset(0, _anims[i].value),
+            child: Container(
+              width: 8,
+              height: 8,
+              margin: const EdgeInsets.symmetric(horizontal: 3),
+              decoration: BoxDecoration(
+                color: Colors.grey.shade400,
+                shape: BoxShape.circle,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ── Modèle de message ─────────────────────────────────────────────────────────
+
 class _ChatMsg {
   final String role;
   final String content;
   final bool isError;
-  const _ChatMsg({required this.role, required this.content, this.isError = false});
+  const _ChatMsg(
+      {required this.role, required this.content, this.isError = false});
 }
