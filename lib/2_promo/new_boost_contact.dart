@@ -84,8 +84,8 @@ class _NewBoostContactPageState extends State<NewBoostContactPage> {
         final data = convert.jsonDecode(response.body);
         if (data['error'] == false) {
           setState(() {
-            _freeNbrJour        = data['date']['nbrJour']          ?? 5;
-            _freeNbContactsMax  = data['quota']['nbContactsMax']   ?? 20;
+            _freeNbrJour        = data['date']['nbrJour']          ?? 1;
+            _freeNbContactsMax  = data['quota']['nbContactsMax']   ?? 15;
           });
         }
       }
