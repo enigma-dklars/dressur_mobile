@@ -17,7 +17,7 @@ import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:http/http.dart' as http;
 
-const versionApp = '1.1.9';
+const versionApp = '1.2.0';
 const oldDatabaseName = 'one_dressur.db';
 const nowDataBaseName = 'two_dressur.db';
 bool modeReconnaissanceContactArrierePlan = false;
@@ -101,7 +101,7 @@ var modeMotDePasseOublier = false;
 var mailConnexion = "";
 var textChargementEvolution = "Loading...";
 var addUserOnAutreProfilPage = "oui";
-var myDressurVersion = '1.1.9';
+var myDressurVersion = '1.2.0';
 var lesPublicites;
 var uidAutreUser;
 var uidUser;
@@ -211,8 +211,7 @@ void insertDressurContact() async {
         Website(tiktokBLT),
         Website(youtubeBLT),
       ]
-      ..accounts =
-          (selectedContactAccountName != null &&
+      ..accounts = (selectedContactAccountName != null &&
               selectedContactAccountType != null)
           ? [
               Account(
@@ -467,21 +466,22 @@ Map<String, String> countryCodes = {
 };
 
 List<Map<String, dynamic>> listeTypePromoAffaire() => [
-  {
-    'value': 'produit_service',
-    'label': (langUserPhone == "fr")
-        ? 'Produits, Services, Événements etc.'
-        : 'Products, Services, Events, etc.',
-  },
-  {
-    'value': 'dmd_emploi',
-    'label': (langUserPhone == "fr") ? "Demandes d'emploi" : "Job Applications",
-  },
-  {
-    'value': 'offre_emploi',
-    'label': (langUserPhone == "fr") ? "Offres d'emploi" : "Job Offers",
-  },
-];
+      {
+        'value': 'produit_service',
+        'label': (langUserPhone == "fr")
+            ? 'Produits, Services, Événements etc.'
+            : 'Products, Services, Events, etc.',
+      },
+      {
+        'value': 'dmd_emploi',
+        'label':
+            (langUserPhone == "fr") ? "Demandes d'emploi" : "Job Applications",
+      },
+      {
+        'value': 'offre_emploi',
+        'label': (langUserPhone == "fr") ? "Offres d'emploi" : "Job Offers",
+      },
+    ];
 
 String getCurrentYear() {
   // Obtenez la date actuelle
@@ -573,9 +573,8 @@ Future<void> sharePromotion(
   String messageShare,
 ) async {
   messageShare += "\n\n";
-  messageShare += (langUserPhone == "fr")
-      ? "Depuis Dressur : "
-      : "From Dressur : ";
+  messageShare +=
+      (langUserPhone == "fr") ? "Depuis Dressur : " : "From Dressur : ";
   messageShare += dressurUrlPlaystore;
 
   // Télécharger l'image depuis le lien HTTP
@@ -593,9 +592,8 @@ Future<void> sharePromotion(
     await Share.shareXFiles(
       [XFile(file.path)],
       text: messageShare,
-      subject: (langUserPhone == 'fr')
-          ? 'Partager Promotion!'
-          : 'Share Promotion!',
+      subject:
+          (langUserPhone == 'fr') ? 'Partager Promotion!' : 'Share Promotion!',
     );
   } else {
     // Gérer les erreurs de téléchargement
@@ -695,13 +693,13 @@ void showWhatsappConfirmation(BuildContext context) {
               Text(
                 (langUserPhone == "fr")
                     ? "Assurez-vous de nous envoyer \"WhatsApp Confirmation\" "
-                          "avec le numéro utilisé pour créer votre compte Dressur.\n\n"
-                          "Cliquez sur Demander ci-dessous pour envoyer votre demande.\n\n"
-                          "Les demandes sont traitées le plus tôt possible."
+                        "avec le numéro utilisé pour créer votre compte Dressur.\n\n"
+                        "Cliquez sur Demander ci-dessous pour envoyer votre demande.\n\n"
+                        "Les demandes sont traitées le plus tôt possible."
                     : "Make sure to send us \"WhatsApp Confirmation\" "
-                          "with the number used to create your Dressur account.\n\n"
-                          "Click Request below to send your request.\n\n"
-                          "Requests are processed as soon as possible.",
+                        "with the number used to create your Dressur account.\n\n"
+                        "Click Request below to send your request.\n\n"
+                        "Requests are processed as soon as possible.",
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 14.5,
@@ -778,8 +776,7 @@ void showConfNumeroWhatsapp(BuildContext context) {
               left: 20,
               right: 20,
               top: 25,
-              bottom:
-                  MediaQuery.of(context).viewInsets.bottom +
+              bottom: MediaQuery.of(context).viewInsets.bottom +
                   25, // Ajustement pour le clavier
             ),
             child: Column(
@@ -825,13 +822,13 @@ void showConfNumeroWhatsapp(BuildContext context) {
                 Text(
                   (langUserPhone == "fr")
                       ? "Vous n’avez pas encore terminé la configuration et la confirmation de votre compte.\n\n"
-                            "Veuillez fermer cette fenêtre et consulter la page Actu. "
-                            "Sur la page Actu, vous verrez clairement les étapes à suivre pour finaliser la configuration et la confirmation de votre compte.\n\n"
-                            "Une fois ces étapes complétées, vous pourrez revenir ici et utiliser cette fonctionnalité sans problème."
+                          "Veuillez fermer cette fenêtre et consulter la page Actu. "
+                          "Sur la page Actu, vous verrez clairement les étapes à suivre pour finaliser la configuration et la confirmation de votre compte.\n\n"
+                          "Une fois ces étapes complétées, vous pourrez revenir ici et utiliser cette fonctionnalité sans problème."
                       : "You have not yet completed the setup and confirmation of your account.\n\n"
-                            "Please close this window and visit the News page. "
-                            "On the News page, you will clearly see the steps to follow to finalize your account setup and confirmation.\n\n"
-                            "Once these steps are completed, you can come back here and use this feature without any issues.",
+                          "Please close this window and visit the News page. "
+                          "On the News page, you will clearly see the steps to follow to finalize your account setup and confirmation.\n\n"
+                          "Once these steps are completed, you can come back here and use this feature without any issues.",
                   textAlign: TextAlign.center,
                   style: GoogleFonts.poppins(
                     fontSize: 14.5,
@@ -892,9 +889,9 @@ Future<void> saveContactDsIfNotExiste() async {
           final String _nom = (contact["nom"] ?? "").toString().trim();
           final String _pseudo = (contact["pseudo"] ?? "").toString();
           final String _telSansPlus = contact["tel"].toString().replaceAll(
-            "+",
-            "",
-          );
+                "+",
+                "",
+              );
           final List<String> _nameParts = [
             _nom,
             _pseudo,
@@ -904,8 +901,7 @@ Future<void> saveContactDsIfNotExiste() async {
           final newContact = Contact()
             ..name.first = _expectedName
             ..phones = [Phone(contact["tel"])]
-            ..accounts =
-                (selectedContactAccountName != null &&
+            ..accounts = (selectedContactAccountName != null &&
                     selectedContactAccountType != null)
                 ? [
                     Account(
