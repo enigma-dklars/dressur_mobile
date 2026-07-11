@@ -105,7 +105,7 @@ class _NotificationBellActionState extends State<NotificationBellAction> {
                 ),
                 alignment: Alignment.center,
                 child: Text(
-                  _notifCount > 99 ? '99+' : '$_notifCount',
+                  _notifCount > 9 ? '9+' : '$_notifCount',
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 9,

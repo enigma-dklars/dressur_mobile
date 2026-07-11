@@ -416,7 +416,7 @@ class _ReceptionPageState extends State<ReceptionPage> {
                       ),
                       alignment: Alignment.center,
                       child: Text(
-                        badge > 99 ? '99+' : '$badge',
+                        badge > 9 ? '9+' : '$badge',
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 10,
