@@ -1,5 +1,6 @@
 // ignore_for_file: use_build_context_synchronously, prefer_const_constructors
 
+import 'package:dressur/5_autre/liste_tuto.dart';
 import 'package:dressur/5_autre/suggestions.dart';
 import 'package:dressur/5_autre/supprimer_contacts_ds.dart';
 import 'package:dressur/components/sociaux.dart';
@@ -214,6 +215,11 @@ class _SettingPageState extends State<SettingPage> {
                 ? "Assistance & Avis"
                 : "Support & Feedback"),
             _buildMenuContainer(isDark, [
+              _buildMenuRow(
+                  FontAwesomeIcons.graduationCap,
+                  (langUserPhone == "fr") ? "Tutoriels" : "Tutorials",
+                  () => Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => const ListeTuto()))),
               _buildMenuRow(
                   FontAwesomeIcons.comments,
                   (langUserPhone == "fr")
