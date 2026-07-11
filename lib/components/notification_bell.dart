@@ -96,13 +96,14 @@ class _NotificationBellActionState extends State<NotificationBellAction> {
               top: -5,
               right: -6,
               child: Container(
-                padding: const EdgeInsets.all(3),
+                padding: const EdgeInsets.symmetric(horizontal: 3),
                 constraints:
                     const BoxConstraints(minWidth: 16, minHeight: 16),
                 decoration: const BoxDecoration(
                   color: Colors.red,
                   shape: BoxShape.circle,
                 ),
+                alignment: Alignment.center,
                 child: Text(
                   _notifCount > 99 ? '99+' : '$_notifCount',
                   style: const TextStyle(

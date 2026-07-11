@@ -407,13 +407,14 @@ class _ReceptionPageState extends State<ReceptionPage> {
                     top: -4,
                     right: -4,
                     child: Container(
-                      padding: const EdgeInsets.all(3),
+                      padding: const EdgeInsets.symmetric(horizontal: 3),
                       constraints:
                           const BoxConstraints(minWidth: 18, minHeight: 18),
                       decoration: const BoxDecoration(
                         color: Colors.red,
                         shape: BoxShape.circle,
                       ),
+                      alignment: Alignment.center,
                       child: Text(
                         badge > 99 ? '99+' : '$badge',
                         style: const TextStyle(
