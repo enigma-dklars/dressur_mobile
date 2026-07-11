@@ -13,6 +13,7 @@ import 'package:dressur/5_autre/support_assistance.dart';
 import 'package:dressur/6_assistant/assistant_page.dart';
 import 'package:dressur/1_reception/liste_notification.dart';
 import 'package:dressur/components/constant.dart';
+import 'package:dressur/components/notification_bell.dart';
 import 'package:dressur/8_admin/admin.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -108,43 +109,7 @@ class _ReceptionPageState extends State<ReceptionPage> {
               ),
             ],
             // ── Cloche avec badge ─────────────────────────────────────────
-            IconButton(
-              onPressed: () => _openNotifications(context),
-              icon: Stack(
-                clipBehavior: Clip.none,
-                children: [
-                  const FaIcon(
-                    FontAwesomeIcons.solidBell,
-                    size: 20,
-                    color: Colors.white,
-                  ),
-                  if (_notifCount > 0)
-                    Positioned(
-                      top: -5,
-                      right: -6,
-                      child: Container(
-                        padding: const EdgeInsets.all(3),
-                        constraints: const BoxConstraints(
-                            minWidth: 16, minHeight: 16),
-                        decoration: const BoxDecoration(
-                          color: Colors.red,
-                          shape: BoxShape.circle,
-                        ),
-                        child: Text(
-                          _notifCount > 99 ? '99+' : '$_notifCount',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 9,
-                            fontWeight: FontWeight.bold,
-                            height: 1,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                    ),
-                ],
-              ),
-            ),
+            const NotificationBellAction(),
             const Padding(
               padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
               child: VerticalDivider(

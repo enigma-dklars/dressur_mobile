@@ -11,7 +11,7 @@ import 'package:dressur/5_autre/delete_compte_user.dart';
 import 'package:dressur/5_autre/modifier_mot_de_passe.dart';
 import 'package:dressur/5_autre/profil_user.dart';
 import 'package:dressur/5_autre/signaler_user.dart';
-import 'package:dressur/1_reception/liste_notification.dart';
+import 'package:dressur/components/notification_bell.dart';
 import 'package:dressur/7_demarage/presentation_ds.dart';
 import 'package:dressur/5_autre/support_assistance.dart';
 import 'package:dressur/6_assistant/assistant_page.dart';
@@ -110,21 +110,7 @@ class _SettingPageState extends State<SettingPage> {
           ),
         ),
         actions: [
-          IconButton(
-            icon: const FaIcon(
-              FontAwesomeIcons.solidBell,
-              size: 20,
-              color: Colors.white,
-            ),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => ListeNotification(),
-                ),
-              );
-            },
-          ),
+          const NotificationBellAction(),
           const Padding(
             padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
             child: VerticalDivider(

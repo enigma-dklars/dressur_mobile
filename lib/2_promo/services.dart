@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'package:dressur/2_promo/liste_promo_reseau_sociaux.dart';
 import 'package:dressur/2_promo/new_promo_reseau_sociaux.dart';
 import 'package:dressur/components/noti.dart';
+import 'package:dressur/components/notification_bell.dart';
 import 'package:dressur/components/padding_and_divider.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -14,7 +15,6 @@ import 'package:dressur/2_promo/liste_boost_contact.dart';
 import 'package:dressur/2_promo/new_boost_contact.dart';
 import 'package:dressur/2_promo/new_promo_affaire.dart';
 import 'package:dressur/5_autre/support_assistance.dart';
-import 'package:dressur/1_reception/liste_notification.dart';
 import 'package:dressur/components/constant.dart';
 import 'package:dressur/components/sociaux.dart';
 import 'package:http/http.dart' as http;
@@ -87,12 +87,7 @@ class _BoostPageState extends State<BoostPage> {
                   VerticalDivider(width: 0, color: Colors.white, thickness: 1),
             ),
           ],
-          IconButton(
-            icon: const FaIcon(FontAwesomeIcons.solidBell, size: 20),
-            color: Colors.white,
-            onPressed: () => Navigator.push(context,
-                MaterialPageRoute(builder: (_) => ListeNotification())),
-          ),
+          const NotificationBellAction(),
           const Padding(
             padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
             child: VerticalDivider(width: 0, color: Colors.white, thickness: 1),

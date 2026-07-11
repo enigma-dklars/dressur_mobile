@@ -15,8 +15,8 @@ import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:dressur/5_autre/confirme_mail_user.dart';
-import 'package:dressur/1_reception/liste_notification.dart';
 import 'package:dressur/components/constant.dart';
+import 'package:dressur/components/notification_bell.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
 import 'package:flutter_contacts/flutter_contacts.dart';
@@ -966,21 +966,7 @@ class _ActuPageState extends State<ActuPage> {
                   VerticalDivider(width: 0, color: Colors.white, thickness: 1),
             ),
           ],
-          IconButton(
-            icon: const FaIcon(
-              FontAwesomeIcons.solidBell,
-              size: 20,
-              color: Colors.white,
-            ),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => ListeNotification(),
-                ),
-              );
-            },
-          ),
+          const NotificationBellAction(),
           const Padding(
             padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
             child: VerticalDivider(
