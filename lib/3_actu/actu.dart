@@ -1054,7 +1054,8 @@ class _ActuPageState extends State<ActuPage> {
               } else if (value == 3) {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const AssistantPage()),
+                  MaterialPageRoute(
+                      builder: (context) => const AssistantPage()),
                 );
               }
             },
@@ -1143,49 +1144,51 @@ class _ActuPageState extends State<ActuPage> {
                       onSaveAll: () {
                         if (!telIsVerified) {
                           showConfNumeroWhatsapp(context);
-                        } else if (!boostEnCours) {
-                          showDialog(
-                            context: context,
-                            builder: (context) => AlertDialog(
-                              title: Text(
-                                (langUserPhone == "fr")
-                                    ? 'Boost Contact requis'
-                                    : 'Boost Contact required',
-                              ),
-                              content: Text(
-                                (langUserPhone == "fr")
-                                    ? 'Vous devez avoir un Boost Contact en cours pour pouvoir ajouter des contacts. Voulez-vous en démarrer un maintenant ?'
-                                    : 'You must have an active Boost Contact to add contacts. Would you like to start one now?',
-                              ),
-                              actions: [
-                                TextButton(
-                                  onPressed: () => Navigator.pop(context),
-                                  child: Text(
-                                    (langUserPhone == "fr")
-                                        ? 'Annuler'
-                                        : 'Cancel',
-                                  ),
-                                ),
-                                TextButton(
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              NewBoostContactPage()),
-                                    );
-                                  },
-                                  child: Text(
-                                    (langUserPhone == "fr")
-                                        ? 'Démarrer un Boost'
-                                        : 'Start a Boost',
-                                  ),
-                                ),
-                              ],
-                            ),
-                          );
-                        } else {
+                        }
+                        // else if (!boostEnCours) {
+                        //   showDialog(
+                        //     context: context,
+                        //     builder: (context) => AlertDialog(
+                        //       title: Text(
+                        //         (langUserPhone == "fr")
+                        //             ? 'Boost Contact requis'
+                        //             : 'Boost Contact required',
+                        //       ),
+                        //       content: Text(
+                        //         (langUserPhone == "fr")
+                        //             ? 'Vous devez avoir un Boost Contact en cours pour pouvoir ajouter des contacts. Voulez-vous en démarrer un maintenant ?'
+                        //             : 'You must have an active Boost Contact to add contacts. Would you like to start one now?',
+                        //       ),
+                        //       actions: [
+                        //         TextButton(
+                        //           onPressed: () => Navigator.pop(context),
+                        //           child: Text(
+                        //             (langUserPhone == "fr")
+                        //                 ? 'Annuler'
+                        //                 : 'Cancel',
+                        //           ),
+                        //         ),
+                        //         TextButton(
+                        //           onPressed: () {
+                        //             Navigator.pop(context);
+                        //             Navigator.push(
+                        //               context,
+                        //               MaterialPageRoute(
+                        //                   builder: (context) =>
+                        //                       NewBoostContactPage()),
+                        //             );
+                        //           },
+                        //           child: Text(
+                        //             (langUserPhone == "fr")
+                        //                 ? 'Démarrer un Boost'
+                        //                 : 'Start a Boost',
+                        //           ),
+                        //         ),
+                        //       ],
+                        //     ),
+                        //   );
+                        // }
+                        else {
                           addTousLesContacts();
                         }
                       },
