@@ -102,7 +102,7 @@ List<_ListItem> _buildItems(List<NotificationDS> notifications) {
     }
     // Détermine si c'est le dernier avant un nouveau groupe
     final nextIsNewDay = i + 1 < notifications.length &&
-        _dayKey(notifications[i + 1]) != key;
+        _dayKey(notifications[i + 1].createdAt) != key;
     items.add(_NotifItem(n, _timeLabel(n.createdAt),
         isLastBeforeHeader: nextIsNewDay));
   }
