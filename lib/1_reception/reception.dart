@@ -13,7 +13,6 @@ import 'package:dressur/5_autre/support_assistance.dart';
 import 'package:dressur/6_assistant/assistant_page.dart';
 import 'package:dressur/1_reception/liste_notification.dart';
 import 'package:dressur/components/constant.dart';
-import 'package:dressur/components/notification_bell.dart';
 import 'package:dressur/8_admin/admin.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -24,8 +23,8 @@ class ReceptionPage extends StatefulWidget {
 }
 
 class _ReceptionPageState extends State<ReceptionPage> {
-  int _notifCount = 0;   // nombre de notifs non vues
-  int _totalNotifs = 0;  // total actuel renvoyé par l'API
+  int _notifCount = 0; // nombre de notifs non vues
+  int _totalNotifs = 0; // total actuel renvoyé par l'API
 
   static const _prefKey = 'notif_last_seen_total';
 
@@ -82,172 +81,171 @@ class _ReceptionPageState extends State<ReceptionPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          automaticallyImplyLeading: false,
-          elevation: 0,
-          backgroundColor: primaryColor,
-          title: Text(
-            (langUserPhone == "fr") ? "Boîte de Réception" : "Inbox",
-            style: GoogleFonts.poppins(
-              color: Colors.white,
-              fontWeight: FontWeight.w400,
-              fontSize: 18,
-            ),
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        elevation: 0,
+        backgroundColor: primaryColor,
+        title: Text(
+          (langUserPhone == "fr") ? "Boîte de Réception" : "Inbox",
+          style: GoogleFonts.poppins(
+            color: Colors.white,
+            fontWeight: FontWeight.w400,
+            fontSize: 18,
           ),
-          actions: [
-            if (admin) ...[
-              IconButton(
-                icon: const FaIcon(FontAwesomeIcons.userShield,
-                    size: 20, color: Colors.amber),
-                onPressed: () => Navigator.push(context,
-                    MaterialPageRoute(builder: (_) => AdministrationPage())),
-              ),
-              const Padding(
-                padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
-                child: VerticalDivider(
-                    width: 0, color: Colors.white, thickness: 1),
-              ),
-            ],
-            // ── Cloche avec badge ─────────────────────────────────────────
-            const NotificationBellAction(),
+        ),
+        actions: [
+          if (admin) ...[
+            IconButton(
+              icon: const FaIcon(FontAwesomeIcons.userShield,
+                  size: 20, color: Colors.amber),
+              onPressed: () => Navigator.push(context,
+                  MaterialPageRoute(builder: (_) => AdministrationPage())),
+            ),
             const Padding(
               padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
-              child: VerticalDivider(
-                width: 0,
-                color: Colors.white,
-                thickness: 1,
-              ),
-            ),
-            PopupMenuButton<dynamic>(
-              itemBuilder: (context) => [
-                PopupMenuItem(
-                  value: 1,
-                  child: Row(
-                    children: [
-                      Text(
-                        (langUserPhone == "fr") ? "Aide" : "Help",
-                        style: GoogleFonts.poppins(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                PopupMenuItem(
-                  value: 2,
-                  child: Row(
-                    children: [
-                      Text(
-                        (langUserPhone == "fr") ? "Assistant IA" : "AI Assistant",
-                        style: GoogleFonts.poppins(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-              offset: const Offset(0, 60),
-              color: primaryColor,
-              icon: const FaIcon(
-                FontAwesomeIcons.bars,
-                color: Colors.white,
-                size: 20,
-              ),
-              elevation: 2,
-              onSelected: (value) {
-                if (value == 1) {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => SupportPage()),
-                  );
-                } else if (value == 2) {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const AssistantPage()),
-                  );
-                }
-              },
+              child:
+                  VerticalDivider(width: 0, color: Colors.white, thickness: 1),
             ),
           ],
-        ),
-        body: SingleChildScrollView(
-          child: Column(
-            children: [
-              const SizedBox(height: 10),
-              _buildSummaryBanner(context),
-              const SizedBox(height: 10),
-              _buildNavigationItem(
-                context: context,
-                icon: FontAwesomeIcons.solidAddressBook,
-                title: "Contacts",
-                subtitle: (langUserPhone == "fr")
-                    ? "Gérez vos contacts ajoutés"
-                    : "Manage your added contacts",
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => ContactPage()),
-                  );
-                },
-              ),
-              const SizedBox(height: 10),
-              _buildNavigationItem(
-                context: context,
-                icon: FontAwesomeIcons.trophy,
-                title: (langUserPhone == "fr") ? "Récompenses" : "Rewards",
-                subtitle: (langUserPhone == "fr")
-                    ? "Gagnez et suivez vos récompenses"
-                    : "Earn and track your rewards",
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => isInscritProgrammeRecompense
-                          ? ProgrammeRecompenseDashboard()
-                          : ProgrammeRecompensePage(optionPage: false),
-                    ),
-                  );
-                },
-              ),
-              const SizedBox(height: 10),
-              _buildNavigationItem(
-                context: context,
-                icon: FontAwesomeIcons.arrowsRotate,
-                title: (langUserPhone == "fr")
-                    ? "Synchronisation avancée"
-                    : "Advanced synchronization",
-                subtitle: (langUserPhone == "fr")
-                    ? "Synchronisez vos contacts avec votre téléphone"
-                    : "Sync your contacts with your phone",
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const SynchroAvance()),
-                  );
-                },
-              ),
-              const SizedBox(height: 10),
-              // ── Item Notifications avec badge ─────────────────────────
-              _buildNavigationItem(
-                context: context,
-                icon: FontAwesomeIcons.solidBell,
-                title: "Notifications",
-                subtitle: (langUserPhone == "fr")
-                    ? "Cadeaux, astuces, recommandations..."
-                    : "Gifts, tips, recommendations...",
-                badge: _notifCount,
-                onTap: () => _openNotifications(context),
-              ),
-              const SizedBox(height: 10),
-              SociauxPage(),
-              const SizedBox(height: 10),
-            ],
+          // ── Cloche avec badge ─────────────────────────────────────────
+          const Padding(
+            padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
+            child: VerticalDivider(
+              width: 0,
+              color: Colors.white,
+              thickness: 1,
+            ),
           ),
+          PopupMenuButton<dynamic>(
+            itemBuilder: (context) => [
+              PopupMenuItem(
+                value: 1,
+                child: Row(
+                  children: [
+                    Text(
+                      (langUserPhone == "fr") ? "Aide" : "Help",
+                      style: GoogleFonts.poppins(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              PopupMenuItem(
+                value: 2,
+                child: Row(
+                  children: [
+                    Text(
+                      (langUserPhone == "fr") ? "Assistant IA" : "AI Assistant",
+                      style: GoogleFonts.poppins(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+            offset: const Offset(0, 60),
+            color: primaryColor,
+            icon: const FaIcon(
+              FontAwesomeIcons.bars,
+              color: Colors.white,
+              size: 20,
+            ),
+            elevation: 2,
+            onSelected: (value) {
+              if (value == 1) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => SupportPage()),
+                );
+              } else if (value == 2) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const AssistantPage()),
+                );
+              }
+            },
+          ),
+        ],
+      ),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            const SizedBox(height: 10),
+            _buildSummaryBanner(context),
+            const SizedBox(height: 10),
+            _buildNavigationItem(
+              context: context,
+              icon: FontAwesomeIcons.solidAddressBook,
+              title: "Contacts",
+              subtitle: (langUserPhone == "fr")
+                  ? "Gérez vos contacts ajoutés"
+                  : "Manage your added contacts",
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => ContactPage()),
+                );
+              },
+            ),
+            const SizedBox(height: 10),
+            _buildNavigationItem(
+              context: context,
+              icon: FontAwesomeIcons.trophy,
+              title: (langUserPhone == "fr") ? "Récompenses" : "Rewards",
+              subtitle: (langUserPhone == "fr")
+                  ? "Gagnez et suivez vos récompenses"
+                  : "Earn and track your rewards",
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => isInscritProgrammeRecompense
+                        ? ProgrammeRecompenseDashboard()
+                        : ProgrammeRecompensePage(optionPage: false),
+                  ),
+                );
+              },
+            ),
+            const SizedBox(height: 10),
+            _buildNavigationItem(
+              context: context,
+              icon: FontAwesomeIcons.arrowsRotate,
+              title: (langUserPhone == "fr")
+                  ? "Synchronisation avancée"
+                  : "Advanced synchronization",
+              subtitle: (langUserPhone == "fr")
+                  ? "Synchronisez vos contacts avec votre téléphone"
+                  : "Sync your contacts with your phone",
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const SynchroAvance()),
+                );
+              },
+            ),
+            const SizedBox(height: 10),
+            // ── Item Notifications avec badge ─────────────────────────
+            _buildNavigationItem(
+              context: context,
+              icon: FontAwesomeIcons.solidBell,
+              title: "Notifications",
+              subtitle: (langUserPhone == "fr")
+                  ? "Informations et actions en rapport avec vos actions."
+                  : "Information and actions related to your actions.",
+              badge: _notifCount,
+              onTap: () => _openNotifications(context),
+            ),
+            const SizedBox(height: 10),
+            SociauxPage(),
+            const SizedBox(height: 10),
+          ],
         ),
+      ),
     );
   }
 
@@ -280,7 +278,9 @@ class _ReceptionPageState extends State<ReceptionPage> {
                   label: (langUserPhone == "fr") ? "Solde FCFA" : "Balance",
                   value: isInscritProgrammeRecompense
                       ? "${soldeProgrammeRecompense ?? 0} FCFA"
-                      : (langUserPhone == "fr") ? "Non inscrit" : "Not enrolled",
+                      : (langUserPhone == "fr")
+                          ? "Non inscrit"
+                          : "Not enrolled",
                 ),
               ),
               _buildVerticalDivider(),
@@ -299,9 +299,14 @@ class _ReceptionPageState extends State<ReceptionPage> {
                       : FontAwesomeIcons.circleStop,
                   label: "Boost",
                   value: boostEnCours
-                      ? (langUserPhone == "fr") ? "En cours" : "Active"
-                      : (langUserPhone == "fr") ? "Inactif" : "Inactive",
-                  valueColor: boostEnCours ? Colors.greenAccent : Colors.white60,
+                      ? (langUserPhone == "fr")
+                          ? "En cours"
+                          : "Active"
+                      : (langUserPhone == "fr")
+                          ? "Inactif"
+                          : "Inactive",
+                  valueColor:
+                      boostEnCours ? Colors.greenAccent : Colors.white60,
                 ),
               ),
             ],

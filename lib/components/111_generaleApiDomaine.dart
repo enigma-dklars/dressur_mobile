@@ -1,1 +1,1 @@
-const generalApiDomaine = "https://dressur.site";
+const generalApiDomaine = "https://dressur.ai-quizos.site";

@@ -68,12 +68,34 @@ String _headerLabel(DateTime dt) {
   if (diff == 1) return (langUserPhone == 'fr') ? "Hier" : "Yesterday";
 
   const monthsFr = [
-    '', 'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
-    'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'
+    '',
+    'Janvier',
+    'Février',
+    'Mars',
+    'Avril',
+    'Mai',
+    'Juin',
+    'Juillet',
+    'Août',
+    'Septembre',
+    'Octobre',
+    'Novembre',
+    'Décembre'
   ];
   const monthsEn = [
-    '', 'January', 'February', 'March', 'April', 'May', 'June',
-    'July', 'August', 'September', 'October', 'November', 'December'
+    '',
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December'
   ];
   final months = (langUserPhone == 'fr') ? monthsFr : monthsEn;
 
@@ -154,8 +176,7 @@ class _ListeNotificationState extends State<ListeNotification> {
       if (body['error'] == false) {
         final List<dynamic> raw = body['notifications'] ?? [];
         setState(() {
-          _notifications =
-              raw.map((e) => NotificationDS.fromJson(e)).toList();
+          _notifications = raw.map((e) => NotificationDS.fromJson(e)).toList();
           _loading = false;
         });
       } else {
@@ -234,8 +255,8 @@ class _ListeNotificationState extends State<ListeNotification> {
               if (value == 1) {
                 _fetchNotifications();
               } else if (value == 2) {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (_) => SupportPage()));
+                Navigator.push(
+                    context, MaterialPageRoute(builder: (_) => SupportPage()));
               }
             },
           ),
@@ -262,8 +283,7 @@ class _ListeNotificationState extends State<ListeNotification> {
               (langUserPhone == 'fr')
                   ? "Impossible de charger les notifications."
                   : "Unable to load notifications.",
-              style:
-                  GoogleFonts.poppins(color: Colors.grey[500], fontSize: 14),
+              style: GoogleFonts.poppins(color: Colors.grey[500], fontSize: 14),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 16),
@@ -350,8 +370,7 @@ class _WhatsAppBannerWidget extends StatelessWidget {
   final VoidCallback onTap;
   final bool isDark;
 
-  const _WhatsAppBannerWidget(
-      {required this.onTap, required this.isDark});
+  const _WhatsAppBannerWidget({required this.onTap, required this.isDark});
 
   @override
   Widget build(BuildContext context) {
@@ -397,8 +416,8 @@ class _WhatsAppBannerWidget extends StatelessWidget {
                     children: [
                       Text(
                         (langUserPhone == 'fr')
-                            ? "Chaîne WhatsApp Dressur"
-                            : "Dressur WhatsApp Channel",
+                            ? "Chaîne WhatsApp"
+                            : "WhatsApp Channel",
                         style: GoogleFonts.poppins(
                           color: Colors.white,
                           fontWeight: FontWeight.w700,
@@ -469,13 +488,12 @@ class _DateSeparator extends StatelessWidget {
             ),
           ),
           Container(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
             decoration: BoxDecoration(
               color: primaryColor.withOpacity(0.1),
               borderRadius: BorderRadius.circular(20),
-              border: Border.all(
-                  color: primaryColor.withOpacity(0.25), width: 1),
+              border:
+                  Border.all(color: primaryColor.withOpacity(0.25), width: 1),
             ),
             child: Text(
               label,
