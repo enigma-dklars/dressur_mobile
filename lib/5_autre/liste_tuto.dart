@@ -92,10 +92,14 @@ class _ListeTutoState extends State<ListeTuto> {
   }
 
   Future<void> _openUrl(String rawUrl) async {
-    final uri = Uri.tryParse(rawUrl);
+    final uri = Uri.tryParse(rawUrl.trim());
     if (uri == null) return;
-    if (await canLaunchUrl(uri)) {
+    try {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } catch (_) {
+      try {
+        await launchUrl(uri, mode: LaunchMode.inAppBrowserView);
+      } catch (_) {}
     }
   }
 
