@@ -10,6 +10,7 @@ import 'package:dressur/components/constant.dart';
 import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
 
+// ── Modèle ───────────────────────────────────────────────────────────────────
 class TutoDS {
   final int id;
   final String titre;
@@ -33,8 +34,14 @@ class TutoDS {
   }
 
   bool get hasUrl => url != null && url!.trim().isNotEmpty;
+
+  bool get isYoutube {
+    final u = url?.toLowerCase() ?? '';
+    return u.contains('youtube') || u.contains('youtu.be');
+  }
 }
 
+// ── Page principale ───────────────────────────────────────────────────────────
 class ListeTuto extends StatefulWidget {
   const ListeTuto({Key? key}) : super(key: key);
 
@@ -59,17 +66,12 @@ class _ListeTutoState extends State<ListeTuto> {
       _loading = true;
       _hasError = false;
     });
-
     try {
       final url = Uri.parse('$generalRouteForApi/getTutos');
-      final response = await http.post(
-        url,
-        body: {'uid': '$uidUser'},
-      ).timeout(const Duration(seconds: 15));
-
+      final response = await http
+          .post(url, body: {'uid': '$uidUser'}).timeout(const Duration(seconds: 15));
       if (!mounted) return;
       final Map<String, dynamic> body = jsonDecode(response.body);
-
       if (body['error'] == false) {
         final List<dynamic> raw = body['tutos'] ?? [];
         setState(() {
@@ -77,17 +79,11 @@ class _ListeTutoState extends State<ListeTuto> {
           _loading = false;
         });
       } else {
-        setState(() {
-          _hasError = true;
-          _loading = false;
-        });
+        setState(() { _hasError = true; _loading = false; });
       }
     } catch (_) {
       if (!mounted) return;
-      setState(() {
-        _hasError = true;
-        _loading = false;
-      });
+      setState(() { _hasError = true; _loading = false; });
     }
   }
 
@@ -106,18 +102,15 @@ class _ListeTutoState extends State<ListeTuto> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-
     return Scaffold(
+      backgroundColor: isDark ? const Color(0xFF121212) : const Color(0xFFF5F6FA),
       appBar: AppBar(
         elevation: 0,
         backgroundColor: primaryColor,
         title: Text(
           (langUserPhone == 'fr') ? "Tutoriels" : "Tutorials",
           style: GoogleFonts.poppins(
-            color: Colors.white,
-            fontWeight: FontWeight.w400,
-            fontSize: 18,
-          ),
+              color: Colors.white, fontWeight: FontWeight.w400, fontSize: 18),
         ),
         leading: IconButton(
           onPressed: () => Navigator.pop(context),
@@ -160,32 +153,49 @@ class _ListeTutoState extends State<ListeTuto> {
 
     if (_hasError) {
       return Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            FaIcon(FontAwesomeIcons.circleExclamation,
-                color: Colors.grey[400], size: 40),
-            const SizedBox(height: 14),
-            Text(
-              (langUserPhone == 'fr')
-                  ? "Impossible de charger les tutoriels."
-                  : "Unable to load tutorials.",
-              style:
-                  GoogleFonts.poppins(color: Colors.grey[500], fontSize: 14),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 16),
-            TextButton.icon(
-              onPressed: _fetchTutos,
-              icon: const FaIcon(FontAwesomeIcons.arrowsRotate,
-                  size: 14, color: Colors.white),
-              label: Text(
-                (langUserPhone == 'fr') ? "Réessayer" : "Retry",
-                style: GoogleFonts.poppins(color: Colors.white),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 32),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Colors.red.withOpacity(0.08),
+                  shape: BoxShape.circle,
+                ),
+                child: FaIcon(FontAwesomeIcons.circleExclamation,
+                    color: Colors.red[300], size: 36),
               ),
-              style: TextButton.styleFrom(backgroundColor: primaryColor),
-            ),
-          ],
+              const SizedBox(height: 16),
+              Text(
+                (langUserPhone == 'fr')
+                    ? "Impossible de charger les tutoriels."
+                    : "Unable to load tutorials.",
+                style: GoogleFonts.poppins(
+                    color: Colors.grey[500], fontSize: 14),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 20),
+              ElevatedButton.icon(
+                onPressed: _fetchTutos,
+                icon: const FaIcon(FontAwesomeIcons.arrowsRotate,
+                    size: 13, color: Colors.white),
+                label: Text(
+                  (langUserPhone == 'fr') ? "Réessayer" : "Retry",
+                  style: GoogleFonts.poppins(
+                      color: Colors.white, fontWeight: FontWeight.w600),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: primaryColor,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12)),
+                ),
+              ),
+            ],
+          ),
         ),
       );
     }
@@ -195,15 +205,32 @@ class _ListeTutoState extends State<ListeTuto> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            FaIcon(FontAwesomeIcons.graduationCap,
-                color: Colors.grey[300], size: 48),
-            const SizedBox(height: 14),
+            Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: primaryColor.withOpacity(0.07),
+                shape: BoxShape.circle,
+              ),
+              child: FaIcon(FontAwesomeIcons.graduationCap,
+                  color: primaryColor.withOpacity(0.4), size: 40),
+            ),
+            const SizedBox(height: 16),
             Text(
               (langUserPhone == 'fr')
                   ? "Aucun tutoriel disponible"
                   : "No tutorials available",
-              style:
-                  GoogleFonts.poppins(fontSize: 15, color: Colors.grey[500]),
+              style: GoogleFonts.poppins(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.grey[500]),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              (langUserPhone == 'fr')
+                  ? "Revenez plus tard"
+                  : "Check back later",
+              style: GoogleFonts.poppins(
+                  fontSize: 13, color: Colors.grey[400]),
             ),
           ],
         ),
@@ -213,139 +240,250 @@ class _ListeTutoState extends State<ListeTuto> {
     return RefreshIndicator(
       color: primaryColor,
       onRefresh: _fetchTutos,
-      child: ListView.builder(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-        itemCount: _tutos.length,
-        itemBuilder: (context, index) {
-          return _TutoCard(
-            tuto: _tutos[index],
-            isDark: isDark,
-            onOpenUrl: _openUrl,
-          );
-        },
+      child: CustomScrollView(
+        slivers: [
+          // ── Bannière de résumé ─────────────────────────────────────────
+          SliverToBoxAdapter(
+            child: _buildHeader(isDark),
+          ),
+          // ── Liste ──────────────────────────────────────────────────────
+          SliverPadding(
+            padding:
+                const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+            sliver: SliverList(
+              delegate: SliverChildBuilderDelegate(
+                (context, index) => _TutoCard(
+                  tuto: _tutos[index],
+                  index: index,
+                  isDark: isDark,
+                  onOpenUrl: _openUrl,
+                ),
+                childCount: _tutos.length,
+              ),
+            ),
+          ),
+          const SliverToBoxAdapter(child: SizedBox(height: 20)),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHeader(bool isDark) {
+    return Container(
+      margin: const EdgeInsets.fromLTRB(14, 16, 14, 10),
+      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [primaryColor, primaryColor.withOpacity(0.78)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(18),
+        boxShadow: [
+          BoxShadow(
+            color: primaryColor.withOpacity(0.30),
+            blurRadius: 16,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.15),
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: const FaIcon(FontAwesomeIcons.graduationCap,
+                color: Colors.white, size: 26),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  (langUserPhone == 'fr') ? "Tutoriels Dressur" : "Dressur Tutorials",
+                  style: GoogleFonts.poppins(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 16,
+                  ),
+                ),
+                const SizedBox(height: 3),
+                Text(
+                  '${_tutos.length} ${(langUserPhone == 'fr') ? (_tutos.length > 1 ? "tutoriels disponibles" : "tutoriel disponible") : (_tutos.length > 1 ? "tutorials available" : "tutorial available")}',
+                  style: GoogleFonts.poppins(
+                    color: Colors.white70,
+                    fontSize: 13,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
 }
 
+// ── Carte tutoriel ────────────────────────────────────────────────────────────
 class _TutoCard extends StatelessWidget {
   final TutoDS tuto;
+  final int index;
   final bool isDark;
   final Future<void> Function(String) onOpenUrl;
 
   const _TutoCard({
     required this.tuto,
+    required this.index,
     required this.isDark,
     required this.onOpenUrl,
   });
 
+  Color get _accentColor => tuto.isYoutube ? const Color(0xFFFF0000) : primaryColor;
+
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 10),
+      margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
         color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: isDark ? Colors.grey[800]! : Colors.grey[200]!,
+          color: isDark ? Colors.grey[800]! : Colors.grey[100]!,
           width: 1,
         ),
         boxShadow: [
           BoxShadow(
             color: isDark
-                ? Colors.black.withOpacity(0.12)
-                : Colors.grey.withOpacity(0.07),
-            blurRadius: 8,
-            offset: const Offset(0, 3),
+                ? Colors.black.withOpacity(0.18)
+                : Colors.grey.withOpacity(0.09),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // ── En-tête : icône + titre ──────────────────────────────────
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(9),
-                  decoration: BoxDecoration(
-                    color: primaryColor.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: FaIcon(FontAwesomeIcons.graduationCap,
-                      color: primaryColor, size: 18),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    tuto.titre,
-                    style: GoogleFonts.poppins(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
-                      color: isDark ? Colors.white : Colors.black87,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            // ── Description ──────────────────────────────────────────────
-            if (tuto.description.isNotEmpty) ...[
-              const SizedBox(height: 10),
-              Padding(
-                padding: const EdgeInsets.only(left: 2),
-                child: Text(
-                  tuto.description,
-                  style: GoogleFonts.poppins(
-                    fontSize: 13,
-                    color: isDark ? Colors.grey[400] : Colors.grey[600],
-                    height: 1.5,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: IntrinsicHeight(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // ── Barre colorée gauche ──────────────────────────────────
+              Container(width: 5, color: _accentColor),
+              // ── Contenu ───────────────────────────────────────────────
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(14, 14, 14, 14),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // ── Numéro + titre ────────────────────────────────
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Container(
+                            width: 28,
+                            height: 28,
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              color: _accentColor.withOpacity(0.12),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Text(
+                              '${index + 1}',
+                              style: GoogleFonts.poppins(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w700,
+                                color: _accentColor,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Text(
+                              tuto.titre,
+                              style: GoogleFonts.poppins(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w600,
+                                color: isDark ? Colors.white : Colors.black87,
+                                height: 1.3,
+                              ),
+                            ),
+                          ),
+                          if (tuto.isYoutube)
+                            Padding(
+                              padding: const EdgeInsets.only(left: 8),
+                              child: FaIcon(FontAwesomeIcons.youtube,
+                                  color: Colors.red, size: 18),
+                            ),
+                        ],
+                      ),
+                      // ── Description ───────────────────────────────────
+                      if (tuto.description.isNotEmpty) ...[
+                        const SizedBox(height: 10),
+                        Text(
+                          tuto.description,
+                          style: GoogleFonts.poppins(
+                            fontSize: 13,
+                            color:
+                                isDark ? Colors.grey[400] : Colors.grey[600],
+                            height: 1.55,
+                          ),
+                        ),
+                      ],
+                      // ── Bouton ────────────────────────────────────────
+                      if (tuto.hasUrl) ...[
+                        const SizedBox(height: 14),
+                        GestureDetector(
+                          onTap: () => onOpenUrl(tuto.url!),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 14, vertical: 10),
+                            decoration: BoxDecoration(
+                              color: _accentColor,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                FaIcon(
+                                  tuto.isYoutube
+                                      ? FontAwesomeIcons.youtube
+                                      : FontAwesomeIcons.arrowUpRightFromSquare,
+                                  size: 13,
+                                  color: Colors.white,
+                                ),
+                                const SizedBox(width: 8),
+                                Text(
+                                  tuto.isYoutube
+                                      ? (langUserPhone == 'fr')
+                                          ? "Voir sur YouTube"
+                                          : "Watch on YouTube"
+                                      : (langUserPhone == 'fr')
+                                          ? "Voir le tutoriel"
+                                          : "Open tutorial",
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ],
                   ),
                 ),
               ),
             ],
-            // ── Bouton lien ──────────────────────────────────────────────
-            if (tuto.hasUrl) ...[
-              const SizedBox(height: 12),
-              SizedBox(
-                width: double.infinity,
-                child: OutlinedButton.icon(
-                  onPressed: () => onOpenUrl(tuto.url!),
-                  icon: FaIcon(
-                    _urlIcon(tuto.url!),
-                    size: 14,
-                    color: primaryColor,
-                  ),
-                  label: Text(
-                    (langUserPhone == 'fr') ? "Voir le tutoriel" : "Watch tutorial",
-                    style: GoogleFonts.poppins(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                      color: primaryColor,
-                    ),
-                  ),
-                  style: OutlinedButton.styleFrom(
-                    side: BorderSide(color: primaryColor.withOpacity(0.4)),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10)),
-                    padding: const EdgeInsets.symmetric(vertical: 10),
-                  ),
-                ),
-              ),
-            ],
-          ],
+          ),
         ),
       ),
     );
-  }
-
-  IconData _urlIcon(String url) {
-    final lower = url.toLowerCase();
-    if (lower.contains('youtube') || lower.contains('youtu.be')) {
-      return FontAwesomeIcons.youtube;
-    }
-    return FontAwesomeIcons.arrowUpRightFromSquare;
   }
 }
