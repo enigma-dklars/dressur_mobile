@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:math';
+
 import 'package:dressur/1_reception/liste_contact.dart';
 import 'package:dressur/1_reception/synchronisation_avance.dart';
 import 'package:dressur/1_reception/recompense_dashboard.dart';
@@ -11,6 +14,8 @@ import 'package:dressur/6_assistant/assistant_page.dart';
 import 'package:dressur/1_reception/liste_notification.dart';
 import 'package:dressur/components/constant.dart';
 import 'package:dressur/8_admin/admin.dart';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ReceptionPage extends StatefulWidget {
   @override
@@ -18,7 +23,62 @@ class ReceptionPage extends StatefulWidget {
 }
 
 class _ReceptionPageState extends State<ReceptionPage> {
+  int _notifCount = 0;   // nombre de notifs non vues
+  int _totalNotifs = 0;  // total actuel renvoyé par l'API
 
+  static const _prefKey = 'notif_last_seen_total';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadNotifCount();
+  }
+
+  // ── Récupère le total de notifs et calcule le badge ──────────────────────
+  Future<void> _loadNotifCount() async {
+    try {
+      final response = await http.post(
+        Uri.parse('$generalRouteForApi/getNotifications'),
+        body: {'uid': '$uidUser'},
+      ).timeout(const Duration(seconds: 10));
+
+      final body = jsonDecode(response.body) as Map<String, dynamic>;
+      if (body['error'] == true) return;
+
+      final List<dynamic> raw = body['notifications'] ?? [];
+      final total = raw.length;
+
+      final prefs = await SharedPreferences.getInstance();
+      final lastSeen = prefs.getInt(_prefKey) ?? 0;
+      final unseen = max(0, total - lastSeen);
+
+      if (!mounted) return;
+      setState(() {
+        _totalNotifs = total;
+        _notifCount = unseen;
+      });
+    } catch (_) {}
+  }
+
+  // ── Marque toutes les notifs comme vues ──────────────────────────────────
+  Future<void> _markAsSeen() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setInt(_prefKey, _totalNotifs);
+    } catch (_) {}
+    if (!mounted) return;
+    setState(() => _notifCount = 0);
+  }
+
+  // ── Ouvre la page notifs puis remet le badge à 0 ─────────────────────────
+  void _openNotifications(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => ListeNotification()),
+    ).then((_) => _markAsSeen());
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
@@ -47,18 +107,43 @@ class _ReceptionPageState extends State<ReceptionPage> {
                     width: 0, color: Colors.white, thickness: 1),
               ),
             ],
+            // ── Cloche avec badge ─────────────────────────────────────────
             IconButton(
-              icon: const FaIcon(
-                FontAwesomeIcons.solidBell,
-                size: 20,
-                color: Colors.white,
+              onPressed: () => _openNotifications(context),
+              icon: Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  const FaIcon(
+                    FontAwesomeIcons.solidBell,
+                    size: 20,
+                    color: Colors.white,
+                  ),
+                  if (_notifCount > 0)
+                    Positioned(
+                      top: -5,
+                      right: -6,
+                      child: Container(
+                        padding: const EdgeInsets.all(3),
+                        constraints: const BoxConstraints(
+                            minWidth: 16, minHeight: 16),
+                        decoration: const BoxDecoration(
+                          color: Colors.red,
+                          shape: BoxShape.circle,
+                        ),
+                        child: Text(
+                          _notifCount > 99 ? '99+' : '$_notifCount',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 9,
+                            fontWeight: FontWeight.bold,
+                            height: 1,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ),
+                ],
               ),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => ListeNotification()),
-                );
-              },
             ),
             const Padding(
               padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
@@ -181,6 +266,7 @@ class _ReceptionPageState extends State<ReceptionPage> {
                 },
               ),
               const SizedBox(height: 10),
+              // ── Item Notifications avec badge ─────────────────────────
               _buildNavigationItem(
                 context: context,
                 icon: FontAwesomeIcons.solidBell,
@@ -188,13 +274,8 @@ class _ReceptionPageState extends State<ReceptionPage> {
                 subtitle: (langUserPhone == "fr")
                     ? "Cadeaux, astuces, recommandations..."
                     : "Gifts, tips, recommendations...",
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => ListeNotification()),
-                  );
-                },
+                badge: _notifCount,
+                onTap: () => _openNotifications(context),
               ),
               const SizedBox(height: 10),
               SociauxPage(),
@@ -226,7 +307,6 @@ class _ReceptionPageState extends State<ReceptionPage> {
       ),
       child: Column(
         children: [
-          // ── Ligne 1 : Solde FCFA · Contacts · Boost ──
           Row(
             children: [
               Expanded(
@@ -318,6 +398,7 @@ class _ReceptionPageState extends State<ReceptionPage> {
     required String title,
     required String subtitle,
     required VoidCallback onTap,
+    int badge = 0,
   }) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
@@ -344,13 +425,43 @@ class _ReceptionPageState extends State<ReceptionPage> {
         ),
         child: Row(
           children: [
-            Container(
-              padding: EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: primaryColor.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(14),
-              ),
-              child: FaIcon(icon, color: primaryColor, size: 26),
+            // ── Icône avec badge optionnel ──────────────────────────────
+            Stack(
+              clipBehavior: Clip.none,
+              children: [
+                Container(
+                  padding: EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: primaryColor.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: FaIcon(icon, color: primaryColor, size: 26),
+                ),
+                if (badge > 0)
+                  Positioned(
+                    top: -4,
+                    right: -4,
+                    child: Container(
+                      padding: const EdgeInsets.all(3),
+                      constraints:
+                          const BoxConstraints(minWidth: 18, minHeight: 18),
+                      decoration: const BoxDecoration(
+                        color: Colors.red,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Text(
+                        badge > 99 ? '99+' : '$badge',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                          height: 1,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ),
+              ],
             ),
             SizedBox(width: 16),
             Expanded(
