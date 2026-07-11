@@ -190,7 +190,15 @@ class _ListeNotificationState extends State<ListeNotification> {
           PopupMenuButton<int>(
             itemBuilder: (context) => [
               PopupMenuItem(
-                value: 4,
+                value: 1,
+                child: Text(
+                  (langUserPhone == "fr") ? "Actualiser" : "Refresh",
+                  style: GoogleFonts.poppins(
+                      color: Colors.white, fontWeight: FontWeight.w600),
+                ),
+              ),
+              PopupMenuItem(
+                value: 2,
                 child: Text(
                   (langUserPhone == "fr") ? "Aide" : "Help",
                   style: GoogleFonts.poppins(
@@ -204,7 +212,9 @@ class _ListeNotificationState extends State<ListeNotification> {
                 color: Colors.white, size: 20),
             elevation: 2,
             onSelected: (value) {
-              if (value == 4) {
+              if (value == 1) {
+                _fetchNotifications();
+              } else if (value == 2) {
                 Navigator.push(context,
                     MaterialPageRoute(builder: (_) => SupportPage()));
               }

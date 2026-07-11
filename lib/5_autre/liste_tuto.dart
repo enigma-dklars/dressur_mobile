@@ -122,6 +122,14 @@ class _ListeTutoState extends State<ListeTuto> {
               PopupMenuItem(
                 value: 1,
                 child: Text(
+                  (langUserPhone == "fr") ? "Actualiser" : "Refresh",
+                  style: GoogleFonts.poppins(
+                      color: Colors.white, fontWeight: FontWeight.w600),
+                ),
+              ),
+              PopupMenuItem(
+                value: 2,
+                child: Text(
                   (langUserPhone == "fr") ? "Aide" : "Help",
                   style: GoogleFonts.poppins(
                       color: Colors.white, fontWeight: FontWeight.w600),
@@ -135,6 +143,8 @@ class _ListeTutoState extends State<ListeTuto> {
             elevation: 2,
             onSelected: (value) {
               if (value == 1) {
+                _fetchTutos();
+              } else if (value == 2) {
                 Navigator.push(context,
                     MaterialPageRoute(builder: (_) => SupportPage()));
               }
