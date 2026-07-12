@@ -18,7 +18,9 @@ class _VendeurRechargePageState extends State<VendeurRechargePage> {
   bool _loadingMethods = false;
   dynamic _valueMethodePaiement;
   final TextEditingController _montantController = TextEditingController();
+  late final TextEditingController _telController = TextEditingController(text: tel);
   String? _erreurMontant;
+  String? _erreurTel;
 
   @override
   void initState() {
@@ -31,6 +33,7 @@ class _VendeurRechargePageState extends State<VendeurRechargePage> {
   @override
   void dispose() {
     _montantController.dispose();
+    _telController.dispose();
     super.dispose();
   }
 
@@ -75,6 +78,17 @@ class _VendeurRechargePageState extends State<VendeurRechargePage> {
     }
     setState(() => _erreurMontant = null);
 
+    final String telSaisi = _telController.text.trim();
+    if (telSaisi.isEmpty) {
+      setState(() {
+        _erreurTel = langUserPhone != "fr"
+            ? "Please enter your phone number (international format)"
+            : "Veuillez saisir votre numéro (format international)";
+      });
+      return;
+    }
+    setState(() => _erreurTel = null);
+
     if (_valueMethodePaiement == null) {
       dangerNoti(
         langUserPhone != "fr" ? "Attention!" : "Attention !",
@@ -107,6 +121,7 @@ class _VendeurRechargePageState extends State<VendeurRechargePage> {
         'uid': uidUser,
         'methodePaiementId': _valueMethodePaiement.toString(),
         'montant': montant.toString(),
+        'tel': telSaisi,
       });
       http.StreamedResponse response = await request.send();
       if (response.statusCode == 200) {
@@ -234,6 +249,33 @@ class _VendeurRechargePageState extends State<VendeurRechargePage> {
                   border: const OutlineInputBorder(),
                   errorText: _erreurMontant,
                   suffixText: "FCFA",
+                ),
+                style: GoogleFonts.poppins(fontSize: 15),
+              ),
+              const SizedBox(height: 20),
+              // Champ téléphone de paiement
+              Text(
+                isFr ? "Indicatif + Numéro du paiement" : "Dial code + Payment number",
+                style: GoogleFonts.poppins(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 13,
+                    color: Colors.grey[600]),
+              ),
+              const SizedBox(height: 8),
+              TextField(
+                controller: _telController,
+                keyboardType: TextInputType.phone,
+                onChanged: (_) {
+                  if (_erreurTel != null) {
+                    setState(() => _erreurTel = null);
+                  }
+                },
+                decoration: InputDecoration(
+                  hintText: isFr ? "Ex: +22890000000" : "e.g. +22890000000",
+                  hintStyle: GoogleFonts.poppins(color: Colors.grey[400]),
+                  border: const OutlineInputBorder(),
+                  errorText: _erreurTel,
+                  prefixIcon: const Icon(Icons.phone),
                 ),
                 style: GoogleFonts.poppins(fontSize: 15),
               ),
