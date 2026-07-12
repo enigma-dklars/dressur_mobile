@@ -191,7 +191,11 @@ class ActuPage extends StatefulWidget {
   State<ActuPage> createState() => _ActuPageState();
 }
 
-class _ActuPageState extends State<ActuPage> {
+class _ActuPageState extends State<ActuPage>
+    with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
+
   final ScrollController _scrollController = ScrollController();
 
   final ValueNotifier<bool> _showFabText = ValueNotifier(true);
@@ -931,6 +935,7 @@ class _ActuPageState extends State<ActuPage> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     if (_firstLoad) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         // actualise(false);

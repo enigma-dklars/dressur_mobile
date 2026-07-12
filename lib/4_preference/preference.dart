@@ -24,7 +24,11 @@ class PreferencePage extends StatefulWidget {
   State<PreferencePage> createState() => _PreferencePageState();
 }
 
-class _PreferencePageState extends State<PreferencePage> {
+class _PreferencePageState extends State<PreferencePage>
+    with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
+
   var data;
   bool _addPageActuLocal = addPageActu;
   bool _updatingAddPageActu = false;
@@ -105,6 +109,7 @@ class _PreferencePageState extends State<PreferencePage> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Scaffold(
         appBar: AppBar(
           automaticallyImplyLeading: false,

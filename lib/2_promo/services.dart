@@ -26,7 +26,11 @@ class BoostPage extends StatefulWidget {
   State<BoostPage> createState() => _BoostPageState();
 }
 
-class _BoostPageState extends State<BoostPage> {
+class _BoostPageState extends State<BoostPage>
+    with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
+
   @override
   void initState() {
     super.initState();
@@ -60,6 +64,7 @@ class _BoostPageState extends State<BoostPage> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,

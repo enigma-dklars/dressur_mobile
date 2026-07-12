@@ -22,7 +22,11 @@ class ReceptionPage extends StatefulWidget {
   State<ReceptionPage> createState() => _ReceptionPageState();
 }
 
-class _ReceptionPageState extends State<ReceptionPage> {
+class _ReceptionPageState extends State<ReceptionPage>
+    with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
+
   int _notifCount = 0; // nombre de notifs non vues
   int _totalNotifs = 0; // total actuel renvoyé par l'API
 
@@ -80,6 +84,7 @@ class _ReceptionPageState extends State<ReceptionPage> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,

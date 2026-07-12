@@ -30,7 +30,6 @@ class _BottomBarState extends State<BottomBar> with WidgetsBindingObserver {
   // L'index 2 correspond maintenant à la page "Actu"
   int _selectedIndex = 2;
   int nombreNewContact = 0;
-  dynamic screens = [];
 
   final PageController _pageController = PageController(initialPage: 2);
 
