@@ -317,6 +317,7 @@ class _ProduitsServicesState extends State<ProduitsServices> {
     final response = await request.send();
     if (response.statusCode == 200) {
       var data1 = await response.stream.bytesToString();
+      if (!mounted) return;
       var data = jsonDecode(data1);
       if (data["error"] == true) {
         dangerNoti(data["titre"], data["message"], context);

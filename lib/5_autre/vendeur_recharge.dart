@@ -61,7 +61,7 @@ class _VendeurRechargePageState extends State<VendeurRechargePage> {
     } catch (_) {
       // Garde le sélecteur vide en cas d'erreur réseau
     } finally {
-      setState(() => _loadingMethods = false);
+      if (mounted) setState(() => _loadingMethods = false);
     }
   }
 
@@ -101,6 +101,7 @@ class _VendeurRechargePageState extends State<VendeurRechargePage> {
     }
 
     bool isConnected = await isConnectedToInternet();
+    if (!mounted) return;
     if (!isConnected) {
       dangerNoti(
         langUserPhone != "fr" ? "Mistake!" : "Erreur!",
@@ -126,6 +127,7 @@ class _VendeurRechargePageState extends State<VendeurRechargePage> {
       http.StreamedResponse response = await request.send();
       if (response.statusCode == 200) {
         var data1 = await response.stream.bytesToString();
+        if (!mounted) return;
         var data = convert.jsonDecode(data1);
         if (data["error"] == true) {
           dangerNoti(data["titre"], data["message"], context);
@@ -154,6 +156,7 @@ class _VendeurRechargePageState extends State<VendeurRechargePage> {
         setState(() => _desactive = false);
       }
     } catch (e) {
+      if (!mounted) return;
       dangerNoti(
         langUserPhone != "fr" ? "Error!" : "Erreur!",
         langUserPhone != "fr"

@@ -147,39 +147,45 @@ class _BottomBarState extends State<BottomBar> with WidgetsBindingObserver {
       ));
     }
 
-    var request = http.MultipartRequest(
-        'POST', Uri.parse('$generalRouteForApi/getUserInfo'));
-    request.fields.addAll({
-      'uid': uidUser,
-    });
+    try {
+      var request = http.MultipartRequest(
+          'POST', Uri.parse('$generalRouteForApi/getUserInfo'));
+      request.fields.addAll({
+        'uid': uidUser,
+      });
 
-    http.StreamedResponse response = await request.send();
+      http.StreamedResponse response = await request.send();
 
-    if (response.statusCode == 200) {
-      var data1 = await response.stream.bytesToString();
-      var data = convert.jsonDecode(data1);
-      if (data["error"] == false) {
-        setState(() {
-          initUserInformations(data['user']);
-          lesPublicites = data['user']["lesPublicites"];
-        });
+      if (response.statusCode == 200) {
+        var data1 = await response.stream.bytesToString();
+        if (!mounted) return;
+        var data = convert.jsonDecode(data1);
+        if (data["error"] == false) {
+          setState(() {
+            initUserInformations(data['user']);
+            lesPublicites = data['user']["lesPublicites"];
+          });
+        }
       }
-    }
-    if (affMessage == true) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          backgroundColor: Colors.green,
-          behavior: SnackBarBehavior.floating,
-          content: Text(
-            (langUserPhone == "fr")
-                ? 'Actualisation terminée.'
-                : 'Refresh complete.',
-            style: GoogleFonts.poppins(
-              color: Colors.white,
+      if (!mounted) return;
+      if (affMessage == true) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: Colors.green,
+            behavior: SnackBarBehavior.floating,
+            content: Text(
+              (langUserPhone == "fr")
+                  ? 'Actualisation terminée.'
+                  : 'Refresh complete.',
+              style: GoogleFonts.poppins(
+                color: Colors.white,
+              ),
             ),
           ),
-        ),
-      );
+        );
+      }
+    } catch (_) {
+      // Erreur réseau silencieuse — l'UI reste dans son état précédent
     }
   }
 

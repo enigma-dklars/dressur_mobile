@@ -88,6 +88,14 @@ class _PasswordChangeFormState extends State<PasswordChangeForm> {
   final passwordController = TextEditingController();
   final passwordVerifController = TextEditingController();
 
+  @override
+  void dispose() {
+    ancienPasswordController.dispose();
+    passwordController.dispose();
+    passwordVerifController.dispose();
+    super.dispose();
+  }
+
   Future<void> _changePassword() async {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _isLoading = true);
@@ -105,6 +113,7 @@ class _PasswordChangeFormState extends State<PasswordChangeForm> {
       http.StreamedResponse response = await request.send();
       if (response.statusCode == 200) {
         var data = convert.jsonDecode(await response.stream.bytesToString());
+        if (!mounted) return;
         if (data["error"] == true) {
           dangerNoti(data["titre"], data["message"], context);
         } else {
@@ -130,6 +139,7 @@ class _PasswordChangeFormState extends State<PasswordChangeForm> {
         );
       }
     } catch (e) {
+      if (!mounted) return;
       dangerNoti(
         (langUserPhone == "fr") ? "Erreur" : "Error",
         (langUserPhone == "fr") ? "Impossible de se connecter au serveur." : "Unable to connect to the server.",
@@ -137,13 +147,14 @@ class _PasswordChangeFormState extends State<PasswordChangeForm> {
       );
     }
 
-    setState(() => _isLoading = false);
+    if (mounted) setState(() => _isLoading = false);
   }
 
   Future<void> _sendPasswordResetMail() async {
     setState(() => _isSendingMail = true);
 
     bool isConnected = await isConnectedToInternet();
+    if (!mounted) return;
     if (isConnected) {
       setState(() {
         _isSendingMail = true;
@@ -158,6 +169,7 @@ class _PasswordChangeFormState extends State<PasswordChangeForm> {
 
       if (response.statusCode == 200) {
         var data1 = await response.stream.bytesToString();
+        if (!mounted) return;
         var data = convert.jsonDecode(data1);
         if (data["error"] == true) {
           dangerNoti(data["titre"], data["message"], context);
@@ -199,7 +211,7 @@ class _PasswordChangeFormState extends State<PasswordChangeForm> {
       });
     }
 
-    setState(() => _isSendingMail = false);
+    if (mounted) setState(() => _isSendingMail = false);
   }
 
   @override

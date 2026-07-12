@@ -579,7 +579,12 @@ Future<void> sharePromotion(
   messageShare += dressurUrlPlaystore;
 
   // Télécharger l'image depuis le lien HTTP
-  final http.Response response = await http.get(Uri.parse(imageLink));
+  final http.Response response;
+  try {
+    response = await http.get(Uri.parse(imageLink));
+  } catch (_) {
+    return;
+  }
 
   if (response.statusCode == 200) {
     // Obtenir le répertoire temporaire
@@ -614,23 +619,27 @@ Future<void> sharePromotion(
 }
 
 Future<String> shortenUrl(String longUrl) async {
-  final url = 'https://tinyurl.com/api-create.php?url=$longUrl';
-  final response = await http.get(Uri.parse(url));
-  if (response.statusCode == 200) {
-    return response.body;
-  } else {
-    // throw Exception('Failed to shorten URL: ${response.body}');
+  try {
+    final url = 'https://tinyurl.com/api-create.php?url=$longUrl';
+    final response = await http.get(Uri.parse(url));
+    if (response.statusCode == 200) {
+      return response.body;
+    }
+    return longUrl;
+  } catch (_) {
     return longUrl;
   }
 }
 
 Future<String> expandShortUrl(String shortUrl) async {
-  final url = 'https://unshorten.me/s/$shortUrl';
-  final response = await http.get(Uri.parse(url));
-  if (response.statusCode == 200) {
-    return response.body;
-  } else {
-    // throw Exception('Failed to expand short URL: ${response.body}');
+  try {
+    final url = 'https://unshorten.me/s/$shortUrl';
+    final response = await http.get(Uri.parse(url));
+    if (response.statusCode == 200) {
+      return response.body;
+    }
+    return shortUrl;
+  } catch (_) {
     return shortUrl;
   }
 }

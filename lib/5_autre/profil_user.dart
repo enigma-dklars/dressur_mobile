@@ -114,6 +114,20 @@ class _RegisterFormState extends State<RegisterForm> {
   final facebookController = TextEditingController(text: facebook);
   final youtubeController = TextEditingController(text: youtube);
 
+  @override
+  void dispose() {
+    telController.dispose();
+    emailController.dispose();
+    nameController.dispose();
+    pseudoController.dispose();
+    aproposController.dispose();
+    tiktokController.dispose();
+    instagramController.dispose();
+    facebookController.dispose();
+    youtubeController.dispose();
+    super.dispose();
+  }
+
   Future<void> _updateProfile() async {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _isLoading = true);
@@ -137,6 +151,7 @@ class _RegisterFormState extends State<RegisterForm> {
       http.StreamedResponse response = await request.send();
       if (response.statusCode == 200) {
         var data = convert.jsonDecode(await response.stream.bytesToString());
+        if (!mounted) return;
         if (data["error"] == true) {
           dangerNoti(data["titre"], data["message"], context);
         } else {
@@ -160,6 +175,7 @@ class _RegisterFormState extends State<RegisterForm> {
         );
       }
     } catch (e) {
+      if (!mounted) return;
       dangerNoti(
         (langUserPhone == "fr") ? "Erreur" : "Error",
         (langUserPhone == "fr") ? "Impossible de se connecter au serveur." : "Unable to connect to the server.",
@@ -167,7 +183,7 @@ class _RegisterFormState extends State<RegisterForm> {
       );
     }
 
-    setState(() => _isLoading = false);
+    if (mounted) setState(() => _isLoading = false);
   }
 
   @override

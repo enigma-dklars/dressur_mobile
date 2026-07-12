@@ -532,6 +532,13 @@ class _RegisterForm2State extends State<RegisterForm2> {
   int prix = 0;
   int jours = 0;
   int? nbContactsMax;
+
+  @override
+  void dispose() {
+    telController.dispose();
+    super.dispose();
+  }
+
   void listeFormuleBoost() async {
     bool isConnected = await isConnectedToInternet();
     if (isConnected) {
@@ -545,6 +552,7 @@ class _RegisterForm2State extends State<RegisterForm2> {
       http.StreamedResponse response = await request.send();
       if (response.statusCode == 200) {
         var data1 = await response.stream.bytesToString();
+        if (!mounted) return;
         var data = convert.jsonDecode(data1);
         if (data["error"] == false) {
           setState(() {
@@ -622,6 +630,7 @@ class _RegisterForm2State extends State<RegisterForm2> {
         http.StreamedResponse response = await request.send();
         if (response.statusCode == 200) {
           var data1 = await response.stream.bytesToString();
+          if (!mounted) return;
           var data = convert.jsonDecode(data1);
           if (data["error"] == false) {
             setState(() => _desactive2 = false);

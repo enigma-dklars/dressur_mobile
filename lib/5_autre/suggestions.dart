@@ -94,6 +94,12 @@ class _SuggestionsFormState extends State<SuggestionsForm> {
   final _formKey = GlobalKey<FormState>();
   final motifController = TextEditingController();
 
+  @override
+  void dispose() {
+    motifController.dispose();
+    super.dispose();
+  }
+
   Future<void> addSuggestion() async {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _isLoading = true);
@@ -109,6 +115,7 @@ class _SuggestionsFormState extends State<SuggestionsForm> {
       http.StreamedResponse response = await request.send();
       if (response.statusCode == 200) {
         var data = convert.jsonDecode(await response.stream.bytesToString());
+        if (!mounted) return;
         if (data["error"] == true) {
           dangerNoti(data["titre"], data["message"], context);
         } else {
@@ -132,6 +139,7 @@ class _SuggestionsFormState extends State<SuggestionsForm> {
         );
       }
     } catch (e) {
+      if (!mounted) return;
       dangerNoti(
         (langUserPhone == "fr") ? "Erreur" : "Error",
         (langUserPhone == "fr") ? "Impossible de se connecter au serveur." : "Unable to connect to the server.",
@@ -139,7 +147,7 @@ class _SuggestionsFormState extends State<SuggestionsForm> {
       );
     }
 
-    setState(() => _isLoading = false);
+    if (mounted) setState(() => _isLoading = false);
   }
 
   @override

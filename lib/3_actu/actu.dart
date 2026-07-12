@@ -352,45 +352,51 @@ class _ActuPageState extends State<ActuPage>
       'uid': uidUser,
     });
 
-    http.StreamedResponse response = await request.send();
+    try {
+      http.StreamedResponse response = await request.send();
 
-    if (response.statusCode == 200) {
-      var data1 = await response.stream.bytesToString();
-      var data = convert.jsonDecode(data1);
-      if (data["error"] == false) {
-        setState(() {
-          initUserInformations(data['user']);
-          lesPublicites = data['user']["lesPublicites"];
-          print(jsonDecode(lesPublicites).length);
-          _futureAdvertisements = fetchAdvertisements();
-          _loading = false;
-        });
-        _savePromoCache(lesPublicites);
+      if (response.statusCode == 200) {
+        var data1 = await response.stream.bytesToString();
+        if (!mounted) return;
+        var data = convert.jsonDecode(data1);
+        if (data["error"] == false) {
+          setState(() {
+            initUserInformations(data['user']);
+            lesPublicites = data['user']["lesPublicites"];
+            print(jsonDecode(lesPublicites).length);
+            _futureAdvertisements = fetchAdvertisements();
+            _loading = false;
+          });
+          _savePromoCache(lesPublicites);
+        } else {
+          setState(() {
+            _loading = false;
+          });
+        }
       } else {
         setState(() {
           _loading = false;
         });
       }
-    } else {
-      setState(() {
-        _loading = false;
-      });
-    }
-    if (affMessage == true) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          backgroundColor: Colors.green,
-          behavior: SnackBarBehavior.floating,
-          content: Text(
-            (langUserPhone == "fr")
-                ? 'Actualisation terminée.'
-                : 'Refresh complete.',
-            style: GoogleFonts.poppins(
-              color: Colors.white,
+      if (!mounted) return;
+      if (affMessage == true) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: Colors.green,
+            behavior: SnackBarBehavior.floating,
+            content: Text(
+              (langUserPhone == "fr")
+                  ? 'Actualisation terminée.'
+                  : 'Refresh complete.',
+              style: GoogleFonts.poppins(
+                color: Colors.white,
+              ),
             ),
           ),
-        ),
-      );
+        );
+      }
+    } catch (_) {
+      if (mounted) setState(() => _loading = false);
     }
   }
 

@@ -691,6 +691,7 @@ class _HistoriqueCompletPageState extends State<HistoriqueCompletPage> {
       var response = await request.send();
       var responseData = await response.stream.bytesToString();
       var data = jsonDecode(responseData);
+      if (!mounted) return;
 
       if (response.statusCode == 200 && data['error'] == false) {
         Navigator.pop(context);
@@ -715,6 +716,7 @@ class _HistoriqueCompletPageState extends State<HistoriqueCompletPage> {
         );
       }
     } catch (e) {
+      if (!mounted) return;
       dangerNoti(
         isFr ? "Erreur" : "Error",
         isFr
@@ -724,7 +726,7 @@ class _HistoriqueCompletPageState extends State<HistoriqueCompletPage> {
       );
     } finally {
       setModalState(() => _isSubmitting = false);
-      setState(() => _isSubmitting = false);
+      if (mounted) setState(() => _isSubmitting = false);
     }
   }
 
