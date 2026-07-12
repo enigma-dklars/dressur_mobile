@@ -30,6 +30,10 @@ class _BottomBarState extends State<BottomBar> with WidgetsBindingObserver {
   // L'index 2 correspond maintenant à la page "Actu"
   int _selectedIndex = 2;
   int nombreNewContact = 0;
+  bool _isInBackground = false;
+
+  Timer? _timerNotif;
+  Timer? _timerSync;
 
   final PageController _pageController = PageController(initialPage: 2);
 
@@ -64,23 +68,29 @@ class _BottomBarState extends State<BottomBar> with WidgetsBindingObserver {
       });
     }
 
-    // Exécute la fonction toutes les 5 heures
-    Timer.periodic(const Duration(hours: 6), (timer) {
-      showNotification(
-          "Cc $name_complete ...",
-          (langUserPhone == "fr")
-              ? "Du nouveau sur votre compte Dressur."
-              : "Something new on your Dressur account.");
+    // Exécute la fonction toutes les 6 heures
+    _timerNotif = Timer.periodic(const Duration(hours: 6), (timer) {
+      if (!_isInBackground) {
+        showNotification(
+            "Cc $name_complete ...",
+            (langUserPhone == "fr")
+                ? "Du nouveau sur votre compte Dressur."
+                : "Something new on your Dressur account.");
+      }
     });
 
-    Timer.periodic(const Duration(hours: 6), (timer) {
-      saveContactDsIfNotExiste();
-      actualise(false);
+    _timerSync = Timer.periodic(const Duration(hours: 6), (timer) {
+      if (!_isInBackground) {
+        saveContactDsIfNotExiste();
+        actualise(false);
+      }
     });
   }
 
   @override
   void dispose() {
+    _timerNotif?.cancel();
+    _timerSync?.cancel();
     _pageController.dispose();
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
@@ -90,10 +100,12 @@ class _BottomBarState extends State<BottomBar> with WidgetsBindingObserver {
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
     if (state == AppLifecycleState.resumed) {
+      _isInBackground = false;
       // showNotificationTimeOutAfter("Cc $name_complete ...", "Dressur est revenue au premier plan.", 300);
       actualise(false);
       saveContactDsIfNotExiste();
     } else if (state == AppLifecycleState.paused) {
+      _isInBackground = true;
       // showNotificationTimeOutAfter("Cc $name_complete ...", "Dressur est passée à l'arrière-plan.", 300);
     }
   }
