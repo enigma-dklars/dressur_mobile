@@ -171,7 +171,7 @@ class _PageDepartState extends State<PageDepart> {
     final prefs = await SharedPreferences.getInstance();
     final String? lastDateStr = prefs.getString('lastSynchroAvanceDate');
     final bool shouldNotify = lastDateStr == null ||
-        DateTime.now().difference(DateTime.parse(lastDateStr)).inDays >= 7;
+        DateTime.now().difference(DateTime.parse(lastDateStr)).inDays >= 30;
     if (shouldNotify) {
       final bool isFr = langUserPhone == 'fr';
       await showNotification(
