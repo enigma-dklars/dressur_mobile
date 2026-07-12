@@ -240,6 +240,13 @@ class _VendeurAdhesionPageState extends State<VendeurAdhesionPage> {
                           ? "Solde rechargeable utilisable pour vos achats sur Dressur"
                           : "Rechargeable balance usable for your purchases on Dressur",
                     ),
+                    const SizedBox(height: 8),
+                    _buildAvantage(
+                      FontAwesomeIcons.headset,
+                      isFr
+                          ? "Support prioritaire réservé aux vendeurs"
+                          : "Priority support reserved for vendors",
+                    ),
                   ],
                 ),
               ),
