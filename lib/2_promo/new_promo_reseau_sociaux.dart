@@ -601,11 +601,7 @@ class _RegisterForm3State extends State<RegisterForm3> {
                 ),
               ),
               onPressed: () {
-                if (!telIsVerified) {
-                  showConfNumeroWhatsapp(context);
-                } else {
-                  _desactive3 ? null : newPromoReseau();
-                }
+                _desactive3 ? null : newPromoReseau();
               },
             ),
           ),
