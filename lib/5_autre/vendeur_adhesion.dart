@@ -80,12 +80,12 @@ class _VendeurAdhesionPageState extends State<VendeurAdhesionPage> {
       return;
     }
 
-    // Validation montant recharge
+    // Validation montant recharge (obligatoire, min 500 FCFA)
     final int montantRecharge = int.tryParse(_montantRechargeController.text.trim()) ?? 0;
-    if (montantRecharge > 0 && montantRecharge < 500) {
+    if (montantRecharge < 500) {
       setState(() => _erreurMontant = langUserPhone != "fr"
-          ? "Minimum recharge amount is 500 FCFA"
-          : "Le montant minimum de recharge est de 500 FCFA");
+          ? "An initial recharge of at least 500 FCFA is required"
+          : "Une recharge initiale d'au moins 500 FCFA est obligatoire");
       return;
     }
     setState(() => _erreurMontant = null);
@@ -279,11 +279,11 @@ class _VendeurAdhesionPageState extends State<VendeurAdhesionPage> {
                       onSaved: (val) {},
                     ),
               const SizedBox(height: 20),
-              // Recharge initiale (optionnelle)
+              // Recharge initiale (obligatoire)
               Text(
                 isFr
-                    ? "Recharge initiale (optionnelle, min 500 FCFA)"
-                    : "Initial recharge (optional, min 500 FCFA)",
+                    ? "Recharge initiale (obligatoire, min 500 FCFA)"
+                    : "Initial recharge (required, min 500 FCFA)",
                 style: GoogleFonts.poppins(
                     fontWeight: FontWeight.w600,
                     fontSize: 13,
