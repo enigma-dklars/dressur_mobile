@@ -503,7 +503,11 @@ class _ProduitsServicesState extends State<ProduitsServices> {
                     : "Reward Program",
                 _rewardProgramAmount),
           if (_publishOnDressurStatus)
-            _recapRow("Statut Dressur", _dressurStatusAmount),
+            _recapRow(
+                (langUserPhone == "fr")
+                    ? "Statut WhatsApp & Story Dressur"
+                    : "WhatsApp Status & Story Dressur",
+                _dressurStatusAmount),
           Divider(height: 20),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -652,24 +656,26 @@ class _ProduitsServicesState extends State<ProduitsServices> {
 
           const SizedBox(height: 15),
 
-          // --- SECTION STATUT DRESSUR ---
+          // --- SECTION STATUT WHATSAPP & STORY DRESSUR ---
           _buildOptionHeader(
             FontAwesomeIcons.solidCircleCheck,
-            "Statut Dressur",
+            (langUserPhone == "fr")
+                ? "Statut WhatsApp de Dressur et Story"
+                : "Dressur WhatsApp Status & Story",
             _publishOnDressurStatus,
           ),
           SwitchListTile(
             title: Text(
               (langUserPhone == "fr")
-                  ? "Publier sur le statut de Dressur"
-                  : "Publish on Dressur status",
+                  ? "Ajouter au statut WhatsApp de Dressur et à la Story sur Dressur"
+                  : "Add to Dressur WhatsApp status and Dressur Story",
               style: GoogleFonts.poppins(
                   fontSize: 14, fontWeight: FontWeight.w500),
             ),
             subtitle: Text(
               (langUserPhone == "fr")
-                  ? "Bénéficiez d’une visibilité maximale sur le statut WhatsApp de Dressur pendant toute la durée de votre promotion."
-                  : "Get maximum visibility on Dressur’s WhatsApp status for the entire duration of your promotion.",
+                  ? "Bénéficiez d'une visibilité maximale : votre promotion sera publiée sur le statut WhatsApp de Dressur et apparaîtra dans les Stories sur l'application pendant toute la durée de votre promotion."
+                  : "Get maximum visibility: your promotion will be published on Dressur's WhatsApp status and appear in Stories on the app for the entire duration of your promotion.",
               style: GoogleFonts.poppins(fontSize: 11),
             ),
             value: _publishOnDressurStatus,
@@ -682,7 +688,9 @@ class _ProduitsServicesState extends State<ProduitsServices> {
               child: Column(
                 children: [
                   _infoBox(
-                      "Frais Statut Dressur : ${_dressurStatusAmount.toStringAsFixed(0)} FCFA",
+                      (langUserPhone == "fr")
+                          ? "Frais Statut WhatsApp & Story Dressur : ${_dressurStatusAmount.toStringAsFixed(0)} FCFA"
+                          : "WhatsApp Status & Story Dressur fee: ${_dressurStatusAmount.toStringAsFixed(0)} FCFA",
                       Colors.blue),
                 ],
               ),
