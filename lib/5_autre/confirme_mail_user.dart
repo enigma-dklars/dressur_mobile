@@ -160,8 +160,12 @@ class _CodeMailConfirmePageState extends State<CodeMailConfirmePage> {
       height: 60,
       textStyle: GoogleFonts.poppins(fontSize: 22, fontWeight: FontWeight.w600),
       decoration: BoxDecoration(
-        color: isDark ? Colors.grey[800] : Colors.grey[100],
+        color: isDark ? Colors.grey[800] : Colors.grey[200],
         borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: isDark ? Colors.grey[600]! : Colors.grey[400]!,
+          width: 1.5,
+        ),
       ),
     );
 
