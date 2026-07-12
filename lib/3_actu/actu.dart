@@ -1093,7 +1093,7 @@ class _ActuPageState extends State<ActuPage>
 
                   _buildActionChecklist(
                     context: context,
-                    showTel: !telIsVerified && mailIsVerified,
+                    showTel: !telIsVerified,
                     showMail: !mailIsVerified,
                     showProfile: (nom.toString().replaceAll(' ', '').isEmpty ||
                         nom == null),
