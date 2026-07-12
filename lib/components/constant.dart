@@ -644,6 +644,39 @@ Future<String> expandShortUrl(String shortUrl) async {
   }
 }
 
+Widget _waStep({required String number, required String text, required bool isDark}) {
+  return Row(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Container(
+        width: 24,
+        height: 24,
+        margin: const EdgeInsets.only(right: 10, top: 1),
+        decoration: BoxDecoration(
+          color: Colors.green,
+          shape: BoxShape.circle,
+        ),
+        child: Center(
+          child: Text(
+            number,
+            style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
+          ),
+        ),
+      ),
+      Expanded(
+        child: Text(
+          text,
+          style: TextStyle(
+            fontSize: 14,
+            height: 1.5,
+            color: isDark ? Colors.grey[400] : Colors.grey[700],
+          ),
+        ),
+      ),
+    ],
+  );
+}
+
 void showWhatsappConfirmation(BuildContext context) {
   final theme = Theme.of(context);
   final isDark = theme.brightness == Brightness.dark;
@@ -700,22 +733,74 @@ void showWhatsappConfirmation(BuildContext context) {
               const SizedBox(height: 15),
 
               /// Message
-              Text(
-                (langUserPhone == "fr")
-                    ? "Assurez-vous de nous envoyer \"WhatsApp Confirmation\" "
-                        "avec le numéro utilisé pour créer votre compte Dressur.\n\n"
-                        "Cliquez sur Demander ci-dessous pour envoyer votre demande.\n\n"
-                        "Les demandes sont traitées le plus tôt possible."
-                    : "Make sure to send us \"WhatsApp Confirmation\" "
-                        "with the number used to create your Dressur account.\n\n"
-                        "Click Request below to send your request.\n\n"
-                        "Requests are processed as soon as possible.",
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 14.5,
-                  height: 1.6,
-                  color: isDark ? Colors.grey[400] : Colors.grey[600],
-                ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    (langUserPhone == "fr")
+                        ? "Suivez ces étapes pour confirmer votre numéro :"
+                        : "Follow these steps to confirm your number:",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 14.5,
+                      height: 1.6,
+                      color: isDark ? Colors.grey[400] : Colors.grey[600],
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+
+                  // Étape 1
+                  _waStep(
+                    number: "1",
+                    text: (langUserPhone == "fr")
+                        ? "Ouvrez WhatsApp depuis le numéro utilisé lors de votre inscription."
+                        : "Open WhatsApp from the number you used when signing up.",
+                    isDark: isDark,
+                  ),
+                  const SizedBox(height: 10),
+
+                  // Étape 2
+                  _waStep(
+                    number: "2",
+                    text: (langUserPhone == "fr")
+                        ? "Envoyez-nous EXACTEMENT ce message, sans faute ni modification :"
+                        : "Send us EXACTLY this message, with no mistakes or changes:",
+                    isDark: isDark,
+                  ),
+                  const SizedBox(height: 8),
+
+                  // Bloc message à copier
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                    decoration: BoxDecoration(
+                      color: Colors.green.withOpacity(isDark ? 0.15 : 0.08),
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: Colors.green.withOpacity(0.4)),
+                    ),
+                    child: Text(
+                      "WhatsApp Confirmation",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 0.5,
+                        fontFamily: 'monospace',
+                        color: Colors.green[700],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+
+                  // Étape 3
+                  _waStep(
+                    number: "3",
+                    text: (langUserPhone == "fr")
+                        ? "Votre numéro sera confirmé dès que possible."
+                        : "Your number will be confirmed as soon as possible.",
+                    isDark: isDark,
+                  ),
+                ],
               ),
 
               const SizedBox(height: 30),
