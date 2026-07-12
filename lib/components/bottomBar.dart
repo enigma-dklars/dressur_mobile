@@ -31,6 +31,7 @@ class _BottomBarState extends State<BottomBar> with WidgetsBindingObserver {
   int _selectedIndex = 2;
   int nombreNewContact = 0;
   bool _isInBackground = false;
+  DateTime? _lastActualise;
 
   Timer? _timerNotif;
   Timer? _timerSync;
@@ -102,8 +103,13 @@ class _BottomBarState extends State<BottomBar> with WidgetsBindingObserver {
     if (state == AppLifecycleState.resumed) {
       _isInBackground = false;
       // showNotificationTimeOutAfter("Cc $name_complete ...", "Dressur est revenue au premier plan.", 300);
-      actualise(false);
-      saveContactDsIfNotExiste();
+      final now = DateTime.now();
+      if (_lastActualise == null ||
+          now.difference(_lastActualise!) > const Duration(minutes: 5)) {
+        _lastActualise = now;
+        actualise(false);
+        saveContactDsIfNotExiste();
+      }
     } else if (state == AppLifecycleState.paused) {
       _isInBackground = true;
       // showNotificationTimeOutAfter("Cc $name_complete ...", "Dressur est passée à l'arrière-plan.", 300);
