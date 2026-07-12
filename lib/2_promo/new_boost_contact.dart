@@ -625,7 +625,12 @@ class _RegisterForm2State extends State<RegisterForm2> {
           var data = convert.jsonDecode(data1);
           if (data["error"] == false) {
             setState(() => _desactive2 = false);
-            if (data["direct"] == true) {
+            if (data["solde_used"] == true) {
+              successNoti(
+                  (langUserPhone == "fr") ? "Succès" : "Success",
+                  data["message"] ?? ((langUserPhone == "fr") ? "Solde débité. Boost Contact enregistré." : "Balance debited. Boost Contact registered."),
+                  context);
+            } else if (data["direct"] == true) {
               dangerNoti(
                   (langUserPhone == "fr") ? "Attention !!!" : "Attention !!!",
                   (langUserPhone == "fr")

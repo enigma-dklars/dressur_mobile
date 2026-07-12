@@ -356,7 +356,12 @@ class _ProduitsServicesState extends State<ProduitsServices> {
         });
 
         cancelPromoReminderNotification();
-        if (data["direct"] == true) {
+        if (data["solde_used"] == true) {
+          successNoti(
+              (langUserPhone == "fr") ? "Succès" : "Success",
+              data["message"] ?? ((langUserPhone == "fr") ? "Solde débité. Promotion Affaire enregistrée." : "Balance debited. Promotion registered."),
+              context);
+        } else if (data["direct"] == true) {
           successNoti(
               (langUserPhone == "fr") ? "Succès" : "Success",
               (langUserPhone == "fr")

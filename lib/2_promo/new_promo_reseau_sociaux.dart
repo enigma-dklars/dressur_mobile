@@ -312,7 +312,12 @@ class _RegisterForm3State extends State<RegisterForm3> {
             setState(() {
               _desactive3 = false;
             });
-            if (data["direct"] == true) {
+            if (data["solde_used"] == true) {
+              successNoti(
+                  (langUserPhone == "fr") ? "Succès" : "Success",
+                  data["message"] ?? ((langUserPhone == "fr") ? "Solde débité. Promotion Réseau enregistrée." : "Balance debited. Social media promotion registered."),
+                  context);
+            } else if (data["direct"] == true) {
               dangerNoti(
                   (langUserPhone == "fr") ? "Attention !!!" : "Attention !!!",
                   (langUserPhone == "fr")

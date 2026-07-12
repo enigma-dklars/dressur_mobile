@@ -1031,7 +1031,12 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
               valueMethodePaiement = "mtn";
             });
 
-            if (data["direct"] == true) {
+            if (data["solde_used"] == true) {
+              successNoti(
+                  (langUserPhone == "fr") ? "Succès" : "Success",
+                  data["message"] ?? ((langUserPhone == "fr") ? "Solde débité. Promotion Affaire relancée." : "Balance debited. Promotion restarted."),
+                  context);
+            } else if (data["direct"] == true) {
               successNoti(
                   (langUserPhone == "fr") ? "Succès" : "Success",
                   (langUserPhone == "fr")
