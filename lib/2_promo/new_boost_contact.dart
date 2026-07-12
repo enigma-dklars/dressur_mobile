@@ -43,8 +43,8 @@ class _NewBoostContactPageState extends State<NewBoostContactPage> {
         ),
         ServiceInfoItem(
           icon: FontAwesomeIcons.users,
-          textFr: "Par Contacts : vous recevez un nombre précis de contacts ; le boost se termine automatiquement.",
-          textEn: "By Contacts: you receive a set number of contacts; the boost ends automatically.",
+          textFr: "Par Quota : vous recevez un nombre précis de contacts ; le boost se termine automatiquement.",
+          textEn: "By Quota: you receive a set number of contacts; the boost ends automatically.",
         ),
         ServiceInfoItem(
           icon: FontAwesomeIcons.trophy,
@@ -267,7 +267,7 @@ class _NewBoostContactPageState extends State<NewBoostContactPage> {
                           : Colors.grey[500]),
                   const SizedBox(height: 4),
                   Text(
-                    isFr ? "Par Contacts" : "By Contacts",
+                    isFr ? "Par Quota" : "By Quota",
                     textAlign: TextAlign.center,
                     style: GoogleFonts.poppins(
                       fontWeight: FontWeight.w700,
