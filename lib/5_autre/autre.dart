@@ -162,6 +162,22 @@ class _SettingPageState extends State<SettingPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // --- SECTION ADMINISTRATION (admins uniquement) ---
+            if (admin) ...[
+              _buildSectionTitle((langUserPhone == "fr") ? "Administration" : "Administration"),
+              _buildMenuContainer(isDark, [
+                _buildMenuRow(
+                    FontAwesomeIcons.userShield,
+                    (langUserPhone == "fr")
+                        ? "Panneau Administrateur"
+                        : "Admin Panel",
+                    () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => AdministrationPage()))),
+              ]),
+            ],
+
             // --- SECTION ESPACE VENDEUR ---
             _buildSectionTitle((langUserPhone == "fr") ? "Espace Vendeur" : "Vendor Space"),
             _buildMenuContainer(isDark, [
@@ -202,22 +218,6 @@ class _SettingPageState extends State<SettingPage> {
                 ),
               ],
             ]),
-
-            // --- SECTION ADMINISTRATION (admins uniquement) ---
-            if (admin) ...[
-              _buildSectionTitle((langUserPhone == "fr") ? "Administration" : "Administration"),
-              _buildMenuContainer(isDark, [
-                _buildMenuRow(
-                    FontAwesomeIcons.userShield,
-                    (langUserPhone == "fr")
-                        ? "Panneau Administrateur"
-                        : "Admin Panel",
-                    () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => AdministrationPage()))),
-              ]),
-            ],
 
             // --- SECTION COMPTE ---
             _buildSectionTitle(
