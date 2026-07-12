@@ -17,7 +17,7 @@ class _VendeurAdhesionPageState extends State<VendeurAdhesionPage> {
   bool _desactive = false;
   bool _loadingMethods = false;
   dynamic _valueMethodePaiement;
-  final TextEditingController _montantRechargeController = TextEditingController();
+  final TextEditingController _montantRechargeController = TextEditingController(text: '500');
   String? _erreurMontant;
 
   @override
@@ -43,9 +43,6 @@ class _VendeurAdhesionPageState extends State<VendeurAdhesionPage> {
             listeMethodePaiements = (data["listeMethodePaiements"] as List<dynamic>)
                 .map((item) => item as Map<String, dynamic>)
                 .toList();
-            if (listeMethodePaiements.isNotEmpty) {
-              _valueMethodePaiement = listeMethodePaiements[0]['value'];
-            }
           });
         }
       }
@@ -233,15 +230,36 @@ class _VendeurAdhesionPageState extends State<VendeurAdhesionPage> {
                     _buildAvantage(
                       FontAwesomeIcons.tag,
                       isFr
-                          ? "Prix préférentiels sur tous les Boosts"
-                          : "Preferential pricing on all Boosts",
+                          ? "10% de réduction sur toutes les formules de promotion réseau"
+                          : "10% discount on all network promotion packages",
                     ),
                     const SizedBox(height: 8),
                     _buildAvantage(
                       FontAwesomeIcons.wallet,
                       isFr
-                          ? "Accès à l'espace vendeur avec solde rechargeable"
-                          : "Access to the vendor space with rechargeable balance",
+                          ? "Solde rechargeable utilisable à tout moment"
+                          : "Rechargeable balance usable at any time",
+                    ),
+                    const SizedBox(height: 8),
+                    _buildAvantage(
+                      FontAwesomeIcons.chartLine,
+                      isFr
+                          ? "Tableau de bord vendeur avec suivi de vos performances"
+                          : "Vendor dashboard with performance tracking",
+                    ),
+                    const SizedBox(height: 8),
+                    _buildAvantage(
+                      FontAwesomeIcons.star,
+                      isFr
+                          ? "Badge vendeur visible sur votre profil"
+                          : "Vendor badge visible on your profile",
+                    ),
+                    const SizedBox(height: 8),
+                    _buildAvantage(
+                      FontAwesomeIcons.headset,
+                      isFr
+                          ? "Assistance prioritaire réservée aux vendeurs"
+                          : "Priority support reserved for vendors",
                     ),
                   ],
                 ),
