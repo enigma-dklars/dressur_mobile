@@ -299,22 +299,45 @@ class _CodeMailConfirmePageState extends State<CodeMailConfirmePage> {
               SizedBox(height: 20),
 
               // --- BOUTON POUR RENVOYER LE CODE ---
-              TextButton(
-                onPressed: _isResending ? null : _resendCode,
-                child: _isResending
-                    ? Text(
-                        (langUserPhone == "fr")
-                            ? "Envoi en cours..."
-                            : "Sending...",
-                        style: GoogleFonts.poppins(color: Colors.grey),
-                      )
-                    : Text(
-                        (langUserPhone == "fr")
-                            ? "Renvoyer le code"
-                            : "Resend Code",
-                        style: GoogleFonts.poppins(
-                            fontWeight: FontWeight.w600, color: primaryColor),
-                      ),
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  onPressed: _isResending ? null : _resendCode,
+                  icon: _isResending
+                      ? SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: primaryColor,
+                          ),
+                        )
+                      : FaIcon(
+                          FontAwesomeIcons.paperPlane,
+                          size: 15,
+                          color: _isResending ? Colors.grey : primaryColor,
+                        ),
+                  label: Text(
+                    (langUserPhone == "fr")
+                        ? _isResending ? "Envoi en cours..." : "Renvoyer le code"
+                        : _isResending ? "Sending..." : "Resend Code",
+                    style: GoogleFonts.poppins(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 15,
+                      color: _isResending ? Colors.grey : primaryColor,
+                    ),
+                  ),
+                  style: OutlinedButton.styleFrom(
+                    padding: EdgeInsets.symmetric(vertical: 14),
+                    side: BorderSide(
+                      color: _isResending ? Colors.grey : primaryColor,
+                      width: 2,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                ),
               ),
               SizedBox(height: 24),
 
