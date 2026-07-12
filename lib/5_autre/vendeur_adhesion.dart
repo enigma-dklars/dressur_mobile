@@ -18,6 +18,7 @@ class _VendeurAdhesionPageState extends State<VendeurAdhesionPage> {
   bool _loadingMethods = false;
   dynamic _valueMethodePaiement;
   final TextEditingController _montantRechargeController = TextEditingController(text: '500');
+  final TextEditingController _telController = TextEditingController(text: tel);
   String? _erreurMontant;
 
   @override
@@ -96,6 +97,7 @@ class _VendeurAdhesionPageState extends State<VendeurAdhesionPage> {
         'uid': uidUser,
         'methodePaiementId': _valueMethodePaiement.toString(),
         'montantRecharge': montantRecharge.toString(),
+        'tel': _telController.text.trim(),
       });
       http.StreamedResponse response = await request.send();
       if (response.statusCode == 200) {
@@ -282,6 +284,29 @@ class _VendeurAdhesionPageState extends State<VendeurAdhesionPage> {
                           setState(() => _valueMethodePaiement = val),
                       onSaved: (val) {},
                     ),
+              const SizedBox(height: 20),
+              // Numéro de téléphone pour le paiement
+              Text(
+                isFr
+                    ? "Indicatif + Numéro du paiement"
+                    : "Country code + Payment number",
+                style: GoogleFonts.poppins(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 13,
+                    color: Colors.grey[600]),
+              ),
+              const SizedBox(height: 8),
+              TextField(
+                controller: _telController,
+                keyboardType: TextInputType.phone,
+                decoration: InputDecoration(
+                  labelStyle: GoogleFonts.poppins(color: Colors.grey[400]),
+                  labelText: isFr
+                      ? 'Indicatif + Numéro du paiement'
+                      : 'Country code + Payment number',
+                  border: const OutlineInputBorder(),
+                ),
+              ),
               const SizedBox(height: 20),
               // Recharge initiale (obligatoire)
               Text(
