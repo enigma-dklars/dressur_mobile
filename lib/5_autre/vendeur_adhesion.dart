@@ -228,6 +228,13 @@ class _VendeurAdhesionPageState extends State<VendeurAdhesionPage> {
                     ),
                     const SizedBox(height: 10),
                     _buildAvantage(
+                      FontAwesomeIcons.tag,
+                      isFr
+                          ? "10% de réduction sur toutes les promotions réseau sociaux"
+                          : "10% discount on all social network promotions",
+                    ),
+                    const SizedBox(height: 8),
+                    _buildAvantage(
                       FontAwesomeIcons.wallet,
                       isFr
                           ? "Solde rechargeable utilisable pour vos achats sur Dressur"

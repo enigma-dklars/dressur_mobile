@@ -217,6 +217,9 @@ class _RegisterForm3State extends State<RegisterForm3> {
       int qteDemander = int.tryParse(quantityController.text) ?? 0;
       if (qteDemander >= qteMin && qteDemander <= qteMax) {
         int prixQteDemander = ((prix * qteDemander) / qte).round();
+        if (isVendeur) {
+          prixQteDemander = (prixQteDemander * 0.9).round();
+        }
         quantityController.text = "$qteDemander";
         priceController.text = "$prixQteDemander";
         if (prixQteDemander < 100) {
