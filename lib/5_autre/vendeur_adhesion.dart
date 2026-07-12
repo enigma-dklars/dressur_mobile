@@ -228,38 +228,10 @@ class _VendeurAdhesionPageState extends State<VendeurAdhesionPage> {
                     ),
                     const SizedBox(height: 10),
                     _buildAvantage(
-                      FontAwesomeIcons.tag,
-                      isFr
-                          ? "10% de réduction sur toutes les formules de promotion réseau"
-                          : "10% discount on all network promotion packages",
-                    ),
-                    const SizedBox(height: 8),
-                    _buildAvantage(
                       FontAwesomeIcons.wallet,
                       isFr
-                          ? "Solde rechargeable utilisable à tout moment"
-                          : "Rechargeable balance usable at any time",
-                    ),
-                    const SizedBox(height: 8),
-                    _buildAvantage(
-                      FontAwesomeIcons.chartLine,
-                      isFr
-                          ? "Tableau de bord vendeur avec suivi de vos performances"
-                          : "Vendor dashboard with performance tracking",
-                    ),
-                    const SizedBox(height: 8),
-                    _buildAvantage(
-                      FontAwesomeIcons.star,
-                      isFr
-                          ? "Badge vendeur visible sur votre profil"
-                          : "Vendor badge visible on your profile",
-                    ),
-                    const SizedBox(height: 8),
-                    _buildAvantage(
-                      FontAwesomeIcons.headset,
-                      isFr
-                          ? "Assistance prioritaire réservée aux vendeurs"
-                          : "Priority support reserved for vendors",
+                          ? "Solde rechargeable utilisable pour vos achats sur Dressur"
+                          : "Rechargeable balance usable for your purchases on Dressur",
                     ),
                   ],
                 ),
