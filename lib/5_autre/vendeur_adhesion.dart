@@ -17,6 +17,8 @@ class _VendeurAdhesionPageState extends State<VendeurAdhesionPage> {
   bool _desactive = false;
   bool _loadingMethods = false;
   dynamic _valueMethodePaiement;
+  final TextEditingController _montantRechargeController = TextEditingController();
+  String? _erreurMontant;
 
   @override
   void initState() {
@@ -78,6 +80,16 @@ class _VendeurAdhesionPageState extends State<VendeurAdhesionPage> {
       return;
     }
 
+    // Validation montant recharge
+    final int montantRecharge = int.tryParse(_montantRechargeController.text.trim()) ?? 0;
+    if (montantRecharge > 0 && montantRecharge < 500) {
+      setState(() => _erreurMontant = langUserPhone != "fr"
+          ? "Minimum recharge amount is 500 FCFA"
+          : "Le montant minimum de recharge est de 500 FCFA");
+      return;
+    }
+    setState(() => _erreurMontant = null);
+
     setState(() => _desactive = true);
 
     try {
@@ -86,6 +98,7 @@ class _VendeurAdhesionPageState extends State<VendeurAdhesionPage> {
       request.fields.addAll({
         'uid': uidUser,
         'methodePaiementId': _valueMethodePaiement.toString(),
+        'montantRecharge': montantRecharge.toString(),
       });
       http.StreamedResponse response = await request.send();
       if (response.statusCode == 200) {
@@ -104,6 +117,9 @@ class _VendeurAdhesionPageState extends State<VendeurAdhesionPage> {
           );
           setState(() {
             isVendeur = true;
+            if (montantRecharge > 0) {
+              soldeProgrammeRecompense = (soldeProgrammeRecompense) + montantRecharge;
+            }
             _desactive = false;
           });
           Navigator.pop(context);
@@ -262,25 +278,61 @@ class _VendeurAdhesionPageState extends State<VendeurAdhesionPage> {
                           setState(() => _valueMethodePaiement = val),
                       onSaved: (val) {},
                     ),
+              const SizedBox(height: 20),
+              // Recharge initiale (optionnelle)
+              Text(
+                isFr
+                    ? "Recharge initiale (optionnelle, min 500 FCFA)"
+                    : "Initial recharge (optional, min 500 FCFA)",
+                style: GoogleFonts.poppins(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 13,
+                    color: Colors.grey[600]),
+              ),
+              const SizedBox(height: 8),
+              TextField(
+                controller: _montantRechargeController,
+                keyboardType: TextInputType.number,
+                onChanged: (_) {
+                  if (_erreurMontant != null) setState(() => _erreurMontant = null);
+                },
+                decoration: InputDecoration(
+                  hintText: isFr ? "Ex : 5000" : "e.g. 5000",
+                  border: const OutlineInputBorder(),
+                  suffixText: "FCFA",
+                  errorText: _erreurMontant,
+                ),
+              ),
               const SizedBox(height: 24),
               // Bouton payer
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: primaryColor,
-                    shape: const StadiumBorder(),
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                  ),
-                  onPressed: _desactive ? null : _payerAdhesion,
-                  child: Text(
-                    _desactive
-                        ? (isFr ? "Patientez..." : "Wait...")
-                        : (isFr ? "Payer 2 000 FCFA" : "Pay 2,000 FCFA"),
-                    style: GoogleFonts.poppins(
-                        color: Colors.white, fontWeight: FontWeight.w600),
-                  ),
-                ),
+              ValueListenableBuilder<TextEditingValue>(
+                valueListenable: _montantRechargeController,
+                builder: (context, value, _) {
+                  final int recharge = int.tryParse(value.text.trim()) ?? 0;
+                  final int total = 2000 + (recharge > 0 ? recharge : 0);
+                  final String totalStr = total.toString().replaceAllMapped(
+                    RegExp(r'(\d)(?=(\d{3})+$)'),
+                    (m) => '${m[1]} ',
+                  );
+                  return SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: primaryColor,
+                        shape: const StadiumBorder(),
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                      ),
+                      onPressed: _desactive ? null : _payerAdhesion,
+                      child: Text(
+                        _desactive
+                            ? (isFr ? "Patientez..." : "Wait...")
+                            : (isFr ? "Payer $totalStr FCFA" : "Pay $totalStr FCFA"),
+                        style: GoogleFonts.poppins(
+                            color: Colors.white, fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                  );
+                },
               ),
               const SizedBox(height: 16),
             ],
