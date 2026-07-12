@@ -127,13 +127,6 @@ class _BottomBarState extends State<BottomBar> with WidgetsBindingObserver {
         }
       }
     }
-    try {
-      var request = http.MultipartRequest(
-          'POST', Uri.parse('$generalRouteForApi/stockerUserContacts'));
-      request.fields
-          .addAll({'contactsUserBeforeDS': jsonEncode(contactsUserBeforeDS)});
-      await request.send();
-    } catch (_) {}
   }
 
   void actualise(affMessage) async {
