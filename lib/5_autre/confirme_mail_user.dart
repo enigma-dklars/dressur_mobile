@@ -117,6 +117,39 @@ class _CodeMailConfirmePageState extends State<CodeMailConfirmePage> {
     setState(() => _isConfirming = false);
   }
 
+  Widget _helpItem(bool isDark, String text) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(top: 5),
+            child: Container(
+              width: 6,
+              height: 6,
+              decoration: BoxDecoration(
+                color: primaryColor,
+                shape: BoxShape.circle,
+              ),
+            ),
+          ),
+          SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              text,
+              style: GoogleFonts.poppins(
+                fontSize: 13,
+                color: isDark ? Colors.grey[300] : Colors.grey[800],
+                height: 1.5,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -283,6 +316,71 @@ class _CodeMailConfirmePageState extends State<CodeMailConfirmePage> {
                             fontWeight: FontWeight.w600, color: primaryColor),
                       ),
               ),
+              SizedBox(height: 24),
+
+              // --- BLOC D'AIDE ---
+              Container(
+                width: double.infinity,
+                padding: EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: isDark ? Colors.grey[850] : Colors.blue[50],
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: isDark ? Colors.grey[700]! : Colors.blue[200]!,
+                  ),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        FaIcon(
+                          FontAwesomeIcons.circleInfo,
+                          color: primaryColor,
+                          size: 18,
+                        ),
+                        SizedBox(width: 8),
+                        Text(
+                          (langUserPhone == "fr")
+                              ? "Vous ne recevez pas le code ?"
+                              : "Not receiving the code?",
+                          style: GoogleFonts.poppins(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 14,
+                            color: primaryColor,
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 12),
+                    _helpItem(
+                      isDark,
+                      (langUserPhone == "fr")
+                          ? "Vérifiez que votre adresse e-mail a été saisie correctement lors de l'inscription."
+                          : "Make sure you entered your email address correctly when registering.",
+                    ),
+                    _helpItem(
+                      isDark,
+                      (langUserPhone == "fr")
+                          ? "Si elle est incorrecte, allez dans Paramètres → Profil pour la corriger, puis renvoyez un nouveau code."
+                          : "If it's wrong, go to Settings → Profile to fix it, then resend a new code.",
+                    ),
+                    _helpItem(
+                      isDark,
+                      (langUserPhone == "fr")
+                          ? "Pensez à vérifier votre dossier Spam ou Indésirables — le mail peut parfois s'y retrouver."
+                          : "Check your Spam or Junk folder — the email may have landed there.",
+                    ),
+                    _helpItem(
+                      isDark,
+                      (langUserPhone == "fr")
+                          ? "Si vous avez plusieurs adresses e-mail, assurez-vous d'ouvrir la bonne boîte de réception."
+                          : "If you have multiple email addresses, make sure you're checking the right inbox.",
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(height: 20),
             ],
           ),
         ),
