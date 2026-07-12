@@ -23,6 +23,8 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:dressur/5_autre/vendeur_adhesion.dart';
+import 'package:dressur/5_autre/vendeur_recharge.dart';
 
 class SettingPage extends StatefulWidget {
   SettingPage({Key? key}) : super(key: key);
@@ -160,6 +162,47 @@ class _SettingPageState extends State<SettingPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // --- SECTION ESPACE VENDEUR ---
+            _buildSectionTitle((langUserPhone == "fr") ? "Espace Vendeur" : "Vendor Space"),
+            _buildMenuContainer(isDark, [
+              if (!isVendeur) ...[
+                _buildMenuRow(
+                  FontAwesomeIcons.store,
+                  (langUserPhone == "fr") ? "Devenir Vendeur" : "Become a Vendor",
+                  () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => VendeurAdhesionPage()),
+                  ),
+                ),
+              ] else ...[
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                  child: Row(
+                    children: [
+                      FaIcon(FontAwesomeIcons.wallet, color: primaryColor, size: 18),
+                      SizedBox(width: 16),
+                      Expanded(
+                        child: Text(
+                          (langUserPhone == "fr")
+                              ? "Solde : ${soldeProgrammeRecompense ?? 0} FCFA"
+                              : "Balance: ${soldeProgrammeRecompense ?? 0} FCFA",
+                          style: GoogleFonts.poppins(fontSize: 15, fontWeight: FontWeight.w500),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                _buildMenuRow(
+                  FontAwesomeIcons.arrowUpFromBracket,
+                  (langUserPhone == "fr") ? "Recharger mon solde" : "Top up balance",
+                  () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => VendeurRechargePage()),
+                  ),
+                ),
+              ],
+            ]),
+
             // --- SECTION ADMINISTRATION (admins uniquement) ---
             if (admin) ...[
               _buildSectionTitle((langUserPhone == "fr") ? "Administration" : "Administration"),
