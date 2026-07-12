@@ -1100,8 +1100,7 @@ class _ActuPageState extends State<ActuPage>
                     showBoost: (addPageActu &&
                         nombreContactDispo <= 100 &&
                         boostEnCours == false &&
-                        telIsVerified &&
-                        mailIsVerified),
+                        telIsVerified),
                   ),
                   const SizedBox(height: 10),
 
