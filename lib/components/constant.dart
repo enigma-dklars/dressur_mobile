@@ -17,7 +17,7 @@ import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:http/http.dart' as http;
 
-const versionApp = '1.2.1';
+const versionApp = '1.2.3';
 const oldDatabaseName = 'one_dressur.db';
 const nowDataBaseName = 'two_dressur.db';
 bool modeReconnaissanceContactArrierePlan = false;
@@ -101,7 +101,7 @@ var modeMotDePasseOublier = false;
 var mailConnexion = "";
 var textChargementEvolution = "Loading...";
 var addUserOnAutreProfilPage = "oui";
-var myDressurVersion = '1.2.1';
+var myDressurVersion = '1.2.3';
 var lesPublicites;
 var uidAutreUser;
 var uidUser;
@@ -644,7 +644,8 @@ Future<String> expandShortUrl(String shortUrl) async {
   }
 }
 
-Widget _waStep({required String number, required String text, required bool isDark}) {
+Widget _waStep(
+    {required String number, required String text, required bool isDark}) {
   return Row(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
@@ -659,7 +660,8 @@ Widget _waStep({required String number, required String text, required bool isDa
         child: Center(
           child: Text(
             number,
-            style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
+            style: const TextStyle(
+                color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
           ),
         ),
       ),
@@ -772,7 +774,8 @@ void showWhatsappConfirmation(BuildContext context) {
                   // Bloc message à copier
                   Container(
                     width: double.infinity,
-                    padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 12, horizontal: 16),
                     decoration: BoxDecoration(
                       color: Colors.green.withOpacity(isDark ? 0.15 : 0.08),
                       borderRadius: BorderRadius.circular(10),
