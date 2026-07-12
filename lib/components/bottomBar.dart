@@ -3,7 +3,6 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:flutter/services.dart';
-import 'dart:convert';
 import 'dart:convert' as convert;
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:http/http.dart' as http;
@@ -101,27 +100,13 @@ class _BottomBarState extends State<BottomBar> with WidgetsBindingObserver {
   }
 
   void synchroAvanceFunction() async {
-    setState(() {
-      contactsUserBeforeDS = [];
-    });
     await SQLHelper.viderLaBaseDeDonneeLocalTelUser();
     await Future.delayed(const Duration(seconds: 3), () {});
     List<Contact> contacts = await FlutterContacts.getContacts(
         withProperties: true, withAccounts: true);
     for (var contact in contacts) {
       for (var phone in contact.phones) {
-        var displayNameTel = contact.displayName;
-        var nameTel = "${contact.name.first} ${contact.name.last}";
-        var mailTel = contact.emails.map((email) => email.address).join(',');
         var numberTel = (phone.number).replaceAll(" ", "").replaceAll("-", "");
-        if (!contactsUserBeforeDS.contains(numberTel)) {
-          contactsUserBeforeDS.add({
-            "nameTel": nameTel,
-            "mailTel": mailTel,
-            "numberTel": numberTel,
-            "displayNameTel": displayNameTel,
-          });
-        }
         if ((await SQLHelper.getOneNumsTelUser(numberTel)).isEmpty) {
           await insertNumTelUserIntoDataBase(numberTel);
         }

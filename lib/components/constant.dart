@@ -76,7 +76,6 @@ const String createMessageTable = """
 
 int nbrAffichageAvertissement = 0;
 List<dynamic> userChatInfo = [];
-List<dynamic> contactsUserBeforeDS = [];
 List<dynamic> contactsEnregistrer = [];
 String? langUserPhone = "fr";
 String preferencePaysText = "";
