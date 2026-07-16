@@ -23,6 +23,54 @@ class _ProgrammeRecompensePageState extends State<ProgrammeRecompensePage> {
   var data;
   bool _desactive = false;
 
+  // Conditions d'accès au programme
+  bool _conditionsLoaded = false;
+  bool _condInscrit7j = false;
+  bool _condMail = false;
+  bool _condWhatsapp = false;
+  bool _condCommandes = false;
+  int _nbrCommandes = 0;
+  bool get _toutesConditions =>
+      _condInscrit7j && _condMail && _condWhatsapp && _condCommandes;
+
+  @override
+  void initState() {
+    super.initState();
+    if (!isInscritProgrammeRecompense) {
+      _fetchConditions();
+    }
+  }
+
+  Future<void> _fetchConditions() async {
+    try {
+      var request = http.MultipartRequest(
+          'POST',
+          Uri.parse('$generalRouteForApi/getConditionsProgrammeRecompense'));
+      request.fields.addAll({'uid': uidUser});
+
+      http.StreamedResponse response = await request.send();
+      if (response.statusCode == 200) {
+        var data1 = await response.stream.bytesToString();
+        var decoded = convert.jsonDecode(data1);
+        if (decoded['error'] == false) {
+          final c = decoded['conditions'];
+          if (mounted) {
+            setState(() {
+              _condInscrit7j  = c['inscritDepuis7Jours'] == true;
+              _condMail       = c['mailConfirme'] == true;
+              _condWhatsapp   = c['whatsappConfirme'] == true;
+              _condCommandes  = c['cinqCommandes'] == true;
+              _nbrCommandes   = c['nbrCommandes'] ?? 0;
+              _conditionsLoaded = true;
+            });
+          }
+        }
+      }
+    } catch (e) {
+      // Silencieux — le bouton reste désactivé
+    }
+  }
+
   void addToRecompenseProgramme() async {
     bool isConnected = await isConnectedToInternet();
     if (isConnected) {
@@ -610,19 +658,87 @@ class _ProgrammeRecompensePageState extends State<ProgrammeRecompensePage> {
 
                 SizedBox(height: 20),
                 if (isInscritProgrammeRecompense == false) ...[
+                  // --- Checklist des conditions d'accès ---
+                  Container(
+                    width: double.infinity,
+                    padding: EdgeInsets.all(18),
+                    decoration: BoxDecoration(
+                      color: isDark
+                          ? Colors.white.withOpacity(0.05)
+                          : Colors.grey[50],
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: _conditionsLoaded
+                            ? (_toutesConditions
+                                ? Colors.green.withOpacity(0.4)
+                                : Colors.orange.withOpacity(0.4))
+                            : theme.dividerColor.withOpacity(0.15),
+                      ),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          isFr
+                              ? "Conditions d'accès au programme"
+                              : "Program access conditions",
+                          style: GoogleFonts.poppins(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: theme.textTheme.bodyLarge?.color,
+                          ),
+                        ),
+                        SizedBox(height: 12),
+                        _conditionRow(
+                          context,
+                          isFr
+                              ? "Inscrit depuis au moins 7 jours"
+                              : "Registered for at least 7 days",
+                          _conditionsLoaded ? _condInscrit7j : null,
+                        ),
+                        _conditionRow(
+                          context,
+                          isFr
+                              ? "Adresse e-mail confirmée"
+                              : "Email address confirmed",
+                          _conditionsLoaded ? _condMail : null,
+                        ),
+                        _conditionRow(
+                          context,
+                          isFr
+                              ? "Numéro WhatsApp confirmé"
+                              : "WhatsApp number confirmed",
+                          _conditionsLoaded ? _condWhatsapp : null,
+                        ),
+                        _conditionRow(
+                          context,
+                          isFr
+                              ? "Au moins 5 commandes payantes ($_nbrCommandes/5)"
+                              : "At least 5 paid orders ($_nbrCommandes/5)",
+                          _conditionsLoaded ? _condCommandes : null,
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(height: 16),
+                  // --- Bouton Participer ---
                   SizedBox(
                     width: double.infinity,
                     height: 55,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: primaryColor,
+                        backgroundColor: (_conditionsLoaded && _toutesConditions)
+                            ? primaryColor
+                            : Colors.grey[400],
                         elevation: 0,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(15),
                         ),
                       ),
                       onPressed: () {
-                        _desactive ? null : addToRecompenseProgramme();
+                        if (_desactive) return;
+                        if (!_conditionsLoaded || !_toutesConditions) return;
+                        addToRecompenseProgramme();
                       },
                       child: _desactive
                           ? SizedBox(
@@ -646,6 +762,19 @@ class _ProgrammeRecompensePageState extends State<ProgrammeRecompensePage> {
                             ),
                     ),
                   ),
+                  if (_conditionsLoaded && !_toutesConditions) ...[
+                    SizedBox(height: 10),
+                    Text(
+                      isFr
+                          ? "Complétez toutes les conditions pour débloquer le programme."
+                          : "Complete all conditions to unlock the program.",
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.poppins(
+                        fontSize: 12,
+                        color: Colors.orange[700],
+                      ),
+                    ),
+                  ],
                 ] else ...[
                   Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -877,6 +1006,35 @@ class _ProgrammeRecompensePageState extends State<ProgrammeRecompensePage> {
   // ---------------------------------------------------------------------------
   // COMPOSANTS DE DESIGN
   // ---------------------------------------------------------------------------
+
+  /// [met] = true → vert ✅, false → rouge ❌, null → gris (chargement)
+  Widget _conditionRow(BuildContext context, String label, bool? met) {
+    final Color iconColor = met == null
+        ? Colors.grey
+        : (met ? Colors.green : Colors.red);
+    final IconData icon = met == null
+        ? Icons.radio_button_unchecked
+        : (met ? Icons.check_circle : Icons.cancel);
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 5),
+      child: Row(
+        children: [
+          Icon(icon, size: 20, color: iconColor),
+          SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              label,
+              style: GoogleFonts.poppins(
+                fontSize: 13,
+                color: Theme.of(context).textTheme.bodyMedium?.color,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
   Widget _sectionTitle(BuildContext context, String title) {
     return Padding(
