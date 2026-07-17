@@ -143,39 +143,6 @@ class _ProgrammeRecompenseDashboardState
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(10, 12, 10, 0),
-              child: GestureDetector(
-                onTap: () {},
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                  decoration: BoxDecoration(
-                    color: primaryColor.withOpacity(0.07),
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: primaryColor.withOpacity(0.25)),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      FaIcon(FontAwesomeIcons.wallet, color: primaryColor, size: 14),
-                      const SizedBox(width: 8),
-                      Text(
-                        isFr ? "Voir mon portefeuille" : "View my wallet",
-                        style: GoogleFonts.poppins(
-                          color: primaryColor,
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      const SizedBox(width: 6),
-                      FaIcon(FontAwesomeIcons.chevronRight, color: primaryColor, size: 11),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            SizedBox(height: 10),
-
-            Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
