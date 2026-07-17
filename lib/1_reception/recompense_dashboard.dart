@@ -142,7 +142,37 @@ class _ProgrammeRecompenseDashboardState
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildWalletCard(context, isFr),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(10, 12, 10, 0),
+              child: GestureDetector(
+                onTap: () {},
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                  decoration: BoxDecoration(
+                    color: primaryColor.withOpacity(0.07),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: primaryColor.withOpacity(0.25)),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      FaIcon(FontAwesomeIcons.wallet, color: primaryColor, size: 14),
+                      const SizedBox(width: 8),
+                      Text(
+                        isFr ? "Voir mon portefeuille" : "View my wallet",
+                        style: GoogleFonts.poppins(
+                          color: primaryColor,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                      FaIcon(FontAwesomeIcons.chevronRight, color: primaryColor, size: 11),
+                    ],
+                  ),
+                ),
+              ),
+            ),
             SizedBox(height: 10),
 
             Padding(
@@ -379,87 +409,6 @@ class _ProgrammeRecompenseDashboardState
                 size: 14, color: primaryColor),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildWalletCard(BuildContext context, bool isFr) {
-    return Container(
-      width: double.infinity,
-      margin: EdgeInsets.fromLTRB(10, 12, 10, 0),
-      padding: EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [primaryColor, primaryColor.withOpacity(0.8)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                isFr ? "Solde disponible" : "Available balance",
-                style: GoogleFonts.poppins(
-                  color: Colors.white.withOpacity(0.85),
-                  fontSize: 14,
-                ),
-              ),
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.15),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Row(
-                  children: [
-                    FaIcon(FontAwesomeIcons.arrowsRotate,
-                        color: Colors.white, size: 13),
-                    SizedBox(width: 4),
-                    Text(
-                      isFr ? "Automatique" : "Automatic",
-                      style: GoogleFonts.poppins(
-                        color: Colors.white,
-                        fontSize: 10,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-
-          SizedBox(height: 8),
-
-          Text(
-            "$soldeProgrammeRecompense FCFA",
-            style: GoogleFonts.poppins(
-              color: Colors.white,
-              fontSize: 30,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-
-          SizedBox(height: 10),
-          Divider(color: Colors.white.withOpacity(0.2)),
-          SizedBox(height: 10),
-
-          Text(
-            isFr
-                ? "Votre solde est utilisé automatiquement pour payer vos services Dressur (Boost Contact, Promotion Affaire, Promotion Réseaux Sociaux)."
-                : "Your balance is automatically used to pay for your Dressur services (Boost Contact, Business Promotion, Social Media Promotion).",
-            style: GoogleFonts.poppins(
-              color: Colors.white.withOpacity(0.75),
-              fontSize: 12.5,
-              height: 1.4,
-            ),
-          ),
-        ],
       ),
     );
   }

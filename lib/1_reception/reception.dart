@@ -180,8 +180,6 @@ class _ReceptionPageState extends State<ReceptionPage>
         child: Column(
           children: [
             const SizedBox(height: 10),
-            _buildSummaryBanner(context),
-            const SizedBox(height: 10),
             _buildNavigationItem(
               context: context,
               icon: FontAwesomeIcons.solidAddressBook,
@@ -251,119 +249,6 @@ class _ReceptionPageState extends State<ReceptionPage>
           ],
         ),
       ),
-    );
-  }
-
-  Widget _buildSummaryBanner(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 10),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [primaryColor, primaryColor.withOpacity(0.75)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: primaryColor.withOpacity(0.35),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          Row(
-            children: [
-              Expanded(
-                child: _buildSummaryCell(
-                  icon: FontAwesomeIcons.trophy,
-                  label: (langUserPhone == "fr") ? "Solde FCFA" : "Balance",
-                  value: isInscritProgrammeRecompense
-                      ? "${soldeProgrammeRecompense ?? 0} FCFA"
-                      : (langUserPhone == "fr")
-                          ? "Non inscrit"
-                          : "Not enrolled",
-                ),
-              ),
-              _buildVerticalDivider(),
-              Expanded(
-                child: _buildSummaryCell(
-                  icon: FontAwesomeIcons.solidAddressBook,
-                  label: (langUserPhone == "fr") ? "Contacts" : "Contacts",
-                  value: "$nombreContacts",
-                ),
-              ),
-              _buildVerticalDivider(),
-              Expanded(
-                child: _buildSummaryCell(
-                  icon: boostEnCours
-                      ? FontAwesomeIcons.rocket
-                      : FontAwesomeIcons.circleStop,
-                  label: "Boost",
-                  value: boostEnCours
-                      ? (langUserPhone == "fr")
-                          ? "En cours"
-                          : "Active"
-                      : (langUserPhone == "fr")
-                          ? "Inactif"
-                          : "Inactive",
-                  valueColor:
-                      boostEnCours ? Colors.greenAccent : Colors.white60,
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSummaryCell({
-    required IconData icon,
-    required String label,
-    required String value,
-    Color? valueColor,
-  }) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        FaIcon(icon, color: Colors.white70, size: 18),
-        const SizedBox(height: 6),
-        Text(
-          value,
-          style: GoogleFonts.poppins(
-            color: valueColor ?? Colors.white,
-            fontWeight: FontWeight.w700,
-            fontSize: 14,
-          ),
-          textAlign: TextAlign.center,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-        ),
-        const SizedBox(height: 2),
-        Text(
-          label,
-          style: GoogleFonts.poppins(
-            color: Colors.white60,
-            fontSize: 11,
-          ),
-          textAlign: TextAlign.center,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-        ),
-      ],
-    );
-  }
-
-  Widget _buildVerticalDivider() {
-    return Container(
-      height: 50,
-      width: 1,
-      color: Colors.white24,
-      margin: const EdgeInsets.symmetric(horizontal: 4),
     );
   }
 

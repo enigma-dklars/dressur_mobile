@@ -196,23 +196,6 @@ class _SettingPageState extends State<SettingPage>
                   ),
                 ),
               ] else ...[
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                  child: Row(
-                    children: [
-                      FaIcon(FontAwesomeIcons.wallet, color: primaryColor, size: 18),
-                      SizedBox(width: 16),
-                      Expanded(
-                        child: Text(
-                          (langUserPhone == "fr")
-                              ? "Solde : ${soldeProgrammeRecompense ?? 0} FCFA"
-                              : "Balance: ${soldeProgrammeRecompense ?? 0} FCFA",
-                          style: GoogleFonts.poppins(fontSize: 15, fontWeight: FontWeight.w500),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
                 _buildMenuRow(
                   FontAwesomeIcons.arrowUpFromBracket,
                   (langUserPhone == "fr") ? "Recharger mon solde" : "Top up balance",
