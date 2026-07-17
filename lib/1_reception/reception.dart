@@ -199,6 +199,22 @@ class _ReceptionPageState extends State<ReceptionPage>
               },
             ),
             const SizedBox(height: 10),
+            if (!isVendeur)
+              _buildNavigationItem(
+                context: context,
+                icon: FontAwesomeIcons.store,
+                title: (langUserPhone == "fr") ? "Devenir Vendeur" : "Become a Vendor",
+                subtitle: (langUserPhone == "fr")
+                    ? "Accédez aux fonctionnalités vendeur"
+                    : "Access vendor features",
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => VendeurAdhesionPage()),
+                  ).then((_) => setState(() {}));
+                },
+              ),
+            if (!isVendeur) const SizedBox(height: 10),
             _buildNavigationItem(
               context: context,
               icon: FontAwesomeIcons.trophy,

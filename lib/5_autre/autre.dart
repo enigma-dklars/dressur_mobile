@@ -23,7 +23,6 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:dressur/5_autre/vendeur_recharge.dart';
 
 class SettingPage extends StatefulWidget {
   SettingPage({Key? key}) : super(key: key);
@@ -181,20 +180,6 @@ class _SettingPageState extends State<SettingPage>
                             builder: (context) => AdministrationPage()))),
               ]),
             ],
-
-            // --- SECTION ESPACE VENDEUR ---
-            _buildSectionTitle((langUserPhone == "fr") ? "Espace Vendeur" : "Vendor Space"),
-            _buildMenuContainer(isDark, [
-              if (isVendeur)
-                _buildMenuRow(
-                  FontAwesomeIcons.arrowUpFromBracket,
-                  (langUserPhone == "fr") ? "Recharger mon solde" : "Top up balance",
-                  () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => VendeurRechargePage()),
-                  ),
-                ),
-            ]),
 
             // --- SECTION COMPTE ---
             _buildSectionTitle(
