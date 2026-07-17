@@ -10,6 +10,8 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:dressur/5_autre/support_assistance.dart';
+import 'package:dressur/5_autre/vendeur_adhesion.dart';
+import 'package:dressur/5_autre/vendeur_recharge.dart';
 import 'package:dressur/6_assistant/assistant_page.dart';
 import 'package:dressur/1_reception/liste_notification.dart';
 import 'package:dressur/components/constant.dart';
@@ -179,7 +181,9 @@ class _ReceptionPageState extends State<ReceptionPage>
       body: SingleChildScrollView(
         child: Column(
           children: [
-            const SizedBox(height: 10),
+            const SizedBox(height: 12),
+            _buildSoldeCard(context),
+            const SizedBox(height: 12),
             _buildNavigationItem(
               context: context,
               icon: FontAwesomeIcons.solidAddressBook,
@@ -248,6 +252,169 @@ class _ReceptionPageState extends State<ReceptionPage>
             const SizedBox(height: 10),
           ],
         ),
+      ),
+    );
+  }
+
+  // ── Carte solde + statuts ─────────────────────────────────────────────────
+  Widget _buildSoldeCard(BuildContext context) {
+    final bool isFr = langUserPhone == "fr";
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 10),
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 14),
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: isDark ? Colors.grey[800]! : Colors.grey[200]!,
+          width: 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: isDark
+                ? Colors.black.withOpacity(0.15)
+                : Colors.grey.withOpacity(0.08),
+            blurRadius: 8,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+
+          // ── Ligne : label + bouton Recharger ────────────────────────
+          Row(
+            children: [
+              FaIcon(FontAwesomeIcons.wallet, color: primaryColor, size: 14),
+              const SizedBox(width: 7),
+              Text(
+                isFr ? "Solde Dressur" : "Dressur Balance",
+                style: GoogleFonts.poppins(
+                  fontSize: 13,
+                  color: isDark ? Colors.grey[400] : Colors.grey[600],
+                ),
+              ),
+              const Spacer(),
+              if (isVendeur)
+                GestureDetector(
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => VendeurRechargePage()),
+                  ).then((_) => setState(() {})),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 12, vertical: 5),
+                    decoration: BoxDecoration(
+                      color: primaryColor,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text(
+                      isFr ? "Recharger" : "Top up",
+                      style: GoogleFonts.poppins(
+                        color: Colors.white,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          ),
+
+          const SizedBox(height: 6),
+
+          // ── Montant ─────────────────────────────────────────────────
+          Text(
+            "${soldeProgrammeRecompense ?? 0} FCFA",
+            style: GoogleFonts.poppins(
+              fontSize: 28,
+              fontWeight: FontWeight.w700,
+              color: isDark ? Colors.white : Colors.black87,
+            ),
+          ),
+
+          const SizedBox(height: 14),
+          Divider(
+            height: 1,
+            color: isDark ? Colors.grey[800] : Colors.grey[200],
+          ),
+          const SizedBox(height: 12),
+
+          // ── Statuts + Devenir vendeur ────────────────────────────────
+          Row(
+            children: [
+              _buildStatusChip(
+                icon: FontAwesomeIcons.store,
+                label: isFr ? "Vendeur" : "Vendor",
+                active: isVendeur,
+              ),
+              const SizedBox(width: 8),
+              _buildStatusChip(
+                icon: FontAwesomeIcons.trophy,
+                label: isFr ? "Récompenses" : "Rewards",
+                active: isInscritProgrammeRecompense,
+              ),
+              const Spacer(),
+              if (!isVendeur)
+                GestureDetector(
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (_) => VendeurAdhesionPage()),
+                  ).then((_) => setState(() {})),
+                  child: Row(
+                    children: [
+                      Text(
+                        isFr ? "Devenir vendeur" : "Become vendor",
+                        style: GoogleFonts.poppins(
+                          color: primaryColor,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                      FaIcon(FontAwesomeIcons.chevronRight,
+                          color: primaryColor, size: 10),
+                    ],
+                  ),
+                ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStatusChip({
+    required IconData icon,
+    required String label,
+    required bool active,
+  }) {
+    final Color color = active ? Colors.green : Colors.grey;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: color.withOpacity(0.35)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          FaIcon(icon, size: 11, color: color),
+          const SizedBox(width: 5),
+          Text(
+            label,
+            style: GoogleFonts.poppins(
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+              color: color,
+            ),
+          ),
+        ],
       ),
     );
   }
