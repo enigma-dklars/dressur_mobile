@@ -373,30 +373,6 @@ class _ReceptionPageState extends State<ReceptionPage>
                 label: isFr ? "Récompenses" : "Rewards",
                 active: isInscritProgrammeRecompense,
               ),
-              const Spacer(),
-              if (!isVendeur)
-                GestureDetector(
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (_) => VendeurAdhesionPage()),
-                  ).then((_) => setState(() {})),
-                  child: Row(
-                    children: [
-                      Text(
-                        isFr ? "Devenir vendeur" : "Become vendor",
-                        style: GoogleFonts.poppins(
-                          color: primaryColor,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      const SizedBox(width: 4),
-                      FaIcon(FontAwesomeIcons.chevronRight,
-                          color: primaryColor, size: 10),
-                    ],
-                  ),
-                ),
             ],
           ),
         ],
