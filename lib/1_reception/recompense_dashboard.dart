@@ -135,134 +135,135 @@ class _ProgrammeRecompenseDashboardState
               color: Colors.white, size: 20),
           onPressed: () => Navigator.pop(context),
         ),
-        actions: [],
       ),
       body: SingleChildScrollView(
         physics: BouncingScrollPhysics(),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildAccessProgramButton(context, theme, isFr),
 
-                  SizedBox(height: 10),
+            // ── Statistiques ─────────────────────────────────────────────
+            _sectionTitle(context,
+                isFr ? "Mes Statistiques" : "My Statistics", 12),
+            Row(
+              children: [
+                _statItem(
+                    context,
+                    isFr ? "Vues Totales" : "Total Views",
+                    "$vuesTotales",
+                    FontAwesomeIcons.eye,
+                    Colors.blue,
+                    theme),
+                SizedBox(width: 12),
+                _statItem(
+                    context,
+                    isFr ? "Gains Totaux" : "Total Earnings",
+                    "$gainsTotales F",
+                    FontAwesomeIcons.wallet,
+                    Colors.green,
+                    theme),
+              ],
+            ),
 
-                  _buildBusinessPromotionsButton(context, theme, isFr),
+            SizedBox(height: 28),
 
-                  SizedBox(height: 15),
-
-                  _sectionTitle(context,
-                      isFr ? "Mes Statistiques" : "My Statistics", 10),
-                  Row(
-                    children: [
-                      _statItem(
-                          context,
-                          isFr ? "Vues Totales" : "Total Views",
-                          "$vuesTotales",
-                          FontAwesomeIcons.eye,
-                          Colors.blue,
-                          theme),
-                      SizedBox(width: 15),
-                      _statItem(
-                          context,
-                          isFr ? "Gains Totaux" : "Total Earnings",
-                          "$gainsTotales F",
-                          FontAwesomeIcons.wallet,
-                          Colors.green,
-                          theme),
-                    ],
-                  ),
-
-                  SizedBox(height: 10),
-
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      _sectionTitle(
-                          context,
-                          isFr
-                              ? "Historique de participation…"
-                              : "Participation history…",
-                          0),
-                      TextButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => HistoriqueCompletPage(
-                                allHistorique: allHistorique,
-                              ),
-                            ),
-                          );
-                        },
-                        child: Text(
-                          isFr ? "Voir tout" : "See all",
-                          style: GoogleFonts.poppins(
-                            color: primaryColor,
-                            fontSize: 12,
-                          ),
+            // ── Historique de participation ───────────────────────────────
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                _sectionTitle(
+                    context,
+                    isFr
+                        ? "Historique de participation"
+                        : "Participation history",
+                    0),
+                TextButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => HistoriqueCompletPage(
+                          allHistorique: allHistorique,
                         ),
-                      )
-                    ],
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 10),
-                    child: Text(
-                      isFr
-                          ? "Sélectionnez un historique pour voir les options possibles…"
-                          : "Select a history entry to see available options…",
-                      style: GoogleFonts.poppins(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w400,
                       ),
+                    );
+                  },
+                  child: Text(
+                    isFr ? "Voir tout" : "See all",
+                    style: GoogleFonts.poppins(
+                      color: primaryColor,
+                      fontSize: 12,
                     ),
                   ),
-                  FutureBuilder<List<HistoriqueRecompense>>(
-                    future: _futureHistoriqueRecompense,
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const Padding(
-                          padding: EdgeInsets.all(20),
-                          child: Center(child: CircularProgressIndicator(color: primaryColor)),
-                        );
-                      }
-
-                      if (snapshot.hasError) {
-                        return Center(
-                            child: Text(isFr
-                                ? "Erreur de chargement"
-                                : "Loading error"));
-                      }
-
-                      if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                        return Center(
-                          child: Text(
-                            isFr
-                                ? "Aucun historique disponible"
-                                : "No history available",
-                            style: GoogleFonts.poppins(fontSize: 12),
-                          ),
-                        );
-                      }
-
-                      return ListView.builder(
-                        itemCount: snapshot.data!.length,
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemBuilder: (context, index) {
-                          final item = snapshot.data![index];
-                          return _promotionItem(context, item, isFr);
-                        },
-                      );
-                    },
-                  ),
-                ],
+                )
+              ],
+            ),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: Text(
+                isFr
+                    ? "Sélectionnez un historique pour voir les options possibles…"
+                    : "Select a history entry to see available options…",
+                style: GoogleFonts.poppins(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w400,
+                  color: Colors.grey[500],
+                ),
               ),
             ),
+            FutureBuilder<List<HistoriqueRecompense>>(
+              future: _futureHistoriqueRecompense,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 30),
+                    child: Center(child: CircularProgressIndicator(color: primaryColor)),
+                  );
+                }
+
+                if (snapshot.hasError) {
+                  return Center(
+                      child: Text(isFr
+                          ? "Erreur de chargement"
+                          : "Loading error"));
+                }
+
+                if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return Center(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 20),
+                      child: Text(
+                        isFr
+                            ? "Aucun historique disponible"
+                            : "No history available",
+                        style: GoogleFonts.poppins(fontSize: 12),
+                      ),
+                    ),
+                  );
+                }
+
+                return ListView.builder(
+                  itemCount: snapshot.data!.length,
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemBuilder: (context, index) {
+                    final item = snapshot.data![index];
+                    return _promotionItem(context, item, isFr);
+                  },
+                );
+              },
+            ),
+
+            SizedBox(height: 28),
+
+            // ── Actions secondaires ───────────────────────────────────────
+            _sectionTitle(context, isFr ? "Programme" : "Program", 12),
+            _buildBusinessPromotionsButton(context, theme, isFr),
+            SizedBox(height: 10),
+            _buildAccessProgramButton(context, theme, isFr),
+
+            SizedBox(height: 20),
           ],
         ),
       ),
