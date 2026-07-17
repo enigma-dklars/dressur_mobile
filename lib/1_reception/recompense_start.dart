@@ -491,22 +491,15 @@ class _ProgrammeRecompensePageState extends State<ProgrammeRecompensePage> {
 
                 _divider(context),
 
-                // 10. Retrait des gains
+                // 10. Utilisation du solde
                 _sectionTitle(context,
-                    isFr ? "Retrait des gains" : "Withdrawal of earnings"),
+                    isFr ? "Utilisation de votre solde" : "Using your balance"),
                 _bulletItem(
                   context,
                   FontAwesomeIcons.moneyBillTrendUp,
                   isFr
-                      ? "Montant minimum : 1 000 FCFA"
-                      : "Minimum amount: 1,000 FCFA",
-                ),
-                _bulletItem(
-                  context,
-                  FontAwesomeIcons.mobileScreen,
-                  isFr
-                      ? "Méthodes : Mobile Money (MTN, Moov, Orange, etc.)"
-                      : "Methods: Mobile Money (MTN, Moov, Orange, etc.)",
+                      ? "Votre solde est utilisé automatiquement pour payer vos services sur Dressur."
+                      : "Your balance is automatically used to pay for your services on Dressur.",
                 ),
                 _bulletItem(
                   context,
@@ -561,76 +554,40 @@ class _ProgrammeRecompensePageState extends State<ProgrammeRecompensePage> {
 
                 _divider(context),
 
-                // 12. Retrait automatique et moyens de paiement
+                // 12. Utilisation automatique du solde
                 _sectionTitle(
                   context,
                   isFr
-                      ? "Retrait automatique et moyens de paiement"
-                      : "Automatic withdrawal and payment methods",
+                      ? "Utilisation automatique du solde"
+                      : "Automatic balance usage",
                 ),
 
                 _paragraph(
                   context,
                   isFr
-                      ? "Les retraits des gains du Programme des récompenses se font automatiquement lorsque votre solde atteint ou dépasse 1 000 FCFA."
-                      : "Earnings from the Rewards Program are withdrawn automatically when your balance reaches or exceeds 1,000 FCFA.",
+                      ? "Les gains du Programme des récompenses s'accumulent dans votre solde Dressur. Ils ne sont pas retirables en argent, mais sont utilisés automatiquement comme crédit plateforme."
+                      : "Rewards Program earnings accumulate in your Dressur balance. They cannot be withdrawn as cash, but are automatically used as platform credit.",
                 ),
                 _bulletItem(
                   context,
                   FontAwesomeIcons.arrowsRotate,
                   isFr
-                      ? "Les retraits sont déclenchés automatiquement dès que le seuil minimum est atteint."
-                      : "Withdrawals are triggered automatically once the minimum threshold is reached.",
+                      ? "Si votre solde est suffisant, il est débité automatiquement lors de votre prochain achat de service sur Dressur."
+                      : "If your balance is sufficient, it is automatically deducted on your next service purchase on Dressur.",
                 ),
                 _bulletItem(
                   context,
-                  FontAwesomeIcons.mobileScreen,
+                  FontAwesomeIcons.cartShopping,
                   isFr
-                      ? "Les paiements sont envoyés vers les réseaux Mobile Money suivants :"
-                      : "Payments are sent to the following Mobile Money networks:",
+                      ? "Services concernés : Boost Contact, Promotion Affaire, Promotion Réseaux Sociaux."
+                      : "Applicable services: Boost Contact, Business Promotion, Social Media Promotion.",
                 ),
-
-                _paddingMobileMoney(context),
 
                 _infoText(
                   context,
                   isFr
-                      ? "📌 Si vous n'avez pas accès aux moyens de paiement Mobile Money pris en charge et que vous ne souhaitez pas utiliser vos gains pour payer des services sur Dressur (Boost Contact, promotions affaires, promotions réseaux sociaux, etc.), nous vous recommandons de ne pas participer au Programme des récompenses pour le moment. Vous pourrez rejoindre le programme plus tard lorsque de nouveaux moyens de paiement seront ajoutés et compatibles avec votre pays ou votre réseau."
-                      : "📌 If you do not have access to the supported Mobile Money payment methods and do not wish to use your earnings to pay for services on Dressur (Boost Contact, business promotions, social media promotions, etc.), we recommend not joining the Rewards Program for now. You can join later when new payment methods compatible with your country or network are added.",
-                ),
-
-                SizedBox(height: 10),
-
-                _infoText(
-                  context,
-                  isFr
-                      ? "📌 Si vous faites partie du Programme des récompenses et que vous souhaitez payer un service sur Dressur (Boost Contact, promotions affaires, promotions réseaux sociaux, etc.), votre solde de récompense sera automatiquement utilisé pour régler la facture si le montant du service est inférieur ou égal à votre solde disponible. Dans ce cas, aucun paiement supplémentaire ne vous sera demandé."
-                      : "📌 If you are part of the Rewards Program and wish to pay for a service on Dressur (Boost Contact, business promotions, social media promotions, etc.), your reward balance will be automatically used to settle the bill if the service amount is less than or equal to your available balance. In that case, no additional payment will be required.",
-                ),
-
-                _divider(context),
-
-                // 13. Configuration du numéro de paiement
-                _sectionTitle(
-                  context,
-                  isFr
-                      ? "Configuration du numéro de paiement"
-                      : "Payment number configuration",
-                ),
-
-                _paragraph(
-                  context,
-                  isFr
-                      ? "Après avoir accepté de participer au programme, vous devrez sélectionner votre réseau Mobile Money et renseigner le numéro correspondant. Les gains seront envoyés directement sur ce numéro."
-                      : "After agreeing to participate in the program, you will need to select your Mobile Money network and enter the corresponding number. Earnings will be sent directly to this number.",
-                ),
-
-                _bulletItem(
-                  context,
-                  FontAwesomeIcons.pen,
-                  isFr
-                      ? "Vous pouvez modifier votre réseau et votre numéro de paiement à tout moment."
-                      : "You can change your network and payment number at any time.",
+                      ? "📌 Si votre solde couvre entièrement le montant d'un service, aucun paiement supplémentaire ne vous sera demandé."
+                      : "📌 If your balance fully covers the cost of a service, no additional payment will be required.",
                 ),
 
                 _divider(context),
@@ -916,27 +873,6 @@ class _ProgrammeRecompensePageState extends State<ProgrammeRecompensePage> {
               ],
             ),
           ),
-        ],
-      ),
-    );
-  }
-
-// ---------------------------------------------------------------------------
-// WIDGET LISTE MOBILE MONEY
-// ---------------------------------------------------------------------------
-  Widget _paddingMobileMoney(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(left: 10, bottom: 10),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _bulletItem(
-              context, FontAwesomeIcons.check, "MTN Mobile Money Bénin"),
-          _bulletItem(context, FontAwesomeIcons.check, "MOOV Money Bénin"),
-          _bulletItem(context, FontAwesomeIcons.check,
-              "MTN Mobile Money Côte d'Ivoire"),
-          _bulletItem(context, FontAwesomeIcons.check, "MOOV Togo"),
-          _bulletItem(context, FontAwesomeIcons.check, "TOGOCEL T-Money"),
         ],
       ),
     );

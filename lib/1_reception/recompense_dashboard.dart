@@ -4,7 +4,6 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:dressur/1_reception/configuration_retrait.dart';
 import 'package:dressur/1_reception/historique_recompense_complet.dart';
 import 'package:dressur/components/noti.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -452,72 +451,13 @@ class _ProgrammeRecompenseDashboardState
 
           Text(
             isFr
-                ? "Les retraits sont automatiques à partir de 1 000 FCFA vers votre numéro configuré."
-                : "Withdrawals are automatic from 1,000 FCFA to your configured number.",
+                ? "Votre solde est utilisé automatiquement pour payer vos services Dressur (Boost Contact, Promotion Affaire, Promotion Réseaux Sociaux)."
+                : "Your balance is automatically used to pay for your Dressur services (Boost Contact, Business Promotion, Social Media Promotion).",
             style: GoogleFonts.poppins(
               color: Colors.white.withOpacity(0.75),
               fontSize: 12.5,
               height: 1.4,
             ),
-          ),
-
-          SizedBox(height: 12),
-
-          Row(
-            children: [
-              Expanded(
-                child: ElevatedButton.icon(
-                  onPressed: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => ConfigurationRetraitPage()));
-                  },
-                  icon: FaIcon(FontAwesomeIcons.gear, size: 18),
-                  label: Text(
-                    isFr ? "Configuration" : "Configuration",
-                    style: GoogleFonts.poppins(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 13,
-                    ),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    foregroundColor: primaryColor,
-                    elevation: 0,
-                    padding: EdgeInsets.symmetric(vertical: 12),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                ),
-              ),
-              SizedBox(width: 10),
-              Expanded(
-                child: OutlinedButton.icon(
-                  onPressed: () {
-                    // TODO: historique des retraits
-                  },
-                  icon: FaIcon(FontAwesomeIcons.clockRotateLeft,
-                      size: 18, color: Colors.white),
-                  label: Text(
-                    isFr ? "Historique" : "History",
-                    style: GoogleFonts.poppins(
-                      fontWeight: FontWeight.w600,
-                      fontSize: 13,
-                      color: Colors.white,
-                    ),
-                  ),
-                  style: OutlinedButton.styleFrom(
-                    side: BorderSide(color: Colors.white.withOpacity(0.6)),
-                    padding: EdgeInsets.symmetric(vertical: 12),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                ),
-              ),
-            ],
           ),
         ],
       ),
