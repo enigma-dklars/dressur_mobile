@@ -88,6 +88,8 @@ bool mailIsVerified = false;
 bool ihaveConnexion = false;
 bool admin = false;
 bool isVendeur = false;
+bool aUnPartenaire = false;
+String? monCodePartenaire;
 String? selectedContactAccountName;
 String? selectedContactAccountType;
 bool permissionAdd = false;
@@ -171,6 +173,8 @@ Future<void> initUserInformations(userInfos) async {
       userInfos["isInscritProgrammeRecompense"] ?? false;
   soldeProgrammeRecompense = userInfos["soldeProgrammeRecompense"] ?? 0;
   isVendeur = userInfos["vendeur"] ?? false;
+  aUnPartenaire = userInfos["aUnPartenaire"] ?? false;
+  monCodePartenaire = userInfos["codePartenaire"];
   SQLHelper.viderLaBaseDeDonneeLocal();
 
   SQLHelper.insert("userInfos", {

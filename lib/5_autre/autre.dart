@@ -9,6 +9,7 @@ import 'package:dressur/8_admin/admin.dart';
 import 'package:dressur/5_autre/a_propos_ds.dart';
 import 'package:dressur/5_autre/delete_compte_user.dart';
 import 'package:dressur/5_autre/modifier_mot_de_passe.dart';
+import 'package:dressur/5_autre/utiliser_code_partenaire.dart';
 import 'package:dressur/5_autre/profil_user.dart';
 import 'package:dressur/5_autre/signaler_user.dart';
 import 'package:dressur/components/notification_bell.dart';
@@ -199,6 +200,16 @@ class _SettingPageState extends State<SettingPage>
                       context,
                       MaterialPageRoute(
                           builder: (context) => ModifierMdpPage()))),
+              if (!aUnPartenaire)
+                _buildMenuRow(
+                    FontAwesomeIcons.handshake,
+                    (langUserPhone == "fr")
+                        ? "Code Partenaire"
+                        : "Partner Code",
+                    () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => UtiliserCodePartenairePage()))),
             ]),
 
             // --- SECTION ASSISTANCE & FEEDBACK ---
