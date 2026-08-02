@@ -50,7 +50,7 @@ class _UtiliserCodePartenairePageState
       if (!mounted) return;
       if (body['error'] == false) {
         setState(() => aUnPartenaire = true);
-        await successNoti(
+        successNoti(
           langUserPhone == "fr" ? "Succès !" : "Success!",
           body['message'] ??
               (langUserPhone == "fr"
@@ -270,8 +270,9 @@ class _UtiliserCodePartenairePageState
               width: double.infinity,
               height: 52,
               child: ElevatedButton(
-                onPressed:
-                    (_toutesConditionsRemplies && !_loading) ? _utiliserCode : null,
+                onPressed: (_toutesConditionsRemplies && !_loading)
+                    ? _utiliserCode
+                    : null,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: primaryColor,
                   disabledBackgroundColor: Colors.grey[300],
@@ -321,11 +322,14 @@ class _UtiliserCodePartenairePageState
           Expanded(
             child: Text(
               label,
-              style: GoogleFonts.poppins(fontSize: 14, fontWeight: FontWeight.w500),
+              style: GoogleFonts.poppins(
+                  fontSize: 14, fontWeight: FontWeight.w500),
             ),
           ),
           FaIcon(
-            fulfilled ? FontAwesomeIcons.circleCheck : FontAwesomeIcons.circleXmark,
+            fulfilled
+                ? FontAwesomeIcons.circleCheck
+                : FontAwesomeIcons.circleXmark,
             color: fulfilled ? Colors.green : Colors.red[300],
             size: 18,
           ),

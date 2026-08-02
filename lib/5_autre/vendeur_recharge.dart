@@ -18,7 +18,8 @@ class _VendeurRechargePageState extends State<VendeurRechargePage> {
   bool _loadingMethods = false;
   dynamic _valueMethodePaiement;
   final TextEditingController _montantController = TextEditingController();
-  late final TextEditingController _telController = TextEditingController(text: tel);
+  late final TextEditingController _telController =
+      TextEditingController(text: tel);
   String? _erreurMontant;
   String? _erreurTel;
 
@@ -49,9 +50,10 @@ class _VendeurRechargePageState extends State<VendeurRechargePage> {
         var data = convert.jsonDecode(data1);
         if (data["error"] == false) {
           setState(() {
-            listeMethodePaiements = (data["listeMethodePaiements"] as List<dynamic>)
-                .map((item) => item as Map<String, dynamic>)
-                .toList();
+            listeMethodePaiements =
+                (data["listeMethodePaiements"] as List<dynamic>)
+                    .map((item) => item as Map<String, dynamic>)
+                    .toList();
             if (listeMethodePaiements.isNotEmpty) {
               _valueMethodePaiement = listeMethodePaiements[0]['value'];
             }
@@ -141,7 +143,8 @@ class _VendeurRechargePageState extends State<VendeurRechargePage> {
             context,
           );
           setState(() {
-            soldeProgrammeRecompense = (soldeProgrammeRecompense ?? 0) + montant;
+            soldeProgrammeRecompense =
+                (soldeProgrammeRecompense ?? 0) + montant;
             _desactive = false;
           });
           Navigator.pop(context);
@@ -171,7 +174,6 @@ class _VendeurRechargePageState extends State<VendeurRechargePage> {
   @override
   Widget build(BuildContext context) {
     final bool isFr = langUserPhone == "fr";
-    final bool isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
       appBar: AppBar(
@@ -196,7 +198,8 @@ class _VendeurRechargePageState extends State<VendeurRechargePage> {
               const SizedBox(height: 10),
               // Solde actuel
               Container(
-                padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 16),
+                padding:
+                    const EdgeInsets.symmetric(vertical: 18, horizontal: 16),
                 decoration: BoxDecoration(
                   color: primaryColor.withOpacity(0.08),
                   borderRadius: BorderRadius.circular(14),
@@ -204,7 +207,8 @@ class _VendeurRechargePageState extends State<VendeurRechargePage> {
                 ),
                 child: Row(
                   children: [
-                    FaIcon(FontAwesomeIcons.wallet, color: primaryColor, size: 22),
+                    FaIcon(FontAwesomeIcons.wallet,
+                        color: primaryColor, size: 22),
                     const SizedBox(width: 14),
                     Expanded(
                       child: Column(
@@ -258,7 +262,9 @@ class _VendeurRechargePageState extends State<VendeurRechargePage> {
               const SizedBox(height: 20),
               // Champ téléphone de paiement
               Text(
-                isFr ? "Indicatif + Numéro du paiement" : "Dial code + Payment number",
+                isFr
+                    ? "Indicatif + Numéro du paiement"
+                    : "Dial code + Payment number",
                 style: GoogleFonts.poppins(
                     fontWeight: FontWeight.w600,
                     fontSize: 13,
