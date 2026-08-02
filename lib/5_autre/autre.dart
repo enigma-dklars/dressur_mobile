@@ -9,6 +9,7 @@ import 'package:dressur/8_admin/admin.dart';
 import 'package:dressur/5_autre/a_propos_ds.dart';
 import 'package:dressur/5_autre/delete_compte_user.dart';
 import 'package:dressur/5_autre/modifier_mot_de_passe.dart';
+import 'package:dressur/5_autre/espace_partenaire.dart';
 import 'package:dressur/5_autre/utiliser_code_partenaire.dart';
 import 'package:dressur/5_autre/profil_user.dart';
 import 'package:dressur/5_autre/signaler_user.dart';
@@ -210,6 +211,15 @@ class _SettingPageState extends State<SettingPage>
                         context,
                         MaterialPageRoute(
                             builder: (context) => UtiliserCodePartenairePage()))),
+              _buildMenuRow(
+                  FontAwesomeIcons.star,
+                  (langUserPhone == "fr") ? "Espace Partenaire" : "Partner Space",
+                  () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const EspacePartenairePage())),
+                  color: Colors.amber[700],
+              ),
             ]),
 
             // --- SECTION ASSISTANCE & FEEDBACK ---

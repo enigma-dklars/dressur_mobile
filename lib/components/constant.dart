@@ -90,6 +90,14 @@ bool admin = false;
 bool isVendeur = false;
 bool aUnPartenaire = false;
 String? monCodePartenaire;
+var estPartenaire  = false;
+var condNom        = false;
+var condTel        = false;
+var condMail       = false;
+var condAnciennete = false;
+var condCumul      = false;
+var joursInscrit   = 0;
+var cumulFcfa      = 0;
 String? selectedContactAccountName;
 String? selectedContactAccountType;
 bool permissionAdd = false;
@@ -173,8 +181,16 @@ Future<void> initUserInformations(userInfos) async {
       userInfos["isInscritProgrammeRecompense"] ?? false;
   soldeProgrammeRecompense = userInfos["soldeProgrammeRecompense"] ?? 0;
   isVendeur = userInfos["vendeur"] ?? false;
-  aUnPartenaire = userInfos["aUnPartenaire"] ?? false;
+  aUnPartenaire  = userInfos["aUnPartenaire"] ?? false;
   monCodePartenaire = userInfos["codePartenaire"];
+  estPartenaire  = userInfos["estPartenaire"]  ?? false;
+  condNom        = userInfos["condNom"]        ?? false;
+  condTel        = userInfos["condTel"]        ?? false;
+  condMail       = userInfos["condMail"]       ?? false;
+  condAnciennete = userInfos["condAnciennete"] ?? false;
+  condCumul      = userInfos["condCumul"]      ?? false;
+  joursInscrit   = userInfos["joursInscrit"]   ?? 0;
+  cumulFcfa      = userInfos["cumulFcfa"]      ?? 0;
   SQLHelper.viderLaBaseDeDonneeLocal();
 
   SQLHelper.insert("userInfos", {
