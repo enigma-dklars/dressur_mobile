@@ -257,6 +257,22 @@ class _SettingPageState extends State<SettingPage>
             _buildSectionTitle(
                 (langUserPhone == "fr") ? "Mon Compte" : "My Account"),
             _buildMenuContainer(isDark, [
+              // -- Identité & sécurité --
+              _buildMenuRow(
+                  FontAwesomeIcons.user,
+                  (langUserPhone == "fr") ? "Profil" : "Profile",
+                  () => Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => ProfilPage()))),
+              _buildMenuRow(
+                  FontAwesomeIcons.lock,
+                  (langUserPhone == "fr")
+                      ? "Modifier le mot de passe"
+                      : "Change Password",
+                  () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => ModifierMdpPage()))),
+              // -- Données principales --
               _buildMenuRow(
                   FontAwesomeIcons.solidAddressBook,
                   (langUserPhone == "fr") ? "Contacts" : "Contacts",
@@ -264,8 +280,18 @@ class _SettingPageState extends State<SettingPage>
                       context,
                       MaterialPageRoute(builder: (context) => ContactPage()))),
               _buildMenuRow(
+                  FontAwesomeIcons.arrowsRotate,
+                  (langUserPhone == "fr")
+                      ? "Synchronisation avancée"
+                      : "Advanced Sync",
+                  () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const SynchroAvance()))),
+              // -- Développer son compte --
+              _buildMenuRow(
                   FontAwesomeIcons.trophy,
-                  (langUserPhone == "fr") ? "Récompenses" : "Rewards",
+                  (langUserPhone == "fr") ? "Espace Récompense" : "Reward Space",
                   () => Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -284,29 +310,7 @@ class _SettingPageState extends State<SettingPage>
                         context,
                         MaterialPageRoute(builder: (_) => VendeurAdhesionPage()),
                     ).then((_) => setState(() {}))),
-              _buildMenuRow(
-                  FontAwesomeIcons.arrowsRotate,
-                  (langUserPhone == "fr")
-                      ? "Synchronisation avancée"
-                      : "Advanced Sync",
-                  () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const SynchroAvance()))),
-              _buildMenuRow(
-                  FontAwesomeIcons.user,
-                  (langUserPhone == "fr") ? "Profil" : "Profile",
-                  () => Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => ProfilPage()))),
-              _buildMenuRow(
-                  FontAwesomeIcons.lock,
-                  (langUserPhone == "fr")
-                      ? "Modifier le mot de passe"
-                      : "Change Password",
-                  () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => ModifierMdpPage()))),
+              // -- Partenariat --
               if (!aUnPartenaire)
                 _buildMenuRow(
                     FontAwesomeIcons.handshake,
@@ -323,9 +327,8 @@ class _SettingPageState extends State<SettingPage>
                   () => Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => const EspacePartenairePage())),
-                  color: Colors.amber[700],
-              ),
+                          builder: (context) => const EspacePartenairePage()))),
+              // -- Personnalisation --
               _buildMenuRow(
                   FontAwesomeIcons.heart,
                   (langUserPhone == "fr") ? "Préférences" : "Preferences",
