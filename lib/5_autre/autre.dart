@@ -245,93 +245,54 @@ class _SettingPageState extends State<SettingPage>
               ]),
             ],
 
-            // --- SECTION MON ESPACE ---
-            _buildSectionTitle(
-                (langUserPhone == "fr") ? "Mon Espace" : "My Space"),
+            // --- CARTE SOLDE ---
             const SizedBox(height: 4),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10),
               child: _buildSoldeCard(context),
             ),
-            const SizedBox(height: 6),
-            _buildNavigationItem(
-              context: context,
-              icon: FontAwesomeIcons.solidBell,
-              title: "Notifications",
-              subtitle: (langUserPhone == "fr")
-                  ? "Informations et actions en rapport avec vos actions."
-                  : "Information and actions related to your actions.",
-              badge: _notifCount,
-              onTap: () => _openNotifications(context),
-            ),
-            const SizedBox(height: 6),
-            _buildNavigationItem(
-              context: context,
-              icon: FontAwesomeIcons.solidAddressBook,
-              title: "Contacts",
-              subtitle: (langUserPhone == "fr")
-                  ? "Gérez vos contacts ajoutés"
-                  : "Manage your added contacts",
-              onTap: () => Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => ContactPage()),
-              ),
-            ),
-            const SizedBox(height: 6),
-            _buildNavigationItem(
-              context: context,
-              icon: FontAwesomeIcons.trophy,
-              title: (langUserPhone == "fr") ? "Récompenses" : "Rewards",
-              subtitle: (langUserPhone == "fr")
-                  ? "Gagnez et suivez vos récompenses"
-                  : "Earn and track your rewards",
-              onTap: () => Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => isInscritProgrammeRecompense
-                      ? ProgrammeRecompenseDashboard()
-                      : ProgrammeRecompensePage(optionPage: false),
-                ),
-              ),
-            ),
-            const SizedBox(height: 6),
-            if (!isVendeur) ...[
-              _buildNavigationItem(
-                context: context,
-                icon: FontAwesomeIcons.store,
-                title: (langUserPhone == "fr")
-                    ? "Devenir Vendeur"
-                    : "Become a Vendor",
-                subtitle: (langUserPhone == "fr")
-                    ? "Accédez aux fonctionnalités vendeur"
-                    : "Access vendor features",
-                onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => VendeurAdhesionPage()),
-                ).then((_) => setState(() {})),
-              ),
-              const SizedBox(height: 6),
-            ],
-            _buildNavigationItem(
-              context: context,
-              icon: FontAwesomeIcons.arrowsRotate,
-              title: (langUserPhone == "fr")
-                  ? "Synchronisation avancée"
-                  : "Advanced synchronization",
-              subtitle: (langUserPhone == "fr")
-                  ? "Synchronisez vos contacts avec votre téléphone"
-                  : "Sync your contacts with your phone",
-              onTap: () => Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const SynchroAvance()),
-              ),
-            ),
             const SizedBox(height: 10),
 
-            // --- SECTION COMPTE ---
+            // --- SECTION MON COMPTE ---
             _buildSectionTitle(
                 (langUserPhone == "fr") ? "Mon Compte" : "My Account"),
             _buildMenuContainer(isDark, [
+              _buildMenuRow(
+                  FontAwesomeIcons.solidAddressBook,
+                  (langUserPhone == "fr") ? "Contacts" : "Contacts",
+                  () => Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => ContactPage()))),
+              _buildMenuRow(
+                  FontAwesomeIcons.trophy,
+                  (langUserPhone == "fr") ? "Récompenses" : "Rewards",
+                  () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => isInscritProgrammeRecompense
+                          ? ProgrammeRecompenseDashboard()
+                          : ProgrammeRecompensePage(optionPage: false),
+                    ),
+                  )),
+              if (!isVendeur)
+                _buildMenuRow(
+                    FontAwesomeIcons.store,
+                    (langUserPhone == "fr")
+                        ? "Devenir Vendeur"
+                        : "Become a Vendor",
+                    () => Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => VendeurAdhesionPage()),
+                    ).then((_) => setState(() {}))),
+              _buildMenuRow(
+                  FontAwesomeIcons.arrowsRotate,
+                  (langUserPhone == "fr")
+                      ? "Synchronisation avancée"
+                      : "Advanced Sync",
+                  () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const SynchroAvance()))),
               _buildMenuRow(
                   FontAwesomeIcons.user,
                   (langUserPhone == "fr") ? "Profil" : "Profile",
