@@ -22,8 +22,18 @@ class _UtiliserCodePartenairePageState
   bool get _nomRenseigne => nom != null && nom.toString().trim().isNotEmpty;
   bool get _whatsappConfirme => telIsVerified;
   bool get _emailConfirme => mailIsVerified;
+  bool get _inscritDepuis24h {
+    try {
+      if (createdAt == null) return false;
+      final dateInscription = DateTime.parse(createdAt.toString());
+      return DateTime.now().difference(dateInscription).inHours < 24;
+    } catch (_) {
+      return false;
+    }
+  }
+
   bool get _toutesConditionsRemplies =>
-      _nomRenseigne && _whatsappConfirme && _emailConfirme;
+      _nomRenseigne && _whatsappConfirme && _emailConfirme && _inscritDepuis24h;
 
   Future<void> _utiliserCode() async {
     final code = _codeController.text.trim().toUpperCase();
@@ -189,6 +199,14 @@ class _UtiliserCodePartenairePageState
                         ? "Adresse e-mail confirmée"
                         : "Email address confirmed",
                     fulfilled: _emailConfirme,
+                  ),
+                  Divider(height: 1, indent: 20, endIndent: 20),
+                  _buildConditionRow(
+                    icon: FontAwesomeIcons.clock,
+                    label: langUserPhone == "fr"
+                        ? "Inscrit depuis moins de 24h"
+                        : "Registered less than 24h ago",
+                    fulfilled: _inscritDepuis24h,
                   ),
                 ],
               ),
