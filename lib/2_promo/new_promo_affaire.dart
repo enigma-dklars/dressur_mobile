@@ -616,7 +616,10 @@ class _ProduitsServicesState extends State<ProduitsServices> {
                 style: GoogleFonts.poppins(fontSize: 11)),
             value: _participateInReward,
             activeColor: primaryColor,
-            onChanged: (val) => setState(() => _participateInReward = val),
+            onChanged: (val) => setState(() {
+              _participateInReward = val;
+              if (val) _rewardBudget = 500;
+            }),
           ),
           if (_participateInReward) ...[
             Padding(
@@ -656,15 +659,6 @@ class _ProduitsServicesState extends State<ProduitsServices> {
                       );
                     }).toList(),
                   ),
-                  if (_rewardBudget > 0) ...[
-                    const SizedBox(height: 10),
-                    _infoBox(
-                      (langUserPhone == "fr")
-                          ? "🎁 Pool participants : ${_rewardPoolAmount.toStringAsFixed(0)} FCFA\n💼 Commission Dressur : ${_rewardCommissionAmount.toStringAsFixed(0)} FCFA"
-                          : "🎁 Participant pool: ${_rewardPoolAmount.toStringAsFixed(0)} FCFA\n💼 Dressur fee: ${_rewardCommissionAmount.toStringAsFixed(0)} FCFA",
-                      Colors.orange,
-                    ),
-                  ],
                 ],
               ),
             ),
