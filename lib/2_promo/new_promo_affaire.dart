@@ -212,7 +212,8 @@ class _ProduitsServicesState extends State<ProduitsServices> {
       prixBoost + _rewardProgramAmount + _dressurStatusAmount;
 
   bool _publishOnDressurStatus = false;
-  final int _dressurStatusPricePer7Days = 5000;
+  // 25% du prix de la formule choisie
+  static const double _dressurStatusRate = 0.25;
 
   // --- CALCULS DES MONTANTS ---
   double get _rewardProgramAmount {
@@ -231,9 +232,9 @@ class _ProduitsServicesState extends State<ProduitsServices> {
   }
 
   double get _dressurStatusAmount {
-    if (!_publishOnDressurStatus || jours == 0) return 0.0;
-    // 5000 FCFA pour 7 jours. Règle de 3 basée sur la durée de la formule choisie.
-    return (jours * _dressurStatusPricePer7Days) / 7;
+    if (!_publishOnDressurStatus || prixBoost == 0) return 0.0;
+    // 25% du prix de la formule choisie
+    return prixBoost * _dressurStatusRate;
   }
 
   bool isImageSquare(File imageFile) {
