@@ -660,8 +660,8 @@ class _ProduitsServicesState extends State<ProduitsServices> {
                     const SizedBox(height: 10),
                     _infoBox(
                       (langUserPhone == "fr")
-                          ? "🎁 Pool participants : ${_rewardPoolAmount.toStringAsFixed(0)} FCFA   |   💼 Commission Dressur : ${_rewardCommissionAmount.toStringAsFixed(0)} FCFA"
-                          : "🎁 Participant pool: ${_rewardPoolAmount.toStringAsFixed(0)} FCFA   |   💼 Dressur fee: ${_rewardCommissionAmount.toStringAsFixed(0)} FCFA",
+                          ? "🎁 Pool participants : ${_rewardPoolAmount.toStringAsFixed(0)} FCFA\n💼 Commission Dressur : ${_rewardCommissionAmount.toStringAsFixed(0)} FCFA"
+                          : "🎁 Participant pool: ${_rewardPoolAmount.toStringAsFixed(0)} FCFA\n💼 Dressur fee: ${_rewardCommissionAmount.toStringAsFixed(0)} FCFA",
                       Colors.orange,
                     ),
                   ],
