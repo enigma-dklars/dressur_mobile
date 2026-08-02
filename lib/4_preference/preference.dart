@@ -7,12 +7,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:dressur/4_preference/choix_pays.dart';
 import 'package:dressur/components/constant.dart';
-import 'package:dressur/components/notification_bell.dart';
-import 'package:dressur/components/sociaux.dart';
-import 'package:dressur/5_autre/support_assistance.dart';
-import 'package:dressur/6_assistant/assistant_page.dart';
 import 'package:http/http.dart' as http;
-import 'package:dressur/8_admin/admin.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 const _accountsChannel = MethodChannel('com.dressur.ds/accounts');
@@ -112,9 +107,12 @@ class _PreferencePageState extends State<PreferencePage>
     super.build(context);
     return Scaffold(
         appBar: AppBar(
-          automaticallyImplyLeading: false,
           elevation: 0,
           backgroundColor: primaryColor,
+          leading: IconButton(
+            onPressed: () => Navigator.pop(context),
+            icon: const FaIcon(FontAwesomeIcons.chevronLeft, color: Colors.white),
+          ),
           title: Text(
             (langUserPhone == "fr") ? "Préférences" : "Preferences",
             style: GoogleFonts.poppins(
@@ -123,83 +121,6 @@ class _PreferencePageState extends State<PreferencePage>
               fontSize: 18,
             ),
           ),
-          actions: [
-            if (admin) ...[
-              IconButton(
-                icon: const FaIcon(FontAwesomeIcons.userShield,
-                    size: 20, color: Colors.amber),
-                onPressed: () => Navigator.push(context,
-                    MaterialPageRoute(builder: (_) => AdministrationPage())),
-              ),
-              const Padding(
-                padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
-                child: VerticalDivider(
-                    width: 0, color: Colors.white, thickness: 1),
-              ),
-            ],
-            const NotificationBellAction(),
-            const Padding(
-              padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
-              child: VerticalDivider(
-                width: 0,
-                color: Colors.white,
-                thickness: 1,
-              ),
-            ),
-            PopupMenuButton<int>(
-              itemBuilder: (context) => [
-                PopupMenuItem(
-                  value: 1,
-                  child: Row(
-                    children: [
-                      Text(
-                        (langUserPhone == "fr") ? "Aide" : "Help",
-                        style: GoogleFonts.poppins(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                PopupMenuItem(
-                  value: 2,
-                  child: Row(
-                    children: [
-                      Text(
-                        (langUserPhone == "fr") ? "Assistant IA" : "AI Assistant",
-                        style: GoogleFonts.poppins(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-              offset: const Offset(0, 60),
-              color: primaryColor,
-              icon: const FaIcon(
-                FontAwesomeIcons.bars,
-                color: Colors.white,
-                size: 20,
-              ),
-              elevation: 2,
-              onSelected: (value) {
-                if (value == 1) {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => SupportPage()),
-                  );
-                } else if (value == 2) {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const AssistantPage()),
-                  );
-                }
-              },
-            ),
-          ],
         ),
         body: SingleChildScrollView(
           child: Container(
@@ -220,9 +141,7 @@ class _PreferencePageState extends State<PreferencePage>
                 ),
                 const SizedBox(height: 10),
                 _buildContactStorageCard(context: context),
-                const SizedBox(height: 10),
-                SociauxPage(),
-                const SizedBox(height: 10),
+                const SizedBox(height: 20),
               ],
             ),
           ),
