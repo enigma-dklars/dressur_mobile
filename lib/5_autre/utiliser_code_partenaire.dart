@@ -243,11 +243,16 @@ class _UtiliserCodePartenairePageState
                 counterText: "",
                 prefixIcon: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 14),
-                  child: FaIcon(FontAwesomeIcons.key,
-                      color: _toutesConditionsRemplies
-                          ? primaryColor
-                          : Colors.grey[400],
-                      size: 20),
+                  child: Align(
+                    alignment: Alignment.center,
+                    widthFactor: 1.0,
+                    heightFactor: 1.0,
+                    child: FaIcon(FontAwesomeIcons.key,
+                        color: _toutesConditionsRemplies
+                            ? primaryColor
+                            : Colors.grey[400],
+                        size: 20),
+                  ),
                 ),
               ),
             ),
