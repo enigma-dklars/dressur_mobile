@@ -232,7 +232,7 @@ class _ProduitsServicesState extends State<ProduitsServices> {
   }
 
   double get _dressurStatusAmount {
-    if (!_publishOnDressurStatus || prixBoost == 0) return 0.0;
+    if (!_publishOnDressurStatus || prixBoost < 1000) return 0.0;
     // 25% du prix de la formule choisie
     return prixBoost * _dressurStatusRate;
   }
@@ -434,6 +434,11 @@ class _ProduitsServicesState extends State<ProduitsServices> {
       _message = (langUserPhone == "fr")
           ? "Formule de $jours jour(s) pour $prix FCFA."
           : "Plan of $jours day(s) for $prix FCFA.";
+
+      // Désactiver le Statut WhatsApp si la formule est < 1000 FCFA
+      if (prixBoost < 1000) {
+        _publishOnDressurStatus = false;
+      }
     });
   }
 
@@ -658,7 +663,8 @@ class _ProduitsServicesState extends State<ProduitsServices> {
 
           const SizedBox(height: 15),
 
-          // --- SECTION STATUT WHATSAPP & STORY DRESSUR ---
+          // --- SECTION STATUT WHATSAPP & STORY DRESSUR (formule >= 1000 FCFA) ---
+          if (prixBoost >= 1000) ...[
           _buildOptionHeader(
             FontAwesomeIcons.solidCircleCheck,
             (langUserPhone == "fr")
@@ -697,6 +703,7 @@ class _ProduitsServicesState extends State<ProduitsServices> {
                 ],
               ),
             ),
+          ], // fin if (prixBoost >= 1000)
 
           const SizedBox(height: 15),
           _buildRecap(),
