@@ -44,16 +44,14 @@ class _BottomBarState extends State<BottomBar> with WidgetsBindingObserver {
     ReceptionPage(),
     BoostPage(),
     ActuPage(), // <--- PAGE "ACTU" INTÉGRÉE
-    PreferencePage(),
     SettingPage(),
   ];
 
-  // Icônes pour chaque onglet, y compris "Actu"
+  // Icônes pour chaque onglet
   final List<IconData> _iconList = [
     FontAwesomeIcons.inbox,
     FontAwesomeIcons.briefcase,
     FontAwesomeIcons.newspaper,
-    FontAwesomeIcons.heart,
     FontAwesomeIcons.gear,
   ];
 
