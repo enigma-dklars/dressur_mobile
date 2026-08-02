@@ -10,7 +10,6 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
-import 'package:dressur/1_reception/reception.dart';
 import 'package:dressur/2_promo/services.dart';
 import 'package:dressur/3_actu/actu.dart';
 import 'package:dressur/4_preference/preference.dart';
@@ -27,8 +26,8 @@ class BottomBar extends StatefulWidget {
 }
 
 class _BottomBarState extends State<BottomBar> with WidgetsBindingObserver {
-  // L'index 2 correspond maintenant à la page "Actu"
-  int _selectedIndex = 2;
+  // L'index 1 correspond à la page "Actu"
+  int _selectedIndex = 1;
   int nombreNewContact = 0;
   bool _isInBackground = false;
   DateTime? _lastActualise;
@@ -36,12 +35,11 @@ class _BottomBarState extends State<BottomBar> with WidgetsBindingObserver {
   Timer? _timerNotif;
   Timer? _timerSync;
 
-  final PageController _pageController = PageController(initialPage: 2);
+  final PageController _pageController = PageController(initialPage: 1);
 
   // --- Listes pour la barre de navigation ---
   // "ActuPage" est maintenant au centre de la liste des écrans
   final List<Widget> _screens = [
-    ReceptionPage(),
     BoostPage(),
     ActuPage(), // <--- PAGE "ACTU" INTÉGRÉE
     SettingPage(),
@@ -49,7 +47,6 @@ class _BottomBarState extends State<BottomBar> with WidgetsBindingObserver {
 
   // Icônes pour chaque onglet
   final List<IconData> _iconList = [
-    FontAwesomeIcons.inbox,
     FontAwesomeIcons.briefcase,
     FontAwesomeIcons.newspaper,
     FontAwesomeIcons.gear,
