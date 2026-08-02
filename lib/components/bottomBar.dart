@@ -52,6 +52,13 @@ class _BottomBarState extends State<BottomBar> with WidgetsBindingObserver {
     FontAwesomeIcons.gear,
   ];
 
+  // Labels pour chaque onglet
+  List<String> get _labelList => [
+    (langUserPhone == "fr") ? "Services" : "Services",
+    (langUserPhone == "fr") ? "Actu" : "News",
+    (langUserPhone == "fr") ? "Paramètres" : "Settings",
+  ];
+
   @override
   void initState() {
     super.initState();
@@ -236,31 +243,26 @@ class _BottomBarState extends State<BottomBar> with WidgetsBindingObserver {
         bottomNavigationBar: AnimatedBottomNavigationBar.builder(
           itemCount: _iconList.length,
           tabBuilder: (int index, bool isActive) {
-            // Pour cette version, nous utilisons toujours les icônes "outlined"
-            // pour un look plus épuré.
             final color = isActive ? primaryColor : Colors.grey[500];
 
             return Column(
               mainAxisSize: MainAxisSize.min,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // L'icône
                 FaIcon(
                   _iconList[index],
-                  size: isActive ? 24 : 18, // L'icône active est plus grande
+                  size: isActive ? 22 : 18,
                   color: color,
                 ),
                 SizedBox(height: 4),
-                // L'indicateur animé
-                AnimatedContainer(
-                  duration: Duration(milliseconds: 200),
-                  height: 4,
-                  width: isActive ? 12 : 0, // L'indicateur apparaît si actif
-                  decoration: BoxDecoration(
-                    color: primaryColor,
-                    borderRadius: BorderRadius.circular(2),
+                Text(
+                  _labelList[index],
+                  style: GoogleFonts.poppins(
+                    fontSize: 10,
+                    fontWeight: isActive ? FontWeight.w600 : FontWeight.w400,
+                    color: color,
                   ),
-                )
+                ),
               ],
             );
           },
