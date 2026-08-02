@@ -202,10 +202,7 @@ class _ProduitsServicesState extends State<ProduitsServices> {
 
   int prixBoost = 0;
   bool _participateInReward = false;
-  int _totalViewsGoal = 2500;
-
-  final TextEditingController _viewsController =
-      TextEditingController(text: "2500");
+  int _rewardBudget = 0; // Budget choisi : 500, 1000, 2000 ou 5000 FCFA
 
   int joursBoost = 0;
   double get _subTotal =>
@@ -217,19 +214,13 @@ class _ProduitsServicesState extends State<ProduitsServices> {
 
   // --- CALCULS DES MONTANTS ---
   double get _rewardProgramAmount {
-    if (!_participateInReward) return 0.0;
-
-    // --- MODIFICATION : CALCUL DYNAMIQUE BASÉ SUR _totalViewsGoal ---
-    // On s'assure que le calcul utilise au minimum 2500 vues
-    int effectiveViews = _totalViewsGoal < 2500 ? 2500 : _totalViewsGoal;
-
-    // Règle de 3 : 4000 vues = 2500 FCFA de récompense
-    // Montant de base = (vues * 2500) / 4000
-    double baseReward = (effectiveViews * 2500) / 4000;
-
-    // Ajout de 20% de commission plateforme
-    return baseReward * 1.2;
+    if (!_participateInReward || _rewardBudget == 0) return 0.0;
+    // Budget fixe choisi par le promoteur (inclut 20% commission Dressur)
+    return _rewardBudget.toDouble();
   }
+
+  double get _rewardPoolAmount => _rewardBudget * 0.8;
+  double get _rewardCommissionAmount => _rewardBudget * 0.2;
 
   double get _dressurStatusAmount {
     if (!_publishOnDressurStatus || prixBoost < 1000) return 0.0;
@@ -303,7 +294,7 @@ class _ProduitsServicesState extends State<ProduitsServices> {
 
     // Envoi des nouvelles options (à traiter en back-end plus tard)
     request.fields['inProgrammeRecompense'] = _participateInReward ? "1" : "0";
-    request.fields['totalViewsGoal'] = _totalViewsGoal.toString();
+    request.fields['rewardBudget'] = _rewardBudget.toString();
     request.fields['publishOnDressurStatus'] =
         _publishOnDressurStatus ? "1" : "0";
     request.fields['totalAmount'] = _subTotal.toStringAsFixed(0);
@@ -339,8 +330,6 @@ class _ProduitsServicesState extends State<ProduitsServices> {
 
           // 3. Réinitialisation des contrôleurs de texte
           _textEditingController.clear(); // Description
-          _viewsController.text = "2500"; // Vues par défaut
-          // telController.text = tel;    // Optionnel : remettre le tel par défaut si besoin
 
           // 4. Réinitialisation des messages et labels
           _message = (langUserPhone == "fr")
@@ -350,7 +339,7 @@ class _ProduitsServicesState extends State<ProduitsServices> {
 
           // 5. Réinitialisation des options spécifiques (Reward & Status)
           _participateInReward = false;
-          _totalViewsGoal = 2500;
+          _rewardBudget = 0;
           _publishOnDressurStatus = false;
 
           // 6. Réinitialisation du mode de paiement par défaut
@@ -442,22 +431,14 @@ class _ProduitsServicesState extends State<ProduitsServices> {
     });
   }
 
-  // --- MODIFICATION : AJOUT D'UN LISTENER POUR LES VUES ---
   @override
   void initState() {
     super.initState();
     listeFormulePromoAffaire();
-    _viewsController.addListener(() {
-      final val = int.tryParse(_viewsController.text) ?? 0;
-      setState(() {
-        _totalViewsGoal = val;
-      });
-    });
   }
 
   @override
   void dispose() {
-    _viewsController.dispose();
     super.dispose();
   }
 
@@ -642,20 +623,48 @@ class _ProduitsServicesState extends State<ProduitsServices> {
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Column(
                 children: [
-                  // --- MODIFICATION : UTILISATION DU CONTROLLER ---
-                  _buildNumberInput(
+                  Text(
                     (langUserPhone == "fr")
-                        ? "Objectif de vues total (min. 2500)"
-                        : "Total views goal (min. 2500)",
-                    _viewsController,
+                        ? "Choisissez votre budget récompenses"
+                        : "Choose your reward budget",
+                    style: GoogleFonts.poppins(fontSize: 13, fontWeight: FontWeight.w500),
                   ),
                   const SizedBox(height: 10),
-                  _infoBox(
-                    (langUserPhone == "fr")
-                        ? "Montant de récompense : ${_rewardProgramAmount.toStringAsFixed(0)} FCFA"
-                        : "Reward amount: ${_rewardProgramAmount.toStringAsFixed(0)} FCFA",
-                    Colors.orange,
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: [500, 1000, 2000, 5000].map((budget) {
+                      final selected = _rewardBudget == budget;
+                      return GestureDetector(
+                        onTap: () => setState(() => _rewardBudget = budget),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+                          decoration: BoxDecoration(
+                            color: selected ? primaryColor : Colors.transparent,
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(color: primaryColor),
+                          ),
+                          child: Text(
+                            "${budget == 1000 ? '1 000' : budget == 2000 ? '2 000' : budget == 5000 ? '5 000' : budget} F",
+                            style: GoogleFonts.poppins(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                              color: selected ? Colors.white : primaryColor,
+                            ),
+                          ),
+                        ),
+                      );
+                    }).toList(),
                   ),
+                  if (_rewardBudget > 0) ...[
+                    const SizedBox(height: 10),
+                    _infoBox(
+                      (langUserPhone == "fr")
+                          ? "🎁 Pool participants : ${_rewardPoolAmount.toStringAsFixed(0)} FCFA   |   💼 Commission Dressur : ${_rewardCommissionAmount.toStringAsFixed(0)} FCFA"
+                          : "🎁 Participant pool: ${_rewardPoolAmount.toStringAsFixed(0)} FCFA   |   💼 Dressur fee: ${_rewardCommissionAmount.toStringAsFixed(0)} FCFA",
+                      Colors.orange,
+                    ),
+                  ],
                 ],
               ),
             ),
