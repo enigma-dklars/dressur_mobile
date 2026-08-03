@@ -199,6 +199,7 @@ class _ProduitsServicesState extends State<ProduitsServices> {
   int prix = 0;
   int jours = 0;
   final telController = TextEditingController(text: tel);
+  final whatsappContactController = TextEditingController(text: tel);
 
   int prixBoost = 0;
   bool _participateInReward = false;
@@ -301,6 +302,16 @@ class _ProduitsServicesState extends State<ProduitsServices> {
         return;
       }
     }
+    final waRegex = RegExp(r'^\+\d{11,}$');
+    if (!waRegex.hasMatch(whatsappContactController.text.trim())) {
+      dangerNoti(
+          "Attention !!!",
+          (langUserPhone == "fr")
+              ? "Le numéro WhatsApp de contact doit commencer par + suivi d'au moins 11 chiffres."
+              : "WhatsApp contact number must start with + followed by at least 11 digits.",
+          context);
+      return;
+    }
     setState(() => _isSending = true);
     final url = Uri.parse('$generalRouteForApi/addProduitService');
     final request = http.MultipartRequest('POST', url);
@@ -318,6 +329,7 @@ class _ProduitsServicesState extends State<ProduitsServices> {
         _publishOnDressurStatus ? "1" : "0";
     request.fields['boostFacebook'] = _boostFacebook ? "1" : "0";
     request.fields['montantBoostFacebook'] = _boostFacebookAmountController.text;
+    request.fields['whatsappContact'] = whatsappContactController.text.trim();
     request.fields['totalAmount'] = _subTotal.toStringAsFixed(0);
 
     final tempDir = await getTemporaryDirectory();
@@ -351,6 +363,7 @@ class _ProduitsServicesState extends State<ProduitsServices> {
 
           // 3. Réinitialisation des contrôleurs de texte
           _textEditingController.clear(); // Description
+          whatsappContactController.text = tel; // Remettre le numéro utilisateur
 
           // 4. Réinitialisation des messages et labels
           _message = (langUserPhone == "fr")
@@ -463,6 +476,7 @@ class _ProduitsServicesState extends State<ProduitsServices> {
   @override
   void dispose() {
     _boostFacebookAmountController.dispose();
+    whatsappContactController.dispose();
     super.dispose();
   }
 
@@ -622,6 +636,31 @@ class _ProduitsServicesState extends State<ProduitsServices> {
               decoration: InputDecoration(
                   labelText: 'Description',
                   border: const OutlineInputBorder())),
+
+          const SizedBox(height: 10),
+
+          // --- WHATSAPP CONTACT ---
+          TextFormField(
+            controller: whatsappContactController,
+            keyboardType: TextInputType.phone,
+            decoration: InputDecoration(
+              labelText: (langUserPhone == "fr")
+                  ? 'Numéro WhatsApp de contact'
+                  : 'WhatsApp contact number',
+              hintText: '+22890000000',
+              prefixIcon: const Icon(Icons.whatsapp, color: Colors.green),
+              border: const OutlineInputBorder(),
+            ),
+            validator: (value) {
+              final waRegex = RegExp(r'^\+\d{11,}$');
+              if (value == null || !waRegex.hasMatch(value.trim())) {
+                return (langUserPhone == "fr")
+                    ? 'Format invalide : + suivi d\'au moins 11 chiffres'
+                    : 'Invalid format: + followed by at least 11 digits';
+              }
+              return null;
+            },
+          ),
 
           const SizedBox(height: 10),
 
