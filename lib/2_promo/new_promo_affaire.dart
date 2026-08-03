@@ -203,10 +203,17 @@ class _ProduitsServicesState extends State<ProduitsServices> {
   int prixBoost = 0;
   bool _participateInReward = false;
   int _rewardBudget = 0; // Budget choisi : 500, 1000, 2000 ou 5000 FCFA
+  bool _boostFacebook = false;
+  final _boostFacebookAmountController = TextEditingController(text: '700');
 
   int joursBoost = 0;
+  double get _boostFacebookAmount {
+    if (!_boostFacebook) return 0.0;
+    return (int.tryParse(_boostFacebookAmountController.text) ?? 0).toDouble();
+  }
+
   double get _subTotal =>
-      prixBoost + _rewardProgramAmount + _dressurStatusAmount;
+      prixBoost + _rewardProgramAmount + _dressurStatusAmount + _boostFacebookAmount;
 
   bool _publishOnDressurStatus = false;
   // 25% du prix de la formule choisie
@@ -282,6 +289,18 @@ class _ProduitsServicesState extends State<ProduitsServices> {
           context);
       return;
     }
+    if (_boostFacebook) {
+      final amount = int.tryParse(_boostFacebookAmountController.text) ?? 0;
+      if (amount < 700) {
+        dangerNoti(
+            "Attention !!!",
+            (langUserPhone == "fr")
+                ? "Le montant minimum pour le boost Facebook est de 700 FCFA."
+                : "The minimum amount for the Facebook boost is 700 FCFA.",
+            context);
+        return;
+      }
+    }
     setState(() => _isSending = true);
     final url = Uri.parse('$generalRouteForApi/addProduitService');
     final request = http.MultipartRequest('POST', url);
@@ -297,6 +316,8 @@ class _ProduitsServicesState extends State<ProduitsServices> {
     request.fields['rewardBudget'] = _rewardBudget.toString();
     request.fields['publishOnDressurStatus'] =
         _publishOnDressurStatus ? "1" : "0";
+    request.fields['boostFacebook'] = _boostFacebook ? "1" : "0";
+    request.fields['montantBoostFacebook'] = _boostFacebookAmountController.text;
     request.fields['totalAmount'] = _subTotal.toStringAsFixed(0);
 
     final tempDir = await getTemporaryDirectory();
@@ -337,10 +358,12 @@ class _ProduitsServicesState extends State<ProduitsServices> {
               : "Please choose a plan.";
           label = "";
 
-          // 5. Réinitialisation des options spécifiques (Reward & Status)
+          // 5. Réinitialisation des options spécifiques (Reward & Status & Boost Facebook)
           _participateInReward = false;
           _rewardBudget = 0;
           _publishOnDressurStatus = false;
+          _boostFacebook = false;
+          _boostFacebookAmountController.text = '700';
 
           // 6. Réinitialisation du mode de paiement par défaut
           valueMethodePaiement = "mtn";
@@ -439,6 +462,7 @@ class _ProduitsServicesState extends State<ProduitsServices> {
 
   @override
   void dispose() {
+    _boostFacebookAmountController.dispose();
     super.dispose();
   }
 
@@ -496,6 +520,12 @@ class _ProduitsServicesState extends State<ProduitsServices> {
                     ? "Statut WhatsApp & Story Dressur"
                     : "WhatsApp Status & Story Dressur",
                 _dressurStatusAmount),
+          if (_boostFacebook)
+            _recapRow(
+                (langUserPhone == "fr")
+                    ? "Boost Facebook"
+                    : "Facebook Boost",
+                _boostFacebookAmount),
           Divider(height: 20),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -707,6 +737,49 @@ class _ProduitsServicesState extends State<ProduitsServices> {
               ),
             ),
           ], // fin if (prixBoost >= 1000)
+
+          const SizedBox(height: 15),
+
+          // --- SECTION BOOST PAGE FACEBOOK ---
+          _buildOptionHeader(
+              FontAwesomeIcons.facebookF,
+              (langUserPhone == "fr")
+                  ? "Boost Page Facebook Dressur"
+                  : "Dressur Facebook Page Boost",
+              _boostFacebook),
+          SwitchListTile(
+            title: Text(
+                (langUserPhone == "fr")
+                    ? "Publier et booster sur la page Facebook de Dressur"
+                    : "Post and boost on Dressur's Facebook page",
+                style: GoogleFonts.poppins(
+                    fontSize: 14, fontWeight: FontWeight.w500)),
+            subtitle: Text(
+                (langUserPhone == "fr")
+                    ? "Votre promotion sera publiée sur la page Facebook officielle de Dressur et boostée auprès d'une audience ciblée. Budget minimum 700 FCFA."
+                    : "Your promotion will be posted on Dressur's official Facebook page and boosted to a targeted audience. Minimum budget 700 FCFA.",
+                style: GoogleFonts.poppins(fontSize: 11)),
+            value: _boostFacebook,
+            activeColor: primaryColor,
+            onChanged: (val) => setState(() => _boostFacebook = val),
+          ),
+          if (_boostFacebook) ...[
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: TextField(
+                controller: _boostFacebookAmountController,
+                keyboardType: TextInputType.number,
+                onChanged: (_) => setState(() {}),
+                decoration: InputDecoration(
+                  labelText: (langUserPhone == "fr")
+                      ? "Budget boost (min. 700 FCFA)"
+                      : "Boost budget (min. 700 FCFA)",
+                  border: const OutlineInputBorder(),
+                  suffixText: "FCFA",
+                ),
+              ),
+            ),
+          ],
 
           const SizedBox(height: 15),
           _buildRecap(),
