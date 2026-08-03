@@ -648,7 +648,7 @@ class _ProduitsServicesState extends State<ProduitsServices> {
                   ? 'Numéro WhatsApp de contact'
                   : 'WhatsApp contact number',
               hintText: '+22890000000',
-              prefixIcon: const Icon(Icons.whatsapp, color: Colors.green),
+              prefixIcon: Icon(FontAwesomeIcons.whatsapp, color: Colors.green),
               border: const OutlineInputBorder(),
             ),
             validator: (value) {
