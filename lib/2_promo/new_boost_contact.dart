@@ -1,4 +1,5 @@
 // ignore_for_file: use_build_context_synchronously
+import 'package:dressur/2_promo/boost_success_checklist.dart';
 import 'package:dressur/2_promo/liste_boost_contact.dart';
 import 'package:dressur/components/noti_sys.dart';
 import 'package:flutter/material.dart';
@@ -157,7 +158,7 @@ class _NewBoostContactPageState extends State<NewBoostContactPage> {
                   _isPaid
                       ? RegisterForm2(
                           key: ValueKey(_typeBoost), typeBoost: _typeBoost)
-                      : RegisterForm(typeBoost: _typeBoost),
+                      : RegisterForm(typeBoost: _typeBoost, nbMax: _freeNbContactsMax),
                   const SizedBox(height: 24),
                 ],
               ),
@@ -416,7 +417,8 @@ class _NewBoostContactPageState extends State<NewBoostContactPage> {
 // ─────────────────────────────────────────────────────────────────────────────
 class RegisterForm extends StatefulWidget {
   final String typeBoost;
-  const RegisterForm({super.key, required this.typeBoost});
+  final int nbMax;
+  const RegisterForm({super.key, required this.typeBoost, required this.nbMax});
   @override
   State<RegisterForm> createState() => _RegisterFormState();
 }
@@ -440,19 +442,16 @@ class _RegisterFormState extends State<RegisterForm> {
           var data = convert.jsonDecode(data1);
           if (data["error"] == false) {
             cancelBoostReminderNotification();
-            setState(() {
-              _desactive = false;
-              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                backgroundColor: Colors.green,
-                behavior: SnackBarBehavior.floating,
-                duration: const Duration(seconds: 15),
-                content: Text(data["message"],
-                    style: GoogleFonts.poppins(color: Colors.white)),
-              ));
-              Navigator.pop(context);
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => ListeBoostContactPage()));
-            });
+            setState(() => _desactive = false);
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => BoostSuccessChecklistPage(
+                  typeBoost: widget.typeBoost,
+                  nbMax: widget.nbMax,
+                ),
+              ),
+            );
           } else {
             dangerNoti(data["titre"], data["message"], context);
             setState(() => _desactive = false);
@@ -635,10 +634,15 @@ class _RegisterForm2State extends State<RegisterForm2> {
           if (data["error"] == false) {
             setState(() => _desactive2 = false);
             if (data["solde_used"] == true) {
-              successNoti(
-                  (langUserPhone == "fr") ? "Succès" : "Success",
-                  data["message"] ?? ((langUserPhone == "fr") ? "Solde débité. Boost Contact enregistré." : "Balance debited. Boost Contact registered."),
-                  context);
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => BoostSuccessChecklistPage(
+                    typeBoost: widget.typeBoost,
+                    nbMax: nbContactsMax ?? 0,
+                  ),
+                ),
+              );
             } else if (data["direct"] == true) {
               dangerNoti(
                   (langUserPhone == "fr") ? "Attention !!!" : "Attention !!!",

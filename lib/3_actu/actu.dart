@@ -6,6 +6,7 @@ import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dressur/1_reception/liste_contact.dart';
+import 'package:dressur/2_promo/liste_boost_contact.dart';
 import 'package:dressur/2_promo/new_boost_contact.dart';
 import 'package:dressur/6_assistant/assistant_page.dart';
 import 'package:dressur/5_autre/profil_user.dart';
@@ -210,6 +211,13 @@ class _ActuPageState extends State<ActuPage>
   bool _firstLoad = true;
   List<StoryModel> _stories = [];
 
+  // ── Bandeau statut boost ───────────────────────────────────────────────────
+  String? _boostTypeActif;
+  int _boostNbObtenus = 0;
+  int _boostNbMax = 0;
+  bool _bandeauDismissed = false;
+  int _bandeauDismissedContactCount = -1;
+
   @override
   void initState() {
     super.initState();
@@ -366,6 +374,15 @@ class _ActuPageState extends State<ActuPage>
             print(jsonDecode(lesPublicites).length);
             _futureAdvertisements = fetchAdvertisements();
             _loading = false;
+            // ── Infos boost actif (retournées par l'API si disponibles) ──
+            _boostTypeActif = data['user']['boostTypeActif'] as String?;
+            _boostNbObtenus = (data['user']['boostNbObtenus'] as int?) ?? 0;
+            _boostNbMax     = (data['user']['boostNbMax']     as int?) ?? 0;
+            // Réafficher le bandeau si de nouveaux contacts sont disponibles
+            if (nombreContactDispo > 0 &&
+                nombreContactDispo != _bandeauDismissedContactCount) {
+              _bandeauDismissed = false;
+            }
           });
           _savePromoCache(lesPublicites);
         } else {
@@ -939,6 +956,109 @@ class _ActuPageState extends State<ActuPage>
     );
   }
 
+  // ── Bandeau statut global ─────────────────────────────────────────────────
+  Widget? _buildBandeau(BuildContext context) {
+    final bool isFr = langUserPhone == 'fr';
+
+    // Si l'utilisateur a fermé le bandeau pour cette session, ne pas afficher
+    if (_bandeauDismissed) return null;
+
+    Color bgColor;
+    String text;
+    String btnLabel;
+    VoidCallback onBtnTap;
+    Widget? secondBtn;
+
+    if (nombreContactDispo > 0) {
+      // ─ CAS 1 : contacts disponibles ──────────────────────────────────────
+      bgColor = const Color(0xFF4CAF50);
+      text = isFr
+          ? '📥 ${nombreContactDispo} contact(s) à enregistrer'
+          : '📥 ${nombreContactDispo} contact(s) to save';
+      btnLabel = isFr ? 'Enregistrer' : 'Save';
+      onBtnTap = () => addTousLesContacts();
+    } else if (boostEnCours) {
+      // ─ CAS 2 : boost actif ───────────────────────────────────────────────
+      bgColor = const Color(0xFF2196F3);
+      if (_boostTypeActif == 'quota' && _boostNbMax > 0) {
+        text = isFr
+            ? '🔵 Boost actif — $_boostNbObtenus/$_boostNbMax contacts reçus'
+            : '🔵 Active boost — $_boostNbObtenus/$_boostNbMax contacts received';
+      } else {
+        text = isFr ? '🔵 Boost Contact actif' : '🔵 Active Boost Contact';
+      }
+      btnLabel = isFr ? 'Voir' : 'View';
+      onBtnTap = () => Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => ListeBoostContactPage()),
+          );
+    } else if (!boostEnCours && nombreContacts > 0) {
+      // ─ CAS 3 : boost expiré ──────────────────────────────────────────────
+      bgColor = const Color(0xFFFF9800);
+      text = isFr
+          ? '🔴 Votre boost est terminé — Relancez pour continuer'
+          : '🔴 Your boost ended — Restart to keep receiving contacts';
+      btnLabel = isFr ? 'Relancer' : 'Restart';
+      onBtnTap = () => Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => NewBoostContactPage()),
+          );
+    } else {
+      return null;
+    }
+
+    return Container(
+      width: double.infinity,
+      color: bgColor,
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(
+              text,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 13,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.white,
+              foregroundColor: bgColor,
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              minimumSize: Size.zero,
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+              elevation: 0,
+            ),
+            onPressed: onBtnTap,
+            child: Text(
+              btnLabel,
+              style: const TextStyle(
+                fontWeight: FontWeight.w600,
+                fontSize: 12,
+              ),
+            ),
+          ),
+          const SizedBox(width: 6),
+          GestureDetector(
+            onTap: () => setState(() {
+              _bandeauDismissed = true;
+              _bandeauDismissedContactCount = nombreContactDispo;
+            }),
+            child: const Icon(Icons.close, color: Colors.white, size: 18),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     super.build(context);
@@ -1061,6 +1181,11 @@ class _ActuPageState extends State<ActuPage>
       ),
       body: Column(
         children: [
+          // ── Bandeau statut global collant ─────────────────────────────────
+          Builder(builder: (ctx) {
+            final bandeau = _buildBandeau(ctx);
+            return bandeau ?? const SizedBox.shrink();
+          }),
           Expanded(
             child: RefreshIndicator(
               onRefresh: _refreshData,
