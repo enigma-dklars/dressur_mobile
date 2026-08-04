@@ -375,9 +375,15 @@ class _ActuPageState extends State<ActuPage>
             _futureAdvertisements = fetchAdvertisements();
             _loading = false;
             // ── Infos boost actif (retournées par l'API si disponibles) ──
-            _boostTypeActif = data['user']['boostTypeActif'] as String?;
-            _boostNbObtenus = (data['user']['boostNbObtenus'] as int?) ?? 0;
-            _boostNbMax     = (data['user']['boostNbMax']     as int?) ?? 0;
+            _boostTypeActif = data['user']['boostTypeActif']?.toString();
+            // Utiliser int.tryParse pour éviter un TypeError si l'API renvoie
+            // un String au lieu d'un int (ex: "5" au lieu de 5).
+            _boostNbObtenus = int.tryParse(
+                    data['user']['boostNbObtenus']?.toString() ?? '') ??
+                0;
+            _boostNbMax = int.tryParse(
+                    data['user']['boostNbMax']?.toString() ?? '') ??
+                0;
             // Réafficher le bandeau si de nouveaux contacts sont disponibles
             if (nombreContactDispo > 0 &&
                 nombreContactDispo != _bandeauDismissedContactCount) {
@@ -992,8 +998,12 @@ class _ActuPageState extends State<ActuPage>
             context,
             MaterialPageRoute(builder: (_) => ListeBoostContactPage()),
           );
-    } else if (!boostEnCours && nombreContacts > 0) {
-      // ─ CAS 3 : boost expiré ──────────────────────────────────────────────
+    } else if (!boostEnCours && (_boostNbMax > 0 || _boostNbObtenus > 0)) {
+      // ─ CAS 3 : boost expiré (l'API a renvoyé des données de boost mais
+      //   boostEnCours est false → quota atteint ou durée écoulée).
+      //   On n'utilise plus nombreContacts > 0 pour éviter d'afficher le
+      //   bandeau à tout utilisateur ayant déjà eu des contacts sans avoir
+      //   de boost actif ou récemment expiré.
       bgColor = const Color(0xFFFF9800);
       text = isFr
           ? '🔴 Votre boost est terminé — Relancez pour continuer'
