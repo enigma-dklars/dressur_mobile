@@ -10,10 +10,12 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:dressur/2_promo/services.dart';
 import 'package:dressur/3_actu/actu.dart';
 import 'package:dressur/5_autre/autre.dart';
 import 'package:dressur/components/constant.dart';
+import 'package:dressur/components/contacts_pending_interrupt.dart';
 import 'package:dressur/components/sql_helper.dart';
 import 'package:dressur/components/noti_sys.dart';
 
@@ -58,11 +60,98 @@ class _BottomBarState extends State<BottomBar> with WidgetsBindingObserver {
     (langUserPhone == "fr") ? "Paramètres" : "Settings",
   ];
 
+  // ── Enregistrement des contacts (miroir de actu.dart) ─────────────────────
+  Future<void> _addTousLesContacts() async {
+    try {
+      var request = http.MultipartRequest(
+          'POST',
+          Uri.parse(
+              '$generalRouteForApi/addTousUserContact/$uidUser/${langUserPhone.toString()}'));
+      request.fields.addAll({'uid': uidUser});
+      http.StreamedResponse response = await request.send();
+      if (response.statusCode == 200) {
+        var data1 = await response.stream.bytesToString();
+        var data = convert.jsonDecode(data1);
+        if (data['error'] == false && (data['contactsAdd'] as List).isNotEmpty) {
+          for (var contactAdd in data['contactsAdd']) {
+            if ((await SQLHelper.getOneNumsTelUser(contactAdd['tel'])).isEmpty) {
+              final String tel = (contactAdd['tel'] as String);
+              final String telSansPlus = tel.replaceAll('+', '');
+              final List<Phone> phonesList = [Phone(tel)];
+              if (tel.startsWith('+229') && !tel.startsWith('+22901')) {
+                final String afterCode = tel.substring(4);
+                phonesList.add(Phone('+22901$afterCode'));
+              }
+              final String nom = (contactAdd['nom'] ?? '').toString().trim();
+              final String pseudo = contactAdd['pseudo'] as String;
+              final List<String> nameParts =
+                  [nom, pseudo, telSansPlus].where((s) => s.isNotEmpty).toList();
+              final newContact = Contact()
+                ..name.first = '${nameParts.join(' - ')} #DS'
+                ..phones = phonesList;
+              await newContact.insert();
+              await insertNumTelUserIntoDataBase(contactAdd['tel']);
+            }
+          }
+          if (mounted) {
+            setState(() {
+              nombreContactDispo =
+                  (nombreContactDispo - (data['contactsAdd'] as List).length)
+                      .clamp(0, 9999);
+            });
+          }
+        }
+      }
+    } catch (_) {}
+  }
+
+  // ── Interrupt au démarrage si contacts disponibles ────────────────────────
+  Future<void> _maybeShowContactsInterrupt() async {
+    if (nombreContactDispo <= 0) return;
+    if (!mounted) return;
+
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final lastShown = prefs.getInt('last_contacts_interrupt') ?? 0;
+      final now = DateTime.now().millisecondsSinceEpoch;
+      final elapsed = now - lastShown;
+
+      // N'afficher que si > 4 heures depuis le dernier affichage
+      if (elapsed < const Duration(hours: 4).inMilliseconds) return;
+
+      await prefs.setInt('last_contacts_interrupt', now);
+
+      if (!mounted) return;
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) => ContactsPendingInterruptPage(
+            nombreContacts: nombreContactDispo,
+            onSaveNow: () => _addTousLesContacts(),
+            onLater: () {
+              // Navigue vers l'onglet Actu (index 1)
+              _pageController.animateToPage(
+                1,
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeInOut,
+              );
+              setState(() => _selectedIndex = 1);
+            },
+          ),
+        ),
+      );
+    } catch (_) {}
+  }
+
   @override
   void initState() {
     super.initState();
     saveContactDsIfNotExiste();
     WidgetsBinding.instance.addObserver(this);
+
+    // Vérifier au démarrage si des contacts sont déjà disponibles (set lors du login)
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _maybeShowContactsInterrupt();
+    });
     if (modeReconnaissanceContactArrierePlan == true) {
       synchroAvanceFunction();
       setState(() {
@@ -166,6 +255,8 @@ class _BottomBarState extends State<BottomBar> with WidgetsBindingObserver {
             initUserInformations(data['user']);
             lesPublicites = data['user']["lesPublicites"];
           });
+          // Afficher l'interrupt si des contacts sont disponibles
+          _maybeShowContactsInterrupt();
         }
       }
       if (!mounted) return;
