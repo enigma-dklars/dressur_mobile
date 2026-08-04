@@ -36,6 +36,11 @@ class _BottomBarState extends State<BottomBar> with WidgetsBindingObserver {
   Timer? _timerNotif;
   Timer? _timerSync;
 
+  /// Verrou pour éviter la race condition : deux appels concurrents à
+  /// _maybeShowContactsInterrupt() (postFrameCallback + refresh data)
+  /// pourraient tous deux passer le test du throttle et empiler deux modals.
+  bool _interruptLock = false;
+
   final PageController _pageController = PageController(initialPage: 1);
 
   // --- Listes pour la barre de navigation ---
@@ -107,10 +112,15 @@ class _BottomBarState extends State<BottomBar> with WidgetsBindingObserver {
 
   // ── Interrupt au démarrage si contacts disponibles ────────────────────────
   Future<void> _maybeShowContactsInterrupt() async {
-    if (nombreContactDispo <= 0) return;
-    if (!mounted) return;
+    // Verrou : si un appel concurrent est déjà en cours, on abandonne immédiatement
+    // pour éviter d'empiler deux pages d'interrupt dans le navigator.
+    if (_interruptLock) return;
+    _interruptLock = true;
 
     try {
+      if (nombreContactDispo <= 0) return;
+      if (!mounted) return;
+
       final prefs = await SharedPreferences.getInstance();
       final lastShown = prefs.getInt('last_contacts_interrupt') ?? 0;
       final now = DateTime.now().millisecondsSinceEpoch;
@@ -122,7 +132,7 @@ class _BottomBarState extends State<BottomBar> with WidgetsBindingObserver {
       await prefs.setInt('last_contacts_interrupt', now);
 
       if (!mounted) return;
-      Navigator.of(context).push(
+      await Navigator.of(context).push(
         MaterialPageRoute(
           builder: (_) => ContactsPendingInterruptPage(
             nombreContacts: nombreContactDispo,
@@ -139,7 +149,10 @@ class _BottomBarState extends State<BottomBar> with WidgetsBindingObserver {
           ),
         ),
       );
-    } catch (_) {}
+    } finally {
+      // Libérer le verrou dans tous les cas (return anticipé ou push terminé)
+      _interruptLock = false;
+    }
   }
 
   @override
