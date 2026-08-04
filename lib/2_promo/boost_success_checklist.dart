@@ -26,19 +26,27 @@ class _BoostSuccessChecklistPageState
 
   List<String> _buildItems() {
     final bool isFr = langUserPhone == 'fr';
+    final String item4 = addPageActu
+        ? (isFr
+            ? "Sur l'onglet Actu, appuyez sur 'Enregistrer les contacts' dès que vous en voyez de disponibles"
+            : "On the News tab, tap 'Save contacts' as soon as you see some available")
+        : (isFr
+            ? "Allez dans Boîte de Réception → Contacts pour retrouver vos contacts obtenus"
+            : "Go to Inbox → Contacts to find your received contacts");
+
     if (widget.typeBoost == 'quota') {
       return isFr
           ? [
               "Ouvrez l'application au moins 4 fois par jour pour ne manquer aucun contact disponible",
               "Surveillez votre progression dans Services → Voir la liste. Quand vos ${widget.nbMax} contacts sont reçus, votre boost s'arrête automatiquement",
               "Dès que votre quota est atteint, revenez faire un nouveau boost pour continuer à recevoir des contacts",
-              "Sur l'onglet Actu, appuyez sur 'Enregistrer les contacts' dès que vous en voyez de disponibles",
+              item4,
             ]
           : [
               "Open the app at least 4 times a day to not miss any available contact",
               "Monitor your progress in Services → View list. When your ${widget.nbMax} contacts are received, your boost stops automatically",
               "Once your quota is reached, come back to start a new boost to keep receiving contacts",
-              "On the News tab, tap 'Save contacts' as soon as you see some available",
+              item4,
             ];
     } else {
       return isFr
@@ -46,13 +54,13 @@ class _BoostSuccessChecklistPageState
               "Ouvrez l'application au moins 4 fois par jour pour ne manquer aucun contact disponible",
               "Surveillez la date de fin de votre boost dans Services → Voir la liste",
               "Dès que votre boost expire, revenez immédiatement faire un nouveau boost pour continuer à recevoir des contacts",
-              "Sur l'onglet Actu, appuyez sur 'Enregistrer les contacts' dès que vous en voyez de disponibles",
+              item4,
             ]
           : [
               "Open the app at least 4 times a day to not miss any available contact",
               "Monitor your boost end date in Services → View list",
               "As soon as your boost expires, come back immediately to start a new boost to keep receiving contacts",
-              "On the News tab, tap 'Save contacts' as soon as you see some available",
+              item4,
             ];
     }
   }

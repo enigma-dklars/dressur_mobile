@@ -1192,10 +1192,11 @@ class _ActuPageState extends State<ActuPage>
       body: Column(
         children: [
           // ── Bandeau statut global collant ─────────────────────────────────
-          Builder(builder: (ctx) {
-            final bandeau = _buildBandeau(ctx);
-            return bandeau ?? const SizedBox.shrink();
-          }),
+          if (addPageActu)
+            Builder(builder: (ctx) {
+              final bandeau = _buildBandeau(ctx);
+              return bandeau ?? const SizedBox.shrink();
+            }),
           Expanded(
             child: RefreshIndicator(
               onRefresh: _refreshData,
