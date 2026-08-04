@@ -118,6 +118,10 @@ class _BottomBarState extends State<BottomBar> with WidgetsBindingObserver {
     _interruptLock = true;
 
     try {
+      // Respecter la préférence utilisateur : si addPageActu est false,
+      // l'utilisateur ne veut pas de suggestions liées aux contacts disponibles.
+      // Cette vérification doit se faire après initUserInformations().
+      if (!addPageActu) return;
       if (nombreContactDispo <= 0) return;
       if (!mounted) return;
 
@@ -161,9 +165,12 @@ class _BottomBarState extends State<BottomBar> with WidgetsBindingObserver {
     saveContactDsIfNotExiste();
     WidgetsBinding.instance.addObserver(this);
 
-    // Vérifier au démarrage si des contacts sont déjà disponibles (set lors du login)
+    // Charger les infos utilisateur depuis l'API au démarrage, puis vérifier
+    // si des contacts sont disponibles. On passe par actualise() pour garantir
+    // que initUserInformations() (et donc addPageActu) soit chargé AVANT
+    // que _maybeShowContactsInterrupt() soit appelé.
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _maybeShowContactsInterrupt();
+      actualise(false);
     });
     if (modeReconnaissanceContactArrierePlan == true) {
       synchroAvanceFunction();
