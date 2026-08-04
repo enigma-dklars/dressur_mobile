@@ -5,7 +5,9 @@ import 'package:dressur/components/constant.dart';
 
 class ContactsPendingInterruptPage extends StatefulWidget {
   final int nombreContacts;
-  final VoidCallback onSaveNow;
+  // Changé de VoidCallback à Future<void> Function() pour pouvoir
+  // attendre la fin de l'enregistrement et afficher un feedback.
+  final Future<void> Function() onSaveNow;
   final VoidCallback onLater;
 
   const ContactsPendingInterruptPage({
@@ -25,6 +27,9 @@ class _ContactsPendingInterruptPageState
     with SingleTickerProviderStateMixin {
   late AnimationController _animController;
   late Animation<double> _scaleAnim;
+
+  /// true pendant que l'enregistrement des contacts est en cours.
+  bool _saving = false;
 
   @override
   void initState() {
@@ -46,12 +51,59 @@ class _ContactsPendingInterruptPageState
     super.dispose();
   }
 
+  Future<void> _handleSaveNow() async {
+    if (_saving) return;
+    setState(() => _saving = true);
+
+    try {
+      await widget.onSaveNow();
+
+      if (!mounted) return;
+
+      // Feedback de succès bref avant de quitter la page.
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: const Color(0xFF4CAF50),
+          behavior: SnackBarBehavior.floating,
+          duration: const Duration(seconds: 2),
+          content: Text(
+            langUserPhone == 'fr'
+                ? 'Contacts enregistrés dans votre répertoire !'
+                : 'Contacts saved to your phone!',
+            style: GoogleFonts.poppins(color: Colors.white),
+          ),
+        ),
+      );
+
+      await Future.delayed(const Duration(milliseconds: 600));
+      if (!mounted) return;
+      Navigator.of(context).pop();
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _saving = false);
+
+      // Feedback d'erreur : l'utilisateur sait que ça n'a pas fonctionné.
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: Colors.redAccent,
+          behavior: SnackBarBehavior.floating,
+          content: Text(
+            langUserPhone == 'fr'
+                ? 'Erreur lors de l\'enregistrement. Réessayez depuis l\'onglet Actu.'
+                : 'Error saving contacts. Try again from the News tab.',
+            style: GoogleFonts.poppins(color: Colors.white),
+          ),
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final bool isFr = langUserPhone == 'fr';
 
     return PopScope(
-      canPop: false, // Bloque le retour arrière
+      canPop: false, // Bloque le retour arrière : l'utilisateur doit choisir
       child: Scaffold(
         backgroundColor: Colors.white,
         body: SafeArea(
@@ -125,27 +177,37 @@ class _ContactsPendingInterruptPageState
                       ),
                       elevation: 2,
                     ),
-                    onPressed: () {
-                      widget.onSaveNow();
-                      Navigator.of(context).pop();
-                    },
-                    child: Text(
-                      isFr ? 'Enregistrer maintenant' : 'Save now',
-                      style: GoogleFonts.poppins(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
+                    // Désactivé pendant l'enregistrement pour éviter un double-tap.
+                    onPressed: _saving ? null : _handleSaveNow,
+                    child: _saving
+                        ? const SizedBox(
+                            height: 22,
+                            width: 22,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2.5,
+                              color: Colors.white,
+                            ),
+                          )
+                        : Text(
+                            isFr ? 'Enregistrer maintenant' : 'Save now',
+                            style: GoogleFonts.poppins(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
                   ),
                 ),
                 const SizedBox(height: 16),
 
                 // ── Bouton secondaire ────────────────────────────────────────
                 TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                    widget.onLater();
-                  },
+                  // Désactivé pendant l'enregistrement.
+                  onPressed: _saving
+                      ? null
+                      : () {
+                          Navigator.of(context).pop();
+                          widget.onLater();
+                        },
                   child: Text(
                     isFr
                         ? 'Plus tard (je le ferai depuis l\'onglet Actu)'
