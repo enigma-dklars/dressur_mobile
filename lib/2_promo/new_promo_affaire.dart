@@ -169,6 +169,9 @@ class _PromotionFormPageState extends State<PromotionFormPage> {
             if (type_promo_affaire == "produit_service") ...[
               ProduitsServices()
             ],
+            if (type_promo_affaire == "sites_applications") ...[
+              SitesApplications()
+            ],
             if (type_promo_affaire == "dmd_emploi") ...[DemandesEmploi()],
             if (type_promo_affaire == "offre_emploi") ...[OffresEmploi()],
             const SizedBox(height: 15),
@@ -1536,6 +1539,376 @@ class _OffresEmploiState extends State<OffresEmploi> {
           ),
         ],
       ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SITES & APPLICATIONS
+// ─────────────────────────────────────────────────────────────────────────────
+
+class SitesApplications extends StatefulWidget {
+  @override
+  State<SitesApplications> createState() => _SitesApplicationsState();
+}
+
+class _SitesApplicationsState extends State<SitesApplications> {
+  bool _isSending = false;
+  File? _imageFile;
+  String _sousType = 'site_web';
+  final _nomController = TextEditingController();
+  final _urlController = TextEditingController();
+  final _descriptionController = TextEditingController();
+  final _telController = TextEditingController(text: tel);
+  String _valueMethodePaiement = 'mtn';
+  bool _loadingPaiements = false;
+
+  bool isImageSquare(File imageFile) {
+    final image = img.decodeImage(imageFile.readAsBytesSync());
+    if (image == null) return false;
+    final aspectRatio = image.width / image.height;
+    return aspectRatio >= 0.8 && aspectRatio <= 1.2;
+  }
+
+  Future<void> _selectImage() async {
+    final picker = ImagePicker();
+    final pickedImage = await picker.pickImage(source: ImageSource.gallery);
+    if (pickedImage != null) {
+      final imageFile = File(pickedImage.path);
+      final fileSize = await imageFile.length();
+      if (fileSize / (1024 * 1024) > 1) {
+        dangerNoti(
+            "Attention !!!",
+            (langUserPhone == "fr")
+                ? "L'image ne peut pas dépasser 1 Mo."
+                : "Image size cannot exceed 1 MB.",
+            context);
+        return;
+      }
+      if (isImageSquare(imageFile)) {
+        setState(() => _imageFile = imageFile);
+      } else {
+        dangerNoti(
+            "Attention !!!",
+            (langUserPhone == "fr")
+                ? "L'image doit être proche d'un carré."
+                : "The image should be close to a square.",
+            context);
+      }
+    }
+  }
+
+  Future<void> _loadMethodesPaiement() async {
+    if (listeMethodePaiements.isNotEmpty) return;
+    setState(() => _loadingPaiements = true);
+    try {
+      final response = await http
+          .post(Uri.parse('$generalRouteForApi/listeFormulePromoAffaire'));
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        if (data["error"] == false) {
+          setState(() {
+            listeMethodePaiements = List<Map<String, dynamic>>.from(
+                data["listeMethodePaiements"]);
+            if (listeMethodePaiements.isNotEmpty) {
+              _valueMethodePaiement = listeMethodePaiements[0]['value'];
+            }
+          });
+        }
+      }
+    } catch (_) {}
+    if (mounted) setState(() => _loadingPaiements = false);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _loadMethodesPaiement();
+  }
+
+  @override
+  void dispose() {
+    _nomController.dispose();
+    _urlController.dispose();
+    _descriptionController.dispose();
+    _telController.dispose();
+    super.dispose();
+  }
+
+  String _urlPlaceholder() {
+    switch (_sousType) {
+      case 'app_mobile':
+        return 'https://play.google.com/... ou https://apps.apple.com/...';
+      case 'logiciel_desktop':
+        return 'https://monlogiciel.com/telecharger';
+      default:
+        return 'https://monsite.com';
+    }
+  }
+
+  Future<void> _sendData() async {
+    if (!telIsVerified) {
+      showConfNumeroWhatsapp(context);
+      return;
+    }
+    final nom = _nomController.text.trim();
+    final url = _urlController.text.trim();
+
+    if (nom.isEmpty || url.isEmpty || _imageFile == null) {
+      dangerNoti(
+          "Attention !!!",
+          (langUserPhone == "fr")
+              ? "Veuillez remplir tous les champs obligatoires et sélectionner une image."
+              : "Please fill in all required fields and select an image.",
+          context);
+      return;
+    }
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+      dangerNoti(
+          "Attention !!!",
+          (langUserPhone == "fr")
+              ? "L'URL doit commencer par http:// ou https://"
+              : "The URL must start with http:// or https://",
+          context);
+      return;
+    }
+
+    setState(() => _isSending = true);
+
+    final uri = Uri.parse('$generalRouteForApi/addSiteApplication');
+    final request = http.MultipartRequest('POST', uri);
+    request.fields['uid'] = uidUser;
+    request.fields['sousType'] = _sousType;
+    request.fields['nom'] = nom;
+    request.fields['description'] = _descriptionController.text.trim();
+    request.fields['url'] = url;
+    request.fields['methodePaiement'] = _valueMethodePaiement;
+    request.fields['tel'] = _telController.text;
+
+    final tempDir = await getTemporaryDirectory();
+    final filePath = '${tempDir.path}/temp_image_site.jpg';
+    final image = img.decodeImage(_imageFile!.readAsBytesSync());
+    final compressedImage = img.encodeJpg(image!, quality: 85);
+    File(filePath).writeAsBytesSync(compressedImage);
+    request.files.add(await http.MultipartFile.fromPath('image', filePath));
+
+    final response = await request.send();
+    if (!mounted) return;
+
+    if (response.statusCode == 200) {
+      final data1 = await response.stream.bytesToString();
+      if (!mounted) return;
+      final data = jsonDecode(data1);
+      if (data["error"] == true) {
+        dangerNoti(data["titre"], data["message"], context);
+        setState(() => _isSending = false);
+      } else {
+        setState(() {
+          _isSending = false;
+          _imageFile = null;
+          _sousType = 'site_web';
+          _valueMethodePaiement = 'mtn';
+        });
+        _nomController.clear();
+        _urlController.clear();
+        _descriptionController.clear();
+        cancelPromoReminderNotification();
+        successNoti(
+            (langUserPhone == "fr") ? "Succès" : "Success",
+            (langUserPhone == "fr")
+                ? "Votre promotion est en attente de validation par notre équipe."
+                : "Your promotion is pending validation by our team.",
+            context);
+      }
+    } else {
+      dangerNoti(
+          (langUserPhone == "fr") ? "Erreur" : "Error",
+          'Code : ${response.statusCode}',
+          context);
+      setState(() => _isSending = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isFr = langUserPhone == "fr";
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        const SizedBox(height: 5),
+
+        // Sous-type
+        DropdownButtonFormField<String>(
+          value: _sousType,
+          decoration: InputDecoration(
+            labelText: isFr ? 'Sous-type' : 'Sub-type',
+            border: const OutlineInputBorder(),
+          ),
+          items: [
+            DropdownMenuItem(
+              value: 'site_web',
+              child: Text(isFr ? 'Site web' : 'Website',
+                  style: GoogleFonts.poppins(fontSize: 14)),
+            ),
+            DropdownMenuItem(
+              value: 'app_mobile',
+              child: Text(isFr ? 'Application mobile' : 'Mobile app',
+                  style: GoogleFonts.poppins(fontSize: 14)),
+            ),
+            DropdownMenuItem(
+              value: 'logiciel_desktop',
+              child: Text(
+                  isFr
+                      ? 'Logiciel / Application desktop'
+                      : 'Desktop software',
+                  style: GoogleFonts.poppins(fontSize: 14)),
+            ),
+          ],
+          onChanged: (val) {
+            if (val != null) setState(() => _sousType = val);
+          },
+        ),
+        const SizedBox(height: 10),
+
+        // Nom
+        TextField(
+          controller: _nomController,
+          maxLength: 150,
+          decoration: InputDecoration(
+            labelText: isFr ? 'Nom' : 'Name',
+            hintText: isFr
+                ? "Nom du site / de l'application"
+                : 'Site / app name',
+            border: const OutlineInputBorder(),
+          ),
+        ),
+        const SizedBox(height: 10),
+
+        // URL
+        TextField(
+          controller: _urlController,
+          keyboardType: TextInputType.url,
+          onChanged: (_) => setState(() {}),
+          decoration: InputDecoration(
+            labelText: 'URL',
+            hintText: _urlPlaceholder(),
+            border: const OutlineInputBorder(),
+          ),
+        ),
+        const SizedBox(height: 10),
+
+        // Description courte avec compteur
+        ValueListenableBuilder<TextEditingValue>(
+          valueListenable: _descriptionController,
+          builder: (context, value, _) {
+            return TextField(
+              controller: _descriptionController,
+              maxLength: 120,
+              maxLines: 3,
+              decoration: InputDecoration(
+                labelText: isFr ? 'Description courte' : 'Short description',
+                border: const OutlineInputBorder(),
+                counterText: '${value.text.length}/120',
+              ),
+            );
+          },
+        ),
+        const SizedBox(height: 10),
+
+        // Upload image
+        ElevatedButton(
+          onPressed: _isSending ? null : _selectImage,
+          style: ElevatedButton.styleFrom(
+              backgroundColor: primaryColor,
+              shape: const StadiumBorder(),
+              padding: const EdgeInsets.symmetric(vertical: 13)),
+          child: Text(
+              isFr ? "Sélectionner l'image" : 'Select image',
+              style: GoogleFonts.poppins(
+                  color: Colors.white, fontWeight: FontWeight.w600)),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 4),
+          child: Text(
+            isFr
+                ? "Icône ou logo (image carrée recommandée)"
+                : "Icon or logo (square image recommended)",
+            style:
+                GoogleFonts.poppins(fontSize: 12, color: Colors.grey[600]),
+            textAlign: TextAlign.center,
+          ),
+        ),
+        if (_imageFile != null)
+          Container(
+              margin: const EdgeInsets.only(top: 10),
+              child: Image.file(_imageFile!, fit: BoxFit.contain)),
+        const SizedBox(height: 15),
+
+        // Prix fixe
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: primaryColor.withOpacity(0.08),
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: primaryColor.withOpacity(0.3)),
+          ),
+          child: Text(
+            isFr ? "Prix : 7 750 FCFA / an" : "Price: 7,750 FCFA / year",
+            style: GoogleFonts.poppins(
+                color: primaryColor,
+                fontWeight: FontWeight.bold,
+                fontSize: 15),
+            textAlign: TextAlign.center,
+          ),
+        ),
+        const SizedBox(height: 15),
+
+        // Méthode de paiement
+        _loadingPaiements
+            ? const Center(
+                child: CircularProgressIndicator(color: primaryColor))
+            : listeMethodePaiements.isNotEmpty
+                ? SelectFormField(
+                    decoration: InputDecoration(
+                        labelText:
+                            isFr ? 'Moyen de paiement' : 'Payment method',
+                        border: const OutlineInputBorder()),
+                    type: SelectFormFieldType.dropdown,
+                    initialValue: _valueMethodePaiement,
+                    items: listeMethodePaiements,
+                    onChanged: (val) =>
+                        setState(() => _valueMethodePaiement = val),
+                  )
+                : const SizedBox.shrink(),
+        const SizedBox(height: 10),
+
+        // Numéro de paiement
+        TextField(
+            controller: _telController,
+            keyboardType: TextInputType.phone,
+            decoration: InputDecoration(
+                labelText:
+                    isFr ? 'Numéro du paiement' : 'Payment number',
+                border: const OutlineInputBorder())),
+        const SizedBox(height: 15),
+
+        // Bouton soumettre
+        ElevatedButton(
+          onPressed: _isSending ? null : _sendData,
+          style: ElevatedButton.styleFrom(
+              backgroundColor: primaryColor,
+              shape: const StadiumBorder(),
+              padding: const EdgeInsets.symmetric(vertical: 15)),
+          child: _isSending
+              ? const CircularProgressIndicator(color: Colors.white)
+              : Text(
+                  isFr ? 'Publier et Payer' : 'Publish & Pay',
+                  style: GoogleFonts.poppins(
+                      color: Colors.white, fontWeight: FontWeight.bold)),
+        ),
+        const SizedBox(height: 10),
+      ],
     );
   }
 }

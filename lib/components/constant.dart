@@ -494,6 +494,10 @@ List<Map<String, dynamic>> listeTypePromoAffaire() => [
             : 'Products, Services, Events, etc.',
       },
       {
+        'value': 'sites_applications',
+        'label': 'Sites & Applications',
+      },
+      {
         'value': 'dmd_emploi',
         'label':
             (langUserPhone == "fr") ? "Demandes d'emploi" : "Job Applications",
