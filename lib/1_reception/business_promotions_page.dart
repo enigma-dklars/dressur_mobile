@@ -377,6 +377,196 @@ class _BusinessPromotionsPageState extends State<BusinessPromotionsPage> {
     );
   }
 
+  // ── Carte dédiée Sites & Applications ──────────────────────────────────────
+  Widget _buildSiteAppCard(Advertisement advertisement, bool isThisItemSharing) {
+    final Map<String, dynamic> info = advertisement.annotherInfo.isNotEmpty
+        ? jsonDecode(advertisement.annotherInfo) as Map<String, dynamic>
+        : {};
+    final String nom = info['nom'] ?? info['nomSiteApp'] ?? "";
+    final String sousType =
+        info['sousType'] ?? info['sousTypeSiteApp'] ?? "site_web";
+    final String url = info['url'] ?? info['urlSiteApp'] ?? "";
+    final String description = advertisement.description;
+
+    String sousTypeLabel;
+    if (sousType == "app_mobile") {
+      sousTypeLabel = langUserPhone == "fr" ? "App mobile" : "Mobile app";
+    } else if (sousType == "logiciel_desktop") {
+      sousTypeLabel = langUserPhone == "fr" ? "Logiciel" : "Software";
+    } else {
+      sousTypeLabel = langUserPhone == "fr" ? "Site web" : "Website";
+    }
+
+    String domaine = "";
+    try {
+      domaine = Uri.parse(url).host;
+    } catch (_) {
+      domaine = url;
+    }
+
+    String actionLabel;
+    if (sousType == "app_mobile") {
+      actionLabel = langUserPhone == "fr" ? "Installer" : "Install";
+    } else if (sousType == "logiciel_desktop") {
+      actionLabel = langUserPhone == "fr" ? "Télécharger" : "Download";
+    } else {
+      actionLabel = langUserPhone == "fr" ? "Ouvrir" : "Open";
+    }
+
+    return Container(
+      margin: const EdgeInsets.only(left: 7, top: 0, right: 7, bottom: 0),
+      child: Column(
+        children: [
+          const SizedBox(height: 1),
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(10),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Icône carrée
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: CachedNetworkImage(
+                          imageUrl: advertisement.image,
+                          width: 72,
+                          height: 72,
+                          fit: BoxFit.cover,
+                          placeholder: (ctx, u) => Container(
+                              width: 72,
+                              height: 72,
+                              color: Colors.grey[200]),
+                          errorWidget: (ctx, u, e) => Container(
+                              width: 72,
+                              height: 72,
+                              color: Colors.grey[200],
+                              child: Image.asset('images/error_image.png')),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      // Texte
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            if (nom.isNotEmpty)
+                              Text(
+                                nom,
+                                style: GoogleFonts.poppins(
+                                    fontWeight: FontWeight.bold, fontSize: 15),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            const SizedBox(height: 4),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 8, vertical: 2),
+                              decoration: BoxDecoration(
+                                  color: primaryColor.withOpacity(0.12),
+                                  borderRadius: BorderRadius.circular(10)),
+                              child: Text(
+                                sousTypeLabel,
+                                style: GoogleFonts.poppins(
+                                    fontSize: 11,
+                                    color: primaryColor,
+                                    fontWeight: FontWeight.w600),
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              description,
+                              style: GoogleFonts.poppins(
+                                  fontSize: 13, color: Colors.grey[700]),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            if (domaine.isNotEmpty) ...[
+                              const SizedBox(height: 4),
+                              Text(
+                                domaine,
+                                style: GoogleFonts.poppins(
+                                    fontSize: 12, color: Colors.grey[500]),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  const Divider(height: 16),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      // Partager
+                      GestureDetector(
+                        onTap: _sharingId != null
+                            ? null
+                            : () async {
+                                await partageInProgrammeRecompense(
+                                    advertisement);
+                              },
+                        child: Row(
+                          children: [
+                            isThisItemSharing
+                                ? const SizedBox(
+                                    width: 18,
+                                    height: 18,
+                                    child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        color: primaryColor))
+                                : const FaIcon(FontAwesomeIcons.shareNodes),
+                            const SizedBox(width: 5),
+                            Text(
+                              isThisItemSharing
+                                  ? (langUserPhone == "fr"
+                                      ? "Patientez..."
+                                      : "Please wait...")
+                                  : (langUserPhone == "fr"
+                                      ? "Partager"
+                                      : "Share"),
+                              style: GoogleFonts.poppins(fontSize: 14),
+                            ),
+                          ],
+                        ),
+                      ),
+                      // Bouton action
+                      ElevatedButton(
+                        onPressed: url.isEmpty
+                            ? null
+                            : () async {
+                                final uri = Uri.parse(url);
+                                await launchUrl(uri,
+                                    mode: LaunchMode.externalApplication);
+                              },
+                        style: ElevatedButton.styleFrom(
+                            backgroundColor: primaryColor,
+                            foregroundColor: Colors.white,
+                            shape: const StadiumBorder(),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 8)),
+                        child: Text(
+                          actionLabel,
+                          style: GoogleFonts.poppins(
+                              fontWeight: FontWeight.w600, fontSize: 14),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 1),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -447,6 +637,12 @@ class _BusinessPromotionsPageState extends State<BusinessPromotionsPage> {
                 Advertisement advertisement = snapshot.data![index];
                 bool isThisItemSharing =
                     _sharingId == advertisement.id; // Vérification spécifique
+
+                // Carte dédiée pour Sites & Applications
+                if (advertisement.typePromotionAffaire == "sites_applications") {
+                  return _buildSiteAppCard(advertisement, isThisItemSharing);
+                }
+
                 return Container(
                   margin: const EdgeInsets.only(
                       left: 7, top: 0, right: 7, bottom: 0),

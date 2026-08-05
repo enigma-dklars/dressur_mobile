@@ -196,6 +196,9 @@ class _PromotionListPageState extends State<PromotionListPage> {
     } else if (type == "offre_emploi") {
       backgroundColor = Colors.orange;
       typeLabel = (langUserPhone == "fr") ? "Offre Emploi" : "Job Offer";
+    } else if (type == "sites_applications") {
+      backgroundColor = Colors.indigo;
+      typeLabel = "Sites & Apps";
     } else {
       backgroundColor = Colors.red;
       typeLabel = (langUserPhone == "fr") ? "Demande Emploi" : "Job Application";
@@ -323,6 +326,10 @@ class _PromotionListPageState extends State<PromotionListPage> {
   }
 
   Widget _buildActiveContent(Promotion promotion) {
+    // Contenu spécifique pour Sites & Applications
+    if (promotion.typePromotionAffaire == "sites_applications") {
+      return _buildSiteAppActiveContent(promotion);
+    }
     return Column(
       key: ValueKey('active'),
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -361,6 +368,82 @@ class _PromotionListPageState extends State<PromotionListPage> {
             ),
           ),
         ],
+      ],
+    );
+  }
+
+  Widget _buildSiteAppActiveContent(Promotion promotion) {
+    final Map<String, dynamic> info = promotion.annotherInfo.isNotEmpty
+        ? jsonDecode(promotion.annotherInfo) as Map<String, dynamic>
+        : {};
+    final String nom = info['nom'] ?? info['nomSiteApp'] ?? "";
+    final String sousType =
+        info['sousType'] ?? info['sousTypeSiteApp'] ?? "site_web";
+    final String url = info['url'] ?? info['urlSiteApp'] ?? "";
+
+    String sousTypeLabel;
+    if (sousType == "app_mobile") {
+      sousTypeLabel = langUserPhone == "fr" ? "App mobile" : "Mobile app";
+    } else if (sousType == "logiciel_desktop") {
+      sousTypeLabel = langUserPhone == "fr" ? "Logiciel" : "Software";
+    } else {
+      sousTypeLabel = langUserPhone == "fr" ? "Site web" : "Website";
+    }
+
+    return Column(
+      key: const ValueKey('site_app_active'),
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 8),
+        if (nom.isNotEmpty)
+          Text(
+            nom,
+            style: GoogleFonts.poppins(
+                fontWeight: FontWeight.bold, fontSize: 15),
+          ),
+        const SizedBox(height: 6),
+        Container(
+          padding:
+              const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+          decoration: BoxDecoration(
+              color: Colors.indigo.withOpacity(0.12),
+              borderRadius: BorderRadius.circular(10)),
+          child: Text(
+            sousTypeLabel,
+            style: GoogleFonts.poppins(
+                fontSize: 11,
+                color: Colors.indigo,
+                fontWeight: FontWeight.w600),
+          ),
+        ),
+        if (url.isNotEmpty) ...[
+          const SizedBox(height: 8),
+          GestureDetector(
+            onTap: () async {
+              final uri = Uri.parse(url);
+              await launchUrl(uri, mode: LaunchMode.externalApplication);
+            },
+            child: Text(
+              url,
+              style: GoogleFonts.poppins(
+                  fontSize: 13,
+                  color: Colors.blue,
+                  decoration: TextDecoration.underline),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ],
+        const SizedBox(height: 10),
+        Row(
+          children: [
+            _buildStatItem(FontAwesomeIcons.eye,
+                promotion.nombreImpression, "Impressions"),
+            const SizedBox(width: 20),
+            _buildStatItem(FontAwesomeIcons.handPointer,
+                promotion.nombreDeVues, "Vues"),
+          ],
+        ),
       ],
     );
   }
@@ -488,9 +571,27 @@ class _PromotionListPageState extends State<PromotionListPage> {
         ].contains(promotion.status) &&
         promotion.typePromotionAffaire == "produit_service";
 
+    // Renouvellement pour sites_applications expirées
+    final bool isExpired = promotion.status.toLowerCase().contains("expir");
+    final bool canRenew = promotion.typePromotionAffaire == "sites_applications" &&
+        isExpired;
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
+        if (canRenew) ...[
+          ElevatedButton.icon(
+            onPressed: () => _showRenewSiteAppModal(context, promotion),
+            icon: const FaIcon(FontAwesomeIcons.rotateRight, size: 16),
+            label: Text(
+                (langUserPhone == "fr") ? 'Renouveler' : 'Renew'),
+            style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.indigo,
+                foregroundColor: Colors.white,
+                shape: const StadiumBorder()),
+          ),
+          const SizedBox(width: 8),
+        ],
         if (canPay) ...[
           ElevatedButton.icon(
             onPressed: () => Navigator.push(
@@ -533,6 +634,39 @@ class _PromotionListPageState extends State<PromotionListPage> {
           child: Text((langUserPhone == "fr") ? 'Détails' : 'Details'),
         ),
       ],
+    );
+  }
+
+  void _showRenewSiteAppModal(BuildContext context, Promotion promotion) {
+    final Map<String, dynamic> info = promotion.annotherInfo.isNotEmpty
+        ? jsonDecode(promotion.annotherInfo) as Map<String, dynamic>
+        : {};
+    final String nom = info['nom'] ?? info['nomSiteApp'] ?? "";
+    final String sousType =
+        info['sousType'] ?? info['sousTypeSiteApp'] ?? "site_web";
+    final String url = info['url'] ?? info['urlSiteApp'] ?? "";
+
+    String sousTypeLabel;
+    if (sousType == "app_mobile") {
+      sousTypeLabel = langUserPhone == "fr" ? "App mobile" : "Mobile app";
+    } else if (sousType == "logiciel_desktop") {
+      sousTypeLabel = langUserPhone == "fr" ? "Logiciel" : "Software";
+    } else {
+      sousTypeLabel = langUserPhone == "fr" ? "Site web" : "Website";
+    }
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      builder: (ctx) => _RenewSiteAppSheet(
+        promotion: promotion,
+        nom: nom,
+        sousTypeLabel: sousTypeLabel,
+        url: url,
+        description: promotion.description,
+      ),
     );
   }
 
@@ -1441,6 +1575,303 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
                       color: Colors.white, fontWeight: FontWeight.bold)),
             ),
             const SizedBox(height: 20),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Modal renouvellement Sites & Applications
+// ─────────────────────────────────────────────────────────────────────────────
+
+class _RenewSiteAppSheet extends StatefulWidget {
+  final Promotion promotion;
+  final String nom;
+  final String sousTypeLabel;
+  final String url;
+  final String description;
+
+  const _RenewSiteAppSheet({
+    required this.promotion,
+    required this.nom,
+    required this.sousTypeLabel,
+    required this.url,
+    required this.description,
+  });
+
+  @override
+  State<_RenewSiteAppSheet> createState() => _RenewSiteAppSheetState();
+}
+
+class _RenewSiteAppSheetState extends State<_RenewSiteAppSheet> {
+  bool _isSending = false;
+  String _valueMethodePaiement = 'mtn';
+  bool _loadingPaiements = false;
+  final _telController = TextEditingController(text: tel);
+
+  @override
+  void initState() {
+    super.initState();
+    _loadMethodesPaiement();
+  }
+
+  @override
+  void dispose() {
+    _telController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _loadMethodesPaiement() async {
+    if (listeMethodePaiements.isNotEmpty) {
+      setState(() => _valueMethodePaiement = listeMethodePaiements[0]['value']);
+      return;
+    }
+    setState(() => _loadingPaiements = true);
+    try {
+      final response = await http
+          .post(Uri.parse('$generalRouteForApi/listeFormulePromoAffaire'));
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        if (data["error"] == false) {
+          setState(() {
+            listeMethodePaiements = List<Map<String, dynamic>>.from(
+                data["listeMethodePaiements"]);
+            if (listeMethodePaiements.isNotEmpty) {
+              _valueMethodePaiement = listeMethodePaiements[0]['value'];
+            }
+          });
+        }
+      }
+    } catch (_) {}
+    if (mounted) setState(() => _loadingPaiements = false);
+  }
+
+  Future<void> _submit() async {
+    if (!telIsVerified) {
+      showConfNumeroWhatsapp(context);
+      return;
+    }
+    setState(() => _isSending = true);
+
+    try {
+      final request = http.MultipartRequest(
+          'POST', Uri.parse('$generalRouteForApi/newPromoPayant'));
+      request.fields.addAll({
+        'uid': uidUser,
+        'idPromotion': widget.promotion.id,
+        'totalAmount': '7750',
+        'valueMethodePaiement': _valueMethodePaiement,
+        'tel': _telController.text,
+        'typeRelance': 'renouv_site_app',
+      });
+
+      final response = await request.send();
+      if (!mounted) return;
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(await response.stream.bytesToString());
+        if (!mounted) return;
+        if (data["error"] == false) {
+          Navigator.pop(context);
+          if (data["solde_used"] == true) {
+            successNoti(
+                (langUserPhone == "fr") ? "Succès" : "Success",
+                data["message"] ??
+                    ((langUserPhone == "fr")
+                        ? "Renouvellement en attente de validation par notre équipe."
+                        : "Renewal pending validation by our team."),
+                context);
+          } else if (data["direct"] == true) {
+            successNoti(
+                (langUserPhone == "fr") ? "Succès" : "Success",
+                (langUserPhone == "fr")
+                    ? "Renouvellement en attente de validation par notre équipe."
+                    : "Renewal pending validation by our team.",
+                context);
+          } else {
+            launchPaiement(data["url"]);
+            successNoti(
+                (langUserPhone == "fr") ? "Succès" : "Success",
+                (langUserPhone == "fr")
+                    ? "Renouvellement en attente de validation par notre équipe."
+                    : "Renewal pending validation by our team.",
+                context);
+          }
+        } else {
+          dangerNoti(data["titre"], data["message"], context);
+          setState(() => _isSending = false);
+        }
+      } else {
+        dangerNoti(
+            (langUserPhone == "fr") ? "Erreur" : "Error",
+            'Code : ${response.statusCode}',
+            context);
+        setState(() => _isSending = false);
+      }
+    } catch (e) {
+      dangerNoti("Erreur", e.toString(), context);
+      setState(() => _isSending = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isFr = langUserPhone == "fr";
+    return Padding(
+      padding:
+          EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.fromLTRB(20, 20, 20, 30),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Barre de drag
+            Center(
+              child: Container(
+                width: 40,
+                height: 5,
+                decoration: BoxDecoration(
+                    color: Colors.grey[300],
+                    borderRadius: BorderRadius.circular(10)),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              isFr ? "Renouveler la promotion" : "Renew promotion",
+              style: GoogleFonts.poppins(
+                  fontSize: 18, fontWeight: FontWeight.bold),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 16),
+
+            // Aperçu des infos actuelles (non modifiables)
+            Container(
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: Colors.grey[100],
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: Colors.grey[300]!),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Image de la promotion
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: CachedNetworkImage(
+                      imageUrl: widget.promotion.image,
+                      height: 120,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                      placeholder: (ctx, u) =>
+                          Container(height: 120, color: Colors.grey[200]),
+                      errorWidget: (ctx, u, e) =>
+                          Container(height: 120, color: Colors.grey[200]),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  if (widget.nom.isNotEmpty)
+                    Text(widget.nom,
+                        style: GoogleFonts.poppins(
+                            fontWeight: FontWeight.bold, fontSize: 15)),
+                  const SizedBox(height: 6),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 8, vertical: 2),
+                    decoration: BoxDecoration(
+                        color: Colors.indigo.withOpacity(0.12),
+                        borderRadius: BorderRadius.circular(10)),
+                    child: Text(widget.sousTypeLabel,
+                        style: GoogleFonts.poppins(
+                            fontSize: 11,
+                            color: Colors.indigo,
+                            fontWeight: FontWeight.w600)),
+                  ),
+                  const SizedBox(height: 6),
+                  if (widget.url.isNotEmpty)
+                    Text(widget.url,
+                        style: GoogleFonts.poppins(
+                            fontSize: 12, color: Colors.grey[600]),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis),
+                  if (widget.description.isNotEmpty) ...[
+                    const SizedBox(height: 6),
+                    Text(widget.description,
+                        style: GoogleFonts.poppins(
+                            fontSize: 13, color: Colors.grey[700]),
+                        maxLines: 3,
+                        overflow: TextOverflow.ellipsis),
+                  ],
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+
+            // Prix fixe
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: primaryColor.withOpacity(0.08),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: primaryColor.withOpacity(0.3)),
+              ),
+              child: Text(
+                isFr ? "Prix : 7 750 FCFA / an" : "Price: 7,750 FCFA / year",
+                style: GoogleFonts.poppins(
+                    color: primaryColor,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 15),
+                textAlign: TextAlign.center,
+              ),
+            ),
+            const SizedBox(height: 14),
+
+            // Méthode de paiement
+            _loadingPaiements
+                ? const Center(
+                    child: CircularProgressIndicator(color: primaryColor))
+                : listeMethodePaiements.isNotEmpty
+                    ? SelectFormField(
+                        decoration: InputDecoration(
+                            labelText:
+                                isFr ? 'Moyen de paiement' : 'Payment method',
+                            border: const OutlineInputBorder()),
+                        type: SelectFormFieldType.dropdown,
+                        initialValue: _valueMethodePaiement,
+                        items: listeMethodePaiements,
+                        onChanged: (val) =>
+                            setState(() => _valueMethodePaiement = val),
+                      )
+                    : const SizedBox.shrink(),
+            const SizedBox(height: 10),
+
+            // Numéro de paiement
+            TextField(
+              controller: _telController,
+              keyboardType: TextInputType.phone,
+              decoration: InputDecoration(
+                  labelText: isFr ? 'Numéro du paiement' : 'Payment number',
+                  border: const OutlineInputBorder()),
+            ),
+            const SizedBox(height: 16),
+
+            // Bouton soumettre
+            ElevatedButton(
+              onPressed: _isSending ? null : _submit,
+              style: ElevatedButton.styleFrom(
+                  backgroundColor: primaryColor,
+                  shape: const StadiumBorder(),
+                  padding: const EdgeInsets.symmetric(vertical: 15)),
+              child: _isSending
+                  ? const CircularProgressIndicator(color: Colors.white)
+                  : Text(
+                      isFr ? 'Renouveler et Payer' : 'Renew & Pay',
+                      style: GoogleFonts.poppins(
+                          color: Colors.white, fontWeight: FontWeight.bold)),
+            ),
           ],
         ),
       ),
