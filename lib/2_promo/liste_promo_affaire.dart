@@ -988,6 +988,9 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
   bool _publishOnDressurStatus = false;
   final int _dressurStatusPricePer7Days = 5000;
 
+  bool _boostFacebook = false;
+  final _boostFacebookAmountController = TextEditingController(text: '700');
+
   // --- CALCULS DYNAMIQUES ---
   double get _rewardProgramAmount {
     if (!_participateInReward) return 0.0;
@@ -1001,8 +1004,13 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
     return (jours * _dressurStatusPricePer7Days) / 7;
   }
 
+  double get _boostFacebookAmount {
+    if (!_boostFacebook) return 0.0;
+    return (int.tryParse(_boostFacebookAmountController.text) ?? 0).toDouble();
+  }
+
   double get _subTotal =>
-      prix.toDouble() + _rewardProgramAmount + _dressurStatusAmount;
+      prix.toDouble() + _rewardProgramAmount + _dressurStatusAmount + _boostFacebookAmount;
   double get _fedapayMax => _subTotal * 0.04;
   double get _totalWithMaxCommission => _subTotal + _fedapayMax;
 
@@ -1089,6 +1097,8 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
           'inProgrammeRecompense': _participateInReward ? "1" : "0",
           'totalViewsGoal': _totalViewsGoal.toString(),
           'publishOnDressurStatus': _publishOnDressurStatus ? "1" : "0",
+          'boostFacebook': _boostFacebook ? "1" : "0",
+          'montantBoostFacebook': _boostFacebookAmountController.text,
           'totalAmount': _totalWithMaxCommission.toStringAsFixed(0),
         });
 
@@ -1114,10 +1124,12 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
                   : "Please choose a plan.";
               label = "";
 
-              // 5. Réinitialisation des options spécifiques (Reward & Status)
+              // 5. Réinitialisation des options spécifiques (Reward & Status & Boost Facebook)
               _participateInReward = false;
               _totalViewsGoal = 2500;
               _publishOnDressurStatus = false;
+              _boostFacebook = false;
+              _boostFacebookAmountController.text = '700';
 
               // 6. Réinitialisation du mode de paiement par défaut
               valueMethodePaiement = "mtn";
@@ -1126,22 +1138,22 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
             if (data["solde_used"] == true) {
               successNoti(
                   (langUserPhone == "fr") ? "Succès" : "Success",
-                  data["message"] ?? ((langUserPhone == "fr") ? "Solde débité. Promotion Affaire relancée." : "Balance debited. Promotion restarted."),
+                  data["message"] ?? ((langUserPhone == "fr") ? "Solde débité. Votre Promotion Affaire est en attente de validation." : "Balance debited. Your Business Promotion is pending validation."),
                   context);
             } else if (data["direct"] == true) {
               successNoti(
                   (langUserPhone == "fr") ? "Succès" : "Success",
                   (langUserPhone == "fr")
-                      ? "Veuillez confirmer le paiement pour relancer la promotion."
-                      : "Please confirm payment to restart the promotion.",
+                      ? "Veuillez confirmer le paiement. Votre promotion sera soumise à validation après confirmation."
+                      : "Please confirm payment. Your promotion will be submitted for validation after confirmation.",
                   context);
             } else {
               launchPaiement(data["url"]);
               successNoti(
                   (langUserPhone == "fr") ? "Succès" : "Success",
                   (langUserPhone == "fr")
-                      ? "Veuillez confirmer le paiement pour finaliser l'enregistrement de votre promotion."
-                      : "Please confirm payment to finalize the registration of your promotion.",
+                      ? "Veuillez confirmer le paiement. Votre promotion sera soumise à validation après confirmation."
+                      : "Please confirm payment. Your promotion will be submitted for validation after confirmation.",
                   context);
             }
           } else {
@@ -1169,6 +1181,7 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
   void dispose() {
     telController.dispose();
     _viewsController.dispose();
+    _boostFacebookAmountController.dispose();
     super.dispose();
   }
 
@@ -1330,6 +1343,49 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
                       "Frais Statut : ${_dressurStatusAmount.toStringAsFixed(0)} FCFA",
                       Colors.blue)),
 
+            const SizedBox(height: 15),
+
+            // --- SECTION BOOST PAGE FACEBOOK ---
+            _buildOptionHeader(
+                FontAwesomeIcons.facebookF,
+                (langUserPhone == "fr")
+                    ? "Boost Page Facebook Dressur"
+                    : "Dressur Facebook Page Boost",
+                _boostFacebook),
+            SwitchListTile(
+              title: Text(
+                  (langUserPhone == "fr")
+                      ? "Publier et booster sur la page Facebook de Dressur"
+                      : "Post and boost on Dressur's Facebook page",
+                  style: GoogleFonts.poppins(
+                      fontSize: 14, fontWeight: FontWeight.w500)),
+              subtitle: Text(
+                  (langUserPhone == "fr")
+                      ? "Votre promotion sera publiée sur la page Facebook officielle de Dressur et boostée auprès d'une audience ciblée. Budget minimum 700 FCFA."
+                      : "Your promotion will be posted on Dressur's official Facebook page and boosted to a targeted audience. Minimum budget 700 FCFA.",
+                  style: GoogleFonts.poppins(fontSize: 11)),
+              value: _boostFacebook,
+              activeColor: primaryColor,
+              onChanged: (val) => setState(() => _boostFacebook = val),
+            ),
+            if (_boostFacebook) ...[
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: TextField(
+                  controller: _boostFacebookAmountController,
+                  keyboardType: TextInputType.number,
+                  onChanged: (_) => setState(() {}),
+                  decoration: InputDecoration(
+                    labelText: (langUserPhone == "fr")
+                        ? "Budget boost (min. 700 FCFA)"
+                        : "Boost budget (min. 700 FCFA)",
+                    border: const OutlineInputBorder(),
+                    suffixText: "FCFA",
+                  ),
+                ),
+              ),
+            ],
+
             const SizedBox(height: 20),
 
             // --- RÉCAPITULATIF ---
@@ -1345,6 +1401,10 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
                     _recapRow((langUserPhone == "fr") ? "Programme Récompense" : "Reward Program", _rewardProgramAmount),
                   if (_publishOnDressurStatus)
                     _recapRow("Statut Dressur", _dressurStatusAmount),
+                  if (_boostFacebook)
+                    _recapRow(
+                        (langUserPhone == "fr") ? "Boost Facebook" : "Facebook Boost",
+                        _boostFacebookAmount),
                   const Divider(height: 20),
                   _recapRow((langUserPhone == "fr") ? "TOTAL ESTIMÉ" : "ESTIMATED TOTAL", _totalWithMaxCommission,
                       isBold: true),
