@@ -15,6 +15,16 @@ import 'package:dressur/components/constant.dart';
 import 'package:select_form_field/select_form_field.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+class MotifRefus {
+  final String motif;
+  final String dateRefus;
+  MotifRefus({required this.motif, required this.dateRefus});
+  factory MotifRefus.fromJson(Map<String, dynamic> json) => MotifRefus(
+        motif: json['motif'] ?? '',
+        dateRefus: json['dateRefus'] ?? '',
+      );
+}
+
 class Promotion {
   final String id;
   final String image;
@@ -31,6 +41,8 @@ class Promotion {
   final String annotherInfo;
   final bool inProgrammeRecompense;
   final bool publishOnDressurStatus;
+  final String whatsappContact;
+  final List<MotifRefus> motifsRefus;
 
   Promotion({
     required this.id,
@@ -48,6 +60,8 @@ class Promotion {
     required this.annotherInfo,
     required this.inProgrammeRecompense,
     required this.publishOnDressurStatus,
+    this.whatsappContact = '',
+    this.motifsRefus = const [],
   });
 }
 
@@ -89,6 +103,10 @@ class _PromotionListPageState extends State<PromotionListPage> {
                 : "",
             inProgrammeRecompense: data['inProgrammeRecompense'] == 1,
             publishOnDressurStatus: data['publishOnDressurStatus'] == 1,
+            whatsappContact: data['whatsappContact'] ?? '',
+            motifsRefus: (data['motifsRefus'] as List<dynamic>? ?? [])
+                .map((e) => MotifRefus.fromJson(e as Map<String, dynamic>))
+                .toList(),
           );
         }).toList();
 
@@ -326,7 +344,63 @@ class _PromotionListPageState extends State<PromotionListPage> {
                 FontAwesomeIcons.handPointer, promotion.nombreDeVues, "Vues"),
           ],
         ),
+        if (promotion.motifsRefus.isNotEmpty) ...[
+          SizedBox(height: 4),
+          TextButton(
+            style: TextButton.styleFrom(
+                padding: EdgeInsets.zero,
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap),
+            onPressed: () =>
+                _showHistoriqueModal(context, promotion.motifsRefus),
+            child: Text(
+              (langUserPhone == "fr")
+                  ? "Historique des refus"
+                  : "Rejection history",
+              style: GoogleFonts.poppins(
+                  fontSize: 12, color: Colors.grey[500]),
+            ),
+          ),
+        ],
       ],
+    );
+  }
+
+  void _showHistoriqueModal(BuildContext context, List<MotifRefus> motifs) {
+    showModalBottomSheet(
+      context: context,
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(16))),
+      builder: (ctx) => Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Text(
+              (langUserPhone == "fr") ? "Historique des refus" : "Rejection history",
+              style: GoogleFonts.poppins(
+                  fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+          ),
+          Divider(height: 1),
+          Flexible(
+            child: ListView.builder(
+              shrinkWrap: true,
+              itemCount: motifs.length,
+              itemBuilder: (_, i) => ListTile(
+                title: Text(
+                  motifs[i].dateRefus,
+                  style: GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 13),
+                ),
+                subtitle: Text(
+                  motifs[i].motif,
+                  style: GoogleFonts.poppins(fontSize: 13),
+                ),
+              ),
+            ),
+          ),
+          SizedBox(height: 12),
+        ],
+      ),
     );
   }
 
@@ -376,6 +450,24 @@ class _PromotionListPageState extends State<PromotionListPage> {
             infoText,
             style: GoogleFonts.poppins(fontSize: 13, color: Colors.grey[600]),
           ),
+          if (promotion.motifsRefus.length > 1) ...[
+            SizedBox(height: 4),
+            TextButton(
+              style: TextButton.styleFrom(
+                  padding: EdgeInsets.zero,
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap),
+              onPressed: () => _showHistoriqueModal(
+                  context,
+                  promotion.motifsRefus.sublist(1)),
+              child: Text(
+                (langUserPhone == "fr")
+                    ? "Voir les refus précédents (${promotion.motifsRefus.length - 1})"
+                    : "See previous rejections (${promotion.motifsRefus.length - 1})",
+                style: GoogleFonts.poppins(
+                    fontSize: 12, color: Colors.red[400]),
+              ),
+            ),
+          ],
         ],
       ),
     );

@@ -37,11 +37,21 @@ class _ModificationProduitServicesPageState
   int prix = 0;
   int jours = 0;
   final TextEditingController telController = TextEditingController();
+  final TextEditingController _whatsappController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     _textEditingController.text = widget.promotion.description;
+    _whatsappController.text = widget.promotion.whatsappContact;
+  }
+
+  @override
+  void dispose() {
+    _textEditingController.dispose();
+    _whatsappController.dispose();
+    telController.dispose();
+    super.dispose();
   }
 
   bool isImageSquare(File imageFile) {
@@ -118,6 +128,7 @@ class _ModificationProduitServicesPageState
     request.fields['idPromoAffaire'] = widget.promotion.id;
     request.fields['text'] = _textEditingController.text;
     request.fields['uid'] = uidUser;
+    request.fields['whatsappContact'] = _whatsappController.text.trim();
 
     if (_imageFile != null) {
       final tempDir = await getTemporaryDirectory();
@@ -242,7 +253,22 @@ class _ModificationProduitServicesPageState
                   border: OutlineInputBorder()),
             ),
             const SizedBox(height: 16),
+            TextField(
+              controller: _whatsappController,
+              keyboardType: TextInputType.phone,
+              decoration: InputDecoration(
+                labelText: langUserPhone == "fr"
+                    ? 'Numéro WhatsApp de contact'
+                    : 'WhatsApp contact number',
+                hintText: '+22900000000',
+                border: OutlineInputBorder(),
+                helperText: langUserPhone == "fr"
+                    ? 'Format international requis, ex : +22900000000'
+                    : 'International format required, e.g. +22900000000',
+              ),
+            ),
             if (load) ...[
+              const SizedBox(height: 16),
               SelectFormField(
                 decoration: InputDecoration(
                     labelText: langUserPhone == "fr"
