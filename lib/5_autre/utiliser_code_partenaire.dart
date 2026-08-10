@@ -18,15 +18,22 @@ class _UtiliserCodePartenairePageState
   final TextEditingController _codeController = TextEditingController();
   bool _loading = false;
 
-  // --- Conditions vérifiées localement ---
+  // --- Conditions reçues du serveur ---
   bool get _nomRenseigne => nom != null && nom.toString().trim().isNotEmpty;
   bool get _whatsappConfirme => telIsVerified;
   bool get _emailConfirme => mailIsVerified;
+
+  // L'API est la source de vérité pour la fenêtre des 24 heures.
+  // Le repli local maintient la compatibilité avec une ancienne réponse serveur.
   bool get _inscritDepuis24h {
+    if (codePartenaireDisponible != null) {
+      return codePartenaireDisponible!;
+    }
     try {
       if (createdAt == null) return false;
-      final dateInscription = DateTime.parse(createdAt.toString());
-      return DateTime.now().difference(dateInscription).inHours < 24;
+      final dateInscription = DateTime.parse(createdAt.toString()).toUtc();
+      final age = DateTime.now().toUtc().difference(dateInscription);
+      return age.inSeconds >= 0 && age.inSeconds < 24 * 60 * 60;
     } catch (_) {
       return false;
     }

@@ -96,6 +96,7 @@ var condTel = false;
 var condMail = false;
 var condAnciennete = false;
 var condCumul = false;
+bool? codePartenaireDisponible;
 var joursInscrit = 0;
 var cumulFcfa = 0;
 String? selectedContactAccountName;
@@ -184,6 +185,9 @@ Future<void> initUserInformations(userInfos) async {
   aUnPartenaire = userInfos["aUnPartenaire"] ?? false;
   monCodePartenaire = userInfos["codePartenaire"];
   estPartenaire = userInfos["estPartenaire"] ?? false;
+  codePartenaireDisponible = userInfos["codePartenaireDisponible"] is bool
+      ? userInfos["codePartenaireDisponible"] as bool
+      : null;
   condNom = userInfos["condNom"] ?? false;
   condTel = userInfos["condTel"] ?? false;
   condMail = userInfos["condMail"] ?? false;
