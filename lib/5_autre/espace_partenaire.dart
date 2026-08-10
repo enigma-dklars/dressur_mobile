@@ -21,24 +21,29 @@ class _EspacePartenairePageState extends State<EspacePartenairePage> {
   @override
   void initState() {
     super.initState();
-    if (estPartenaire) _chargerAccompagnes();
-    else setState(() => _loading = false);
+    _chargerEspacePartenaire();
   }
 
-  Future<void> _chargerAccompagnes() async {
+  Future<void> _chargerEspacePartenaire() async {
     try {
-      final response = await http.get(
-        Uri.parse('$generalRouteForApi/accompagnesPartenaire'),
-        headers: {'uid': uidUser ?? ''},
+      final response = await http.post(
+        Uri.parse('$generalRouteForApi/espacePartenaire'),
+        body: {'uid': '$uidUser'},
       );
       if (response.statusCode == 200) {
         final body = jsonDecode(response.body);
         if (body['success'] == true) {
-          setState(() { _accompagnes = body['accompagnes'] ?? []; });
+          final code = body['codePartenaire']?.toString();
+          setState(() {
+            if (code != null && code.isNotEmpty) {
+              monCodePartenaire = code;
+            }
+            _accompagnes = body['accompagnes'] ?? [];
+          });
         }
       }
     } catch (_) {}
-    setState(() => _loading = false);
+    if (mounted) setState(() => _loading = false);
   }
 
   @override
