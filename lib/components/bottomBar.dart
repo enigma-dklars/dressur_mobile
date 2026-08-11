@@ -11,6 +11,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:dressur/6_login_register/connexion.dart';
 import 'package:dressur/2_promo/services.dart';
 import 'package:dressur/3_actu/actu.dart';
 import 'package:dressur/5_autre/autre.dart';
@@ -18,6 +19,57 @@ import 'package:dressur/components/constant.dart';
 import 'package:dressur/components/contacts_pending_interrupt.dart';
 import 'package:dressur/components/sql_helper.dart';
 import 'package:dressur/components/noti_sys.dart';
+
+class _AccountBlockedPage extends StatelessWidget {
+  const _AccountBlockedPage();
+
+  @override
+  Widget build(BuildContext context) {
+    final isFrench = langUserPhone == "fr";
+    return Scaffold(
+      backgroundColor: primaryColor,
+      body: SafeArea(
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(
+                  Icons.block_outlined,
+                  color: Colors.white,
+                  size: 72,
+                ),
+                const SizedBox(height: 24),
+                Text(
+                  isFrench ? 'Compte bloqué' : 'Account blocked',
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.poppins(
+                    color: Colors.white,
+                    fontSize: 26,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  isFrench
+                      ? 'Votre compte est actuellement bloqué. Contactez l’assistance pour obtenir de l’aide.'
+                      : 'Your account is currently blocked. Contact support for help.',
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.poppins(
+                    color: Colors.white70,
+                    fontSize: 15,
+                    height: 1.5,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
 
 class BottomBar extends StatefulWidget {
   const BottomBar({Key? key}) : super(key: key);
@@ -27,6 +79,8 @@ class BottomBar extends StatefulWidget {
 }
 
 class _BottomBarState extends State<BottomBar> with WidgetsBindingObserver {
+  static const _refreshTimeout = Duration(seconds: 12);
+
   // L'index 1 correspond à la page "Actu"
   int _selectedIndex = 1;
   int nombreNewContact = 0;
@@ -40,6 +94,8 @@ class _BottomBarState extends State<BottomBar> with WidgetsBindingObserver {
   /// _maybeShowContactsInterrupt() (postFrameCallback + refresh data)
   /// pourraient tous deux passer le test du throttle et empiler deux modals.
   bool _interruptLock = false;
+  bool _actualiseInProgress = false;
+  bool _sessionRedirectStarted = false;
 
   final PageController _pageController = PageController(initialPage: 1);
 
@@ -241,64 +297,203 @@ class _BottomBarState extends State<BottomBar> with WidgetsBindingObserver {
     }
   }
 
-  void actualise(affMessage) async {
-    if (affMessage == true) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        backgroundColor: Colors.red,
-        behavior: SnackBarBehavior.floating,
-        content: Text(
-          (langUserPhone == "fr")
-              ? 'Actualisation en cours…'
-              : 'Update in progress…',
-          style: GoogleFonts.poppins(
-            color: Colors.white,
-          ),
-        ),
-      ));
+  Future<void> actualise(bool affMessage) async {
+    if (_sessionRedirectStarted || _actualiseInProgress) return;
+    _actualiseInProgress = true;
+
+    if (affMessage && mounted) {
+      _showRefreshMessage(
+        (langUserPhone == "fr")
+            ? 'Actualisation en cours…'
+            : 'Update in progress…',
+        Colors.red,
+      );
     }
 
     try {
-      var request = http.MultipartRequest(
-          'POST', Uri.parse('$generalRouteForApi/getUserInfo'));
-      request.fields.addAll({
-        'uid': uidUser,
-      });
+      final request = http.MultipartRequest(
+        'POST',
+        Uri.parse('$generalRouteForApi/getUserInfo'),
+      )..fields.addAll({
+          'uid': uidUser,
+        });
 
-      http.StreamedResponse response = await request.send();
+      final response = await request.send().timeout(_refreshTimeout);
+      final body = await response.stream
+          .bytesToString()
+          .timeout(_refreshTimeout);
+      final data = _decodeRefreshResponse(body, response.statusCode);
 
-      if (response.statusCode == 200) {
-        var data1 = await response.stream.bytesToString();
-        if (!mounted) return;
-        var data = convert.jsonDecode(data1);
-        if (data["error"] == false) {
-          setState(() {
-            initUserInformations(data['user']);
-            lesPublicites = data['user']["lesPublicites"];
-          });
-          // Afficher l'interrupt si des contacts sont disponibles
-          _maybeShowContactsInterrupt();
-        }
+      if (_isBlockedResponse(data)) {
+        await _handleBlockedSession();
+        return;
       }
-      if (!mounted) return;
-      if (affMessage == true) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            backgroundColor: Colors.green,
-            behavior: SnackBarBehavior.floating,
-            content: Text(
-              (langUserPhone == "fr")
-                  ? 'Actualisation terminée.'
-                  : 'Refresh complete.',
-              style: GoogleFonts.poppins(
-                color: Colors.white,
-              ),
-            ),
-          ),
+      if (_isInvalidSessionResponse(data)) {
+        await _handleInvalidSession();
+        return;
+      }
+
+      if (data['error'] == false && data['user'] is Map<String, dynamic>) {
+        await initUserInformations(data['user']);
+        if (!mounted || _sessionRedirectStarted) return;
+        setState(() {
+          lesPublicites = data['user']["lesPublicites"];
+        });
+        await _maybeShowContactsInterrupt();
+        if (affMessage && mounted) {
+          _showRefreshMessage(
+            (langUserPhone == "fr")
+                ? 'Actualisation terminée.'
+                : 'Refresh complete.',
+            Colors.green,
+          );
+        }
+        return;
+      }
+
+      if (affMessage && mounted) {
+        _showRefreshMessage(
+          (langUserPhone == "fr")
+              ? 'Actualisation impossible pour le moment.'
+              : 'Refresh is unavailable right now.',
+          Colors.red,
         );
       }
+    } on TimeoutException {
+      _showRefreshErrorIfRequested(affMessage);
+    } on SocketException {
+      _showRefreshErrorIfRequested(affMessage);
+    } on FormatException {
+      _showRefreshErrorIfRequested(affMessage);
     } catch (_) {
-      // Erreur réseau silencieuse — l'UI reste dans son état précédent
+      _showRefreshErrorIfRequested(affMessage);
+    } finally {
+      _actualiseInProgress = false;
     }
+  }
+
+  Map<String, dynamic> _decodeRefreshResponse(String body, int statusCode) {
+    dynamic decoded;
+    try {
+      decoded = convert.jsonDecode(body);
+    } catch (_) {
+      return <String, dynamic>{'_statusCode': statusCode};
+    }
+
+    if (decoded is Map<String, dynamic>) {
+      return <String, dynamic>{
+        ...decoded,
+        '_statusCode': statusCode,
+      };
+    }
+    return <String, dynamic>{'_statusCode': statusCode};
+  }
+
+  bool _isBlockedResponse(Map<String, dynamic> data) {
+    return data['blocked'] == true || data['code'] == 'account_blocked';
+  }
+
+  bool _isInvalidSessionResponse(Map<String, dynamic> data) {
+    final statusCode = data['_statusCode'];
+    if (statusCode == 401 || statusCode == 404) return true;
+    if (data['deleted'] == true) return true;
+
+    final code = data['code']?.toString().toLowerCase();
+    const invalidSessionCodes = <String>{
+      'session_missing',
+      'session_invalid',
+      'user_missing',
+      'user_not_found',
+      'account_not_found',
+    };
+    if (code != null && invalidSessionCodes.contains(code)) return true;
+
+    if (data['user'] != null) return false;
+    final responseText = _normalizeResponseText(
+      '${data['titre'] ?? ''} ${data['message'] ?? ''}',
+    );
+    return responseText.contains('user not found') ||
+        responseText.contains('utilisateur introuvable') ||
+        responseText.contains('utilisateur non trouve') ||
+        responseText.contains('account not found') ||
+        responseText.contains('compte introuvable') ||
+        responseText.contains('compte non trouve');
+  }
+
+  String _normalizeResponseText(String value) {
+    return value
+        .toLowerCase()
+        .replaceAll('é', 'e')
+        .replaceAll('è', 'e')
+        .replaceAll('ê', 'e')
+        .replaceAll('ë', 'e')
+        .replaceAll('à', 'a')
+        .replaceAll('â', 'a')
+        .replaceAll('î', 'i')
+        .replaceAll('ï', 'i')
+        .replaceAll('ô', 'o')
+        .replaceAll('ù', 'u')
+        .replaceAll('û', 'u');
+  }
+
+  Future<void> _handleInvalidSession() async {
+    if (_sessionRedirectStarted) return;
+    _sessionRedirectStarted = true;
+    _timerNotif?.cancel();
+    _timerSync?.cancel();
+    uidUser = null;
+    try {
+      await SQLHelper.clearCachedSession().timeout(const Duration(seconds: 3));
+    } catch (_) {
+      // Continue to the login page even if local cleanup fails.
+    }
+    if (!mounted) return;
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(builder: (_) => LoginPage()),
+      (_) => false,
+    );
+  }
+
+  Future<void> _handleBlockedSession() async {
+    if (_sessionRedirectStarted) return;
+    _sessionRedirectStarted = true;
+    _timerNotif?.cancel();
+    _timerSync?.cancel();
+    uidUser = null;
+    try {
+      await SQLHelper.clearCachedSession().timeout(const Duration(seconds: 3));
+    } catch (_) {
+      // Continue to the blocked-account screen even if local cleanup fails.
+    }
+    if (!mounted) return;
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(builder: (_) => const _AccountBlockedPage()),
+      (_) => false,
+    );
+  }
+
+  void _showRefreshErrorIfRequested(bool affMessage) {
+    if (!affMessage || !mounted || _sessionRedirectStarted) return;
+    _showRefreshMessage(
+      (langUserPhone == "fr")
+          ? 'Impossible de joindre Dressur. Réessayez.'
+          : 'Dressur could not be reached. Try again.',
+      Colors.red,
+    );
+  }
+
+  void _showRefreshMessage(String message, Color backgroundColor) {
+    if (!mounted || _sessionRedirectStarted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        backgroundColor: backgroundColor,
+        behavior: SnackBarBehavior.floating,
+        content: Text(
+          message,
+          style: GoogleFonts.poppins(color: Colors.white),
+        ),
+      ),
+    );
   }
 
   @override
