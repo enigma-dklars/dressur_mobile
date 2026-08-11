@@ -222,7 +222,8 @@ class MyApp extends StatelessWidget {
           initialRoute: '/',
           routes: <String, WidgetBuilder>{
             WelcomePage.routeName: (_) =>
-                WelcomePage(notificationAppLaunchDetails),
+                WelcomePage(
+                    notificationAppLaunchDetails: notificationAppLaunchDetails),
           },
           debugShowCheckedModeBanner: false,
           title: 'Dressur',

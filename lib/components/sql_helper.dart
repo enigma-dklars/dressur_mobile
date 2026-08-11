@@ -149,6 +149,31 @@ class SQLHelper {
     }
   }
 
+  /// Removes only the cached authentication identity.
+  ///
+  /// Contact data is deliberately kept so a stale session cannot force the
+  /// user to lose locally collected information just because the account was
+  /// deleted or the API is temporarily unavailable.
+  static Future<void> clearCachedSession() async {
+    try {
+      final db = await SQLHelper.db();
+      await db.delete("userInfos",
+          where: "tableName = ?", whereArgs: ["user"]);
+    } catch (err) {
+      debugPrint("Unable to clear current cached session: $err");
+    }
+
+    // Older releases stored the identity in a separate database. Clear it
+    // too, otherwise the fallback lookup can restore the same invalid UID.
+    try {
+      final oldDb = await SQLHelper.dbOLD();
+      await oldDb.delete("userInfos",
+          where: "tableName = ?", whereArgs: ["user"]);
+    } catch (err) {
+      debugPrint("Unable to clear legacy cached session: $err");
+    }
+  }
+
   static Future<void> viderLaBaseDeDonneeLocalTelUser() async {
     final db = await SQLHelper.db();
     try {

@@ -187,9 +187,9 @@ Future<void> initUserInformations(userInfos) async {
   condCumul = userInfos["condCumul"] ?? false;
   joursInscrit = userInfos["joursInscrit"] ?? 0;
   cumulFcfa = userInfos["cumulFcfa"] ?? 0;
-  SQLHelper.viderLaBaseDeDonneeLocal();
+  await SQLHelper.viderLaBaseDeDonneeLocal();
 
-  SQLHelper.insert("userInfos", {
+  await SQLHelper.insert("userInfos", {
     'tableName': "user",
     'id': 0,
     'uid': userInfos["uid"],
