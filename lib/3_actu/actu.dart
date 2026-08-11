@@ -2168,10 +2168,97 @@ class AdvertisementDetailPage extends StatelessWidget {
 
   AdvertisementDetailPage({required this.advertisement});
 
-  Future<void> _launchURL(String url) async {
-    final Uri uri = Uri.parse(url);
-    if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
-      print('Could not launch $url');
+  Map<String, dynamic> _parseSiteApplicationInfo(String rawInfo) {
+    if (rawInfo.trim().isEmpty) return {};
+
+    try {
+      final decoded = jsonDecode(rawInfo);
+      if (decoded is Map) {
+        return Map<String, dynamic>.from(decoded);
+      }
+    } catch (_) {}
+
+    return {};
+  }
+
+  String _siteApplicationValue(
+      Map<String, dynamic> info, String primaryKey, String fallbackKey) {
+    final primaryValue = info[primaryKey]?.toString().trim() ?? "";
+    if (primaryValue.isNotEmpty) return primaryValue;
+    return info[fallbackKey]?.toString().trim() ?? "";
+  }
+
+  String _siteApplicationTypeLabel(String subtype) {
+    switch (subtype) {
+      case "app_mobile":
+        return langUserPhone == "fr" ? "App mobile" : "Mobile app";
+      case "logiciel_desktop":
+        return langUserPhone == "fr" ? "Logiciel desktop" : "Desktop software";
+      case "site_web":
+      default:
+        return langUserPhone == "fr" ? "Site web" : "Website";
+    }
+  }
+
+  String _siteApplicationActionLabel(String subtype) {
+    switch (subtype) {
+      case "app_mobile":
+        return langUserPhone == "fr" ? "Télécharger" : "Download";
+      case "logiciel_desktop":
+        return langUserPhone == "fr" ? "Savoir plus" : "Learn more";
+      case "site_web":
+      default:
+        return langUserPhone == "fr" ? "Ouvrir" : "Open";
+    }
+  }
+
+  Future<void> _launchURL(BuildContext context, String rawUrl) async {
+    final url = rawUrl.trim();
+    final uri = Uri.tryParse(url);
+    final isValidUrl = uri != null &&
+        uri.hasScheme &&
+        uri.host.isNotEmpty &&
+        (uri.scheme == "http" || uri.scheme == "https");
+
+    if (!isValidUrl) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            langUserPhone == "fr"
+                ? "L’URL n’est pas valide."
+                : "The URL is invalid.",
+          ),
+        ),
+      );
+      return;
+    }
+
+    if (!await canLaunchUrl(uri)) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            langUserPhone == "fr"
+                ? "Impossible d’ouvrir cette URL."
+                : "This URL could not be opened.",
+          ),
+        ),
+      );
+      return;
+    }
+
+    final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
+    if (!launched && context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            langUserPhone == "fr"
+                ? "Impossible d’ouvrir cette URL."
+                : "This URL could not be opened.",
+          ),
+        ),
+      );
     }
   }
 
@@ -2213,9 +2300,22 @@ class AdvertisementDetailPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Map<String, dynamic> infoMap = (advertisement.annotherInfo != "")
-        ? jsonDecode(advertisement.annotherInfo)
-        : {};
+    final infoMap = _parseSiteApplicationInfo(advertisement.annotherInfo);
+    final isSiteApplication =
+        advertisement.typePromotionAffaire == "sites_applications";
+    final siteApplicationName =
+        _siteApplicationValue(infoMap, "nom", "nomSiteApp");
+    final siteApplicationSubtype =
+        _siteApplicationValue(infoMap, "sousType", "sousTypeSiteApp");
+    final siteApplicationUrl =
+        _siteApplicationValue(infoMap, "url", "urlSiteApp");
+    final normalizedSiteApplicationSubtype = const {
+      "site_web",
+      "app_mobile",
+      "logiciel_desktop",
+    }.contains(siteApplicationSubtype)
+        ? siteApplicationSubtype
+        : "site_web";
 
     return Scaffold(
       appBar: AppBar(
@@ -2279,8 +2379,20 @@ class AdvertisementDetailPage extends StatelessWidget {
 
                   SizedBox(height: 15),
 
-                  // --- BARRE DE STATS ET CONTACT ---
-                  _buildContactBar(context),
+                  if (isSiteApplication) ...[
+                    _buildSiteApplicationIdentity(
+                      name: siteApplicationName,
+                      subtype: normalizedSiteApplicationSubtype,
+                    ),
+                    const SizedBox(height: 18),
+                    _buildSiteApplicationActions(
+                      context,
+                      subtype: normalizedSiteApplicationSubtype,
+                      url: siteApplicationUrl,
+                    ),
+                  ] else
+                    // --- BARRE DE STATS ET CONTACT ---
+                    _buildContactBar(context),
                   SizedBox(height: 25),
 
                   // --- DESCRIPTION ---
@@ -2290,7 +2402,7 @@ class AdvertisementDetailPage extends StatelessWidget {
                           ? "Description"
                           : "Description"),
                   SelectableLinkify(
-                    onOpen: (link) => _launchURL(link.url),
+                    onOpen: (link) => _launchURL(context, link.url),
                     text: advertisement.description,
                     style: GoogleFonts.poppins(fontSize: 14, height: 1.6),
                     // --- STYLE DES LIENS SANS SOULIGNEMENT ---
@@ -2314,7 +2426,7 @@ class AdvertisementDetailPage extends StatelessWidget {
                           StringExtension(entry.key.replaceAll('_', ' '))
                               .capitalize();
                       final value = entry.value;
-                      return _buildInfoRow(key, value);
+                      return _buildInfoRow(context, key, value.toString());
                     }).toList(),
                   ],
                 ],
@@ -2323,6 +2435,90 @@ class AdvertisementDetailPage extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildSiteApplicationIdentity({
+    required String name,
+    required String subtype,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (name.isNotEmpty)
+          Text(
+            name,
+            style: GoogleFonts.poppins(
+              fontSize: 20,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        const SizedBox(height: 8),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+          decoration: BoxDecoration(
+            color: primaryColor.withOpacity(0.12),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Text(
+            _siteApplicationTypeLabel(subtype),
+            style: GoogleFonts.poppins(
+              color: primaryColor,
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSiteApplicationActions(
+    BuildContext context, {
+    required String subtype,
+    required String url,
+  }) {
+    return Row(
+      children: [
+        Expanded(
+          child: ElevatedButton(
+            onPressed: () => _launchURL(context, url),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: primaryColor,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+              padding: const EdgeInsets.symmetric(vertical: 12),
+            ),
+            child: Text(
+              _siteApplicationActionLabel(subtype),
+              style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+            ),
+          ),
+        ),
+        if (advertisement.whatsappNumber.trim().isNotEmpty) ...[
+          const SizedBox(width: 10),
+          Expanded(
+            child: ElevatedButton.icon(
+              onPressed: openWhatsAppChat,
+              icon: const FaIcon(FontAwesomeIcons.whatsapp, size: 18),
+              label: Text(
+                langUserPhone == "fr" ? "Contacter" : "Contact",
+                style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color.fromRGBO(37, 211, 102, 0.5),
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                padding: const EdgeInsets.symmetric(vertical: 12),
+              ),
+            ),
+          ),
+        ],
+      ],
     );
   }
 
@@ -2387,7 +2583,7 @@ class AdvertisementDetailPage extends StatelessWidget {
     );
   }
 
-  Widget _buildInfoRow(String key, String value) {
+  Widget _buildInfoRow(BuildContext context, String key, String value) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12.0),
       child: Column(
@@ -2402,7 +2598,7 @@ class AdvertisementDetailPage extends StatelessWidget {
           ),
           SizedBox(height: 4),
           SelectableLinkify(
-            onOpen: (link) => _launchURL(link.url),
+             onOpen: (link) => _launchURL(context, link.url),
             text: value,
             style:
                 GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w500),
