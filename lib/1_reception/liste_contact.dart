@@ -19,10 +19,6 @@ class ContactDS {
   final String pays;
   final String tel;
   final String apropos;
-  final String tiktok;
-  final String instagram;
-  final String facebook;
-  final String youtube;
 
   const ContactDS({
     required this.id,
@@ -32,10 +28,6 @@ class ContactDS {
     required this.pays,
     required this.tel,
     required this.apropos,
-    required this.tiktok,
-    required this.instagram,
-    required this.facebook,
-    required this.youtube,
   });
 }
 
@@ -221,10 +213,6 @@ class _ContactPageState extends State<ContactPage> {
           pays: data['pays'],
           tel: data['tel'],
           apropos: data['apropos'],
-          tiktok: data['tiktok'],
-          instagram: data['instagram'],
-          facebook: data['facebook'],
-          youtube: data['youtube'],
         );
       }).toList();
 
