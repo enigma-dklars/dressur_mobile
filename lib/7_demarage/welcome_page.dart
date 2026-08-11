@@ -68,9 +68,21 @@ class _PageDepartState extends State<PageDepart> {
     try {
       decoded = convert.jsonDecode(body);
     } catch (_) {
+      if (response.statusCode == 401 || response.statusCode == 404) {
+        return <String, dynamic>{
+          'error': true,
+          '_statusCode': response.statusCode,
+        };
+      }
       throw const FormatException('Invalid server response');
     }
     if (decoded is! Map<String, dynamic>) {
+      if (response.statusCode == 401 || response.statusCode == 404) {
+        return <String, dynamic>{
+          'error': true,
+          '_statusCode': response.statusCode,
+        };
+      }
       throw const FormatException('Invalid server response');
     }
     return <String, dynamic>{
@@ -129,6 +141,7 @@ class _PageDepartState extends State<PageDepart> {
       'getUserInfo',
       fields: {'uid': storedUid},
     );
+
     if (data['error'] == false && data['user'] is Map<String, dynamic>) {
       uidUser = storedUid;
       await initUserInformations(data['user']);
@@ -138,13 +151,63 @@ class _PageDepartState extends State<PageDepart> {
     if (data['blocked'] == true || data['code'] == 'account_blocked') {
       return _SessionRestoreResult.blocked;
     }
-    if (data['deleted'] == true ||
-        data['code'] == 'session_invalid' ||
-        data['code'] == 'session_missing' ||
-        data['_statusCode'] == 401) {
+    if (_isInvalidSessionResponse(data)) {
       return _SessionRestoreResult.invalid;
     }
     return _SessionRestoreResult.serverError;
+  }
+
+  bool _isInvalidSessionResponse(Map<String, dynamic> data) {
+    final statusCode = data['_statusCode'];
+    if (statusCode == 401 || statusCode == 404) return true;
+    if (data['deleted'] == true) return true;
+
+    final code = data['code']?.toString().toLowerCase();
+    const invalidSessionCodes = <String>{
+      'session_missing',
+      'session_invalid',
+      'user_missing',
+      'user_not_found',
+      'account_not_found',
+    };
+    if (code != null && invalidSessionCodes.contains(code)) return true;
+
+    if (data['user'] != null) return false;
+    final responseText = _normalizeResponseText(
+      '${data['titre'] ?? ''} ${data['message'] ?? ''}',
+    );
+    return responseText.contains('user not found') ||
+        responseText.contains('utilisateur introuvable') ||
+        responseText.contains('utilisateur non trouve') ||
+        responseText.contains('account not found') ||
+        responseText.contains('compte introuvable') ||
+        responseText.contains('compte non trouve');
+  }
+
+  String _normalizeResponseText(String value) {
+    return value
+        .toLowerCase()
+        .replaceAll('é', 'e')
+        .replaceAll('è', 'e')
+        .replaceAll('ê', 'e')
+        .replaceAll('ë', 'e')
+        .replaceAll('à', 'a')
+        .replaceAll('â', 'a')
+        .replaceAll('î', 'i')
+        .replaceAll('ï', 'i')
+        .replaceAll('ô', 'o')
+        .replaceAll('ù', 'u')
+        .replaceAll('û', 'u');
+  }
+
+  Future<void> _clearCachedSessionSafely() async {
+    uidUser = null;
+    try {
+      await SQLHelper.clearCachedSession()
+          .timeout(const Duration(seconds: 3));
+    } catch (_) {
+      // The recovery screen remains available even if local cleanup fails.
+    }
   }
 
   Future<void> directConnect() async {
@@ -172,16 +235,14 @@ class _PageDepartState extends State<PageDepart> {
 
       final result = await _restoreSession(storedUid);
       if (result == _SessionRestoreResult.invalid) {
-        await SQLHelper.clearCachedSession();
-        uidUser = null;
+        await _clearCachedSessionSafely();
         await _waitForMinimumSplash(startedAt);
         if (!mounted) return;
         _openStartupRecovery(_StartupFailure.sessionInvalid);
         return;
       }
       if (result == _SessionRestoreResult.blocked) {
-        await SQLHelper.clearCachedSession();
-        uidUser = null;
+        await _clearCachedSessionSafely();
         await _waitForMinimumSplash(startedAt);
         if (!mounted) return;
         _openStartupRecovery(_StartupFailure.accountBlocked);

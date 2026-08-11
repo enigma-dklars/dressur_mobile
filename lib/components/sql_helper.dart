@@ -155,6 +155,13 @@ class SQLHelper {
   /// user to lose locally collected information just because the account was
   /// deleted or the API is temporarily unavailable.
   static Future<void> clearCachedSession() async {
+    await Future.wait<void>([
+      _clearCurrentCachedSession(),
+      _clearLegacyCachedSession(),
+    ]);
+  }
+
+  static Future<void> _clearCurrentCachedSession() async {
     try {
       final db = await SQLHelper.db();
       await db.delete("userInfos",
@@ -162,7 +169,9 @@ class SQLHelper {
     } catch (err) {
       debugPrint("Unable to clear current cached session: $err");
     }
+  }
 
+  static Future<void> _clearLegacyCachedSession() async {
     // Older releases stored the identity in a separate database. Clear it
     // too, otherwise the fallback lookup can restore the same invalid UID.
     try {
