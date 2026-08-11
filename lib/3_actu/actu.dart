@@ -1337,6 +1337,10 @@ class _ActuPageState extends State<ActuPage>
                             itemBuilder: (context, index) {
                               Advertisement advertisement =
                                   snapshot.data![index];
+                             if (advertisement.typePromotionAffaire ==
+                                 "sites_applications") {
+                               return _buildSiteApplicationCard(advertisement);
+                             }
                               return Container(
                                 margin: const EdgeInsets.only(
                                     left: 7, top: 0, right: 7, bottom: 0),
@@ -1462,6 +1466,269 @@ class _ActuPageState extends State<ActuPage>
               ),
             ),
           ),
+        ],
+      ),
+    );
+  }
+
+  Map<String, dynamic> _parseSiteApplicationInfo(String rawInfo) {
+    if (rawInfo.trim().isEmpty) return {};
+
+    try {
+      final decoded = jsonDecode(rawInfo);
+      if (decoded is Map) {
+        return Map<String, dynamic>.from(decoded);
+      }
+    } catch (_) {}
+
+    return {};
+  }
+
+  String _siteApplicationValue(
+      Map<String, dynamic> info, String primaryKey, String fallbackKey) {
+    final primaryValue = info[primaryKey]?.toString().trim() ?? "";
+    if (primaryValue.isNotEmpty) return primaryValue;
+    return info[fallbackKey]?.toString().trim() ?? "";
+  }
+
+  String _siteApplicationTypeLabel(String subtype) {
+    switch (subtype) {
+      case "app_mobile":
+        return langUserPhone == "fr" ? "App mobile" : "Mobile app";
+      case "logiciel_desktop":
+        return langUserPhone == "fr" ? "Logiciel desktop" : "Desktop software";
+      case "site_web":
+      default:
+        return langUserPhone == "fr" ? "Site web" : "Website";
+    }
+  }
+
+  String _siteApplicationActionLabel(String subtype) {
+    switch (subtype) {
+      case "app_mobile":
+        return langUserPhone == "fr" ? "Télécharger" : "Download";
+      case "logiciel_desktop":
+        return langUserPhone == "fr" ? "Savoir plus" : "Learn more";
+      case "site_web":
+      default:
+        return langUserPhone == "fr" ? "Ouvrir" : "Open";
+    }
+  }
+
+  Future<void> _openSiteApplicationUrl(
+      BuildContext context, String rawUrl) async {
+    final url = rawUrl.trim();
+    final uri = Uri.tryParse(url);
+    final isValidUrl = uri != null &&
+        uri.hasScheme &&
+        uri.host.isNotEmpty &&
+        (uri.scheme == "http" || uri.scheme == "https");
+
+    if (!isValidUrl) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            langUserPhone == "fr"
+                ? "L’URL de cette promotion n’est pas valide."
+                : "The URL for this promotion is invalid.",
+          ),
+        ),
+      );
+      return;
+    }
+
+    if (!await canLaunchUrl(uri)) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            langUserPhone == "fr"
+                ? "Impossible d’ouvrir cette URL."
+                : "This URL could not be opened.",
+          ),
+        ),
+      );
+      return;
+    }
+
+    final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
+    if (!launched && context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            langUserPhone == "fr"
+                ? "Impossible d’ouvrir cette URL."
+                : "This URL could not be opened.",
+          ),
+        ),
+      );
+    }
+  }
+
+  Widget _buildSiteApplicationCard(Advertisement advertisement) {
+    final info = _parseSiteApplicationInfo(advertisement.annotherInfo);
+    final nom = _siteApplicationValue(info, "nom", "nomSiteApp");
+    final sousType =
+        _siteApplicationValue(info, "sousType", "sousTypeSiteApp");
+    final url = _siteApplicationValue(info, "url", "urlSiteApp");
+    final normalizedSubtype =
+        const {"site_web", "app_mobile", "logiciel_desktop"}.contains(sousType)
+            ? sousType
+            : "site_web";
+
+    return Container(
+      margin: const EdgeInsets.only(left: 7, top: 0, right: 7, bottom: 0),
+      child: Column(
+        children: [
+          Card(
+            child: Column(
+              children: [
+                GestureDetector(
+                  onTap: () {
+                    setPromotionToWatch(advertisement);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => AdvertisementDetailPage(
+                          advertisement: advertisement,
+                        ),
+                      ),
+                    );
+                  },
+                  child: Column(
+                    children: [
+                      Stack(
+                        children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(10),
+                            child: CachedNetworkImage(
+                              imageUrl: advertisement.image,
+                              placeholder: (context, url) => Image.asset(
+                                'images/placeholder.png',
+                              ),
+                              errorWidget: (context, url, error) => Image.asset(
+                                'images/error_image.png',
+                              ),
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                          if (advertisement.inProgrammeRecompense)
+                            Positioned(
+                              top: 10,
+                              right: 10,
+                              child: AnimatedRewardBadge(
+                                onTap: () => _showRewardInfo(context),
+                              ),
+                            ),
+                        ],
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(12, 10, 12, 5),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            if (nom.isNotEmpty)
+                              Text(
+                                nom,
+                                style: GoogleFonts.poppins(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            const SizedBox(height: 6),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 3,
+                              ),
+                              decoration: BoxDecoration(
+                                color: primaryColor.withOpacity(0.12),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Text(
+                                _siteApplicationTypeLabel(normalizedSubtype),
+                                style: GoogleFonts.poppins(
+                                  fontSize: 11,
+                                  color: primaryColor,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              advertisement.description,
+                              style: GoogleFonts.poppins(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w400,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(12, 4, 12, 10),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: ElevatedButton.icon(
+                          onPressed: () => sharePromotion(
+                            context,
+                            advertisement.image,
+                            advertisement.imageName,
+                            advertisement.description,
+                          ),
+                          icon: const FaIcon(
+                            FontAwesomeIcons.shareNodes,
+                            size: 18,
+                          ),
+                          label: Text(
+                            langUserPhone == "fr" ? "Partager" : "Share",
+                            style: GoogleFonts.poppins(
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: primaryColor.withOpacity(0.1),
+                            foregroundColor: primaryColor,
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            padding: const EdgeInsets.symmetric(vertical: 10),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: () =>
+                              _openSiteApplicationUrl(context, url),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: primaryColor,
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            padding: const EdgeInsets.symmetric(vertical: 10),
+                          ),
+                          child: Text(
+                            _siteApplicationActionLabel(normalizedSubtype),
+                            style: GoogleFonts.poppins(
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 5),
         ],
       ),
     );
