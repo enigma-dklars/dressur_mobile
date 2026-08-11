@@ -1491,31 +1491,43 @@ class _ActuPageState extends State<ActuPage>
     return info[fallbackKey]?.toString().trim() ?? "";
   }
 
-  String _siteApplicationTypeLabel(String subtype) {
-    switch (subtype) {
-      case "app_mobile":
-        return langUserPhone == "fr" ? "App mobile" : "Mobile app";
-      case "logiciel_desktop":
-        return langUserPhone == "fr" ? "Logiciel desktop" : "Desktop software";
-      case "site_web":
-      default:
-        return langUserPhone == "fr" ? "Site web" : "Website";
+  String _siteApplicationIconUrl(
+        Map<String, dynamic> info, String fallbackImage) {
+      const iconKeys = ["iconUrl", "urlIcon", "imageIcon", "icone", "icon"];
+      for (final key in iconKeys) {
+        final value = info[key]?.toString().trim() ?? "";
+        if (value.isNotEmpty) return value;
+      }
+      return fallbackImage;
     }
-  }
 
-  String _siteApplicationActionLabel(String subtype) {
-    switch (subtype) {
-      case "app_mobile":
-        return langUserPhone == "fr" ? "Télécharger" : "Download";
-      case "logiciel_desktop":
-        return langUserPhone == "fr" ? "Savoir plus" : "Learn more";
-      case "site_web":
-      default:
-        return langUserPhone == "fr" ? "Ouvrir" : "Open";
+    String _siteApplicationTypeLabel(String subtype) {
+      switch (subtype) {
+        case "app_mobile":
+          return langUserPhone == "fr" ? "Application mobile" : "Mobile application";
+        case "logiciel_desktop":
+          return langUserPhone == "fr"
+              ? "Logiciel / application desktop"
+              : "Desktop software/application";
+        case "site_web":
+        default:
+          return langUserPhone == "fr" ? "Site web" : "Website";
+      }
     }
-  }
 
-  Future<void> _openSiteApplicationUrl(
+    String _siteApplicationActionLabel(String subtype) {
+      switch (subtype) {
+        case "app_mobile":
+          return langUserPhone == "fr" ? "Télécharger" : "Download";
+        case "logiciel_desktop":
+          return langUserPhone == "fr" ? "En savoir plus" : "Learn more";
+        case "site_web":
+        default:
+          return langUserPhone == "fr" ? "Ouvrir" : "Open";
+      }
+    }
+
+      Future<void> _openSiteApplicationUrl(
       BuildContext context, String rawUrl) async {
     final url = rawUrl.trim();
     final uri = Uri.tryParse(url);
@@ -1566,175 +1578,218 @@ class _ActuPageState extends State<ActuPage>
   }
 
   Widget _buildSiteApplicationCard(Advertisement advertisement) {
-    final info = _parseSiteApplicationInfo(advertisement.annotherInfo);
-    final nom = _siteApplicationValue(info, "nom", "nomSiteApp");
-    final sousType =
-        _siteApplicationValue(info, "sousType", "sousTypeSiteApp");
-    final url = _siteApplicationValue(info, "url", "urlSiteApp");
-    final normalizedSubtype =
-        const {"site_web", "app_mobile", "logiciel_desktop"}.contains(sousType)
-            ? sousType
-            : "site_web";
+      final info = _parseSiteApplicationInfo(advertisement.annotherInfo);
+      final nom = _siteApplicationValue(info, "nom", "nomSiteApp");
+      final sousType =
+          _siteApplicationValue(info, "sousType", "sousTypeSiteApp");
+      final url = _siteApplicationValue(info, "url", "urlSiteApp");
+      final iconUrl = _siteApplicationIconUrl(info, advertisement.image);
+      final normalizedSubtype =
+          const {"site_web", "app_mobile", "logiciel_desktop"}.contains(sousType)
+              ? sousType
+              : "site_web";
+      final displayName = nom.isNotEmpty ? nom : advertisement.pseudoAnnonceur;
 
-    return Container(
-      margin: const EdgeInsets.only(left: 7, top: 0, right: 7, bottom: 0),
-      child: Column(
-        children: [
-          Card(
-            child: Column(
-              children: [
-                GestureDetector(
-                  onTap: () {
-                    setPromotionToWatch(advertisement);
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => AdvertisementDetailPage(
-                          advertisement: advertisement,
+      return Container(
+        margin: const EdgeInsets.only(left: 7, top: 0, right: 7, bottom: 0),
+        child: Column(
+          children: [
+            Card(
+              child: Column(
+                children: [
+                  Stack(
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          setPromotionToWatch(advertisement);
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => AdvertisementDetailPage(
+                                advertisement: advertisement,
+                              ),
+                            ),
+                          );
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(12, 12, 56, 8),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Container(
+                                    width: 64,
+                                    height: 64,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      border: Border.all(
+                                        color: primaryColor.withOpacity(0.35),
+                                        width: 2,
+                                      ),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black.withOpacity(0.12),
+                                          blurRadius: 6,
+                                          offset: const Offset(0, 2),
+                                        ),
+                                      ],
+                                    ),
+                                    child: ClipOval(
+                                      child: CachedNetworkImage(
+                                        imageUrl: iconUrl,
+                                        placeholder: (context, url) => Image.asset(
+                                          'images/placeholder.png',
+                                          fit: BoxFit.cover,
+                                        ),
+                                        errorWidget: (context, url, error) =>
+                                            Image.asset(
+                                          'images/error_image.png',
+                                          fit: BoxFit.cover,
+                                        ),
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          displayName,
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: GoogleFonts.poppins(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 8),
+                                        Divider(
+                                          height: 1,
+                                          thickness: 0.7,
+                                          color: Theme.of(context)
+                                              .dividerColor
+                                              .withOpacity(0.55),
+                                        ),
+                                        const SizedBox(height: 8),
+                                        Text(
+                                          _siteApplicationTypeLabel(
+                                              normalizedSubtype),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: GoogleFonts.poppins(
+                                            fontSize: 12,
+                                            color: primaryColor,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 12),
+                              Text(
+                                advertisement.description,
+                                softWrap: true,
+                                style: GoogleFonts.poppins(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w400,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
-                    );
-                  },
-                  child: Column(
-                    children: [
-                      Stack(
-                        children: [
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(10),
-                            child: CachedNetworkImage(
-                              imageUrl: advertisement.image,
-                              placeholder: (context, url) => Image.asset(
-                                'images/placeholder.png',
-                              ),
-                              errorWidget: (context, url, error) => Image.asset(
-                                'images/error_image.png',
-                              ),
-                              fit: BoxFit.cover,
-                            ),
+                      if (advertisement.inProgrammeRecompense)
+                        Positioned(
+                          top: 10,
+                          right: 10,
+                          child: AnimatedRewardBadge(
+                            onTap: () => _showRewardInfo(context),
                           ),
-                          if (advertisement.inProgrammeRecompense)
-                            Positioned(
-                              top: 10,
-                              right: 10,
-                              child: AnimatedRewardBadge(
-                                onTap: () => _showRewardInfo(context),
-                              ),
+                        ),
+                    ],
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(12, 4, 12, 10),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: ElevatedButton.icon(
+                            onPressed: () => sharePromotion(
+                              context,
+                              advertisement.image,
+                              advertisement.imageName,
+                              advertisement.description,
                             ),
-                        ],
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(12, 10, 12, 5),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            if (nom.isNotEmpty)
-                              Text(
-                                nom,
+                            icon: const FaIcon(
+                              FontAwesomeIcons.shareNodes,
+                              size: 18,
+                            ),
+                            label: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Text(
+                                langUserPhone == "fr" ? "Partager" : "Share",
+                                maxLines: 1,
                                 style: GoogleFonts.poppins(
-                                  fontSize: 16,
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
-                            const SizedBox(height: 6),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
-                                vertical: 3,
-                              ),
-                              decoration: BoxDecoration(
-                                color: primaryColor.withOpacity(0.12),
+                            ),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: primaryColor.withOpacity(0.1),
+                              foregroundColor: primaryColor,
+                              elevation: 0,
+                              shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(10),
                               ),
+                              padding: const EdgeInsets.symmetric(vertical: 10),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: () =>
+                                _openSiteApplicationUrl(context, url),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: primaryColor,
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              padding: const EdgeInsets.symmetric(vertical: 10),
+                            ),
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
                               child: Text(
-                                _siteApplicationTypeLabel(normalizedSubtype),
+                                _siteApplicationActionLabel(normalizedSubtype),
+                                maxLines: 1,
                                 style: GoogleFonts.poppins(
-                                  fontSize: 11,
-                                  color: primaryColor,
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
                             ),
-                            const SizedBox(height: 8),
-                            Text(
-                              advertisement.description,
-                              style: GoogleFonts.poppins(
-                                fontSize: 15,
-                                fontWeight: FontWeight.w400,
-                              ),
-                            ),
-                          ],
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(12, 4, 12, 10),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: ElevatedButton.icon(
-                          onPressed: () => sharePromotion(
-                            context,
-                            advertisement.image,
-                            advertisement.imageName,
-                            advertisement.description,
-                          ),
-                          icon: const FaIcon(
-                            FontAwesomeIcons.shareNodes,
-                            size: 18,
-                          ),
-                          label: Text(
-                            langUserPhone == "fr" ? "Partager" : "Share",
-                            style: GoogleFonts.poppins(
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: primaryColor.withOpacity(0.1),
-                            foregroundColor: primaryColor,
-                            elevation: 0,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            padding: const EdgeInsets.symmetric(vertical: 10),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: ElevatedButton(
-                          onPressed: () =>
-                              _openSiteApplicationUrl(context, url),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: primaryColor,
-                            foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            padding: const EdgeInsets.symmetric(vertical: 10),
-                          ),
-                          child: Text(
-                            _siteApplicationActionLabel(normalizedSubtype),
-                            style: GoogleFonts.poppins(
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-          const SizedBox(height: 5),
-        ],
-      ),
-    );
-  }
+            const SizedBox(height: 5),
+          ],
+        ),
+      );
+    }
 
-  Widget _buildActionChecklist({
+      Widget _buildActionChecklist({
     required BuildContext context,
     required bool showTel,
     required bool showMail,
