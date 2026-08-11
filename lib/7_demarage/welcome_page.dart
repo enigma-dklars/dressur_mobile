@@ -8,7 +8,6 @@ import 'package:dressur/7_demarage/permissions_required_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:dressur/7_demarage/update_app_important.dart';
 import 'package:dressur/7_demarage/presentation_ds.dart';
 import 'package:dressur/components/constant.dart';
@@ -101,22 +100,6 @@ class _PageDepartState extends State<PageDepart> {
     return null;
   }
 
-  Future<bool> _requestFirstLaunchPermissions() async {
-    try {
-      final results = <PermissionStatus>[];
-      results.add(await Permission.contacts.request().timeout(_requestTimeout));
-      results.add(await Permission.storage.request().timeout(_requestTimeout));
-      results.add(await Permission.scheduleExactAlarm
-          .request()
-          .timeout(_requestTimeout));
-      return results.every((status) => status.isGranted);
-    } catch (_) {
-      // Permission prompts are optional for startup. The user can continue
-      // and grant them later from the dedicated page.
-      return false;
-    }
-  }
-
   Future<bool> _checkAppVersion() async {
     final data = await _requestJson('getVersionApp');
     if (data['error'] == false && data['importantUpdate'] == true) {
@@ -181,14 +164,9 @@ class _PageDepartState extends State<PageDepart> {
 
       final storedUid = await _loadStoredUid();
       if (storedUid == null) {
-        final permissionsGranted = await _requestFirstLaunchPermissions();
         await _waitForMinimumSplash(startedAt);
         if (!mounted) return;
-        if (permissionsGranted) {
-          _openPresentation();
-        } else {
-          _openPermissions();
-        }
+        _openPresentation();
         return;
       }
 
