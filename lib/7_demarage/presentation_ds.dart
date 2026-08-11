@@ -83,6 +83,13 @@ final List<_SlideData> _slides = [
 ];
 
 class PresentationPage extends StatefulWidget {
+  final ValueChanged<BuildContext>? onOpenPermissions;
+
+  const PresentationPage({
+    this.onOpenPermissions,
+    Key? key,
+  }) : super(key: key);
+
   @override
   _PresentationPageState createState() => _PresentationPageState();
 }
@@ -233,19 +240,43 @@ class _PresentationPageState extends State<PresentationPage> {
       alignment: Alignment.topRight,
       child: Padding(
         padding: EdgeInsets.only(top: 52, right: 20),
-        child: TextButton(
-          onPressed: () => Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (_) => WelcomePage()),
-          ),
-          child: Text(
-            langUserPhone == "fr" ? "Passer" : "Skip",
-            style: GoogleFonts.poppins(
-              color: Colors.white54,
-              fontSize: 15,
-              fontWeight: FontWeight.w500,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            if (widget.onOpenPermissions != null)
+              TextButton.icon(
+                onPressed: () => widget.onOpenPermissions!(context),
+                icon: FaIcon(
+                  FontAwesomeIcons.gear,
+                  size: 14,
+                  color: Colors.white70,
+                ),
+                label: Text(
+                  langUserPhone == "fr"
+                      ? "Gérer les permissions"
+                      : "Manage permissions",
+                  style: GoogleFonts.poppins(
+                    color: Colors.white70,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
             ),
-          ),
+            TextButton(
+              onPressed: () => Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (_) => WelcomePage()),
+              ),
+              child: Text(
+                langUserPhone == "fr" ? "Passer" : "Skip",
+                style: GoogleFonts.poppins(
+                  color: Colors.white54,
+                  fontSize: 15,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

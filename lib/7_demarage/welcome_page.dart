@@ -300,26 +300,27 @@ class _PageDepartState extends State<PageDepart> {
     if (_navigationStarted || !mounted) return;
     _navigationStarted = true;
     Navigator.of(context).pushAndRemoveUntil(
-      MaterialPageRoute(builder: (_) => PresentationPage()),
+      MaterialPageRoute(
+        builder: (_) => PresentationPage(
+          onOpenPermissions: _openPermissions,
+        ),
+      ),
       (_) => false,
     );
   }
 
-  void _openPermissions() {
-    if (_navigationStarted || !mounted) return;
-    _navigationStarted = true;
-    Navigator.of(context).pushAndRemoveUntil(
+  void _openPermissions(BuildContext presentationContext) {
+    if (!presentationContext.mounted) return;
+    Navigator.of(presentationContext).push(
       MaterialPageRoute(
         builder: (_) => PermissionsRequiredPage(
           onContinue: () {
-            Navigator.of(context).pushAndRemoveUntil(
-              MaterialPageRoute(builder: (_) => PresentationPage()),
-              (_) => false,
-            );
+            if (presentationContext.mounted) {
+              Navigator.of(presentationContext).pop();
+            }
           },
         ),
       ),
-      (_) => false,
     );
   }
 
