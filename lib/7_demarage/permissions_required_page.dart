@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -19,8 +21,12 @@ class PermissionsRequiredPage extends StatefulWidget {
 
 class _PermissionsRequiredPageState extends State<PermissionsRequiredPage>
     with WidgetsBindingObserver {
+  static const _permissionCheckTimeout = Duration(seconds: 8);
+  static const _settingsTimeout = Duration(seconds: 3);
+
   bool _checking = false;
   bool _navigationStarted = false;
+  String? _checkMessage;
 
   @override
   void initState() {
@@ -36,32 +42,88 @@ class _PermissionsRequiredPageState extends State<PermissionsRequiredPage>
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed) _checkPermissions();
+    if (state == AppLifecycleState.resumed) {
+      _checkPermissions();
+    }
   }
 
   Future<void> _checkPermissions() async {
-    if (_checking) return;
+    if (_checking || !mounted) return;
     setState(() => _checking = true);
+
     try {
       final statuses = await Future.wait<PermissionStatus>([
         Permission.contacts.status,
         Permission.storage.status,
         Permission.scheduleExactAlarm.status,
-      ]).timeout(const Duration(seconds: 8));
+      ]).timeout(_permissionCheckTimeout);
+
       if (!mounted) return;
       if (statuses.every((status) => status.isGranted) &&
           !_navigationStarted) {
-        _navigationStarted = true;
-        Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (_) => PresentationPage()),
-          (_) => false,
-        );
+        _continueWithoutPermissions();
+      } else {
+        setState(() => _checkMessage = null);
+      }
+    } on TimeoutException {
+      if (mounted) {
+        setState(() {
+          _checkMessage = langUserPhone == "fr"
+              ? "La vérification prend trop de temps. Vous pouvez réessayer ou continuer."
+              : "The check is taking too long. You can retry or continue.";
+        });
       }
     } catch (_) {
-      // The page remains actionable; permissions can be checked on next resume.
+      if (mounted) {
+        setState(() {
+          _checkMessage = langUserPhone == "fr"
+              ? "Les autorisations n'ont pas pu être vérifiées. Vous pouvez réessayer ou continuer."
+              : "Permissions could not be checked. You can retry or continue.";
+        });
+      }
     } finally {
-      if (mounted) setState(() => _checking = false);
+      if (mounted && _checking) {
+        setState(() => _checking = false);
+      }
     }
+  }
+
+  Future<void> _openSettings() async {
+    if (_checking || !mounted) return;
+
+    setState(() => _checkMessage = null);
+    try {
+      await openAppSettings().timeout(_settingsTimeout);
+    } on TimeoutException {
+      // Android may keep the settings screen open even when this call times out.
+    } catch (_) {
+      if (mounted) {
+        setState(() {
+          _checkMessage = langUserPhone == "fr"
+              ? "Les paramètres n'ont pas pu être ouverts. Vous pouvez vérifier à nouveau ou continuer."
+              : "Settings could not be opened. You can check again or continue.";
+        });
+      }
+    }
+
+    if (mounted) {
+      await _checkPermissions();
+    }
+  }
+
+  void _continueWithoutPermissions() {
+    if (_navigationStarted || !mounted) return;
+    _navigationStarted = true;
+
+    if (widget.onContinue != null) {
+      widget.onContinue!();
+      return;
+    }
+
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(builder: (_) => PresentationPage()),
+      (_) => false,
+    );
   }
 
   @override
@@ -82,8 +144,8 @@ class _PermissionsRequiredPageState extends State<PermissionsRequiredPage>
               const SizedBox(height: 40),
               Text(
                 langUserPhone == "fr"
-                    ? "Autorisations requises"
-                    : "Permissions Required",
+                    ? "Autorisations pour certaines fonctions"
+                    : "Permissions for some features",
                 style: GoogleFonts.poppins(
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
@@ -94,11 +156,13 @@ class _PermissionsRequiredPageState extends State<PermissionsRequiredPage>
               const SizedBox(height: 20),
               Text(
                 langUserPhone == "fr"
-                    ? "Pour que Dressur fonctionne correctement, vous devez autoriser :\n\n"
+                    ? "Ces autorisations permettent d'utiliser certaines fonctions de Dressur. "
+                        "Vous pouvez continuer à utiliser l'application sans les accorder.\n\n"
                         "• Accès aux contacts\n"
                         "• Notifications (alarmes exactes)\n"
                         "• Accès au stockage"
-                    : "For Dressur to work properly, you must allow:\n\n"
+                    : "These permissions enable some Dressur features. "
+                        "You can continue using the app without granting them.\n\n"
                         "• Access to contacts\n"
                         "• Notifications (exact alarms)\n"
                         "• Storage access",
@@ -111,12 +175,7 @@ class _PermissionsRequiredPageState extends State<PermissionsRequiredPage>
               ),
               const SizedBox(height: 40),
               ElevatedButton.icon(
-                onPressed: _checking
-                    ? null
-                    : () async {
-                        await openAppSettings();
-                        if (mounted) await _checkPermissions();
-                      },
+                onPressed: _checking ? null : _openSettings,
                 icon: const FaIcon(FontAwesomeIcons.gear, color: Colors.black),
                 label: Text(
                   langUserPhone == "fr"
@@ -144,7 +203,7 @@ class _PermissionsRequiredPageState extends State<PermissionsRequiredPage>
                 ),
               ),
               TextButton(
-                onPressed: widget.onContinue,
+                onPressed: _continueWithoutPermissions,
                 child: Text(
                   langUserPhone == "fr"
                       ? "Continuer sans ces autorisations"
@@ -154,10 +213,32 @@ class _PermissionsRequiredPageState extends State<PermissionsRequiredPage>
                 ),
               ),
               const SizedBox(height: 20),
+              if (_checking)
+                Text(
+                  langUserPhone == "fr"
+                      ? "Vérification en cours…"
+                      : "Checking permissions…",
+                  style: GoogleFonts.poppins(
+                    fontSize: 14,
+                    color: Colors.white70,
+                  ),
+                  textAlign: TextAlign.center,
+                )
+              else if (_checkMessage != null)
+                Text(
+                  _checkMessage!,
+                  style: GoogleFonts.poppins(
+                    fontSize: 14,
+                    color: Colors.white70,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              if (_checking || _checkMessage != null)
+                const SizedBox(height: 12),
               Text(
                 langUserPhone == "fr"
-                    ? "Après avoir accordé les autorisations,\nfermez et relancez l'application."
-                    : "After granting permissions,\nclose and restart the app.",
+                    ? "Après votre retour des paramètres, les autorisations seront vérifiées automatiquement."
+                    : "When you return from Settings, permissions will be checked automatically.",
                 style: GoogleFonts.poppins(
                   fontSize: 16,
                   color: Colors.white60,
