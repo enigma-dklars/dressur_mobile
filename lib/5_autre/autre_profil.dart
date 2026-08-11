@@ -7,7 +7,6 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:dressur/components/constant.dart';
 import 'package:http/http.dart' as http;
-import 'package:url_launcher/url_launcher.dart';
 
 class AutreProfilPage extends StatefulWidget {
   @override
@@ -25,10 +24,6 @@ class _AutreProfilPageState extends State<AutreProfilPage> {
   var autre_pays;
   var autre_tel;
   var autre_apropos;
-  var autre_tiktok;
-  var autre_instagram;
-  var autre_facebook;
-  var autre_youtube;
   var autre_affUserName;
   var autre_profilePic;
   var autre_bannerPic;
@@ -60,10 +55,6 @@ class _AutreProfilPageState extends State<AutreProfilPage> {
           autre_pays = userAutreInfos["pays"];
           autre_tel = userAutreInfos["tel"];
           autre_apropos = userAutreInfos["apropos"];
-          autre_tiktok = userAutreInfos["tiktok"];
-          autre_instagram = userAutreInfos["instagram"];
-          autre_facebook = userAutreInfos["facebook"];
-          autre_youtube = userAutreInfos["youtube"];
           autre_affUserName = userAutreInfos["affUserName"];
           // autre_profilePic = userAutreInfos["profilePic"];
           // autre_bannerPic = userAutreInfos["bannerPic"];
@@ -271,14 +262,6 @@ class _AutreProfilPageState extends State<AutreProfilPage> {
                                   ? "Numéro de Téléphone"
                                   : "Phone number",
                               autre_tel),
-                        if (autre_tiktok != null)
-                          buildSocialMediaCard("TikTok", autre_tiktok),
-                        if (autre_youtube != null)
-                          buildSocialMediaCard("Youtube", autre_youtube),
-                        if (autre_facebook != null)
-                          buildSocialMediaCard("Facebook", autre_facebook),
-                        if (autre_instagram != null)
-                          buildSocialMediaCard("Instagram", autre_instagram),
                         if (autre_apropos != null)
                           buildInfoCard(
                               (langUserPhone == "fr") ? "À propos" : "About",
@@ -354,49 +337,4 @@ class _AutreProfilPageState extends State<AutreProfilPage> {
     );
   }
 
-  Widget buildSocialMediaCard(String platform, String url) {
-    return Card(
-      margin: EdgeInsets.only(bottom: 10),
-      child: ListTile(
-        // Le changement est ici : la fonction retourne directement le bon widget
-        leading: getSocialMediaIcon(platform),
-        title: Text(
-          platform,
-          style: GoogleFonts.poppins(fontSize: 18),
-        ),
-        onTap: () async {
-          final Uri _url = Uri.parse(url);
-          if (!await launchUrl(_url, mode: LaunchMode.externalApplication)) {
-            throw 'Could not launch $_url';
-          }
-        },
-      ),
-    );
-  }
-
-// La fonction améliorée qui retourne un FaIcon
-  FaIcon getSocialMediaIcon(String platform) {
-    switch (platform.toLowerCase()) {
-      // Utiliser toLowerCase() pour plus de robustesse
-      case "tiktok":
-        // FontAwesome a une icône spécifique pour TikTok
-        return FaIcon(FontAwesomeIcons.tiktok);
-
-      case "youtube":
-        return FaIcon(FontAwesomeIcons.youtube);
-
-      case "facebook":
-        return FaIcon(
-            FontAwesomeIcons.facebook); // Couleur officielle de Facebook
-
-      case "instagram":
-        // L'icône Instagram est souvent représentée par un dégradé,
-        // mais une couleur unie comme le magenta est une bonne alternative.
-        return FaIcon(FontAwesomeIcons.instagram);
-
-      default:
-        // Une icône de lien générique si la plateforme n'est pas reconnue
-        return FaIcon(FontAwesomeIcons.link);
-    }
-  }
 }
