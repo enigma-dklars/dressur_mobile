@@ -125,10 +125,6 @@ var tel;
 var apropos;
 var createdAt;
 var messageErreurPermissionAdd;
-var tiktok;
-var instagram;
-var facebook;
-var youtube;
 var soldeProgrammeRecompense;
 
 Future<bool> isConnectedToInternet() async {
@@ -161,10 +157,6 @@ Future<void> initUserInformations(userInfos) async {
   pays = userInfos["pays"];
   tel = userInfos["tel"];
   apropos = userInfos["apropos"];
-  tiktok = userInfos["tiktok"];
-  instagram = userInfos["instagram"];
-  facebook = userInfos["facebook"];
-  youtube = userInfos["youtube"];
   mailIsVerified = userInfos["mailIsVerified"];
   telIsVerified = userInfos["telIsVerified"];
   langUserPhone = userInfos["lang"];
