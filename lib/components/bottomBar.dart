@@ -9,7 +9,6 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:dressur/6_login_register/connexion.dart';
@@ -18,6 +17,7 @@ import 'package:dressur/3_actu/actu.dart';
 import 'package:dressur/5_autre/autre.dart';
 import 'package:dressur/components/constant.dart';
 import 'package:dressur/components/contacts_pending_interrupt.dart';
+import 'package:dressur/components/permission_manager.dart';
 import 'package:dressur/components/sql_helper.dart';
 import 'package:dressur/components/noti_sys.dart';
 
@@ -224,9 +224,10 @@ class _BottomBarState extends State<BottomBar> with WidgetsBindingObserver {
     Future<void> Function() task,
   ) async {
     try {
-      final permission = await Permission.contacts.status
+      final permission = await PermissionManager.instance
+          .check(Permission.contacts)
           .timeout(const Duration(seconds: 3));
-      if (!permission.isGranted) return;
+      if (!permission.canProceed) return;
 
       await task().timeout(_refreshTimeout);
     } catch (_) {

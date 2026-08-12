@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:dressur/components/constant.dart';
 import 'package:dressur/7_demarage/presentation_ds.dart';
+import 'package:dressur/components/permission_manager.dart';
 
 class PermissionsRequiredPage extends StatefulWidget {
   const PermissionsRequiredPage({
@@ -52,10 +53,10 @@ class _PermissionsRequiredPageState extends State<PermissionsRequiredPage>
     setState(() => _checking = true);
 
     try {
-      final statuses = await Future.wait<PermissionStatus>([
-        Permission.contacts.status,
-        Permission.storage.status,
-        Permission.scheduleExactAlarm.status,
+      final statuses = await Future.wait<AppPermissionResult>([
+        PermissionManager.instance.check(Permission.contacts),
+        PermissionManager.instance.check(Permission.storage),
+        PermissionManager.instance.check(Permission.scheduleExactAlarm),
       ]).timeout(_permissionCheckTimeout);
 
       if (!mounted) return;
@@ -93,7 +94,7 @@ class _PermissionsRequiredPageState extends State<PermissionsRequiredPage>
 
     setState(() => _checkMessage = null);
     try {
-      await openAppSettings().timeout(_settingsTimeout);
+      await PermissionManager.instance.openSettings().timeout(_settingsTimeout);
     } on TimeoutException {
       // Android may keep the settings screen open even when this call times out.
     } catch (_) {

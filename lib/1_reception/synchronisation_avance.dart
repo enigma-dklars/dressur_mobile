@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:dressur/components/constant.dart';
 import 'package:dressur/components/noti.dart';
+import 'package:dressur/components/permission_manager.dart';
 import 'package:dressur/components/synchro_avance_service.dart';
 
 class SynchroAvance extends StatelessWidget {
@@ -52,13 +53,11 @@ class _SynchroAvancePageState extends State<_SynchroAvancePage> {
 
   /// Demande la permission contacts et insère le contact Dressur si accordée.
   Future<void> _initPermissionsAndContact() async {
-    PermissionStatus permission = await Permission.contacts.status;
-    if (permission != PermissionStatus.granted) {
-      permission = await Permission.contacts.request();
-    }
-    if (permission == PermissionStatus.granted) {
+    final permission =
+        await PermissionManager.instance.request(Permission.contacts);
+    if (permission.canProceed) {
       insertDressurContact();
-    } else if (permission != PermissionStatus.granted) {
+    } else {
       if (!mounted) return;
       warningNoti(
         "Attention !",

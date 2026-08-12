@@ -2,11 +2,12 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:dressur/4_preference/choix_pays.dart';
 import 'package:dressur/components/constant.dart';
+import 'package:dressur/components/permission_manager.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -33,8 +34,9 @@ class _PreferencePageState extends State<PreferencePage>
   Future<List<Map<String, String?>>> _fetchAccountsList() async {
     final defaultEntry = {'name': null, 'type': null, 'label': langUserPhone == 'fr' ? 'Téléphone (local)' : 'Phone (local)'};
     try {
-      final granted = await FlutterContacts.requestPermission();
-      if (!granted) return [defaultEntry];
+      final permission =
+          await PermissionManager.instance.request(Permission.contacts);
+      if (!permission.canProceed) return [defaultEntry];
 
       // Interroge Android AccountManager directement via MethodChannel pour
       // lister TOUS les comptes du téléphone (Google, Exchange, etc.),

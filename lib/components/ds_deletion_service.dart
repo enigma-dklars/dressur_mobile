@@ -3,6 +3,7 @@ import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:dressur/components/constant.dart';
 import 'package:dressur/components/noti_sys.dart';
+import 'package:dressur/components/permission_manager.dart';
 
 class DSDeletionService extends ChangeNotifier {
   // ── Singleton ─────────────────────────────────────────────────────────────
@@ -64,18 +65,16 @@ class DSDeletionService extends ChangeNotifier {
     final bool isFr = langUserPhone == 'fr';
 
     // Permission contacts
-    PermissionStatus contactPerm = await Permission.contacts.status;
-    if (contactPerm != PermissionStatus.granted) {
-      contactPerm = await Permission.contacts.request();
-    }
-    if (contactPerm != PermissionStatus.granted) {
+    final contactPerm =
+        await PermissionManager.instance.request(Permission.contacts);
+    if (!contactPerm.canProceed) {
       return isFr
           ? "Veuillez autoriser Dressur à accéder à vos contacts."
           : "Please allow Dressur to access your contacts.";
     }
 
     // Permission notifications (Android 13+)
-    await Permission.notification.request();
+    await PermissionManager.instance.request(Permission.notification);
 
     // Démarrage
     isRunning = true;
