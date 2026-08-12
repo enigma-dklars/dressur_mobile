@@ -265,6 +265,8 @@ class _MesReseauxPageState extends State<MesReseauxPage> {
   }
 
   Future<void> _confirmAndDelete(_UserNetwork network) async {
+    if (_isMutating) return;
+
     final shouldDelete = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
