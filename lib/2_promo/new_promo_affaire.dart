@@ -224,8 +224,6 @@ class _ProduitsServicesState extends State<ProduitsServices> {
       prixBoost + _rewardProgramAmount + _dressurStatusAmount + _boostFacebookAmount;
 
   bool _publishOnDressurStatus = false;
-  // 25% du prix de la formule choisie
-  static const double _dressurStatusRate = 0.25;
 
   // --- CALCULS DES MONTANTS ---
   double get _rewardProgramAmount {
@@ -352,9 +350,12 @@ class _ProduitsServicesState extends State<ProduitsServices> {
   }
 
   double get _dressurStatusAmount {
-    if (!_publishOnDressurStatus || prixBoost < 1000) return 0.0;
-    // 25% du prix de la formule choisie
-    return prixBoost * _dressurStatusRate;
+    if (!_publishOnDressurStatus || prixBoost < 1000 || joursBoost <= 0) {
+      return 0.0;
+    }
+
+    // Même formule que l'API : round((nombreDeJours * 5000) / 7).
+    return ((joursBoost * 5000) / 7).roundToDouble();
   }
 
   bool isImageSquare(File imageFile) {
@@ -455,7 +456,8 @@ class _ProduitsServicesState extends State<ProduitsServices> {
     request.fields['publishOnDressurStatus'] =
         _publishOnDressurStatus ? "1" : "0";
     request.fields['boostFacebook'] = _boostFacebook ? "1" : "0";
-    request.fields['montantBoostFacebook'] = _boostFacebookAmountController.text;
+    request.fields['montantBoostFacebook'] =
+        _boostFacebook ? _boostFacebookAmountController.text : '0';
     request.fields['whatsappContact'] = whatsappContactController.text.trim();
     request.fields['totalAmount'] = _subTotal.toStringAsFixed(0);
     _debugValidatePromotionRequest(request);
