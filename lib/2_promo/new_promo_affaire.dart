@@ -14,6 +14,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:image/image.dart' as img;
 import 'package:dressur/components/constant.dart';
+import 'package:dressur/2_promo/boost_billing.dart';
 import 'package:dressur/components/noti.dart';
 import 'package:dressur/components/noti_sys.dart';
 import 'package:select_form_field/select_form_field.dart';
@@ -221,7 +222,15 @@ class _ProduitsServicesState extends State<ProduitsServices> {
   }
 
   double get _subTotal =>
-      prixBoost + _rewardProgramAmount + _dressurStatusAmount + _boostFacebookAmount;
+      BoostBilling.calculateTotal(
+        formulaAmount: prixBoost,
+        rewardEnabled: _participateInReward,
+        rewardBudget: _rewardBudget,
+        facebookEnabled: _boostFacebook,
+        facebookAmount: int.tryParse(_boostFacebookAmountController.text) ?? 0,
+        publishOnDressurStatus: _publishOnDressurStatus,
+        formulaDays: joursBoost,
+      );
 
   bool _publishOnDressurStatus = false;
 
@@ -447,19 +456,18 @@ class _ProduitsServicesState extends State<ProduitsServices> {
     request.fields['paymentMethod'] = valueMethodePaiement;
     request.fields['tel'] = telController.text;
 
-    request.fields['inProgrammeRecompense'] =
-        _participateInReward ? '1' : '0';
-    request.fields['rewardBudget'] =
-        _participateInReward ? _rewardBudget.toString() : '0';
-    request.fields['rewardBudgetType'] =
-        _isCustomRewardBudget ? "custom" : "predefined";
-    request.fields['publishOnDressurStatus'] =
-        _publishOnDressurStatus ? "1" : "0";
-    request.fields['boostFacebook'] = _boostFacebook ? "1" : "0";
-    request.fields['montantBoostFacebook'] =
-        _boostFacebook ? _boostFacebookAmountController.text : '0';
+    request.fields.addAll(BoostBilling.buildOptionFields(
+      formulaAmount: prixBoost,
+      rewardEnabled: _participateInReward,
+      rewardBudget: _rewardBudget,
+      customRewardBudget: _isCustomRewardBudget,
+      publishOnDressurStatus: _publishOnDressurStatus,
+      facebookEnabled: _boostFacebook,
+      facebookAmount: _boostFacebookAmountController.text,
+      includeSource: false,
+      formulaDays: joursBoost,
+    ));
     request.fields['whatsappContact'] = whatsappContactController.text.trim();
-    request.fields['totalAmount'] = _subTotal.toStringAsFixed(0);
     _debugValidatePromotionRequest(request);
 
     final tempDir = await getTemporaryDirectory();

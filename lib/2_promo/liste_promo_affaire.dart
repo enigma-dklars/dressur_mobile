@@ -13,6 +13,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:dressur/5_autre/support_assistance.dart';
 import 'package:dressur/components/constant.dart';
+import 'package:dressur/2_promo/boost_billing.dart';
 import 'package:select_form_field/select_form_field.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -1230,9 +1231,15 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
   }
 
   double get _subTotal =>
-      prix.toDouble() + _rewardProgramAmount + _dressurStatusAmount + _boostFacebookAmount;
-  double get _fedapayMax => _subTotal * 0.04;
-  double get _totalWithMaxCommission => _subTotal + _fedapayMax;
+      BoostBilling.calculateTotal(
+        formulaAmount: prix,
+        rewardEnabled: _participateInReward,
+        rewardBudget: _rewardBudget,
+        facebookEnabled: _boostFacebook,
+        facebookAmount: int.tryParse(_boostFacebookAmountController.text) ?? 0,
+        publishOnDressurStatus: _publishOnDressurStatus,
+        formulaDays: jours,
+      );
 
   void listeFormulePromoAffaire() async {
     bool isConnected = await isConnectedToInternet();
@@ -1317,15 +1324,18 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
           'idFormulBoost': idFormulBoost.toString(),
           'valueMethodePaiement': valueMethodePaiement,
           'tel': telController.text,
-          // Nouvelles options
-          'inProgrammeRecompense': _participateInReward ? "1" : "0",
-          'rewardBudget': _participateInReward ? _rewardBudget.toString() : "0",
-          'rewardBudgetType': _isCustomRewardBudget ? "custom" : "predefined",
-          'publishOnDressurStatus': _publishOnDressurStatus ? "1" : "0",
-          'boostFacebook': _boostFacebook ? "1" : "0",
-          'montantBoostFacebook': _boostFacebookAmountController.text,
-          'totalAmount': _totalWithMaxCommission.toStringAsFixed(0),
         });
+        request.fields.addAll(BoostBilling.buildOptionFields(
+          formulaAmount: prix,
+          rewardEnabled: _participateInReward,
+          rewardBudget: _rewardBudget,
+          customRewardBudget: _isCustomRewardBudget,
+          publishOnDressurStatus: _publishOnDressurStatus,
+          facebookEnabled: _boostFacebook,
+          facebookAmount: _boostFacebookAmountController.text,
+          includeSource: false,
+          formulaDays: jours,
+        ));
 
         http.StreamedResponse response = await request.send();
         if (response.statusCode == 200) {
@@ -1712,7 +1722,7 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
                         (langUserPhone == "fr") ? "Boost Facebook" : "Facebook Boost",
                         _boostFacebookAmount),
                   const Divider(height: 20),
-                  _recapRow((langUserPhone == "fr") ? "TOTAL ESTIMÉ" : "ESTIMATED TOTAL", _totalWithMaxCommission,
+                  _recapRow((langUserPhone == "fr") ? "TOTAL ESTIMÉ" : "ESTIMATED TOTAL", _subTotal,
                       isBold: true),
                 ],
               ),
