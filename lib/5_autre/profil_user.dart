@@ -1,6 +1,7 @@
 // ignore_for_file: use_build_context_synchronously, prefer_const_constructors
 
 import 'package:dressur/5_autre/autre_profil.dart';
+import 'package:dressur/5_autre/mes_reseaux.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:dressur/components/constant.dart';
@@ -91,6 +92,32 @@ class ProfilPage extends StatelessWidget {
               SizedBox(height: 25),
               // --- FORMULAIRE ---
               RegisterForm(),
+              const SizedBox(height: 18),
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  onPressed: () => Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => const MesReseauxPage(),
+                    ),
+                  ),
+                  icon: const FaIcon(FontAwesomeIcons.shareNodes),
+                  label: Text(
+                    (langUserPhone == "fr")
+                        ? "Gérer mes réseaux"
+                        : "Manage my networks",
+                    style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+                  ),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: primaryColor,
+                    side: const BorderSide(color: primaryColor),
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                ),
+              ),
             ],
           ),
         ),
