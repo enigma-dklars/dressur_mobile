@@ -260,7 +260,9 @@ class _SettingPageState extends State<SettingPage>
               // -- Identité & sécurité --
               _buildMenuRow(
                   FontAwesomeIcons.user,
-                  (langUserPhone == "fr") ? "Profil" : "Profile",
+                  (langUserPhone == "fr")
+                      ? "Mes informations"
+                      : "Personal information",
                   () => Navigator.push(context,
                       MaterialPageRoute(builder: (context) => ProfilPage()))),
               _buildMenuRow(
@@ -428,6 +430,15 @@ class _SettingPageState extends State<SettingPage>
             _buildSectionTitle((langUserPhone == "fr")
                 ? "Abonnement et Partage"
                 : "Subscription & Sharing"),
+            _buildMenuContainer(isDark, [
+              _buildMenuRow(
+                FontAwesomeIcons.shareNodes,
+                (langUserPhone == "fr") ? "Mes réseaux" : "My networks",
+                null,
+                showChevron: false,
+              ),
+            ]),
+            const SizedBox(height: 10),
             SociauxPage(),
 
             SizedBox(height: 20),
