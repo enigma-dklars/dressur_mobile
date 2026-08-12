@@ -17,6 +17,7 @@ import 'package:dressur/components/constant.dart';
 import 'package:dressur/2_promo/boost_billing.dart';
 import 'package:dressur/components/noti.dart';
 import 'package:dressur/components/noti_sys.dart';
+import 'package:dressur/components/permission_manager.dart';
 import 'package:select_form_field/select_form_field.dart';
 import 'package:dressur/components/info_service_bottom_sheet.dart';
 
@@ -377,6 +378,13 @@ class _ProduitsServicesState extends State<ProduitsServices> {
   }
 
   Future<void> _selectImage() async {
+    final canAccessGallery = await PermissionManager.instance
+        .ensureGalleryAccessWithRecovery(
+      context,
+      isFrench: langUserPhone == "fr",
+    );
+    if (!canAccessGallery || !mounted) return;
+
     final picker = ImagePicker();
     final pickedImage = await picker.pickImage(source: ImageSource.gallery);
     if (pickedImage != null) {
@@ -1772,6 +1780,13 @@ class _SitesApplicationsState extends State<SitesApplications> {
   }
 
   Future<void> _selectImage() async {
+    final canAccessGallery = await PermissionManager.instance
+        .ensureGalleryAccessWithRecovery(
+      context,
+      isFrench: langUserPhone == "fr",
+    );
+    if (!canAccessGallery || !mounted) return;
+
     final picker = ImagePicker();
     final pickedImage = await picker.pickImage(source: ImageSource.gallery);
     if (pickedImage != null) {

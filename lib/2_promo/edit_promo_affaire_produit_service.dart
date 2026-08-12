@@ -12,6 +12,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:image/image.dart' as img;
 import 'package:dressur/components/constant.dart';
 import 'package:dressur/components/noti.dart';
+import 'package:dressur/components/permission_manager.dart';
 import 'package:select_form_field/select_form_field.dart';
 
 class ModificationProduitServicesPage extends StatefulWidget {
@@ -62,6 +63,13 @@ class _ModificationProduitServicesPageState
   }
 
   Future<void> _selectImage() async {
+    final canAccessGallery = await PermissionManager.instance
+        .ensureGalleryAccessWithRecovery(
+      context,
+      isFrench: langUserPhone == "fr",
+    );
+    if (!canAccessGallery || !mounted) return;
+
     final picker = ImagePicker();
     final pickedImage = await picker.pickImage(source: ImageSource.gallery);
     if (pickedImage == null) return;

@@ -47,5 +47,7 @@
 	<true/>
 	<key>NSContactsUsageDescription</key>
     <string>Reason we need access to the contact list</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Dressur needs access to your photos so you can select an image.</string>
 </dict>
 </plist>

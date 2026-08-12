@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 /// États de permission exposés aux fonctionnalités de l'application.
@@ -11,6 +12,12 @@ enum AppPermissionStatus {
   temporary,
   restricted,
   unknown,
+}
+
+enum PermissionRecoveryAction {
+  retry,
+  openSettings,
+  cancel,
 }
 
 /// Résultat exploitable après une vérification ou une demande de permission.
@@ -99,6 +106,96 @@ class PermissionManager {
     }));
 
     return requestFuture;
+  }
+
+  /// Vérifie d'abord l'état courant, puis demande uniquement si nécessaire.
+  ///
+  /// Les accès limités et temporaires sont considérés comme suffisants par
+  /// [AppPermissionResult.canProceed]. Les accès bloqués dans les réglages
+  /// sont retournés tels quels afin que l'interface puisse proposer une
+  /// récupération claire.
+  Future<AppPermissionResult> ensure(Permission permission) async {
+    final current = await check(permission);
+    if (current.canProceed || current.needsSettings) {
+      return current;
+    }
+    return request(permission);
+  }
+
+  Future<AppPermissionResult> ensureGalleryAccess() {
+    return ensure(Permission.photos);
+  }
+
+  /// Protège une action qui ouvre la galerie sans interrompre la session.
+  ///
+  /// Après un refus simple, l'utilisateur peut réessayer. Après un blocage
+  /// définitif ou restreint, il peut ouvrir les réglages. L'action appelante
+  /// ne doit démarrer que si cette méthode renvoie true.
+  Future<bool> ensureGalleryAccessWithRecovery(
+    BuildContext context, {
+    required bool isFrench,
+  }) async {
+    for (var attempt = 0; attempt < 2; attempt++) {
+      final result = await ensureGalleryAccess();
+      if (result.canProceed) return true;
+      if (!context.mounted) return false;
+
+      final action = await _showGalleryPermissionDialog(
+        context,
+        result,
+        isFrench: isFrench,
+      );
+      if (action == PermissionRecoveryAction.openSettings) {
+        await openSettings();
+        return false;
+      }
+      if (action != PermissionRecoveryAction.retry) return false;
+    }
+    return false;
+  }
+
+  Future<PermissionRecoveryAction> _showGalleryPermissionDialog(
+    BuildContext context,
+    AppPermissionResult result, {
+    required bool isFrench,
+  }) async {
+    final needsSettings = result.needsSettings;
+    final title = isFrench ? 'Accès aux photos requis' : 'Photo access required';
+    final message = needsSettings
+        ? (isFrench
+            ? 'L’accès à vos photos est désactivé. Autorisez-le dans les réglages pour choisir une image. Votre session reste active.'
+            : 'Photo access is disabled. Allow it in Settings to choose an image. Your session will remain active.')
+        : (isFrench
+            ? 'Dressur a besoin d’un accès à votre galerie pour choisir une image. Vous pouvez réessayer sans quitter votre session.'
+            : 'Dressur needs access to your gallery to choose an image. You can try again without leaving your session.');
+
+    return await showDialog<PermissionRecoveryAction>(
+          context: context,
+          barrierDismissible: false,
+          builder: (dialogContext) => AlertDialog(
+            title: Text(title),
+            content: Text(message),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(dialogContext)
+                    .pop(PermissionRecoveryAction.cancel),
+                child: Text(isFrench ? 'Plus tard' : 'Later'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.of(dialogContext)
+                    .pop(PermissionRecoveryAction.retry),
+                child: Text(isFrench ? 'Réessayer' : 'Try again'),
+              ),
+              if (needsSettings)
+                FilledButton(
+                  onPressed: () => Navigator.of(dialogContext)
+                      .pop(PermissionRecoveryAction.openSettings),
+                  child: Text(isFrench ? 'Ouvrir les réglages' : 'Open settings'),
+                ),
+            ],
+          ),
+        ) ??
+        PermissionRecoveryAction.cancel;
   }
 
   Future<AppPermissionResult> _requestPermission(

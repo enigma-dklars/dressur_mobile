@@ -9,6 +9,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
 import 'package:google_fonts/google_fonts.dart';
 import 'package:dressur/components/constant.dart';
+import 'package:dressur/components/permission_manager.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -649,6 +650,13 @@ class _HistoriqueCompletPageState extends State<HistoriqueCompletPage> {
   }
 
   Future<void> _pickImage(int index, StateSetter setModalState) async {
+    final canAccessGallery = await PermissionManager.instance
+        .ensureGalleryAccessWithRecovery(
+      context,
+      isFrench: langUserPhone == "fr",
+    );
+    if (!canAccessGallery || !mounted) return;
+
     final XFile? pickedFile =
         await _picker.pickImage(source: ImageSource.gallery, imageQuality: 80);
     if (pickedFile != null) {
