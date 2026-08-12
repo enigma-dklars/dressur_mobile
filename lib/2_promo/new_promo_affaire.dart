@@ -24,6 +24,90 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:select_form_field/select_form_field.dart';
 import 'package:dressur/components/info_service_bottom_sheet.dart';
 
+const _supportedPromotionImageRatios = <double>[1, 4 / 3, 3 / 4];
+
+bool _hasSupportedPromotionImageRatio(img.Image image) {
+  final aspectRatio = image.width / image.height;
+  const tolerance = 0.01;
+  return _supportedPromotionImageRatios.any(
+    (ratio) => (aspectRatio - ratio).abs() <= tolerance,
+  );
+}
+
+Future<File?> _preparePromotionImage({
+  required BuildContext context,
+  required File imageFile,
+  required bool isFrench,
+}) async {
+  try {
+    final fileSize = await imageFile.length();
+    if (fileSize / (1024 * 1024) > 1) {
+      if (context.mounted) {
+        dangerNoti(
+          "Attention !!!",
+          isFrench
+              ? "L'image ne peut pas dépasser 1 Mo."
+              : "Image size cannot exceed 1 MB.",
+          context,
+        );
+      }
+      return null;
+    }
+
+    final bytes = await imageFile.readAsBytes();
+    final decodedImage = img.decodeImage(bytes);
+    if (decodedImage == null) {
+      if (context.mounted) {
+        dangerNoti(
+          "Attention !!!",
+          isFrench
+              ? "Cette image ne peut pas être décodée."
+              : "This image cannot be decoded.",
+          context,
+        );
+      }
+      return null;
+    }
+
+    final orientedImage = img.bakeOrientation(decodedImage);
+    if (_hasSupportedPromotionImageRatio(orientedImage)) {
+      return imageFile;
+    }
+
+    if (!context.mounted) return null;
+    return showDialog<File>(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => _PromotionImageCropper(
+        imageFile: imageFile,
+        isFrench: isFrench,
+      ),
+    );
+  } on FileSystemException {
+    if (context.mounted) {
+      dangerNoti(
+        "Attention !!!",
+        isFrench
+            ? "Impossible de lire temporairement cette image. Veuillez réessayer."
+            : "This image could not be read temporarily. Please try again.",
+        context,
+      );
+    }
+    return null;
+  } catch (_) {
+    if (context.mounted) {
+      dangerNoti(
+        "Attention !!!",
+        isFrench
+            ? "Impossible de préparer cette image. Veuillez réessayer."
+            : "Unable to prepare this image. Please try again.",
+        context,
+      );
+    }
+    return null;
+  }
+}
+
 class PromotionFormPage extends StatefulWidget {
   @override
   _PromotionFormPageState createState() => _PromotionFormPageState();
@@ -383,26 +467,13 @@ class _ProduitsServicesState extends State<ProduitsServices> {
         final pickedImage = await picker.pickImage(source: ImageSource.gallery);
         if (pickedImage != null) {
           final imageFile = File(pickedImage.path);
-          final fileSize = await imageFile.length();
-          if (fileSize / (1024 * 1024) > 1) {
-            dangerNoti(
-                "Attention !!!",
-                (langUserPhone == "fr")
-                    ? "L'image ne peut pas dépasser 1 Mo."
-                    : "Image size cannot exceed 1 MB.",
-                context);
-            return;
-          }
-          final croppedImage = await showDialog<File>(
+          final preparedImage = await _preparePromotionImage(
             context: context,
-            barrierDismissible: false,
-            builder: (_) => _PromotionImageCropper(
-              imageFile: imageFile,
-              isFrench: langUserPhone == "fr",
-            ),
+            imageFile: imageFile,
+            isFrench: langUserPhone == "fr",
           );
-          if (croppedImage != null && mounted) {
-            setState(() => _imageFile = croppedImage);
+          if (preparedImage != null && mounted) {
+            setState(() => _imageFile = preparedImage);
           }
         }
       }
@@ -2201,26 +2272,13 @@ class _SitesApplicationsState extends State<SitesApplications> {
         final pickedImage = await picker.pickImage(source: ImageSource.gallery);
         if (pickedImage != null) {
           final imageFile = File(pickedImage.path);
-          final fileSize = await imageFile.length();
-          if (fileSize / (1024 * 1024) > 1) {
-            dangerNoti(
-                "Attention !!!",
-                (langUserPhone == "fr")
-                    ? "L'image ne peut pas dépasser 1 Mo."
-                    : "Image size cannot exceed 1 MB.",
-                context);
-            return;
-          }
-          final croppedImage = await showDialog<File>(
+          final preparedImage = await _preparePromotionImage(
             context: context,
-            barrierDismissible: false,
-            builder: (_) => _PromotionImageCropper(
-              imageFile: imageFile,
-              isFrench: langUserPhone == "fr",
-            ),
+            imageFile: imageFile,
+            isFrench: langUserPhone == "fr",
           );
-          if (croppedImage != null && mounted) {
-            setState(() => _imageFile = croppedImage);
+          if (preparedImage != null && mounted) {
+            setState(() => _imageFile = preparedImage);
           }
         }
       }
@@ -2460,8 +2518,8 @@ class _SitesApplicationsState extends State<SitesApplications> {
           padding: const EdgeInsets.symmetric(vertical: 4),
           child: Text(
             isFr
-                ? "Choisissez le format puis recadrez l'image"
-                : "Choose a format, then crop the image",
+                ? "Formats acceptés : 1:1, 4:3 ou 3:4"
+                : "Accepted formats: 1:1, 4:3 or 3:4",
             style:
                 GoogleFonts.poppins(fontSize: 12, color: Colors.grey[600]),
             textAlign: TextAlign.center,
