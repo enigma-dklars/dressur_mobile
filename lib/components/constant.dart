@@ -218,7 +218,7 @@ String preferencePaysToText(preferencePays) {
 
 Future<bool> insertDressurContact() async {
   final permission =
-      await PermissionManager.instance.ensure(Permission.contacts);
+      await PermissionManager.instance.check(Permission.contacts);
   if (!permission.canProceed) return false;
 
   if ((await SQLHelper.getOneNumsTelUser("+22964044294")).isEmpty) {
@@ -996,7 +996,7 @@ void showConfNumeroWhatsapp(BuildContext context) {
 
 Future<void> saveContactDsIfNotExiste() async {
   final permission =
-      await PermissionManager.instance.ensure(Permission.contacts);
+      await PermissionManager.instance.check(Permission.contacts);
   if (!permission.canProceed) return;
 
   int nombreNewContact = 0;

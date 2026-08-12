@@ -145,7 +145,7 @@ class SynchroAvanceService extends ChangeNotifier {
     }
 
     final canAccessContacts =
-        (await PermissionManager.instance.ensure(Permission.contacts))
+        (await PermissionManager.instance.check(Permission.contacts))
             .canProceed;
     if (!canAccessContacts) {
       return isFr
@@ -167,7 +167,7 @@ class SynchroAvanceService extends ChangeNotifier {
         isFrench: isFr,
       );
     } else {
-      await PermissionManager.instance.ensure(Permission.notification);
+      await PermissionManager.instance.check(Permission.notification);
     }
 
     isRunning = true;

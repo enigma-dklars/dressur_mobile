@@ -31,7 +31,7 @@ Future<bool> _ensureNotificationAccess({
           context,
           isFrench: isFr,
         )
-      : (await manager.ensure(Permission.notification)).canProceed;
+      : (await manager.check(Permission.notification)).canProceed;
   if (!hasNotificationPermission) return false;
 
   if (requiresExactAlarm && Platform.isAndroid) {
@@ -40,7 +40,7 @@ Future<bool> _ensureNotificationAccess({
             context,
             isFrench: isFr,
           )
-        : (await manager.ensure(Permission.scheduleExactAlarm)).canProceed;
+        : (await manager.check(Permission.scheduleExactAlarm)).canProceed;
     if (!hasExactAlarmPermission) return false;
   }
 

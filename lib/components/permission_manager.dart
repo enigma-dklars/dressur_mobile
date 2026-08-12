@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:dressur/components/permission_recovery_dialog.dart';
 
@@ -251,6 +252,20 @@ class PermissionManager {
         }
       }
     } catch (error, stackTrace) {
+      if (_isPermissionException(error)) {
+        await _recoverAfterPermissionException(
+          context,
+          result: await check(permission),
+          permission: permission,
+          isFrench: isFrench,
+          titleFr: titleFr,
+          titleEn: titleEn,
+          messageFr: messageFr,
+          messageEn: messageEn,
+        );
+        pending.complete();
+        return;
+      }
       pending.completeError(error, stackTrace);
     } finally {
       if (identical(_pendingActions[actionKey], pending)) {
@@ -370,6 +385,59 @@ class PermissionManager {
       if (action != PermissionRecoveryAction.retry) return false;
     }
     return false;
+  }
+
+  Future<void> _recoverAfterPermissionException(
+    BuildContext context, {
+    required AppPermissionResult result,
+    required Permission permission,
+    required bool isFrench,
+    String? titleFr,
+    String? titleEn,
+    String? messageFr,
+    String? messageEn,
+  }) async {
+    if (result.canProceed || !context.mounted) return;
+
+    final recoveryAction = await _showPermissionDialog(
+      context,
+      result,
+      permission: permission,
+      isFrench: isFrench,
+      titleFr: titleFr,
+      titleEn: titleEn,
+      messageFr: messageFr,
+      messageEn: messageEn,
+    );
+
+    if (recoveryAction == PermissionRecoveryAction.retry) {
+      // L'action native peut déjà avoir modifié des données avant l'échec.
+      // On redemande ici l'accès, mais on laisse l'utilisateur relancer
+      // l'action depuis l'interface au lieu de l'exécuter automatiquement.
+      await ensure(permission);
+    } else if (recoveryAction == PermissionRecoveryAction.openSettings) {
+      await openSettings();
+    }
+  }
+
+  bool _isPermissionException(Object error) {
+    if (error is! PlatformException) return false;
+
+    final details = <String>[
+      error.code,
+      if (error.message != null) error.message!,
+      error.toString(),
+    ].join(' ').toLowerCase();
+    const permissionMarkers = <String>[
+      'permission',
+      'authorization',
+      'authorisation',
+      'access denied',
+      'not authorized',
+      'not authorised',
+      'restricted',
+    ];
+    return permissionMarkers.any(details.contains);
   }
 
   Future<PermissionRecoveryAction> _showPermissionDialog(

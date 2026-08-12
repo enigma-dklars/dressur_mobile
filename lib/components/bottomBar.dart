@@ -325,7 +325,7 @@ class _BottomBarState extends State<BottomBar> with WidgetsBindingObserver {
 
   Future<void> synchroAvanceFunction() async {
     final permission =
-        await PermissionManager.instance.ensure(Permission.contacts);
+        await PermissionManager.instance.check(Permission.contacts);
     if (!permission.canProceed) return;
 
     await SQLHelper.viderLaBaseDeDonneeLocalTelUser();

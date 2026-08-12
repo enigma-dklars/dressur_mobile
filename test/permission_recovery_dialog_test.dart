@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:dressur/components/permission_recovery_dialog.dart';
 import 'package:dressur/components/permission_manager.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -273,6 +274,48 @@ void main() {
       );
       expect(actionCount, 2);
       expect(requestCount, 1);
+    },
+  );
+
+  testWidgets(
+    'native permission exception is recovered without propagating',
+    (tester) async {
+      late BuildContext context;
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Builder(
+            builder: (builderContext) {
+              context = builderContext;
+              return const SizedBox.shrink();
+            },
+          ),
+        ),
+      );
+
+      var currentStatus = AppPermissionStatus.granted;
+      final manager = PermissionManager.forTesting(
+        checkPermission: (permission) async => AppPermissionResult(
+          permission: permission,
+          status: currentStatus,
+        ),
+        recoveryAction: () async => PermissionRecoveryAction.cancel,
+      );
+
+      await manager.runWithPermissionRecovery(
+        context,
+        actionKey: 'contacts:native-denial',
+        permission: Permission.contacts,
+        isFrench: true,
+        action: () async {
+          currentStatus = AppPermissionStatus.denied;
+          throw PlatformException(
+            code: 'permission_denied',
+            message: 'Contacts permission was revoked',
+          );
+        },
+      );
+
+      expect(manager.hasPendingAction('contacts:native-denial'), isFalse);
     },
   );
 }
