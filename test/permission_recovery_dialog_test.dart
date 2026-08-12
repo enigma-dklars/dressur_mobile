@@ -156,4 +156,123 @@ void main() {
     expect(actionCount, 0);
     expect(manager.hasPendingAction('contacts:delete'), isFalse);
   });
+
+  testWidgets(
+    'limited and temporary access remains usable without a new request',
+    (tester) async {
+      late BuildContext context;
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Builder(
+            builder: (builderContext) {
+              context = builderContext;
+              return const SizedBox.shrink();
+            },
+          ),
+        ),
+      );
+
+      var currentStatus = AppPermissionStatus.limited;
+      var requestCount = 0;
+      var actionCount = 0;
+
+      final manager = PermissionManager.forTesting(
+        checkPermission: (permission) async => AppPermissionResult(
+          permission: permission,
+          status: currentStatus,
+        ),
+        requestPermission: (permission) async {
+          requestCount++;
+          return AppPermissionResult(
+            permission: permission,
+            status: AppPermissionStatus.granted,
+          );
+        },
+        recoveryAction: () async => PermissionRecoveryAction.cancel,
+      );
+
+      final limitedResult = await manager.ensure(Permission.photos);
+      expect(limitedResult.isLimited, isTrue);
+      expect(limitedResult.canProceed, isTrue);
+      expect(requestCount, 0);
+
+      currentStatus = AppPermissionStatus.temporary;
+      final temporaryResult = await manager.ensure(Permission.notification);
+      expect(temporaryResult.isTemporary, isTrue);
+      expect(temporaryResult.canProceed, isTrue);
+      expect(requestCount, 0);
+
+      await manager.runWithPermissionRecovery(
+        context,
+        actionKey: 'photos:limited-action',
+        permission: Permission.photos,
+        isFrench: true,
+        action: () async => actionCount++,
+      );
+      expect(actionCount, 1);
+      expect(requestCount, 0);
+    },
+  );
+
+  testWidgets(
+    'permission unavailable on a later action is requested then recovered',
+    (tester) async {
+      late BuildContext context;
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Builder(
+            builder: (builderContext) {
+              context = builderContext;
+              return const SizedBox.shrink();
+            },
+          ),
+        ),
+      );
+
+      var currentStatus = AppPermissionStatus.temporary;
+      var requestCount = 0;
+      var actionCount = 0;
+
+      final manager = PermissionManager.forTesting(
+        checkPermission: (permission) async => AppPermissionResult(
+          permission: permission,
+          status: currentStatus,
+        ),
+        requestPermission: (permission) async {
+          requestCount++;
+          currentStatus = AppPermissionStatus.granted;
+          return AppPermissionResult(
+            permission: permission,
+            status: AppPermissionStatus.granted,
+          );
+        },
+        recoveryAction: () async => PermissionRecoveryAction.cancel,
+      );
+
+      await manager.runWithPermissionRecovery(
+        context,
+        actionKey: 'notification:temporary-action',
+        permission: Permission.notification,
+        isFrench: true,
+        action: () async => actionCount++,
+      );
+      expect(actionCount, 1);
+      expect(requestCount, 0);
+
+      currentStatus = AppPermissionStatus.denied;
+      final statusBeforeNewAction = await manager.check(Permission.notification);
+      expect(statusBeforeNewAction.isDenied, isTrue);
+      expect(requestCount, 0);
+
+      await manager.runWithPermissionRecovery(
+        context,
+        actionKey: 'notification:renewed-action',
+        permission: Permission.notification,
+        isFrench: true,
+        action: () async => actionCount++,
+      );
+      expect(actionCount, 2);
+      expect(requestCount, 1);
+    },
+  );
 }

@@ -33,6 +33,9 @@ class _PermissionsRequiredPageState extends State<PermissionsRequiredPage>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkPermissions();
+    });
   }
 
   @override

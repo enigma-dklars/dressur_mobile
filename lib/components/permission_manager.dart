@@ -60,9 +60,13 @@ class AppPermissionResult {
 class PermissionManager {
   PermissionManager._({
     Future<AppPermissionResult> Function(Permission)? ensureOverride,
+    Future<AppPermissionResult> Function(Permission)? checkOverride,
+    Future<AppPermissionResult> Function(Permission)? requestOverride,
     Future<PermissionRecoveryAction> Function()? recoveryActionOverride,
     Future<bool> Function()? openSettingsOverride,
   })  : _ensureOverride = ensureOverride,
+        _checkOverride = checkOverride,
+        _requestOverride = requestOverride,
         _recoveryActionOverride = recoveryActionOverride,
         _openSettingsOverride = openSettingsOverride;
 
@@ -70,16 +74,22 @@ class PermissionManager {
 
   /// Constructeur réservé aux tests du flux de reprise.
   PermissionManager.forTesting({
-    required Future<AppPermissionResult> Function(Permission) ensurePermission,
+    Future<AppPermissionResult> Function(Permission)? ensurePermission,
+    Future<AppPermissionResult> Function(Permission)? checkPermission,
+    Future<AppPermissionResult> Function(Permission)? requestPermission,
     required Future<PermissionRecoveryAction> Function() recoveryAction,
     Future<bool> Function()? openSettings,
   }) : this._(
           ensureOverride: ensurePermission,
+          checkOverride: checkPermission,
+          requestOverride: requestPermission,
           recoveryActionOverride: recoveryAction,
           openSettingsOverride: openSettings,
         );
 
   final Future<AppPermissionResult> Function(Permission)? _ensureOverride;
+  final Future<AppPermissionResult> Function(Permission)? _checkOverride;
+  final Future<AppPermissionResult> Function(Permission)? _requestOverride;
   final Future<PermissionRecoveryAction> Function()? _recoveryActionOverride;
   final Future<bool> Function()? _openSettingsOverride;
 
@@ -90,6 +100,9 @@ class PermissionManager {
       <String, _PendingPermissionAction>{};
 
   Future<AppPermissionResult> check(Permission permission) async {
+    final override = _checkOverride;
+    if (override != null) return override(permission);
+
     try {
       final platformStatus = await permission.status;
       return _fromPlatformStatus(permission, platformStatus);
@@ -435,11 +448,14 @@ class PermissionManager {
 
   Future<AppPermissionResult> _requestPermission(Permission permission) async {
     final current = await check(permission);
-    if (current.status != AppPermissionStatus.denied) {
+    if (current.canProceed || current.needsSettings) {
       return current;
     }
 
     try {
+      final override = _requestOverride;
+      if (override != null) return override(permission);
+
       final platformStatus = await permission.request();
       return _fromPlatformStatus(permission, platformStatus);
     } catch (_) {
