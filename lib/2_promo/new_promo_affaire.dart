@@ -108,6 +108,63 @@ Future<File?> _preparePromotionImage({
   }
 }
 
+Future<File> _createPromotionUploadFile({
+  required File imageFile,
+  required String fileName,
+}) async {
+  final imageBytes = await imageFile.readAsBytes();
+  final decodedImage = img.decodeImage(imageBytes);
+  if (decodedImage == null) {
+    throw const FormatException('The selected image cannot be decoded.');
+  }
+
+  final orientedImage = img.bakeOrientation(decodedImage);
+  if (!_hasSupportedPromotionImageRatio(orientedImage)) {
+    throw const FormatException('The selected image has an unsupported ratio.');
+  }
+
+  final tempDirectory = await getTemporaryDirectory();
+  final uploadFile = File('${tempDirectory.path}/$fileName');
+
+  // Preserve the legacy Promotion Affaire upload contract: JPEG encoding,
+  // multipart field "image", and no extra compression pass.
+  final encodedImage = img.encodeJpg(orientedImage, quality: 85);
+  await uploadFile.writeAsBytes(encodedImage, flush: true);
+  if (await uploadFile.length() > 1024 * 1024) {
+    throw const FormatException('The selected image is larger than 1 MB.');
+  }
+
+  return uploadFile;
+}
+
+Map<String, dynamic>? _decodePromotionApiResponse(String body) {
+  try {
+    final decoded = jsonDecode(body);
+    if (decoded is Map) {
+      return Map<String, dynamic>.from(decoded);
+    }
+  } catch (_) {
+    // The caller displays a generic error when the API does not return JSON.
+  }
+  return null;
+}
+
+void _showPromotionApiError({
+  required BuildContext context,
+  required bool isFrench,
+  required int statusCode,
+  Map<String, dynamic>? data,
+}) {
+  final fallbackTitle = isFrench ? "Erreur" : "Error";
+  final fallbackMessage = isFrench
+      ? "Une erreur est survenue lors de l'envoi. Veuillez réessayer."
+      : "An error occurred while sending. Please try again.";
+  final title = data?['titre']?.toString() ?? fallbackTitle;
+  final message = data?['message']?.toString() ??
+      (statusCode > 0 ? '$fallbackMessage (Code : $statusCode)' : fallbackMessage);
+  dangerNoti(title, message, context);
+}
+
 class PromotionFormPage extends StatefulWidget {
   @override
   _PromotionFormPageState createState() => _PromotionFormPageState();
@@ -546,86 +603,103 @@ class _ProduitsServicesState extends State<ProduitsServices> {
     request.fields['whatsappContact'] = whatsappContactController.text.trim();
     _debugValidatePromotionRequest(request);
 
-    final tempDir = await getTemporaryDirectory();
-    final filePath = '${tempDir.path}/temp_image.jpg';
-    final image = img.decodeImage(_imageFile!.readAsBytesSync());
-    final compressedImage = img.encodeJpg(image!, quality: 85);
-    File(filePath).writeAsBytesSync(compressedImage);
-    request.files.add(await http.MultipartFile.fromPath('image', filePath));
+    try {
+      final uploadFile = await _createPromotionUploadFile(
+        imageFile: _imageFile!,
+        fileName: 'temp_image.jpg',
+      );
+      request.files.add(
+        await http.MultipartFile.fromPath('image', uploadFile.path),
+      );
 
-    final response = await request.send();
-    if (response.statusCode == 200) {
-      var data1 = await response.stream.bytesToString();
+      final response = await request.send();
+      final responseBody = await response.stream.bytesToString();
       if (!mounted) return;
-      var data = jsonDecode(data1);
-      if (data["error"] == true) {
-        dangerNoti(data["titre"], data["message"], context);
+      final data = _decodePromotionApiResponse(responseBody);
+      if (response.statusCode < 200 ||
+          response.statusCode >= 300 ||
+          data == null ||
+          data['error'] == true) {
+        _showPromotionApiError(
+          context: context,
+          isFrench: langUserPhone == "fr",
+          statusCode: response.statusCode,
+          data: data,
+        );
         setState(() => _isSending = false);
-      } else {
-        setState(() {
-          // 1. Réinitialisation des états de chargement et financiers
-          _isSending = false;
-          prixBoost = 0;
-          joursBoost = 0;
-          prix = 0;
-          jours = 0;
-          value = 0;
-          idFormulBoost = 0;
-
-          // 2. Réinitialisation des médias
-          _imageFile = null;
-
-          // 3. Réinitialisation des contrôleurs de texte
-          _textEditingController.clear(); // Description
-          whatsappContactController.text = tel; // Remettre le numéro utilisateur
-
-          // 4. Réinitialisation des messages et labels
-          _message = (langUserPhone == "fr")
-              ? "Veuillez choisir une formule."
-              : "Please choose a plan.";
-          label = "";
-
-          // 5. Réinitialisation des options spécifiques (Reward & Status & Boost Facebook)
-          _participateInReward = false;
-          _rewardBudget = 0;
-           _isCustomRewardBudget = false;
-           _rewardBudgetError = null;
-           _customRewardBudgetController.clear();
-          _publishOnDressurStatus = false;
-          _boostFacebook = false;
-          _boostFacebookAmountController.text = '700';
-
-          // 6. Réinitialisation du mode de paiement par défaut
-          valueMethodePaiement = "mtn";
-        });
-
-        cancelPromoReminderNotification();
-        if (data["solde_used"] == true) {
-          successNoti(
-              (langUserPhone == "fr") ? "Succès" : "Success",
-              data["message"] ?? ((langUserPhone == "fr") ? "Solde débité. Promotion Affaire enregistrée." : "Balance debited. Promotion registered."),
-              context);
-        } else if (data["direct"] == true) {
-          successNoti(
-              (langUserPhone == "fr") ? "Succès" : "Success",
-              (langUserPhone == "fr")
-                  ? "Veuillez confirmer le paiement pour finaliser l'enregistrement de votre promotion."
-                  : "Please confirm payment to finalize the registration of your promotion.",
-              context);
-        } else {
-          launchPaiement(data["url"]);
-          successNoti(
-              (langUserPhone == "fr") ? "Succès" : "Success",
-              (langUserPhone == "fr")
-                  ? "Veuillez confirmer le paiement pour finaliser l'enregistrement de votre promotion."
-                  : "Please confirm payment to finalize the registration of your promotion.",
-              context);
-        }
+        return;
       }
-    } else {
-      dangerNoti((langUserPhone == "fr") ? "Erreur" : "Error",
-          'Code : ${response.statusCode}', context);
+
+      setState(() {
+        // 1. Réinitialisation des états de chargement et financiers
+        _isSending = false;
+        prixBoost = 0;
+        joursBoost = 0;
+        prix = 0;
+        jours = 0;
+        value = 0;
+        idFormulBoost = 0;
+
+        // 2. Réinitialisation des médias
+        _imageFile = null;
+
+        // 3. Réinitialisation des contrôleurs de texte
+        _textEditingController.clear(); // Description
+        whatsappContactController.text = tel; // Remettre le numéro utilisateur
+
+        // 4. Réinitialisation des messages et labels
+        _message = (langUserPhone == "fr")
+            ? "Veuillez choisir une formule."
+            : "Please choose a plan.";
+        label = "";
+
+        // 5. Réinitialisation des options spécifiques (Reward & Status & Boost Facebook)
+        _participateInReward = false;
+        _rewardBudget = 0;
+        _isCustomRewardBudget = false;
+        _rewardBudgetError = null;
+        _customRewardBudgetController.clear();
+        _publishOnDressurStatus = false;
+        _boostFacebook = false;
+        _boostFacebookAmountController.text = '700';
+
+        // 6. Réinitialisation du mode de paiement par défaut
+        valueMethodePaiement = "mtn";
+      });
+
+      cancelPromoReminderNotification();
+      if (data["solde_used"] == true) {
+        successNoti(
+            (langUserPhone == "fr") ? "Succès" : "Success",
+            data["message"] ??
+                ((langUserPhone == "fr")
+                    ? "Solde débité. Promotion Affaire enregistrée."
+                    : "Balance debited. Promotion registered."),
+            context);
+      } else if (data["direct"] == true) {
+        successNoti(
+            (langUserPhone == "fr") ? "Succès" : "Success",
+            (langUserPhone == "fr")
+                ? "Veuillez confirmer le paiement pour finaliser l'enregistrement de votre promotion."
+                : "Please confirm payment to finalize the registration of your promotion.",
+            context);
+      } else {
+        launchPaiement(data["url"]);
+        successNoti(
+            (langUserPhone == "fr") ? "Succès" : "Success",
+            (langUserPhone == "fr")
+                ? "Veuillez confirmer le paiement pour finaliser l'enregistrement de votre promotion."
+                : "Please confirm payment to finalize the registration of your promotion.",
+            context);
+      }
+    } catch (_) {
+      if (!mounted) return;
       setState(() => _isSending = false);
+      _showPromotionApiError(
+        context: context,
+        isFrench: langUserPhone == "fr",
+        statusCode: 0,
+      );
     }
   }
 
@@ -2372,47 +2446,57 @@ class _SitesApplicationsState extends State<SitesApplications> {
     request.fields['methodePaiement'] = _valueMethodePaiement;
     request.fields['tel'] = _telController.text;
 
-    final tempDir = await getTemporaryDirectory();
-    final filePath = '${tempDir.path}/temp_image_site.jpg';
-    final image = img.decodeImage(_imageFile!.readAsBytesSync());
-    final compressedImage = img.encodeJpg(image!, quality: 85);
-    File(filePath).writeAsBytesSync(compressedImage);
-    request.files.add(await http.MultipartFile.fromPath('image', filePath));
+    try {
+      final uploadFile = await _createPromotionUploadFile(
+        imageFile: _imageFile!,
+        fileName: 'temp_image_site.jpg',
+      );
+      request.files.add(
+        await http.MultipartFile.fromPath('image', uploadFile.path),
+      );
 
-    final response = await request.send();
-    if (!mounted) return;
-
-    if (response.statusCode == 200) {
-      final data1 = await response.stream.bytesToString();
+      final response = await request.send();
+      final responseBody = await response.stream.bytesToString();
       if (!mounted) return;
-      final data = jsonDecode(data1);
-      if (data["error"] == true) {
-        dangerNoti(data["titre"], data["message"], context);
+      final data = _decodePromotionApiResponse(responseBody);
+      if (response.statusCode < 200 ||
+          response.statusCode >= 300 ||
+          data == null ||
+          data['error'] == true) {
+        _showPromotionApiError(
+          context: context,
+          isFrench: langUserPhone == "fr",
+          statusCode: response.statusCode,
+          data: data,
+        );
         setState(() => _isSending = false);
-      } else {
-        setState(() {
-          _isSending = false;
-          _imageFile = null;
-          _sousType = 'site_web';
-          _valueMethodePaiement = 'mtn';
-        });
-        _nomController.clear();
-        _urlController.clear();
-        _descriptionController.clear();
-        cancelPromoReminderNotification();
-        successNoti(
-            (langUserPhone == "fr") ? "Succès" : "Success",
-            (langUserPhone == "fr")
-                ? "Votre promotion est en attente de validation par notre équipe."
-                : "Your promotion is pending validation by our team.",
-            context);
+        return;
       }
-    } else {
-      dangerNoti(
-          (langUserPhone == "fr") ? "Erreur" : "Error",
-          'Code : ${response.statusCode}',
+
+      setState(() {
+        _isSending = false;
+        _imageFile = null;
+        _sousType = 'site_web';
+        _valueMethodePaiement = 'mtn';
+      });
+      _nomController.clear();
+      _urlController.clear();
+      _descriptionController.clear();
+      cancelPromoReminderNotification();
+      successNoti(
+          (langUserPhone == "fr") ? "Succès" : "Success",
+          (langUserPhone == "fr")
+              ? "Votre promotion est en attente de validation par notre équipe."
+              : "Your promotion is pending validation by our team.",
           context);
+    } catch (_) {
+      if (!mounted) return;
       setState(() => _isSending = false);
+      _showPromotionApiError(
+        context: context,
+        isFrench: langUserPhone == "fr",
+        statusCode: 0,
+      );
     }
   }
 
