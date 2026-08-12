@@ -650,24 +650,28 @@ class _HistoriqueCompletPageState extends State<HistoriqueCompletPage> {
   }
 
   Future<void> _pickImage(int index, StateSetter setModalState) async {
-    final canAccessGallery = await PermissionManager.instance
-        .ensureGalleryAccessWithRecovery(
+    await PermissionManager.instance.runWithPermissionRecovery(
       context,
+      actionKey: 'historique_recompense:pick_image:$index',
+      permission: Permission.photos,
       isFrench: langUserPhone == "fr",
+      action: () async {
+        if (!mounted) return;
+        final XFile? pickedFile = await _picker.pickImage(
+          source: ImageSource.gallery,
+          imageQuality: 80,
+        );
+        if (pickedFile != null) {
+          setState(() {
+            if (index == 1)
+              _proofImage1 = File(pickedFile.path);
+            else
+              _proofImage2 = File(pickedFile.path);
+          });
+          setModalState(() {});
+        }
+      },
     );
-    if (!canAccessGallery || !mounted) return;
-
-    final XFile? pickedFile =
-        await _picker.pickImage(source: ImageSource.gallery, imageQuality: 80);
-    if (pickedFile != null) {
-      setState(() {
-        if (index == 1)
-          _proofImage1 = File(pickedFile.path);
-        else
-          _proofImage2 = File(pickedFile.path);
-      });
-      setModalState(() {});
-    }
   }
 
   Future<void> _submitProofs(

@@ -52,15 +52,19 @@ class _SynchroAvancePageState extends State<_SynchroAvancePage> {
 
   /// Demande la permission contacts et insère le contact Dressur si accordée.
   Future<void> _initPermissionsAndContact() async {
-    final canAccessContacts =
-        await PermissionManager.instance.ensureContactsAccessWithRecovery(
+    var actionResumed = false;
+    await PermissionManager.instance.runWithPermissionRecovery(
       context,
+      actionKey: 'synchro_avance:init_contact',
+      permission: Permission.contacts,
       isFrench: langUserPhone == "fr",
+      action: () async {
+        if (!mounted) return;
+        actionResumed = true;
+        await insertDressurContact();
+      },
     );
-    if (canAccessContacts) {
-      await insertDressurContact();
-    } else {
-      if (!mounted) return;
+    if (!actionResumed && mounted) {
       warningNoti(
         "Attention !",
         langUserPhone != "fr"

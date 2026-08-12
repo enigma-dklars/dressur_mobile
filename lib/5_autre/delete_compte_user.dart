@@ -113,15 +113,33 @@ class _DeletecompteFormState extends State<DeletecompteForm> {
 
     if (!response.isTapConfirmButton) return;
 
-    if (contactsEnregistrer.isNotEmpty) {
-      final canAccessContacts =
-          await PermissionManager.instance.ensureContactsAccessWithRecovery(
-        context,
-        isFrench: langUserPhone == "fr",
+    final contactsToDelete = List<String>.from(contactsEnregistrer);
+    final motifDeleted = motifController.text;
+    if (contactsToDelete.isEmpty) {
+      await _deleteAccountAfterPermission(
+        motifDeleted: motifDeleted,
+        contactsToDelete: contactsToDelete,
       );
-      if (!canAccessContacts || !mounted) return;
+      return;
     }
 
+    await PermissionManager.instance.runWithPermissionRecovery(
+      context,
+      actionKey: 'delete_account:delete',
+      permission: Permission.contacts,
+      isFrench: langUserPhone == "fr",
+      action: () => _deleteAccountAfterPermission(
+        motifDeleted: motifDeleted,
+        contactsToDelete: contactsToDelete,
+      ),
+    );
+  }
+
+  Future<void> _deleteAccountAfterPermission({
+    required String motifDeleted,
+    required List<String> contactsToDelete,
+  }) async {
+    if (!mounted) return;
     setState(() => _isLoading = true);
 
     try {
@@ -129,8 +147,7 @@ class _DeletecompteFormState extends State<DeletecompteForm> {
           'POST', Uri.parse('$generalRouteForApi/deleteCompteDS'));
       request.fields.addAll({
         'uid': uidUser,
-        
-        'motifDeleted': motifController.text
+        'motifDeleted': motifDeleted,
       });
       http.StreamedResponse httpResponse = await request.send();
       if (httpResponse.statusCode == 200) {
@@ -140,13 +157,13 @@ class _DeletecompteFormState extends State<DeletecompteForm> {
           dangerNoti(data["titre"], data["message"], context);
         } else {
           // Logique de nettoyage local
-          if (contactsEnregistrer.isNotEmpty) {
+          if (contactsToDelete.isNotEmpty) {
             List<Contact> contacts =
                 await FlutterContacts.getContacts(withProperties: true, withAccounts: true);
             for (var contact in contacts) {
               bool shouldDelete = false;
               for (var phone in contact.phones) {
-                if (contactsEnregistrer.contains(
+                if (contactsToDelete.contains(
                     (phone.number).replaceAll(" ", "").replaceAll("-", ""))) {
                   shouldDelete = true;
                   break;

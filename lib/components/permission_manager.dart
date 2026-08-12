@@ -58,13 +58,36 @@ class AppPermissionResult {
 /// soit active à la fois. Deux demandes simultanées pour la même permission
 /// partagent le même résultat.
 class PermissionManager {
-  PermissionManager._();
+  PermissionManager._({
+    Future<AppPermissionResult> Function(Permission)? ensureOverride,
+    Future<PermissionRecoveryAction> Function()? recoveryActionOverride,
+    Future<bool> Function()? openSettingsOverride,
+  })  : _ensureOverride = ensureOverride,
+        _recoveryActionOverride = recoveryActionOverride,
+        _openSettingsOverride = openSettingsOverride;
 
   static final PermissionManager instance = PermissionManager._();
+
+  /// Constructeur réservé aux tests du flux de reprise.
+  PermissionManager.forTesting({
+    required Future<AppPermissionResult> Function(Permission) ensurePermission,
+    required Future<PermissionRecoveryAction> Function() recoveryAction,
+    Future<bool> Function()? openSettings,
+  }) : this._(
+          ensureOverride: ensurePermission,
+          recoveryActionOverride: recoveryAction,
+          openSettingsOverride: openSettings,
+        );
+
+  final Future<AppPermissionResult> Function(Permission)? _ensureOverride;
+  final Future<PermissionRecoveryAction> Function()? _recoveryActionOverride;
+  final Future<bool> Function()? _openSettingsOverride;
 
   Future<void> _requestQueue = Future<void>.value();
   final Map<Permission, Future<AppPermissionResult>> _pendingRequests =
       <Permission, Future<AppPermissionResult>>{};
+  final Map<String, _PendingPermissionAction> _pendingActions =
+      <String, _PendingPermissionAction>{};
 
   Future<AppPermissionResult> check(Permission permission) async {
     try {
@@ -109,11 +132,119 @@ class PermissionManager {
   /// sont retournés tels quels afin que l'interface puisse proposer une
   /// récupération claire.
   Future<AppPermissionResult> ensure(Permission permission) async {
+    final override = _ensureOverride;
+    if (override != null) return override(permission);
+
     final current = await check(permission);
     if (current.canProceed || current.needsSettings) {
       return current;
     }
     return request(permission);
+  }
+
+  /// Exécute une action qui dépend d'une permission.
+  ///
+  /// L'appelant doit capturer ici les données nécessaires à l'action avant
+  /// l'attente de permission. Tant que la permission n'est pas accordée,
+  /// l'action reste en attente sans être exécutée. Deux appels simultanés avec
+  /// la même [actionKey] partagent la même Future, ce qui empêche les doubles
+  /// envois et doubles traitements.
+  ///
+  /// L'action est exécutée au maximum une fois. Après une annulation, un refus,
+  /// une action terminée ou une erreur, l'entrée est supprimée du gestionnaire.
+  Future<void> runWithPermissionRecovery(
+    BuildContext context, {
+    required String actionKey,
+    required Permission permission,
+    required bool isFrench,
+    required Future<void> Function() action,
+    String? titleFr,
+    String? titleEn,
+    String? messageFr,
+    String? messageEn,
+  }) {
+    final existing = _pendingActions[actionKey];
+    if (existing != null) return existing.future;
+
+    final completer = Completer<void>();
+    final pending = _PendingPermissionAction(completer);
+    _pendingActions[actionKey] = pending;
+
+    unawaited(
+      _runPendingPermissionAction(
+        context,
+        pending,
+        actionKey: actionKey,
+        permission: permission,
+        isFrench: isFrench,
+        action: action,
+        titleFr: titleFr,
+        titleEn: titleEn,
+        messageFr: messageFr,
+        messageEn: messageEn,
+      ),
+    );
+
+    return completer.future;
+  }
+
+  bool hasPendingAction(String actionKey) =>
+      _pendingActions.containsKey(actionKey);
+
+  Future<void> _runPendingPermissionAction(
+    BuildContext context,
+    _PendingPermissionAction pending, {
+    required String actionKey,
+    required Permission permission,
+    required bool isFrench,
+    required Future<void> Function() action,
+    String? titleFr,
+    String? titleEn,
+    String? messageFr,
+    String? messageEn,
+  }) async {
+    try {
+      for (var attempt = 0; attempt < 2; attempt++) {
+        final result = await ensure(permission);
+        if (result.canProceed) {
+          await action();
+          pending.complete();
+          return;
+        }
+
+        if (!context.mounted) return;
+
+        final recoveryAction = await _showPermissionDialog(
+          context,
+          result,
+          permission: permission,
+          isFrench: isFrench,
+          titleFr: titleFr,
+          titleEn: titleEn,
+          messageFr: messageFr,
+          messageEn: messageEn,
+        );
+
+        if (recoveryAction == PermissionRecoveryAction.cancel) return;
+
+        if (recoveryAction == PermissionRecoveryAction.openSettings) {
+          await openSettings();
+          final afterSettings = await check(permission);
+          if (afterSettings.canProceed) {
+            await action();
+            pending.complete();
+          }
+          return;
+        }
+      }
+    } catch (error, stackTrace) {
+      pending.completeError(error, stackTrace);
+    } finally {
+      if (identical(_pendingActions[actionKey], pending)) {
+        _pendingActions.remove(actionKey);
+      }
+      if (!pending.isCompleted) pending.complete();
+    }
   }
 
   Future<AppPermissionResult> ensureGalleryAccess() {
@@ -221,7 +352,7 @@ class PermissionManager {
       );
       if (action == PermissionRecoveryAction.openSettings) {
         await openSettings();
-        return false;
+        return (await check(permission)).canProceed;
       }
       if (action != PermissionRecoveryAction.retry) return false;
     }
@@ -238,6 +369,9 @@ class PermissionManager {
     String? messageFr,
     String? messageEn,
   }) async {
+    final recoveryActionOverride = _recoveryActionOverride;
+    if (recoveryActionOverride != null) return recoveryActionOverride();
+
     final needsSettings = result.needsSettings;
     final permissionLabel = _permissionLabel(permission, isFrench: isFrench);
     final title = isFrench
@@ -317,6 +451,9 @@ class PermissionManager {
   }
 
   Future<bool> openSettings() async {
+    final openSettingsOverride = _openSettingsOverride;
+    if (openSettingsOverride != null) return openSettingsOverride();
+
     try {
       return await openAppSettings();
     } catch (_) {
@@ -346,5 +483,25 @@ class PermissionManager {
     }
 
     return AppPermissionResult(permission: permission, status: status);
+  }
+}
+
+class _PendingPermissionAction {
+  _PendingPermissionAction(this._completer);
+
+  final Completer<void> _completer;
+
+  bool get isCompleted => _completer.isCompleted;
+
+  Future<void> get future => _completer.future;
+
+  void complete() {
+    if (!_completer.isCompleted) _completer.complete();
+  }
+
+  void completeError(Object error, StackTrace stackTrace) {
+    if (!_completer.isCompleted) {
+      _completer.completeError(error, stackTrace);
+    }
   }
 }

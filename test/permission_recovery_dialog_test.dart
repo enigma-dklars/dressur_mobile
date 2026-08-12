@@ -1,6 +1,10 @@
+import 'dart:async';
+
 import 'package:dressur/components/permission_recovery_dialog.dart';
+import 'package:dressur/components/permission_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 void main() {
   Future<void> pumpDialog(
@@ -54,5 +58,102 @@ void main() {
 
     await tester.tap(find.text('Ouvrir les réglages'));
     expect(actions, [PermissionRecoveryAction.openSettings]);
+  });
+
+  testWidgets('pending action resumes once after permission is granted', (
+    tester,
+  ) async {
+    late BuildContext context;
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Builder(
+          builder: (builderContext) {
+            context = builderContext;
+            return const SizedBox.shrink();
+          },
+        ),
+      ),
+    );
+
+    final statuses = <AppPermissionStatus>[
+      AppPermissionStatus.denied,
+      AppPermissionStatus.granted,
+    ];
+    final recoveryResponse = Completer<PermissionRecoveryAction>();
+    final manager = PermissionManager.forTesting(
+      ensurePermission: (permission) async => AppPermissionResult(
+        permission: permission,
+        status: statuses.removeAt(0),
+      ),
+      recoveryAction: () => recoveryResponse.future,
+    );
+    var actionCount = 0;
+
+    final firstCall = manager.runWithPermissionRecovery(
+      context,
+      actionKey: 'contacts:add',
+      permission: Permission.contacts,
+      isFrench: true,
+      action: () async {
+        actionCount++;
+      },
+    );
+    await tester.pump();
+    expect(actionCount, 0);
+    expect(manager.hasPendingAction('contacts:add'), isTrue);
+
+    final duplicateCall = manager.runWithPermissionRecovery(
+      context,
+      actionKey: 'contacts:add',
+      permission: Permission.contacts,
+      isFrench: true,
+      action: () async {
+        actionCount++;
+      },
+    );
+
+    recoveryResponse.complete(PermissionRecoveryAction.retry);
+    await Future.wait<void>([firstCall, duplicateCall]);
+
+    expect(actionCount, 1);
+    expect(manager.hasPendingAction('contacts:add'), isFalse);
+  });
+
+  testWidgets('refused pending action is not executed and is cleared', (
+    tester,
+  ) async {
+    late BuildContext context;
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Builder(
+          builder: (builderContext) {
+            context = builderContext;
+            return const SizedBox.shrink();
+          },
+        ),
+      ),
+    );
+
+    final manager = PermissionManager.forTesting(
+      ensurePermission: (permission) async => AppPermissionResult(
+        permission: permission,
+        status: AppPermissionStatus.denied,
+      ),
+      recoveryAction: () async => PermissionRecoveryAction.cancel,
+    );
+    var actionCount = 0;
+
+    await manager.runWithPermissionRecovery(
+      context,
+      actionKey: 'contacts:delete',
+      permission: Permission.contacts,
+      isFrench: true,
+      action: () async {
+        actionCount++;
+      },
+    );
+
+    expect(actionCount, 0);
+    expect(manager.hasPendingAction('contacts:delete'), isFalse);
   });
 }

@@ -33,36 +33,47 @@ class _PreferencePageState extends State<PreferencePage>
   Future<List<Map<String, String?>>> _fetchAccountsList(
     BuildContext context,
   ) async {
-    final defaultEntry = {'name': null, 'type': null, 'label': langUserPhone == 'fr' ? 'Téléphone (local)' : 'Phone (local)'};
-    try {
-      final canAccessContacts =
-          await PermissionManager.instance.ensureContactsAccessWithRecovery(
-        context,
-        isFrench: langUserPhone == "fr",
-      );
-      if (!canAccessContacts) return [defaultEntry];
+    final Map<String, String?> defaultEntry = {
+      'name': null,
+      'type': null,
+      'label': langUserPhone == 'fr' ? 'Téléphone (local)' : 'Phone (local)'
+    };
+    var accounts = <Map<String, String?>>[defaultEntry];
 
-      // Interroge Android AccountManager directement via MethodChannel pour
-      // lister TOUS les comptes du téléphone (Google, Exchange, etc.),
-      // indépendamment des contacts synchronisés.
-      final raw = await _accountsChannel.invokeMethod<List>('getDeviceAccounts');
-      final seen = <String>{};
-      final accounts = <Map<String, String?>>[defaultEntry];
-      for (final item in raw ?? []) {
-        final name = item['name'] as String? ?? '';
-        final type = item['type'] as String? ?? '';
-        final key = '${name}__${type}';
-        if (name.isNotEmpty && !seen.contains(key)) {
-          seen.add(key);
-          final label = name.contains('@') ? name : '$name (${type.split('.').last})';
-          accounts.add({'name': name, 'type': type, 'label': label});
+    await PermissionManager.instance.runWithPermissionRecovery(
+      context,
+      actionKey: 'preference:fetch_device_accounts',
+      permission: Permission.contacts,
+      isFrench: langUserPhone == "fr",
+      action: () async {
+        if (!mounted) return;
+
+        // Interroge Android AccountManager directement via MethodChannel pour
+        // lister TOUS les comptes du téléphone (Google, Exchange, etc.),
+        // indépendamment des contacts synchronisés.
+        try {
+          final raw =
+              await _accountsChannel.invokeMethod<List>('getDeviceAccounts');
+          final seen = <String>{};
+          accounts = <Map<String, String?>>[defaultEntry];
+          for (final item in raw ?? []) {
+            final name = item['name'] as String? ?? '';
+            final type = item['type'] as String? ?? '';
+            final key = '${name}__${type}';
+            if (name.isNotEmpty && !seen.contains(key)) {
+              seen.add(key);
+              final label =
+                  name.contains('@') ? name : '$name (${type.split('.').last})';
+              accounts.add({'name': name, 'type': type, 'label': label});
+            }
+          }
+        } catch (e) {
+          debugPrint('[Accounts] erreur: $e');
         }
-      }
-      return accounts;
-    } catch (e) {
-      debugPrint('[Accounts] erreur: $e');
-      return [defaultEntry];
-    }
+      },
+    );
+
+    return accounts;
   }
 
   Future<void> _saveAccountPreference(String? name, String? type) async {

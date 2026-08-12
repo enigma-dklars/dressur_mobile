@@ -378,38 +378,40 @@ class _ProduitsServicesState extends State<ProduitsServices> {
   }
 
   Future<void> _selectImage() async {
-    final canAccessGallery = await PermissionManager.instance
-        .ensureGalleryAccessWithRecovery(
+    await PermissionManager.instance.runWithPermissionRecovery(
       context,
+      actionKey: 'new_promo_affaire:select_image',
+      permission: Permission.photos,
       isFrench: langUserPhone == "fr",
+      action: () async {
+        if (!mounted) return;
+        final picker = ImagePicker();
+        final pickedImage = await picker.pickImage(source: ImageSource.gallery);
+        if (pickedImage != null) {
+          final imageFile = File(pickedImage.path);
+          final fileSize = await imageFile.length();
+          if (fileSize / (1024 * 1024) > 1) {
+            dangerNoti(
+                "Attention !!!",
+                (langUserPhone == "fr")
+                    ? "L'image ne peut pas dépasser 1 Mo."
+                    : "Image size cannot exceed 1 MB.",
+                context);
+            return;
+          }
+          if (isImageSquare(imageFile)) {
+            setState(() => _imageFile = imageFile);
+          } else {
+            dangerNoti(
+                "Attention !!!",
+                (langUserPhone == "fr")
+                    ? "L'image doit être proche d'un carré."
+                    : "The image should be close to a square.",
+                context);
+          }
+        }
+      }
     );
-    if (!canAccessGallery || !mounted) return;
-
-    final picker = ImagePicker();
-    final pickedImage = await picker.pickImage(source: ImageSource.gallery);
-    if (pickedImage != null) {
-      final imageFile = File(pickedImage.path);
-      final fileSize = await imageFile.length();
-      if (fileSize / (1024 * 1024) > 1) {
-        dangerNoti(
-            "Attention !!!",
-            (langUserPhone == "fr")
-                ? "L'image ne peut pas dépasser 1 Mo."
-                : "Image size cannot exceed 1 MB.",
-            context);
-        return;
-      }
-      if (isImageSquare(imageFile)) {
-        setState(() => _imageFile = imageFile);
-      } else {
-        dangerNoti(
-            "Attention !!!",
-            (langUserPhone == "fr")
-                ? "L'image doit être proche d'un carré."
-                : "The image should be close to a square.",
-            context);
-      }
-    }
   }
 
   Future<void> _sendData() async {
@@ -1780,38 +1782,40 @@ class _SitesApplicationsState extends State<SitesApplications> {
   }
 
   Future<void> _selectImage() async {
-    final canAccessGallery = await PermissionManager.instance
-        .ensureGalleryAccessWithRecovery(
+    await PermissionManager.instance.runWithPermissionRecovery(
       context,
+      actionKey: 'sites_applications:select_image',
+      permission: Permission.photos,
       isFrench: langUserPhone == "fr",
+      action: () async {
+        if (!mounted) return;
+        final picker = ImagePicker();
+        final pickedImage = await picker.pickImage(source: ImageSource.gallery);
+        if (pickedImage != null) {
+          final imageFile = File(pickedImage.path);
+          final fileSize = await imageFile.length();
+          if (fileSize / (1024 * 1024) > 1) {
+            dangerNoti(
+                "Attention !!!",
+                (langUserPhone == "fr")
+                    ? "L'image ne peut pas dépasser 1 Mo."
+                    : "Image size cannot exceed 1 MB.",
+                context);
+            return;
+          }
+          if (isImageSquare(imageFile)) {
+            setState(() => _imageFile = imageFile);
+          } else {
+            dangerNoti(
+                "Attention !!!",
+                (langUserPhone == "fr")
+                    ? "L'image doit être proche d'un carré."
+                    : "The image should be close to a square.",
+                context);
+          }
+        }
+      }
     );
-    if (!canAccessGallery || !mounted) return;
-
-    final picker = ImagePicker();
-    final pickedImage = await picker.pickImage(source: ImageSource.gallery);
-    if (pickedImage != null) {
-      final imageFile = File(pickedImage.path);
-      final fileSize = await imageFile.length();
-      if (fileSize / (1024 * 1024) > 1) {
-        dangerNoti(
-            "Attention !!!",
-            (langUserPhone == "fr")
-                ? "L'image ne peut pas dépasser 1 Mo."
-                : "Image size cannot exceed 1 MB.",
-            context);
-        return;
-      }
-      if (isImageSquare(imageFile)) {
-        setState(() => _imageFile = imageFile);
-      } else {
-        dangerNoti(
-            "Attention !!!",
-            (langUserPhone == "fr")
-                ? "L'image doit être proche d'un carré."
-                : "The image should be close to a square.",
-            context);
-      }
-    }
   }
 
   Future<void> _loadMethodesPaiement() async {

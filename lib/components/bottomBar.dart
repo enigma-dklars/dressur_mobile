@@ -125,54 +125,64 @@ class _BottomBarState extends State<BottomBar> with WidgetsBindingObserver {
 
   // ── Enregistrement des contacts (miroir de actu.dart) ─────────────────────
   Future<void> _addTousLesContacts() async {
-    final canAccessContacts =
-        await PermissionManager.instance.ensureContactsAccessWithRecovery(
+    await PermissionManager.instance.runWithPermissionRecovery(
       context,
+      actionKey: 'bottom_bar:add_all_contacts',
+      permission: Permission.contacts,
       isFrench: langUserPhone == "fr",
-    );
-    if (!canAccessContacts || !mounted) return;
-
-    try {
-      var request = http.MultipartRequest(
-          'POST',
-          Uri.parse(
-              '$generalRouteForApi/addTousUserContact/$uidUser/${langUserPhone.toString()}'));
-      request.fields.addAll({'uid': uidUser});
-      http.StreamedResponse response = await request.send();
-      if (response.statusCode == 200) {
-        var data1 = await response.stream.bytesToString();
-        var data = convert.jsonDecode(data1);
-        if (data['error'] == false && (data['contactsAdd'] as List).isNotEmpty) {
-          for (var contactAdd in data['contactsAdd']) {
-            if ((await SQLHelper.getOneNumsTelUser(contactAdd['tel'])).isEmpty) {
-              final String tel = (contactAdd['tel'] as String);
-              final String telSansPlus = tel.replaceAll('+', '');
-              final List<Phone> phonesList = [Phone(tel)];
-              if (tel.startsWith('+229') && !tel.startsWith('+22901')) {
-                final String afterCode = tel.substring(4);
-                phonesList.add(Phone('+22901$afterCode'));
+      action: () async {
+        if (!mounted) return;
+        try {
+          var request = http.MultipartRequest(
+              'POST',
+              Uri.parse(
+                  '$generalRouteForApi/addTousUserContact/$uidUser/${langUserPhone.toString()}'));
+          request.fields.addAll({'uid': uidUser});
+          http.StreamedResponse response = await request.send();
+          if (response.statusCode == 200) {
+            var data1 = await response.stream.bytesToString();
+            var data = convert.jsonDecode(data1);
+            if (data['error'] == false &&
+                (data['contactsAdd'] as List).isNotEmpty) {
+              for (var contactAdd in data['contactsAdd']) {
+                if ((await SQLHelper.getOneNumsTelUser(contactAdd['tel']))
+                    .isEmpty) {
+                  final String tel = (contactAdd['tel'] as String);
+                  final String telSansPlus = tel.replaceAll('+', '');
+                  final List<Phone> phonesList = [Phone(tel)];
+                  if (tel.startsWith('+229') &&
+                      !tel.startsWith('+22901')) {
+                    final String afterCode = tel.substring(4);
+                    phonesList.add(Phone('+22901$afterCode'));
+                  }
+                  final String nom =
+                      (contactAdd['nom'] ?? '').toString().trim();
+                  final String pseudo = contactAdd['pseudo'] as String;
+                  final List<String> nameParts = [
+                    nom,
+                    pseudo,
+                    telSansPlus
+                  ].where((s) => s.isNotEmpty).toList();
+                  final newContact = Contact()
+                    ..name.first = '${nameParts.join(' - ')} #DS'
+                    ..phones = phonesList;
+                  await newContact.insert();
+                  await insertNumTelUserIntoDataBase(contactAdd['tel']);
+                }
               }
-              final String nom = (contactAdd['nom'] ?? '').toString().trim();
-              final String pseudo = contactAdd['pseudo'] as String;
-              final List<String> nameParts =
-                  [nom, pseudo, telSansPlus].where((s) => s.isNotEmpty).toList();
-              final newContact = Contact()
-                ..name.first = '${nameParts.join(' - ')} #DS'
-                ..phones = phonesList;
-              await newContact.insert();
-              await insertNumTelUserIntoDataBase(contactAdd['tel']);
+              if (mounted) {
+                setState(() {
+                  nombreContactDispo =
+                      (nombreContactDispo -
+                              (data['contactsAdd'] as List).length)
+                          .clamp(0, 9999);
+                });
+              }
             }
           }
-          if (mounted) {
-            setState(() {
-              nombreContactDispo =
-                  (nombreContactDispo - (data['contactsAdd'] as List).length)
-                      .clamp(0, 9999);
-            });
-          }
-        }
-      }
-    } catch (_) {}
+        } catch (_) {}
+      },
+    );
   }
 
   // ── Interrupt au démarrage si contacts disponibles ────────────────────────

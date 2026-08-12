@@ -125,18 +125,41 @@ class SynchroAvanceService extends ChangeNotifier {
 
     final bool isFr = langUserPhone == 'fr';
 
-    final bool canAccessContacts = context != null
-        ? await PermissionManager.instance.ensureContactsAccessWithRecovery(
-            context,
-            isFrench: isFr,
-          )
-        : (await PermissionManager.instance.ensure(Permission.contacts))
+    if (context != null) {
+      var permissionError = isFr
+          ? "Veuillez autoriser Dressur à accéder à vos contacts."
+          : "Please allow Dressur to access your contacts.";
+      await PermissionManager.instance.runWithPermissionRecovery(
+        context,
+        actionKey: 'synchro_avance:start',
+        permission: Permission.contacts,
+        isFrench: isFr,
+        action: () async {
+          permissionError = await _startAfterContactsPermission(
+            etendreOption,
+            context: context,
+          );
+        },
+      );
+      return permissionError;
+    }
+
+    final canAccessContacts =
+        (await PermissionManager.instance.ensure(Permission.contacts))
             .canProceed;
     if (!canAccessContacts) {
       return isFr
           ? "Veuillez autoriser Dressur à accéder à vos contacts."
           : "Please allow Dressur to access your contacts.";
     }
+    return _startAfterContactsPermission(etendreOption);
+  }
+
+  Future<String?> _startAfterContactsPermission(
+    bool etendreOption, {
+    BuildContext? context,
+  }) async {
+    final bool isFr = langUserPhone == 'fr';
 
     if (context != null) {
       await PermissionManager.instance.ensureNotificationAccessWithRecovery(

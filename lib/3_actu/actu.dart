@@ -573,63 +573,60 @@ class _ActuPageState extends State<ActuPage>
     );
   }
 
-  void addTousLesContacts() async {
-    final canAccessContacts =
-        await PermissionManager.instance.ensureContactsAccessWithRecovery(
+  Future<void> addTousLesContacts() async {
+    await PermissionManager.instance.runWithPermissionRecovery(
       context,
+      actionKey: 'actu:add_all_contacts',
+      permission: Permission.contacts,
       isFrench: langUserPhone == "fr",
-    );
-    if (!canAccessContacts || !mounted) return;
-
-    setState(() {
-      _loading = true;
-    });
-    var request = http.MultipartRequest(
-        'POST',
-        Uri.parse(
-            '$generalRouteForApi/addTousUserContact/$uidUser/${langUserPhone.toString()}'));
-    request.fields.addAll({
-      'uid': uidUser,
-    });
-
-    http.StreamedResponse response = await request.send();
-
-    if (response.statusCode == 200) {
-      var data1 = await response.stream.bytesToString();
-      var data = jsonDecode(data1);
-      if (data["error"] == true) {
-        if (data["permissionAdd"] == false) {
-          setState(() {
-            permissionAdd = false;
-            messageErreurPermissionAdd = data["messageErreurPermissionAdd"];
+      action: () async {
+        if (!mounted) return;
+        setState(() {
+          _loading = true;
+        });
+        try {
+          var request = http.MultipartRequest(
+              'POST',
+              Uri.parse(
+                  '$generalRouteForApi/addTousUserContact/$uidUser/${langUserPhone.toString()}'));
+          request.fields.addAll({
+            'uid': uidUser,
           });
-          await saveContactsAddsIfExiste(data);
-          // tu a deja depasser
-          _showMessagePasPermiAdd(messageErreurPermissionAdd, context);
-        }
-      } else if (data["error"] == false) {
-        await saveContactsAddsIfExiste(data);
-      } else {
-        // erreur server heinnn
-      }
 
-      setState(() {
-        _loading = false;
-      });
-    } else {
-      setState(() {
-        _loading = false;
-      });
-    }
+          http.StreamedResponse response = await request.send();
+
+          if (response.statusCode == 200) {
+            var data1 = await response.stream.bytesToString();
+            var data = jsonDecode(data1);
+            if (data["error"] == true) {
+              if (data["permissionAdd"] == false) {
+                setState(() {
+                  permissionAdd = false;
+                  messageErreurPermissionAdd = data["messageErreurPermissionAdd"];
+                });
+                await saveContactsAddsIfExiste(data);
+                // tu a deja depasser
+                _showMessagePasPermiAdd(messageErreurPermissionAdd, context);
+              }
+            } else if (data["error"] == false) {
+              await saveContactsAddsIfExiste(data);
+            } else {
+              // erreur server heinnn
+            }
+          }
+        } finally {
+          if (mounted) {
+            setState(() {
+              _loading = false;
+            });
+          }
+        }
+      },
+    );
   }
 
   Future<void> saveContactsAddsIfExiste(data) async {
-    final canAccessContacts =
-        await PermissionManager.instance.ensureContactsAccessWithRecovery(
-      context,
-      isFrench: langUserPhone == "fr",
-    );
-    if (!canAccessContacts || !mounted) return;
+    if (!mounted) return;
 
     int nombreAddNow = 0;
     if ((data["contactsAdd"]).length >= 1) {

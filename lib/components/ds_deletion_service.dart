@@ -65,19 +65,35 @@ class DSDeletionService extends ChangeNotifier {
 
     final bool isFr = langUserPhone == 'fr';
 
-    // Permission contacts
-    final bool canAccessContacts = context != null
-        ? await PermissionManager.instance.ensureContactsAccessWithRecovery(
-            context,
-            isFrench: isFr,
-          )
-        : (await PermissionManager.instance.ensure(Permission.contacts))
+    if (context != null) {
+      var permissionError = isFr
+          ? "Veuillez autoriser Dressur à accéder à vos contacts."
+          : "Please allow Dressur to access your contacts.";
+      await PermissionManager.instance.runWithPermissionRecovery(
+        context,
+        actionKey: 'ds_deletion:start',
+        permission: Permission.contacts,
+        isFrench: isFr,
+        action: () async {
+          permissionError = await _startAfterContactsPermission(context: context);
+        },
+      );
+      return permissionError;
+    }
+
+    final canAccessContacts =
+        (await PermissionManager.instance.ensure(Permission.contacts))
             .canProceed;
     if (!canAccessContacts) {
       return isFr
           ? "Veuillez autoriser Dressur à accéder à vos contacts."
           : "Please allow Dressur to access your contacts.";
     }
+    return _startAfterContactsPermission();
+  }
+
+  Future<String?> _startAfterContactsPermission({BuildContext? context}) async {
+    final bool isFr = langUserPhone == 'fr';
 
     // Permission notifications (Android 13+)
     if (context != null) {
