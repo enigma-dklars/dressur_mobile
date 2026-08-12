@@ -6,6 +6,7 @@ import 'package:dressur/components/constant.dart';
 import 'package:dressur/components/noti.dart';
 import 'package:dressur/components/permission_manager.dart';
 import 'package:dressur/components/synchro_avance_service.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class SynchroAvance extends StatelessWidget {
   const SynchroAvance({Key? key}) : super(key: key);

@@ -66,7 +66,7 @@ class DSDeletionService extends ChangeNotifier {
     final bool isFr = langUserPhone == 'fr';
 
     if (context != null) {
-      var permissionError = isFr
+      String? permissionError = isFr
           ? "Veuillez autoriser Dressur à accéder à vos contacts."
           : "Please allow Dressur to access your contacts.";
       await PermissionManager.instance.runWithPermissionRecovery(

@@ -26,6 +26,7 @@ import 'package:dressur/components/sql_helper.dart';
 import 'package:dressur/components/permission_manager.dart';
 import 'package:dressur/5_autre/support_assistance.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:dressur/8_admin/admin.dart';
 
 class AnimatedRewardBadge extends StatefulWidget {

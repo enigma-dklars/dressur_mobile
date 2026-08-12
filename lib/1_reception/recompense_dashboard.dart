@@ -17,6 +17,7 @@ import 'package:dressur/components/constant.dart';
 import 'package:dressur/components/permission_manager.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class HistoriqueRecompense {
   final int id;

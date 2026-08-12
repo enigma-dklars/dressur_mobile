@@ -14,6 +14,7 @@ import 'package:dressur/components/constant.dart';
 import 'package:dressur/components/noti.dart';
 import 'package:dressur/components/permission_manager.dart';
 import 'package:select_form_field/select_form_field.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class ModificationProduitServicesPage extends StatefulWidget {
   final Promotion promotion;

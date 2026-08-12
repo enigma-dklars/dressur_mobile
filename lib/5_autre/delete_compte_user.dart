@@ -12,6 +12,7 @@ import 'dart:convert' as convert;
 import 'package:dressur/components/sql_helper.dart';
 import 'package:dressur/components/noti.dart';
 import 'package:dressur/components/permission_manager.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class DeletecomptePage extends StatelessWidget {
   @override

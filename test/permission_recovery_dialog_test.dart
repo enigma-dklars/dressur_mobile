@@ -61,6 +61,101 @@ void main() {
     expect(actions, [PermissionRecoveryAction.openSettings]);
   });
 
+  testWidgets('already granted permission runs the action without recovery', (
+    tester,
+  ) async {
+    late BuildContext context;
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Builder(
+          builder: (builderContext) {
+            context = builderContext;
+            return const SizedBox.shrink();
+          },
+        ),
+      ),
+    );
+
+    var actionCount = 0;
+    var requestCount = 0;
+    var recoveryCount = 0;
+    final manager = PermissionManager.forTesting(
+      checkPermission: (permission) async => AppPermissionResult(
+        permission: permission,
+        status: AppPermissionStatus.granted,
+      ),
+      requestPermission: (permission) async {
+        requestCount++;
+        return AppPermissionResult(
+          permission: permission,
+          status: AppPermissionStatus.granted,
+        );
+      },
+      recoveryAction: () async {
+        recoveryCount++;
+        return PermissionRecoveryAction.cancel;
+      },
+    );
+
+    await manager.runWithPermissionRecovery(
+      context,
+      actionKey: 'photos:already-granted',
+      permission: Permission.photos,
+      isFrench: true,
+      action: () async => actionCount++,
+    );
+
+    expect(actionCount, 1);
+    expect(requestCount, 0);
+    expect(recoveryCount, 0);
+    expect(manager.hasPendingAction('photos:already-granted'), isFalse);
+  });
+
+  testWidgets(
+    'permanently denied permission can resume after accepting in settings',
+    (tester) async {
+      late BuildContext context;
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Builder(
+            builder: (builderContext) {
+              context = builderContext;
+              return const SizedBox.shrink();
+            },
+          ),
+        ),
+      );
+
+      var currentStatus = AppPermissionStatus.permanentlyDenied;
+      var settingsCount = 0;
+      var actionCount = 0;
+      final manager = PermissionManager.forTesting(
+        checkPermission: (permission) async => AppPermissionResult(
+          permission: permission,
+          status: currentStatus,
+        ),
+        recoveryAction: () async => PermissionRecoveryAction.openSettings,
+        openSettings: () async {
+          settingsCount++;
+          currentStatus = AppPermissionStatus.granted;
+          return true;
+        },
+      );
+
+      await manager.runWithPermissionRecovery(
+        context,
+        actionKey: 'contacts:settings-recovery',
+        permission: Permission.contacts,
+        isFrench: true,
+        action: () async => actionCount++,
+      );
+
+      expect(settingsCount, 1);
+      expect(actionCount, 1);
+      expect(manager.hasPendingAction('contacts:settings-recovery'), isFalse);
+    },
+  );
+
   testWidgets('pending action resumes once after permission is granted', (
     tester,
   ) async {
@@ -157,6 +252,45 @@ void main() {
     expect(actionCount, 0);
     expect(manager.hasPendingAction('contacts:delete'), isFalse);
   });
+
+  testWidgets(
+    'refusing permission keeps the session screen mounted and does not close the app',
+    (tester) async {
+      late BuildContext context;
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Builder(
+            builder: (builderContext) {
+              context = builderContext;
+              return const _SessionProbe();
+            },
+          ),
+        ),
+      );
+
+      final manager = PermissionManager.forTesting(
+        ensurePermission: (permission) async => AppPermissionResult(
+          permission: permission,
+          status: AppPermissionStatus.denied,
+        ),
+        recoveryAction: () async => PermissionRecoveryAction.cancel,
+      );
+
+      await manager.runWithPermissionRecovery(
+        context,
+        actionKey: 'notification:session-preserved',
+        permission: Permission.notification,
+        isFrench: true,
+        action: () async {},
+      );
+      await tester.pump();
+
+      expect(context.mounted, isTrue);
+      expect(find.text(_SessionProbe.sessionLabel), findsOneWidget);
+      expect(find.byType(MaterialApp), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    },
+  );
 
   testWidgets(
     'limited and temporary access remains usable without a new request',
@@ -318,4 +452,15 @@ void main() {
       expect(manager.hasPendingAction('contacts:native-denial'), isFalse);
     },
   );
+}
+
+class _SessionProbe extends StatelessWidget {
+  const _SessionProbe();
+
+  static const sessionLabel = 'session-active';
+
+  @override
+  Widget build(BuildContext context) {
+    return const Text(sessionLabel);
+  }
 }
