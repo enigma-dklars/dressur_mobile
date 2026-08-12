@@ -9,6 +9,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:dressur/6_login_register/connexion.dart';
@@ -215,10 +216,30 @@ class _BottomBarState extends State<BottomBar> with WidgetsBindingObserver {
     }
   }
 
+  /// Les traitements de contacts sont optionnels au démarrage.
+  ///
+  /// Une permission refusée ne doit ni interrompre la restauration de session
+  /// ni produire une Future non gérée depuis initState ou le lifecycle.
+  Future<void> _runOptionalContactStartupTask(
+    Future<void> Function() task,
+  ) async {
+    try {
+      final permission = await Permission.contacts.status
+          .timeout(const Duration(seconds: 3));
+      if (!permission.isGranted) return;
+
+      await task().timeout(_refreshTimeout);
+    } catch (_) {
+      // Les contacts ne doivent jamais empêcher l'utilisateur d'entrer dans
+      // l'application. Les fonctionnalités concernées pourront réessayer
+      // depuis leur écran dédié.
+    }
+  }
+
   @override
   void initState() {
     super.initState();
-    saveContactDsIfNotExiste();
+    unawaited(_runOptionalContactStartupTask(saveContactDsIfNotExiste));
     WidgetsBinding.instance.addObserver(this);
 
     // Charger les infos utilisateur depuis l'API au démarrage, puis vérifier
@@ -229,7 +250,7 @@ class _BottomBarState extends State<BottomBar> with WidgetsBindingObserver {
       actualise(false);
     });
     if (modeReconnaissanceContactArrierePlan == true) {
-      synchroAvanceFunction();
+      unawaited(_runOptionalContactStartupTask(synchroAvanceFunction));
       setState(() {
         modeReconnaissanceContactArrierePlan = false;
       });
@@ -248,7 +269,7 @@ class _BottomBarState extends State<BottomBar> with WidgetsBindingObserver {
 
     _timerSync = Timer.periodic(const Duration(hours: 6), (timer) {
       if (!_isInBackground) {
-        saveContactDsIfNotExiste();
+        unawaited(_runOptionalContactStartupTask(saveContactDsIfNotExiste));
         actualise(false);
       }
     });
@@ -274,7 +295,7 @@ class _BottomBarState extends State<BottomBar> with WidgetsBindingObserver {
           now.difference(_lastActualise!) > const Duration(minutes: 5)) {
         _lastActualise = now;
         actualise(false);
-        saveContactDsIfNotExiste();
+        unawaited(_runOptionalContactStartupTask(saveContactDsIfNotExiste));
       }
     } else if (state == AppLifecycleState.paused) {
       _isInBackground = true;
@@ -282,7 +303,7 @@ class _BottomBarState extends State<BottomBar> with WidgetsBindingObserver {
     }
   }
 
-  void synchroAvanceFunction() async {
+  Future<void> synchroAvanceFunction() async {
     await SQLHelper.viderLaBaseDeDonneeLocalTelUser();
     await Future.delayed(const Duration(seconds: 3), () {});
     List<Contact> contacts = await FlutterContacts.getContacts(
