@@ -407,6 +407,8 @@ class _ProduitsServicesState extends State<ProduitsServices> {
     request.fields['inProgrammeRecompense'] = _participateInReward ? "1" : "0";
     request.fields['rewardBudget'] =
         (_participateInReward ? _rewardBudget : 0).toString();
+    request.fields['rewardBudgetType'] =
+        _isCustomRewardBudget ? "custom" : "predefined";
     request.fields['publishOnDressurStatus'] =
         _publishOnDressurStatus ? "1" : "0";
     request.fields['boostFacebook'] = _boostFacebook ? "1" : "0";
