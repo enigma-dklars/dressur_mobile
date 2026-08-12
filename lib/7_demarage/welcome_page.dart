@@ -255,17 +255,13 @@ class _PageDepartState extends State<PageDepart> {
         return;
       }
 
-      try {
-        await _checkSynchroAvanceReminder();
-      } catch (_) {
-        // A reminder is optional and must not prevent the user from entering.
-      }
       await _waitForMinimumSplash(startedAt);
       if (!mounted) return;
       textChargementEvolution = langUserPhone != "fr"
           ? "Initialization complete"
           : "Initialisation terminée";
       _openHome();
+      unawaited(_runOptionalStartupReminder());
     } on TimeoutException {
       await _waitForMinimumSplash(startedAt);
       if (mounted) _openStartupRecovery(_StartupFailure.networkTimeout);
@@ -285,6 +281,14 @@ class _PageDepartState extends State<PageDepart> {
     final elapsed = DateTime.now().difference(startedAt);
     final remaining = _splashMinimum - elapsed;
     if (remaining > Duration.zero) await Future<void>.delayed(remaining);
+  }
+
+  Future<void> _runOptionalStartupReminder() async {
+    try {
+      await _checkSynchroAvanceReminder();
+    } catch (_) {
+      // Notifications are optional and must never affect session restoration.
+    }
   }
 
   void _openHome() {
