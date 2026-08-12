@@ -251,6 +251,10 @@ class _ProduitsServicesState extends State<ProduitsServices> {
       ? "Le montant doit être supérieur à 5 000 FCFA."
       : "The amount must be greater than 5,000 FCFA.";
 
+  String get _rewardBudgetSelectionMessage => langUserPhone == "fr"
+      ? "Veuillez choisir un budget de récompense valide."
+      : "Please choose a valid reward budget.";
+
   void _onCustomRewardBudgetChanged(String value) {
     final amountText = value.trim();
     int? amount;
@@ -276,36 +280,75 @@ class _ProduitsServicesState extends State<ProduitsServices> {
   }
 
   bool _validateRewardBudget() {
-    if (!_participateInReward || !_isCustomRewardBudget) {
+    if (!_participateInReward) {
+      _rewardBudget = 0;
+      _rewardBudgetError = null;
       return true;
     }
 
-    final amountText = _customRewardBudgetController.text.trim();
-    final amount = int.tryParse(amountText);
-    String? error;
+    if (_isCustomRewardBudget) {
+      final amountText = _customRewardBudgetController.text.trim();
+      final amount = int.tryParse(amountText);
+      String? error;
 
-    if (amountText.isEmpty) {
-      error = _rewardBudgetRequiredMessage;
-    } else if (!RegExp(r'^\d+$').hasMatch(amountText) || amount == null) {
-      error = _rewardBudgetIntegerMessage;
-    } else if (amount <= 5000) {
-      error = _rewardBudgetMinimumMessage;
+      if (amountText.isEmpty) {
+        error = _rewardBudgetRequiredMessage;
+      } else if (!RegExp(r'^\d+$').hasMatch(amountText) || amount == null) {
+        error = _rewardBudgetIntegerMessage;
+      } else if (amount <= 5000) {
+        error = _rewardBudgetMinimumMessage;
+      }
+
+      if (error != null) {
+        setState(() {
+          _rewardBudget = 0;
+          _rewardBudgetError = error;
+        });
+        dangerNoti("Attention !!!", error, context);
+        return false;
+      }
+
+      setState(() {
+        _rewardBudget = amount!;
+        _rewardBudgetError = null;
+      });
+      return true;
     }
 
-    if (error != null) {
-      setState(() {
-        _rewardBudget = 0;
-        _rewardBudgetError = error;
-      });
-      dangerNoti("Attention !!!", error, context);
+    const predefinedBudgets = [500, 1000, 2000, 5000];
+    if (!predefinedBudgets.contains(_rewardBudget)) {
+      setState(() => _rewardBudgetError = _rewardBudgetSelectionMessage);
+      dangerNoti("Attention !!!", _rewardBudgetSelectionMessage, context);
       return false;
     }
 
-    setState(() {
-      _rewardBudget = amount!;
-      _rewardBudgetError = null;
-    });
     return true;
+  }
+
+  void _debugValidatePromotionRequest(http.MultipartRequest request) {
+    assert(() {
+      final fields = request.fields;
+      debugPrint(
+        '[DEV] addProduitService options: '
+        'inProgrammeRecompense=${fields['inProgrammeRecompense']}, '
+        'rewardBudget=${fields['rewardBudget']}, '
+        'publishOnDressurStatus=${fields['publishOnDressurStatus']}, '
+        'boostFacebook=${fields['boostFacebook']}, '
+        'montantBoostFacebook=${fields['montantBoostFacebook']}',
+      );
+
+      if (prixBoost == 100 &&
+          _participateInReward &&
+          _rewardBudget == 500 &&
+          _boostFacebook &&
+          _boostFacebookAmountController.text == '700') {
+        assert(fields['inProgrammeRecompense'] == '1');
+        assert(fields['rewardBudget'] == '500');
+        assert(fields['boostFacebook'] == '1');
+        assert(fields['montantBoostFacebook'] == '700');
+      }
+      return true;
+    }());
   }
 
   double get _dressurStatusAmount {
@@ -403,10 +446,10 @@ class _ProduitsServicesState extends State<ProduitsServices> {
     request.fields['paymentMethod'] = valueMethodePaiement;
     request.fields['tel'] = telController.text;
 
-    // Envoi des nouvelles options (à traiter en back-end plus tard)
-    request.fields['inProgrammeRecompense'] = _participateInReward ? "1" : "0";
+    request.fields['inProgrammeRecompense'] =
+        _participateInReward ? '1' : '0';
     request.fields['rewardBudget'] =
-        (_participateInReward ? _rewardBudget : 0).toString();
+        _participateInReward ? _rewardBudget.toString() : '0';
     request.fields['rewardBudgetType'] =
         _isCustomRewardBudget ? "custom" : "predefined";
     request.fields['publishOnDressurStatus'] =
@@ -415,6 +458,7 @@ class _ProduitsServicesState extends State<ProduitsServices> {
     request.fields['montantBoostFacebook'] = _boostFacebookAmountController.text;
     request.fields['whatsappContact'] = whatsappContactController.text.trim();
     request.fields['totalAmount'] = _subTotal.toStringAsFixed(0);
+    _debugValidatePromotionRequest(request);
 
     final tempDir = await getTemporaryDirectory();
     final filePath = '${tempDir.path}/temp_image.jpg';
