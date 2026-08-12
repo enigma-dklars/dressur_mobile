@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:http/http.dart' as http;
 import 'package:permission_handler/permission_handler.dart';
@@ -116,20 +117,35 @@ class SynchroAvanceService extends ChangeNotifier {
   }
 
   // ── Démarrage ─────────────────────────────────────────────────────────────
-  Future<String?> start(bool etendreOption) async {
+  Future<String?> start(
+    bool etendreOption, {
+    BuildContext? context,
+  }) async {
     if (isRunning) return null;
 
     final bool isFr = langUserPhone == 'fr';
 
-    final contactPerm =
-        await PermissionManager.instance.request(Permission.contacts);
-    if (!contactPerm.canProceed) {
+    final bool canAccessContacts = context != null
+        ? await PermissionManager.instance.ensureContactsAccessWithRecovery(
+            context,
+            isFrench: isFr,
+          )
+        : (await PermissionManager.instance.ensure(Permission.contacts))
+            .canProceed;
+    if (!canAccessContacts) {
       return isFr
           ? "Veuillez autoriser Dressur à accéder à vos contacts."
           : "Please allow Dressur to access your contacts.";
     }
 
-    await PermissionManager.instance.request(Permission.notification);
+    if (context != null) {
+      await PermissionManager.instance.ensureNotificationAccessWithRecovery(
+        context,
+        isFrench: isFr,
+      );
+    } else {
+      await PermissionManager.instance.ensure(Permission.notification);
+    }
 
     isRunning = true;
     isCompleted = false;

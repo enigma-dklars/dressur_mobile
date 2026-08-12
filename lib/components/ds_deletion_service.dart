@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:dressur/components/constant.dart';
@@ -59,22 +60,34 @@ class DSDeletionService extends ChangeNotifier {
   }
 
   /// Lance la suppression des contacts DS.
-  Future<String?> start() async {
+  Future<String?> start({BuildContext? context}) async {
     if (isRunning) return null;
 
     final bool isFr = langUserPhone == 'fr';
 
     // Permission contacts
-    final contactPerm =
-        await PermissionManager.instance.request(Permission.contacts);
-    if (!contactPerm.canProceed) {
+    final bool canAccessContacts = context != null
+        ? await PermissionManager.instance.ensureContactsAccessWithRecovery(
+            context,
+            isFrench: isFr,
+          )
+        : (await PermissionManager.instance.ensure(Permission.contacts))
+            .canProceed;
+    if (!canAccessContacts) {
       return isFr
           ? "Veuillez autoriser Dressur à accéder à vos contacts."
           : "Please allow Dressur to access your contacts.";
     }
 
     // Permission notifications (Android 13+)
-    await PermissionManager.instance.request(Permission.notification);
+    if (context != null) {
+      await PermissionManager.instance.ensureNotificationAccessWithRecovery(
+        context,
+        isFrench: isFr,
+      );
+    } else {
+      await PermissionManager.instance.ensure(Permission.notification);
+    }
 
     // Démarrage
     isRunning = true;

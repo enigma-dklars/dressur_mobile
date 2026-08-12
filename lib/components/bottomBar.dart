@@ -9,6 +9,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:dressur/6_login_register/connexion.dart';
@@ -124,6 +125,13 @@ class _BottomBarState extends State<BottomBar> with WidgetsBindingObserver {
 
   // ── Enregistrement des contacts (miroir de actu.dart) ─────────────────────
   Future<void> _addTousLesContacts() async {
+    final canAccessContacts =
+        await PermissionManager.instance.ensureContactsAccessWithRecovery(
+      context,
+      isFrench: langUserPhone == "fr",
+    );
+    if (!canAccessContacts || !mounted) return;
+
     try {
       var request = http.MultipartRequest(
           'POST',
@@ -264,7 +272,8 @@ class _BottomBarState extends State<BottomBar> with WidgetsBindingObserver {
             "Cc $name_complete ...",
             (langUserPhone == "fr")
                 ? "Du nouveau sur votre compte Dressur."
-                : "Something new on your Dressur account.");
+                : "Something new on your Dressur account.",
+            context: context);
       }
     });
 
@@ -305,6 +314,10 @@ class _BottomBarState extends State<BottomBar> with WidgetsBindingObserver {
   }
 
   Future<void> synchroAvanceFunction() async {
+    final permission =
+        await PermissionManager.instance.ensure(Permission.contacts);
+    if (!permission.canProceed) return;
+
     await SQLHelper.viderLaBaseDeDonneeLocalTelUser();
     await Future.delayed(const Duration(seconds: 3), () {});
     List<Contact> contacts = await FlutterContacts.getContacts(

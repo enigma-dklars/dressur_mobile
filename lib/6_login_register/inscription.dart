@@ -165,8 +165,8 @@ class _RegisterFormState extends State<RegisterForm> {
       if (response.statusCode == 200 && data["error"] == false) {
         modeReconnaissanceContactArrierePlan = true;
         isNouvelUtilisateur = true;
-        scheduleBoostReminderNotification();
-        schedulePromoReminderNotification();
+        await scheduleBoostReminderNotification(context: context);
+        await schedulePromoReminderNotification(context: context);
         initUserInformations(data['user']);
         Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(builder: (context) => const BottomBar()),

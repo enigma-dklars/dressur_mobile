@@ -2,7 +2,6 @@ import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:dressur/components/constant.dart';
 import 'package:dressur/components/noti.dart';
 import 'package:dressur/components/permission_manager.dart';
@@ -53,10 +52,13 @@ class _SynchroAvancePageState extends State<_SynchroAvancePage> {
 
   /// Demande la permission contacts et insère le contact Dressur si accordée.
   Future<void> _initPermissionsAndContact() async {
-    final permission =
-        await PermissionManager.instance.request(Permission.contacts);
-    if (permission.canProceed) {
-      insertDressurContact();
+    final canAccessContacts =
+        await PermissionManager.instance.ensureContactsAccessWithRecovery(
+      context,
+      isFrench: langUserPhone == "fr",
+    );
+    if (canAccessContacts) {
+      await insertDressurContact();
     } else {
       if (!mounted) return;
       warningNoti(
@@ -70,7 +72,10 @@ class _SynchroAvancePageState extends State<_SynchroAvancePage> {
   }
 
   Future<void> _lancer() async {
-    final String? erreur = await _service.start(_etendreAuxNonDS);
+    final String? erreur = await _service.start(
+      _etendreAuxNonDS,
+      context: context,
+    );
     if (erreur != null && mounted) {
       warningNoti("Attention !", erreur, context);
     }

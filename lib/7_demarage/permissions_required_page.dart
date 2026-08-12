@@ -56,11 +56,13 @@ class _PermissionsRequiredPageState extends State<PermissionsRequiredPage>
       final statuses = await Future.wait<AppPermissionResult>([
         PermissionManager.instance.check(Permission.contacts),
         PermissionManager.instance.check(Permission.storage),
+        PermissionManager.instance.check(Permission.photos),
+        PermissionManager.instance.check(Permission.notification),
         PermissionManager.instance.check(Permission.scheduleExactAlarm),
       ]).timeout(_permissionCheckTimeout);
 
       if (!mounted) return;
-      if (statuses.every((status) => status.isGranted) &&
+      if (statuses.every((status) => status.canProceed) &&
           !_navigationStarted) {
         _continueWithoutPermissions();
       } else {
@@ -160,12 +162,14 @@ class _PermissionsRequiredPageState extends State<PermissionsRequiredPage>
                     ? "Ces autorisations permettent d'utiliser certaines fonctions de Dressur. "
                         "Vous pouvez continuer à utiliser l'application sans les accorder.\n\n"
                         "• Accès aux contacts\n"
-                        "• Notifications (alarmes exactes)\n"
+                        "• Photos et galerie\n"
+                        "• Notifications et alarmes exactes\n"
                         "• Accès au stockage"
                     : "These permissions enable some Dressur features. "
                         "You can continue using the app without granting them.\n\n"
                         "• Access to contacts\n"
-                        "• Notifications (exact alarms)\n"
+                        "• Photos and gallery\n"
+                        "• Notifications and exact alarms\n"
                         "• Storage access",
                 style: GoogleFonts.poppins(
                   fontSize: 18,

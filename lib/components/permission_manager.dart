@@ -135,15 +135,95 @@ class PermissionManager {
     BuildContext context, {
     required bool isFrench,
   }) async {
+    return ensureWithRecovery(
+      context,
+      Permission.photos,
+      isFrench: isFrench,
+      titleFr: 'Accès aux photos requis',
+      titleEn: 'Photo access required',
+      messageFr:
+          'Dressur a besoin d’un accès à votre galerie pour choisir une image. Vous pouvez réessayer sans quitter votre session.',
+      messageEn:
+          'Dressur needs access to your gallery to choose an image. You can try again without leaving your session.',
+    );
+  }
+
+  Future<bool> ensureContactsAccessWithRecovery(
+    BuildContext context, {
+    required bool isFrench,
+  }) {
+    return ensureWithRecovery(
+      context,
+      Permission.contacts,
+      isFrench: isFrench,
+      titleFr: 'Accès aux contacts requis',
+      titleEn: 'Contact access required',
+      messageFr:
+          'Dressur doit accéder à vos contacts pour effectuer cette action. Vous pouvez réessayer ou autoriser l’accès dans les réglages.',
+      messageEn:
+          'Dressur needs access to your contacts for this action. You can try again or allow access in Settings.',
+    );
+  }
+
+  Future<bool> ensureNotificationAccessWithRecovery(
+    BuildContext context, {
+    required bool isFrench,
+  }) {
+    return ensureWithRecovery(
+      context,
+      Permission.notification,
+      isFrench: isFrench,
+      titleFr: 'Notifications désactivées',
+      titleEn: 'Notifications are disabled',
+      messageFr:
+          'Dressur ne peut pas afficher cette notification sans autorisation. Réessayez ou ouvrez les réglages. Votre session reste active.',
+      messageEn:
+          'Dressur cannot show this notification without permission. Try again or open Settings. Your session will remain active.',
+    );
+  }
+
+  Future<bool> ensureExactAlarmAccessWithRecovery(
+    BuildContext context, {
+    required bool isFrench,
+  }) {
+    return ensureWithRecovery(
+      context,
+      Permission.scheduleExactAlarm,
+      isFrench: isFrench,
+      titleFr: 'Alarmes exactes requises',
+      titleEn: 'Exact alarms required',
+      messageFr:
+          'Dressur doit pouvoir planifier ce rappel à l’heure prévue. Réessayez ou ouvrez les réglages. Votre session reste active.',
+      messageEn:
+          'Dressur needs permission to schedule this reminder at the planned time. Try again or open Settings. Your session will remain active.',
+    );
+  }
+
+  /// Vérifie une permission juste avant une action et fournit une voie de
+  /// récupération explicite sans jamais quitter l'application.
+  Future<bool> ensureWithRecovery(
+    BuildContext context,
+    Permission permission, {
+    required bool isFrench,
+    String? titleFr,
+    String? titleEn,
+    String? messageFr,
+    String? messageEn,
+  }) async {
     for (var attempt = 0; attempt < 2; attempt++) {
-      final result = await ensureGalleryAccess();
+      final result = await ensure(permission);
       if (result.canProceed) return true;
       if (!context.mounted) return false;
 
-      final action = await _showGalleryPermissionDialog(
+      final action = await _showPermissionDialog(
         context,
         result,
+        permission: permission,
         isFrench: isFrench,
+        titleFr: titleFr,
+        titleEn: titleEn,
+        messageFr: messageFr,
+        messageEn: messageEn,
       );
       if (action == PermissionRecoveryAction.openSettings) {
         await openSettings();
@@ -154,20 +234,30 @@ class PermissionManager {
     return false;
   }
 
-  Future<PermissionRecoveryAction> _showGalleryPermissionDialog(
+  Future<PermissionRecoveryAction> _showPermissionDialog(
     BuildContext context,
     AppPermissionResult result, {
+    required Permission permission,
     required bool isFrench,
+    String? titleFr,
+    String? titleEn,
+    String? messageFr,
+    String? messageEn,
   }) async {
     final needsSettings = result.needsSettings;
-    final title = isFrench ? 'Accès aux photos requis' : 'Photo access required';
+    final permissionLabel = _permissionLabel(permission, isFrench: isFrench);
+    final title = isFrench
+        ? (titleFr ?? '$permissionLabel requis')
+        : (titleEn ?? '$permissionLabel required');
     final message = needsSettings
         ? (isFrench
-            ? 'L’accès à vos photos est désactivé. Autorisez-le dans les réglages pour choisir une image. Votre session reste active.'
-            : 'Photo access is disabled. Allow it in Settings to choose an image. Your session will remain active.')
+            ? 'L’accès à $permissionLabel est désactivé. Autorisez-le dans les réglages, puis réessayez. Votre session reste active.'
+            : 'Access to $permissionLabel is disabled. Allow it in Settings, then try again. Your session will remain active.')
         : (isFrench
-            ? 'Dressur a besoin d’un accès à votre galerie pour choisir une image. Vous pouvez réessayer sans quitter votre session.'
-            : 'Dressur needs access to your gallery to choose an image. You can try again without leaving your session.');
+            ? (messageFr ??
+                'Dressur a besoin de $permissionLabel pour continuer. Vous pouvez réessayer sans quitter votre session.')
+            : (messageEn ??
+                'Dressur needs $permissionLabel to continue. You can try again without leaving your session.'));
 
     return await showDialog<PermissionRecoveryAction>(
           context: context,
@@ -186,7 +276,7 @@ class PermissionManager {
                     .pop(PermissionRecoveryAction.retry),
                 child: Text(isFrench ? 'Réessayer' : 'Try again'),
               ),
-              if (needsSettings)
+               if (needsSettings || result.isDenied)
                 FilledButton(
                   onPressed: () => Navigator.of(dialogContext)
                       .pop(PermissionRecoveryAction.openSettings),
@@ -196,6 +286,25 @@ class PermissionManager {
           ),
         ) ??
         PermissionRecoveryAction.cancel;
+  }
+
+  String _permissionLabel(
+    Permission permission, {
+    required bool isFrench,
+  }) {
+    if (permission == Permission.contacts) {
+      return isFrench ? 'vos contacts' : 'your contacts';
+    }
+    if (permission == Permission.notification) {
+      return isFrench ? 'les notifications' : 'notifications';
+    }
+    if (permission == Permission.scheduleExactAlarm) {
+      return isFrench ? 'les alarmes exactes' : 'exact alarms';
+    }
+    if (permission == Permission.photos || permission == Permission.storage) {
+      return isFrench ? 'vos photos' : 'your photos';
+    }
+    return isFrench ? 'cette autorisation' : 'this permission';
   }
 
   Future<AppPermissionResult> _requestPermission(

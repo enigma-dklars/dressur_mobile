@@ -365,6 +365,7 @@ class _PageDepartState extends State<PageDepart> {
         isFr
             ? 'Mettez à jour vos contacts Dressur en lançant une Synchronisation Avancée.'
             : 'Update your Dressur contacts by running an Advanced Synchronization.',
+        context: context,
       );
     }
   }

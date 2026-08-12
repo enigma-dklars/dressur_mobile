@@ -652,14 +652,15 @@ class _RegisterForm2State extends State<RegisterForm2> {
                   context);
             } else {
               launchPaiement(data["url"]);
-              Navigator.pop(context);
-              showNotification(
+              await showNotification(
                   (langUserPhone == "fr")
                       ? "Paiement en cours !"
                       : "Payment in progress !",
                   (langUserPhone == "fr")
                       ? "Après confirmation du paiement, veuillez consulter la liste de vos boosts."
-                      : "After payment confirmation, please view the list of your boosts.");
+                      : "After payment confirmation, please view the list of your boosts.",
+                  context: context);
+              if (mounted) Navigator.pop(context);
             }
           } else {
             dangerNoti(data["titre"], data["message"], context);

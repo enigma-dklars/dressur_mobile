@@ -11,6 +11,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
 import 'package:dressur/components/sql_helper.dart';
 import 'package:dressur/components/noti.dart';
+import 'package:dressur/components/permission_manager.dart';
 
 class DeletecomptePage extends StatelessWidget {
   @override
@@ -111,6 +112,15 @@ class _DeletecompteFormState extends State<DeletecompteForm> {
     );
 
     if (!response.isTapConfirmButton) return;
+
+    if (contactsEnregistrer.isNotEmpty) {
+      final canAccessContacts =
+          await PermissionManager.instance.ensureContactsAccessWithRecovery(
+        context,
+        isFrench: langUserPhone == "fr",
+      );
+      if (!canAccessContacts || !mounted) return;
+    }
 
     setState(() => _isLoading = true);
 

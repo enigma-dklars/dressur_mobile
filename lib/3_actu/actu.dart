@@ -23,6 +23,7 @@ import 'dart:convert' as convert;
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:dressur/components/sociaux.dart';
 import 'package:dressur/components/sql_helper.dart';
+import 'package:dressur/components/permission_manager.dart';
 import 'package:dressur/5_autre/support_assistance.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:dressur/8_admin/admin.dart';
@@ -573,6 +574,13 @@ class _ActuPageState extends State<ActuPage>
   }
 
   void addTousLesContacts() async {
+    final canAccessContacts =
+        await PermissionManager.instance.ensureContactsAccessWithRecovery(
+      context,
+      isFrench: langUserPhone == "fr",
+    );
+    if (!canAccessContacts || !mounted) return;
+
     setState(() {
       _loading = true;
     });
@@ -616,6 +624,13 @@ class _ActuPageState extends State<ActuPage>
   }
 
   Future<void> saveContactsAddsIfExiste(data) async {
+    final canAccessContacts =
+        await PermissionManager.instance.ensureContactsAccessWithRecovery(
+      context,
+      isFrench: langUserPhone == "fr",
+    );
+    if (!canAccessContacts || !mounted) return;
+
     int nombreAddNow = 0;
     if ((data["contactsAdd"]).length >= 1) {
       for (var contactAdd in data["contactsAdd"]) {

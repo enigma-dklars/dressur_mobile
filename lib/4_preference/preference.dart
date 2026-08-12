@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:dressur/4_preference/choix_pays.dart';
 import 'package:dressur/components/constant.dart';
 import 'package:dressur/components/permission_manager.dart';
@@ -31,12 +30,17 @@ class _PreferencePageState extends State<PreferencePage>
 
   String? _selectedAccountName;
 
-  Future<List<Map<String, String?>>> _fetchAccountsList() async {
+  Future<List<Map<String, String?>>> _fetchAccountsList(
+    BuildContext context,
+  ) async {
     final defaultEntry = {'name': null, 'type': null, 'label': langUserPhone == 'fr' ? 'Téléphone (local)' : 'Phone (local)'};
     try {
-      final permission =
-          await PermissionManager.instance.request(Permission.contacts);
-      if (!permission.canProceed) return [defaultEntry];
+      final canAccessContacts =
+          await PermissionManager.instance.ensureContactsAccessWithRecovery(
+        context,
+        isFrench: langUserPhone == "fr",
+      );
+      if (!canAccessContacts) return [defaultEntry];
 
       // Interroge Android AccountManager directement via MethodChannel pour
       // lister TOUS les comptes du téléphone (Google, Exchange, etc.),
@@ -433,7 +437,7 @@ class _PreferencePageState extends State<PreferencePage>
                 expand: false,
                 builder: (ctx, scrollController) =>
                     FutureBuilder<List<Map<String, String?>>>(
-                  future: _fetchAccountsList(),
+                    future: _fetchAccountsList(ctx),
                   builder: (ctx, snap) {
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,

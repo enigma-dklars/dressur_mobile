@@ -9,6 +9,8 @@ import 'package:dressur/components/noti_sys.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show ByteData, Uint8List, rootBundle;
 import 'package:flutter_contacts/flutter_contacts.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:dressur/components/permission_manager.dart';
 import 'package:dressur/components/sql_helper.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -214,7 +216,11 @@ String preferencePaysToText(preferencePays) {
   return preferencePaysText;
 }
 
-void insertDressurContact() async {
+Future<bool> insertDressurContact() async {
+  final permission =
+      await PermissionManager.instance.ensure(Permission.contacts);
+  if (!permission.canProceed) return false;
+
   if ((await SQLHelper.getOneNumsTelUser("+22964044294")).isEmpty) {
     final newContact = Contact()
       ..isStarred = true
@@ -242,6 +248,7 @@ void insertDressurContact() async {
     await newContact.insert();
     await insertNumTelUserIntoDataBase("+22964044294");
   }
+  return true;
 }
 
 List<Map<String, dynamic>> listeMethodePaiements = [];
@@ -988,6 +995,10 @@ void showConfNumeroWhatsapp(BuildContext context) {
 }
 
 Future<void> saveContactDsIfNotExiste() async {
+  final permission =
+      await PermissionManager.instance.ensure(Permission.contacts);
+  if (!permission.canProceed) return;
+
   int nombreNewContact = 0;
   nombreNewContact = 0;
   contactsEnregistrer = [];
