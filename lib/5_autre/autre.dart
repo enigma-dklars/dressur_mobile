@@ -12,6 +12,7 @@ import 'package:dressur/5_autre/modifier_mot_de_passe.dart';
 import 'package:dressur/5_autre/espace_partenaire.dart';
 import 'package:dressur/5_autre/utiliser_code_partenaire.dart';
 import 'package:dressur/5_autre/profil_user.dart';
+import 'package:dressur/5_autre/mes_reseaux.dart';
 import 'package:dressur/4_preference/preference.dart';
 import 'package:dressur/5_autre/signaler_user.dart';
 import 'package:dressur/components/notification_bell.dart';
@@ -434,8 +435,12 @@ class _SettingPageState extends State<SettingPage>
               _buildMenuRow(
                 FontAwesomeIcons.shareNodes,
                 (langUserPhone == "fr") ? "Mes réseaux" : "My networks",
-                null,
-                showChevron: false,
+                () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const MesReseauxPage(),
+                  ),
+                ),
               ),
             ]),
             const SizedBox(height: 10),
