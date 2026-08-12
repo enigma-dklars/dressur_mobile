@@ -22,9 +22,12 @@ class _MesReseauxPageState extends State<MesReseauxPage> {
   List<_UserNetwork> _networks = [];
   List<_NetworkCatalogItem> _catalog = [];
   String? _deletingNetworkType;
+  String? _updatingNetworkType;
 
   String get _uid => uidUser?.toString().trim() ?? '';
   bool get _isFrench => langUserPhone == 'fr';
+  bool get _isMutating =>
+      _deletingNetworkType != null || _updatingNetworkType != null;
 
   @override
   void initState() {
@@ -211,6 +214,56 @@ class _MesReseauxPageState extends State<MesReseauxPage> {
     }
   }
 
+  Future<String?> _updateNetwork(_UserNetwork network, String url) async {
+    if (_uid.isEmpty) {
+      return _isFrench
+          ? 'Votre session est invalide. Veuillez vous reconnecter.'
+          : 'Your session is invalid. Please sign in again.';
+    }
+
+    try {
+      final response = await http
+          .put(
+            Uri.parse(
+              '$generalRouteForApi/user/social-networks/'
+              '${Uri.encodeComponent(network.networkType)}',
+            ),
+            headers: const {'Accept': 'application/json'},
+            body: {'uid': _uid, 'url': url.trim()},
+          )
+          .timeout(_requestTimeout);
+      final payload = _readPayload(
+        response,
+        _isFrench
+            ? 'Impossible de modifier ce réseau.'
+            : 'Unable to update this network.',
+      );
+      final rawNetwork = payload['network'];
+      if (rawNetwork is! Map) {
+        throw _NetworkApiException(
+          _isFrench
+              ? 'La réponse du serveur est invalide.'
+              : 'The server response is invalid.',
+        );
+      }
+
+      final updatedNetwork = _UserNetwork.fromJson(rawNetwork);
+      if (!mounted) return null;
+      setState(() {
+        _networks = _networks
+            .map(
+              (item) => item.networkType == updatedNetwork.networkType
+                  ? updatedNetwork
+                  : item,
+            )
+            .toList();
+      });
+      return null;
+    } catch (error) {
+      return _errorMessageFor(error);
+    }
+  }
+
   Future<void> _confirmAndDelete(_UserNetwork network) async {
     final shouldDelete = await showDialog<bool>(
       context: context,
@@ -237,7 +290,7 @@ class _MesReseauxPageState extends State<MesReseauxPage> {
       ),
     );
 
-    if (shouldDelete != true || _deletingNetworkType != null) return;
+    if (shouldDelete != true || _isMutating) return;
     if (_uid.isEmpty) {
       _showSnackBar(
         _isFrench
@@ -277,6 +330,8 @@ class _MesReseauxPageState extends State<MesReseauxPage> {
   }
 
   Future<void> _showAddNetworkDialog() async {
+    if (_isMutating) return;
+
     final availableNetworks = _availableNetworks;
     if (availableNetworks.isEmpty) {
       _showSnackBar(
@@ -290,7 +345,7 @@ class _MesReseauxPageState extends State<MesReseauxPage> {
 
     final wasAdded = await showDialog<bool>(
       context: context,
-      builder: (_) => _AddNetworkDialog(
+      builder: (_) => _NetworkFormDialog(
         isFrench: _isFrench,
         networks: availableNetworks,
         onSubmit: _createNetwork,
@@ -298,6 +353,41 @@ class _MesReseauxPageState extends State<MesReseauxPage> {
     );
     if (wasAdded == true && mounted) {
       _showSnackBar(_isFrench ? 'Réseau ajouté.' : 'Network added.');
+    }
+  }
+
+  Future<void> _showEditNetworkDialog(_UserNetwork network) async {
+    if (_isMutating) return;
+
+    _NetworkCatalogItem? catalogNetwork;
+    for (final item in _catalog) {
+      if (item.id == network.networkType) {
+        catalogNetwork = item;
+        break;
+      }
+    }
+    final selectedCatalogNetwork =
+        catalogNetwork ??
+        _NetworkCatalogItem(
+          id: network.networkType,
+          label: _networkLabel(network.networkType),
+        );
+
+    setState(() => _updatingNetworkType = network.networkType);
+    final wasUpdated = await showDialog<bool>(
+      context: context,
+      builder: (_) => _NetworkFormDialog(
+        isFrench: _isFrench,
+        isEditing: true,
+        networks: [selectedCatalogNetwork],
+        initialNetworkType: network.networkType,
+        initialUrl: network.url,
+        onSubmit: (_, url) => _updateNetwork(network, url),
+      ),
+    );
+    if (mounted) setState(() => _updatingNetworkType = null);
+    if (wasUpdated == true && mounted) {
+      _showSnackBar(_isFrench ? 'Réseau modifié.' : 'Network updated.');
     }
   }
 
@@ -331,7 +421,7 @@ class _MesReseauxPageState extends State<MesReseauxPage> {
         ),
         actions: [
           IconButton(
-            onPressed: _isLoading ? null : _showAddNetworkDialog,
+            onPressed: _isLoading || _isMutating ? null : _showAddNetworkDialog,
             tooltip: _isFrench ? 'Ajouter un réseau' : 'Add a network',
             icon: const FaIcon(FontAwesomeIcons.plus, color: Colors.white),
           ),
@@ -432,6 +522,8 @@ class _MesReseauxPageState extends State<MesReseauxPage> {
 
   Widget _buildNetworkCard(_UserNetwork network) {
     final isDeleting = _deletingNetworkType == network.networkType;
+    final isUpdating = _updatingNetworkType == network.networkType;
+    final isMutating = _isMutating;
     final uri = Uri.tryParse(network.url);
     final canOpen =
         uri != null && (uri.scheme == 'http' || uri.scheme == 'https');
@@ -475,7 +567,7 @@ class _MesReseauxPageState extends State<MesReseauxPage> {
                   InkWell(
                     onTap: canOpen
                         ? () => launchUrl(
-                            uri!,
+                            Uri.parse(network.url),
                             mode: LaunchMode.externalApplication,
                           )
                         : null,
@@ -494,7 +586,27 @@ class _MesReseauxPageState extends State<MesReseauxPage> {
               ),
             ),
             IconButton(
-              onPressed: isDeleting ? null : () => _confirmAndDelete(network),
+              onPressed: isMutating
+                  ? null
+                  : () => _showEditNetworkDialog(network),
+              tooltip: _isFrench ? 'Modifier' : 'Edit',
+              icon: isUpdating
+                  ? SizedBox(
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: primaryColor,
+                      ),
+                    )
+                  : const FaIcon(
+                      FontAwesomeIcons.penToSquare,
+                      color: primaryColor,
+                      size: 17,
+                    ),
+            ),
+            IconButton(
+              onPressed: isMutating ? null : () => _confirmAndDelete(network),
               tooltip: _isFrench ? 'Supprimer' : 'Delete',
               icon: isDeleting
                   ? SizedBox(
@@ -518,27 +630,40 @@ class _MesReseauxPageState extends State<MesReseauxPage> {
   }
 }
 
-class _AddNetworkDialog extends StatefulWidget {
-  const _AddNetworkDialog({
+class _NetworkFormDialog extends StatefulWidget {
+  const _NetworkFormDialog({
     required this.isFrench,
     required this.networks,
     required this.onSubmit,
+    this.isEditing = false,
+    this.initialNetworkType,
+    this.initialUrl = '',
   });
 
   final bool isFrench;
   final List<_NetworkCatalogItem> networks;
   final Future<String?> Function(String networkType, String url) onSubmit;
+  final bool isEditing;
+  final String? initialNetworkType;
+  final String initialUrl;
 
   @override
-  State<_AddNetworkDialog> createState() => _AddNetworkDialogState();
+  State<_NetworkFormDialog> createState() => _NetworkFormDialogState();
 }
 
-class _AddNetworkDialogState extends State<_AddNetworkDialog> {
+class _NetworkFormDialogState extends State<_NetworkFormDialog> {
   final _formKey = GlobalKey<FormState>();
-  final _urlController = TextEditingController();
+  late final TextEditingController _urlController;
   String? _selectedNetworkType;
   String? _errorMessage;
   bool _isSubmitting = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedNetworkType = widget.initialNetworkType;
+    _urlController = TextEditingController(text: widget.initialUrl);
+  }
 
   @override
   void dispose() {
@@ -578,7 +703,9 @@ class _AddNetworkDialogState extends State<_AddNetworkDialog> {
   Widget build(BuildContext context) {
     return AlertDialog(
       title: Text(
-        widget.isFrench ? 'Ajouter un réseau' : 'Add a network',
+        widget.isEditing
+            ? (widget.isFrench ? 'Modifier un réseau' : 'Edit a network')
+            : (widget.isFrench ? 'Ajouter un réseau' : 'Add a network'),
         style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
       ),
       content: SingleChildScrollView(
@@ -616,7 +743,7 @@ class _AddNetworkDialogState extends State<_AddNetworkDialog> {
                       ),
                     )
                     .toList(),
-                onChanged: _isSubmitting
+                onChanged: widget.isEditing || _isSubmitting
                     ? null
                     : (value) => setState(() => _selectedNetworkType = value),
                 validator: (value) => value == null
