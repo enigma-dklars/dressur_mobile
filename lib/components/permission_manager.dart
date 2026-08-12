@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:dressur/components/permission_recovery_dialog.dart';
 
 /// États de permission exposés aux fonctionnalités de l'application.
 enum AppPermissionStatus {
@@ -14,18 +15,9 @@ enum AppPermissionStatus {
   unknown,
 }
 
-enum PermissionRecoveryAction {
-  retry,
-  openSettings,
-  cancel,
-}
-
 /// Résultat exploitable après une vérification ou une demande de permission.
 class AppPermissionResult {
-  const AppPermissionResult({
-    required this.permission,
-    required this.status,
-  });
+  const AppPermissionResult({required this.permission, required this.status});
 
   final Permission permission;
   final AppPermissionStatus status;
@@ -99,11 +91,13 @@ class PermissionManager {
     );
     _pendingRequests[permission] = requestFuture;
 
-    unawaited(requestFuture.whenComplete(() {
-      if (identical(_pendingRequests[permission], requestFuture)) {
-        _pendingRequests.remove(permission);
-      }
-    }));
+    unawaited(
+      requestFuture.whenComplete(() {
+        if (identical(_pendingRequests[permission], requestFuture)) {
+          _pendingRequests.remove(permission);
+        }
+      }),
+    );
 
     return requestFuture;
   }
@@ -251,47 +245,31 @@ class PermissionManager {
         : (titleEn ?? '$permissionLabel required');
     final message = needsSettings
         ? (isFrench
-            ? 'L’accès à $permissionLabel est désactivé. Autorisez-le dans les réglages, puis réessayez. Votre session reste active.'
-            : 'Access to $permissionLabel is disabled. Allow it in Settings, then try again. Your session will remain active.')
+              ? 'L’accès à $permissionLabel est désactivé. Autorisez-le dans les réglages, puis réessayez. Votre session reste active.'
+              : 'Access to $permissionLabel is disabled. Allow it in Settings, then try again. Your session will remain active.')
         : (isFrench
-            ? (messageFr ??
-                'Dressur a besoin de $permissionLabel pour continuer. Vous pouvez réessayer sans quitter votre session.')
-            : (messageEn ??
-                'Dressur needs $permissionLabel to continue. You can try again without leaving your session.'));
+              ? (messageFr ??
+                    'Dressur a besoin de $permissionLabel pour continuer. Vous pouvez réessayer sans quitter votre session.')
+              : (messageEn ??
+                    'Dressur needs $permissionLabel to continue. You can try again without leaving your session.'));
 
     return await showDialog<PermissionRecoveryAction>(
           context: context,
           barrierDismissible: false,
-          builder: (dialogContext) => AlertDialog(
-            title: Text(title),
-            content: Text(message),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(dialogContext)
-                    .pop(PermissionRecoveryAction.cancel),
-                child: Text(isFrench ? 'Plus tard' : 'Later'),
-              ),
-              TextButton(
-                onPressed: () => Navigator.of(dialogContext)
-                    .pop(PermissionRecoveryAction.retry),
-                child: Text(isFrench ? 'Réessayer' : 'Try again'),
-              ),
-               if (needsSettings || result.isDenied)
-                FilledButton(
-                  onPressed: () => Navigator.of(dialogContext)
-                      .pop(PermissionRecoveryAction.openSettings),
-                  child: Text(isFrench ? 'Ouvrir les réglages' : 'Open settings'),
-                ),
-            ],
+          builder: (dialogContext) => PermissionRecoveryDialog(
+            title: title,
+            message: message,
+            isFrench: isFrench,
+            showSettingsAction: needsSettings,
+            onAction: (action) => Navigator.of(
+              dialogContext,
+            ).pop<PermissionRecoveryAction>(action),
           ),
         ) ??
         PermissionRecoveryAction.cancel;
   }
 
-  String _permissionLabel(
-    Permission permission, {
-    required bool isFrench,
-  }) {
+  String _permissionLabel(Permission permission, {required bool isFrench}) {
     if (permission == Permission.contacts) {
       return isFrench ? 'vos contacts' : 'your contacts';
     }
@@ -301,15 +279,27 @@ class PermissionManager {
     if (permission == Permission.scheduleExactAlarm) {
       return isFrench ? 'les alarmes exactes' : 'exact alarms';
     }
-    if (permission == Permission.photos || permission == Permission.storage) {
+    if (permission == Permission.photos) {
       return isFrench ? 'vos photos' : 'your photos';
+    }
+    if (permission == Permission.storage) {
+      return isFrench ? 'le stockage de votre appareil' : 'your device storage';
+    }
+    if (permission == Permission.camera) {
+      return isFrench ? 'votre appareil photo' : 'your camera';
+    }
+    if (permission == Permission.microphone) {
+      return isFrench ? 'votre microphone' : 'your microphone';
+    }
+    if (permission == Permission.location ||
+        permission == Permission.locationWhenInUse ||
+        permission == Permission.locationAlways) {
+      return isFrench ? 'votre position' : 'your location';
     }
     return isFrench ? 'cette autorisation' : 'this permission';
   }
 
-  Future<AppPermissionResult> _requestPermission(
-    Permission permission,
-  ) async {
+  Future<AppPermissionResult> _requestPermission(Permission permission) async {
     final current = await check(permission);
     if (current.status != AppPermissionStatus.denied) {
       return current;
