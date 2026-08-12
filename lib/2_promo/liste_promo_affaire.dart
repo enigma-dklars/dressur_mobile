@@ -6,6 +6,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dressur/2_promo/edit_promo_affaire_produit_service.dart';
 import 'package:dressur/components/noti.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -1115,9 +1116,10 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
 
   // --- NOUVELLES VARIABLES POUR LES OPTIONS ---
   bool _participateInReward = false;
-  int _totalViewsGoal = 2500;
-  final TextEditingController _viewsController =
-      TextEditingController(text: "2500");
+  int _rewardBudget = 0;
+  bool _isCustomRewardBudget = false;
+  String? _rewardBudgetError;
+  final _customRewardBudgetController = TextEditingController();
 
   bool _publishOnDressurStatus = false;
   final int _dressurStatusPricePer7Days = 5000;
@@ -1127,10 +1129,94 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
 
   // --- CALCULS DYNAMIQUES ---
   double get _rewardProgramAmount {
-    if (!_participateInReward) return 0.0;
-    int effectiveViews = _totalViewsGoal < 2500 ? 2500 : _totalViewsGoal;
-    double baseReward = (effectiveViews * 2500) / 4000;
-    return baseReward * 1.2; // + 20% commission
+    if (!_participateInReward || _rewardBudget == 0) return 0.0;
+    return _rewardBudget.toDouble();
+  }
+
+  String get _rewardBudgetRequiredMessage => langUserPhone == "fr"
+      ? "Veuillez saisir un montant personnalisé."
+      : "Please enter a custom amount.";
+
+  String get _rewardBudgetIntegerMessage => langUserPhone == "fr"
+      ? "Veuillez saisir uniquement un nombre entier."
+      : "Please enter a whole number only.";
+
+  String get _rewardBudgetMinimumMessage => langUserPhone == "fr"
+      ? "Le montant doit être supérieur à 5 000 FCFA."
+      : "The amount must be greater than 5,000 FCFA.";
+
+  String get _rewardBudgetSelectionMessage => langUserPhone == "fr"
+      ? "Veuillez choisir un budget de récompense valide."
+      : "Please choose a valid reward budget.";
+
+  void _onCustomRewardBudgetChanged(String value) {
+    final amountText = value.trim();
+    int? amount;
+    String? error;
+
+    if (amountText.isEmpty) {
+      error = _rewardBudgetRequiredMessage;
+    } else if (!RegExp(r'^\d+$').hasMatch(amountText)) {
+      error = _rewardBudgetIntegerMessage;
+    } else {
+      amount = int.tryParse(amountText);
+      if (amount == null) {
+        error = _rewardBudgetIntegerMessage;
+      } else if (amount <= 5000) {
+        error = _rewardBudgetMinimumMessage;
+      }
+    }
+
+    setState(() {
+      _rewardBudget = error == null ? amount! : 0;
+      _rewardBudgetError = error;
+    });
+  }
+
+  bool _validateRewardBudget() {
+    if (!_participateInReward) {
+      _rewardBudget = 0;
+      _rewardBudgetError = null;
+      return true;
+    }
+
+    if (_isCustomRewardBudget) {
+      final amountText = _customRewardBudgetController.text.trim();
+      final amount = int.tryParse(amountText);
+      String? error;
+
+      if (amountText.isEmpty) {
+        error = _rewardBudgetRequiredMessage;
+      } else if (!RegExp(r'^\d+$').hasMatch(amountText) || amount == null) {
+        error = _rewardBudgetIntegerMessage;
+      } else if (amount <= 5000) {
+        error = _rewardBudgetMinimumMessage;
+      }
+
+      if (error != null) {
+        setState(() {
+          _rewardBudget = 0;
+          _rewardBudgetError = error;
+        });
+        dangerNoti("Attention !!!", error, context);
+        return false;
+      }
+
+      setState(() {
+        _rewardBudget = amount!;
+        _rewardBudgetError = null;
+      });
+      return true;
+    }
+
+    const predefinedBudgets = [500, 1000, 2000, 5000];
+    if (!predefinedBudgets.contains(_rewardBudget)) {
+      setState(() => _rewardBudgetError = _rewardBudgetSelectionMessage);
+      dangerNoti("Attention !!!", _rewardBudgetSelectionMessage, context);
+      return false;
+    }
+
+    return true;
   }
 
   double get _dressurStatusAmount {
@@ -1214,6 +1300,10 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
         return;
       }
 
+      if (!_validateRewardBudget()) {
+        return;
+      }
+
       bool isConnected = await isConnectedToInternet();
       if (isConnected) {
         setState(() => _desactive2 = true);
@@ -1229,7 +1319,8 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
           'tel': telController.text,
           // Nouvelles options
           'inProgrammeRecompense': _participateInReward ? "1" : "0",
-          'totalViewsGoal': _totalViewsGoal.toString(),
+          'rewardBudget': _participateInReward ? _rewardBudget.toString() : "0",
+          'rewardBudgetType': _isCustomRewardBudget ? "custom" : "predefined",
           'publishOnDressurStatus': _publishOnDressurStatus ? "1" : "0",
           'boostFacebook': _boostFacebook ? "1" : "0",
           'montantBoostFacebook': _boostFacebookAmountController.text,
@@ -1249,7 +1340,7 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
               idFormulBoost = 0;
 
               // 3. Réinitialisation des contrôleurs de texte
-              _viewsController.text = "2500"; // Vues par défaut
+              _customRewardBudgetController.clear();
               // telController.text = tel;    // Optionnel : remettre le tel par défaut si besoin
 
               // 4. Réinitialisation des messages et labels
@@ -1260,7 +1351,9 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
 
               // 5. Réinitialisation des options spécifiques (Reward & Status & Boost Facebook)
               _participateInReward = false;
-              _totalViewsGoal = 2500;
+              _rewardBudget = 0;
+              _isCustomRewardBudget = false;
+              _rewardBudgetError = null;
               _publishOnDressurStatus = false;
               _boostFacebook = false;
               _boostFacebookAmountController.text = '700';
@@ -1305,16 +1398,12 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
   void initState() {
     super.initState();
     listeFormulePromoAffaire();
-    _viewsController.addListener(() {
-      final val = int.tryParse(_viewsController.text) ?? 0;
-      setState(() => _totalViewsGoal = val);
-    });
   }
 
   @override
   void dispose() {
     telController.dispose();
-    _viewsController.dispose();
+    _customRewardBudgetController.dispose();
     _boostFacebookAmountController.dispose();
     super.dispose();
   }
@@ -1422,34 +1511,117 @@ class _PaymentPayantPageState extends State<PaymentPayantPage> {
                   style: GoogleFonts.poppins(fontSize: 11)),
               value: _participateInReward,
               activeColor: primaryColor,
-              onChanged: (val) => setState(() => _participateInReward = val),
+              onChanged: (val) => setState(() {
+                _participateInReward = val;
+                _isCustomRewardBudget = false;
+                _rewardBudget = val ? 500 : 0;
+                _rewardBudgetError = null;
+                _customRewardBudgetController.clear();
+              }),
             ),
             if (_participateInReward) ...[
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Column(
                   children: [
-                    Row(
-                      children: [
-                        Expanded(
-                            child: Text((langUserPhone == "fr") ? "Objectif de vues (min. 2500)" : "Views goal (min. 2500)",
-                                style: GoogleFonts.poppins(fontSize: 13))),
-                        SizedBox(
-                            width: 100,
-                            child: TextField(
-                                controller: _viewsController,
-                                keyboardType: TextInputType.number,
-                                decoration: const InputDecoration(
-                                    isDense: true,
-                                    border: OutlineInputBorder()))),
-                      ],
+                    Text(
+                      (langUserPhone == "fr")
+                          ? "Choisissez votre budget récompenses"
+                          : "Choose your reward budget",
+                      style: GoogleFonts.poppins(
+                          fontSize: 13, fontWeight: FontWeight.w500),
                     ),
                     const SizedBox(height: 10),
-                    _infoBox(
-                        (langUserPhone == "fr")
-                            ? "Montant Récompense : ${_rewardProgramAmount.toStringAsFixed(0)} FCFA"
-                            : "Reward amount: ${_rewardProgramAmount.toStringAsFixed(0)} FCFA",
-                        Colors.orange),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: [
+                        ...[500, 1000, 2000, 5000].map((budget) {
+                          final selected =
+                              !_isCustomRewardBudget && _rewardBudget == budget;
+                          return GestureDetector(
+                            onTap: () => setState(() {
+                              _isCustomRewardBudget = false;
+                              _rewardBudget = budget;
+                              _rewardBudgetError = null;
+                              _customRewardBudgetController.clear();
+                            }),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 18, vertical: 10),
+                              decoration: BoxDecoration(
+                                color: selected
+                                    ? primaryColor
+                                    : Colors.transparent,
+                                borderRadius: BorderRadius.circular(20),
+                                border: Border.all(color: primaryColor),
+                              ),
+                              child: Text(
+                                "${budget == 1000 ? '1 000' : budget == 2000 ? '2 000' : budget == 5000 ? '5 000' : budget} F",
+                                style: GoogleFonts.poppins(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                  color: selected
+                                      ? Colors.white
+                                      : primaryColor,
+                                ),
+                              ),
+                            ),
+                          );
+                        }),
+                        GestureDetector(
+                          onTap: () => setState(() {
+                            _isCustomRewardBudget = true;
+                            _rewardBudget = 0;
+                            _rewardBudgetError =
+                                _customRewardBudgetController.text.trim().isEmpty
+                                    ? _rewardBudgetRequiredMessage
+                                    : null;
+                          }),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 18, vertical: 10),
+                            decoration: BoxDecoration(
+                              color: _isCustomRewardBudget
+                                  ? primaryColor
+                                  : Colors.transparent,
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(color: primaryColor),
+                            ),
+                            child: Text(
+                              langUserPhone == "fr" ? "Autre" : "Other",
+                              style: GoogleFonts.poppins(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                                color: _isCustomRewardBudget
+                                    ? Colors.white
+                                    : primaryColor,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    if (_isCustomRewardBudget) ...[
+                      const SizedBox(height: 12),
+                      TextField(
+                        controller: _customRewardBudgetController,
+                        keyboardType: TextInputType.number,
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly,
+                        ],
+                        onChanged: _onCustomRewardBudgetChanged,
+                        decoration: InputDecoration(
+                          labelText: langUserPhone == "fr"
+                              ? "Montant personnalisé"
+                              : "Custom amount",
+                          hintText: "Supérieur à 5 000 FCFA",
+                          suffixText: "FCFA",
+                          errorText: _rewardBudgetError,
+                          border: const OutlineInputBorder(),
+                        ),
+                      ),
+                    ],
                   ],
                 ),
               ),
