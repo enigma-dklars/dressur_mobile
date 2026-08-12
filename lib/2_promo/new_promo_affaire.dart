@@ -8,6 +8,7 @@ import 'dart:io';
 import 'dart:async';
 import 'package:dressur/components/padding_and_divider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
@@ -206,7 +207,10 @@ class _ProduitsServicesState extends State<ProduitsServices> {
 
   int prixBoost = 0;
   bool _participateInReward = false;
-  int _rewardBudget = 0; // Budget choisi : 500, 1000, 2000 ou 5000 FCFA
+  int _rewardBudget = 0;
+  bool _isCustomRewardBudget = false;
+  String? _rewardBudgetError;
+  final _customRewardBudgetController = TextEditingController();
   bool _boostFacebook = false;
   final _boostFacebookAmountController = TextEditingController(text: '700');
 
@@ -226,12 +230,83 @@ class _ProduitsServicesState extends State<ProduitsServices> {
   // --- CALCULS DES MONTANTS ---
   double get _rewardProgramAmount {
     if (!_participateInReward || _rewardBudget == 0) return 0.0;
-    // Budget fixe choisi par le promoteur (inclut 20% commission Dressur)
+    // Budget choisi par le promoteur (inclut 20% commission Dressur)
     return _rewardBudget.toDouble();
   }
 
-  double get _rewardPoolAmount => _rewardBudget * 0.8;
-  double get _rewardCommissionAmount => _rewardBudget * 0.2;
+  double get _rewardPoolAmount =>
+      _participateInReward ? _rewardBudget * 0.8 : 0.0;
+  double get _rewardCommissionAmount =>
+      _participateInReward ? _rewardBudget * 0.2 : 0.0;
+
+  String get _rewardBudgetRequiredMessage => langUserPhone == "fr"
+      ? "Veuillez saisir un montant personnalisé."
+      : "Please enter a custom amount.";
+
+  String get _rewardBudgetIntegerMessage => langUserPhone == "fr"
+      ? "Veuillez saisir uniquement un nombre entier."
+      : "Please enter a whole number only.";
+
+  String get _rewardBudgetMinimumMessage => langUserPhone == "fr"
+      ? "Le montant doit être supérieur à 5 000 FCFA."
+      : "The amount must be greater than 5,000 FCFA.";
+
+  void _onCustomRewardBudgetChanged(String value) {
+    final amountText = value.trim();
+    int? amount;
+    String? error;
+
+    if (amountText.isEmpty) {
+      error = _rewardBudgetRequiredMessage;
+    } else if (!RegExp(r'^\d+$').hasMatch(amountText)) {
+      error = _rewardBudgetIntegerMessage;
+    } else {
+      amount = int.tryParse(amountText);
+      if (amount == null) {
+        error = _rewardBudgetIntegerMessage;
+      } else if (amount <= 5000) {
+        error = _rewardBudgetMinimumMessage;
+      }
+    }
+
+    setState(() {
+      _rewardBudget = error == null ? amount! : 0;
+      _rewardBudgetError = error;
+    });
+  }
+
+  bool _validateRewardBudget() {
+    if (!_participateInReward || !_isCustomRewardBudget) {
+      return true;
+    }
+
+    final amountText = _customRewardBudgetController.text.trim();
+    final amount = int.tryParse(amountText);
+    String? error;
+
+    if (amountText.isEmpty) {
+      error = _rewardBudgetRequiredMessage;
+    } else if (!RegExp(r'^\d+$').hasMatch(amountText) || amount == null) {
+      error = _rewardBudgetIntegerMessage;
+    } else if (amount <= 5000) {
+      error = _rewardBudgetMinimumMessage;
+    }
+
+    if (error != null) {
+      setState(() {
+        _rewardBudget = 0;
+        _rewardBudgetError = error;
+      });
+      dangerNoti("Attention !!!", error, context);
+      return false;
+    }
+
+    setState(() {
+      _rewardBudget = amount!;
+      _rewardBudgetError = null;
+    });
+    return true;
+  }
 
   double get _dressurStatusAmount {
     if (!_publishOnDressurStatus || prixBoost < 1000) return 0.0;
@@ -293,6 +368,9 @@ class _ProduitsServicesState extends State<ProduitsServices> {
           context);
       return;
     }
+    if (!_validateRewardBudget()) {
+      return;
+    }
     if (_boostFacebook) {
       final amount = int.tryParse(_boostFacebookAmountController.text) ?? 0;
       if (amount < 700) {
@@ -327,7 +405,8 @@ class _ProduitsServicesState extends State<ProduitsServices> {
 
     // Envoi des nouvelles options (à traiter en back-end plus tard)
     request.fields['inProgrammeRecompense'] = _participateInReward ? "1" : "0";
-    request.fields['rewardBudget'] = _rewardBudget.toString();
+    request.fields['rewardBudget'] =
+        (_participateInReward ? _rewardBudget : 0).toString();
     request.fields['publishOnDressurStatus'] =
         _publishOnDressurStatus ? "1" : "0";
     request.fields['boostFacebook'] = _boostFacebook ? "1" : "0";
@@ -377,6 +456,9 @@ class _ProduitsServicesState extends State<ProduitsServices> {
           // 5. Réinitialisation des options spécifiques (Reward & Status & Boost Facebook)
           _participateInReward = false;
           _rewardBudget = 0;
+           _isCustomRewardBudget = false;
+           _rewardBudgetError = null;
+           _customRewardBudgetController.clear();
           _publishOnDressurStatus = false;
           _boostFacebook = false;
           _boostFacebookAmountController.text = '700';
@@ -479,6 +561,7 @@ class _ProduitsServicesState extends State<ProduitsServices> {
   @override
   void dispose() {
     _boostFacebookAmountController.dispose();
+    _customRewardBudgetController.dispose();
     whatsappContactController.dispose();
     super.dispose();
   }
@@ -688,10 +771,13 @@ class _ProduitsServicesState extends State<ProduitsServices> {
                 style: GoogleFonts.poppins(fontSize: 11)),
             value: _participateInReward,
             activeColor: primaryColor,
-            onChanged: (val) => setState(() {
-              _participateInReward = val;
-              if (val) _rewardBudget = 500;
-            }),
+             onChanged: (val) => setState(() {
+               _participateInReward = val;
+               _isCustomRewardBudget = false;
+               _rewardBudget = val ? 500 : 0;
+               _rewardBudgetError = null;
+               _customRewardBudgetController.clear();
+             }),
           ),
           if (_participateInReward) ...[
             Padding(
@@ -708,10 +794,17 @@ class _ProduitsServicesState extends State<ProduitsServices> {
                   Wrap(
                     spacing: 8,
                     runSpacing: 8,
-                    children: [500, 1000, 2000, 5000].map((budget) {
-                      final selected = _rewardBudget == budget;
+                    children: [
+                      ...[500, 1000, 2000, 5000].map((budget) {
+                        final selected =
+                            !_isCustomRewardBudget && _rewardBudget == budget;
                       return GestureDetector(
-                        onTap: () => setState(() => _rewardBudget = budget),
+                        onTap: () => setState(() {
+                          _isCustomRewardBudget = false;
+                          _rewardBudget = budget;
+                          _rewardBudgetError = null;
+                          _customRewardBudgetController.clear();
+                        }),
                         child: Container(
                           padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
                           decoration: BoxDecoration(
@@ -729,8 +822,60 @@ class _ProduitsServicesState extends State<ProduitsServices> {
                           ),
                         ),
                       );
-                    }).toList(),
+                      }),
+                      GestureDetector(
+                        onTap: () => setState(() {
+                          _isCustomRewardBudget = true;
+                          _rewardBudget = 0;
+                          _rewardBudgetError =
+                              _customRewardBudgetController.text.trim().isEmpty
+                                  ? _rewardBudgetRequiredMessage
+                                  : null;
+                        }),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 18, vertical: 10),
+                          decoration: BoxDecoration(
+                            color: _isCustomRewardBudget
+                                ? primaryColor
+                                : Colors.transparent,
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(color: primaryColor),
+                          ),
+                          child: Text(
+                            langUserPhone == "fr" ? "Autre" : "Other",
+                            style: GoogleFonts.poppins(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                              color: _isCustomRewardBudget
+                                  ? Colors.white
+                                  : primaryColor,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
+                  if (_isCustomRewardBudget) ...[
+                    const SizedBox(height: 12),
+                    TextField(
+                      controller: _customRewardBudgetController,
+                      keyboardType: TextInputType.number,
+                      inputFormatters: [
+                        FilteringTextInputFormatter.digitsOnly,
+                      ],
+                      onChanged: _onCustomRewardBudgetChanged,
+                      decoration: InputDecoration(
+                        labelText: langUserPhone == "fr"
+                            ? "Montant personnalisé"
+                            : "Custom amount",
+                        hintText: "Supérieur à 5 000 FCFA",
+                        suffixText: "FCFA",
+                        errorText: _rewardBudgetError,
+                        border: const OutlineInputBorder(),
+                      ),
+                    ),
+                  ],
                 ],
               ),
             ),
