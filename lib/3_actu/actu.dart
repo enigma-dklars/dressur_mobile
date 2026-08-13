@@ -1655,7 +1655,7 @@ class _ActuPageState extends State<ActuPage>
         SiteApplicationInfo.fromAdvertisement(advertisement);
     final nom = siteApplicationInfo.nom;
     final sousType = siteApplicationInfo.sousType;
-    final url = siteApplicationInfo.url;
+    final siteApplicationUrl = siteApplicationInfo.url;
     final iconUrl = siteApplicationInfo.iconUrl(advertisement.image);
     final displayName = nom.isNotEmpty
         ? nom
@@ -1826,7 +1826,10 @@ class _ActuPageState extends State<ActuPage>
                         Expanded(
                           child: ElevatedButton(
                             onPressed: () =>
-                                _openSiteApplicationUrl(context, url),
+                                _openSiteApplicationUrl(
+                                  context,
+                                  siteApplicationUrl,
+                                ),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: primaryColor,
                               foregroundColor: Colors.white,
