@@ -17,6 +17,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:image/image.dart' as img;
 import 'package:dressur/components/constant.dart';
 import 'package:dressur/2_promo/boost_billing.dart';
+import 'package:dressur/2_promo/promotion_crop_geometry.dart';
 import 'package:dressur/components/noti.dart';
 import 'package:dressur/components/noti_sys.dart';
 import 'package:dressur/components/permission_manager.dart';
@@ -1246,9 +1247,9 @@ class _PromotionImageCropper extends StatefulWidget {
 
 class _PromotionImageCropperState extends State<_PromotionImageCropper> {
   static const _ratios = <_PromotionCropRatio>[
-    _PromotionCropRatio(label: '1:1', value: 1),
-    _PromotionCropRatio(label: '4:3', value: 4 / 3),
-    _PromotionCropRatio(label: '3:4', value: 3 / 4),
+    _PromotionCropRatio(label: '1:1', width: 1, height: 1),
+    _PromotionCropRatio(label: '4:3', width: 4, height: 3),
+    _PromotionCropRatio(label: '3:4', width: 3, height: 4),
   ];
 
   img.Image? _decodedImage;
@@ -1293,10 +1294,12 @@ class _PromotionImageCropperState extends State<_PromotionImageCropper> {
 
   double _baseScale(Size frameSize) {
     final image = _decodedImage!;
-    return math.max(
-      frameSize.width / image.width,
-      frameSize.height / image.height,
-    ).toDouble();
+    return PromotionCropGeometry.baseScale(
+      imageWidth: image.width,
+      imageHeight: image.height,
+      frameWidth: frameSize.width,
+      frameHeight: frameSize.height,
+    );
   }
 
   Offset _clampOffset({
@@ -1306,15 +1309,19 @@ class _PromotionImageCropperState extends State<_PromotionImageCropper> {
     required double zoom,
   }) {
     final image = _decodedImage!;
-    final renderedWidth = image.width * baseScale * zoom;
-    final renderedHeight = image.height * baseScale * zoom;
-    final maxX =
-        math.max(0.0, (renderedWidth - frameSize.width) / 2).toDouble();
-    final maxY =
-        math.max(0.0, (renderedHeight - frameSize.height) / 2).toDouble();
+    final clamped = PromotionCropGeometry.clampOffset(
+      imageWidth: image.width,
+      imageHeight: image.height,
+      frameWidth: frameSize.width,
+      frameHeight: frameSize.height,
+      baseScale: baseScale,
+      zoom: zoom,
+      offsetX: offset.dx,
+      offsetY: offset.dy,
+    );
     return Offset(
-      offset.dx.clamp(-maxX, maxX).toDouble(),
-      offset.dy.clamp(-maxY, maxY).toDouble(),
+      clamped.dx,
+      clamped.dy,
     );
   }
 
@@ -1330,12 +1337,19 @@ class _PromotionImageCropperState extends State<_PromotionImageCropper> {
     double baseScale,
   ) {
     final nextZoom = (details.scale * _gestureZoom).clamp(1.0, 4.0).toDouble();
-    final frameCenter = Offset(frameSize.width / 2, frameSize.height / 2);
-    final zoomOffset =
-        (_gestureFocalPoint - frameCenter) * (_gestureZoom - nextZoom);
+    final zoomOffset = PromotionCropGeometry.zoomCompensation(
+      focalX: _gestureFocalPoint.dx,
+      focalY: _gestureFocalPoint.dy,
+      frameWidth: frameSize.width,
+      frameHeight: frameSize.height,
+      previousZoom: _gestureZoom,
+      nextZoom: nextZoom,
+    );
     final panOffset = details.localFocalPoint - _gestureFocalPoint;
     final nextOffset = _clampOffset(
-      offset: _gestureOffset + zoomOffset + panOffset,
+      offset: _gestureOffset +
+          Offset(zoomOffset.dx, zoomOffset.dy) +
+          panOffset,
       frameSize: frameSize,
       baseScale: baseScale,
       zoom: nextZoom,
@@ -1352,30 +1366,24 @@ class _PromotionImageCropperState extends State<_PromotionImageCropper> {
 
     try {
       final image = _decodedImage!;
-      final displayScale = baseScale * _zoom;
-      final renderedWidth = image.width * displayScale;
-      final renderedHeight = image.height * displayScale;
-      final sourceX =
-          ((renderedWidth - frameSize.width) / 2 - _offset.dx) / displayScale;
-      final sourceY =
-          ((renderedHeight - frameSize.height) / 2 - _offset.dy) / displayScale;
-      final sourceWidth = frameSize.width / displayScale;
-      final sourceHeight = frameSize.height / displayScale;
-
-      final cropX =
-          sourceX.round().clamp(0, image.width - 1).toInt();
-      final cropY =
-          sourceY.round().clamp(0, image.height - 1).toInt();
-      final cropWidth =
-          sourceWidth.round().clamp(1, image.width - cropX).toInt();
-      final cropHeight =
-          sourceHeight.round().clamp(1, image.height - cropY).toInt();
+      final cropRect = PromotionCropGeometry.sourceRect(
+        imageWidth: image.width,
+        imageHeight: image.height,
+        frameWidth: frameSize.width,
+        frameHeight: frameSize.height,
+        baseScale: baseScale,
+        zoom: _zoom,
+        offsetX: _offset.dx,
+        offsetY: _offset.dy,
+        aspectWidth: _selectedRatio.width,
+        aspectHeight: _selectedRatio.height,
+      );
       final cropped = img.copyCrop(
         image,
-        x: cropX,
-        y: cropY,
-        width: cropWidth,
-        height: cropHeight,
+        x: cropRect.x,
+        y: cropRect.y,
+        width: cropRect.width,
+        height: cropRect.height,
       );
 
       // PNG keeps the crop lossless. The existing upload pipeline remains
@@ -1608,11 +1616,15 @@ class _PromotionImageCropperState extends State<_PromotionImageCropper> {
 class _PromotionCropRatio {
   const _PromotionCropRatio({
     required this.label,
-    required this.value,
+    required this.width,
+    required this.height,
   });
 
   final String label;
-  final double value;
+  final int width;
+  final int height;
+
+  double get value => width / height;
 }
 
 class _PromotionCropOverlayPainter extends CustomPainter {
