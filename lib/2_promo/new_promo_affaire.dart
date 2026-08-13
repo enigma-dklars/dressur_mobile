@@ -1510,7 +1510,7 @@ class _PromotionImageCropperState extends State<_PromotionImageCropper> {
                               height: renderedHeight,
                               child: Image.memory(
                                 _imageBytes!,
-                                fit: BoxFit.fill,
+                                fit: BoxFit.cover,
                                 filterQuality: FilterQuality.high,
                               ),
                             ),
