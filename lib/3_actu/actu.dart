@@ -1654,7 +1654,9 @@ class _ActuPageState extends State<ActuPage>
     final sousType = siteApplicationInfo.sousType;
     final url = siteApplicationInfo.url;
     final iconUrl = siteApplicationInfo.iconUrl(advertisement.image);
-    final displayName = nom;
+    final displayName = nom.isNotEmpty
+        ? nom
+        : (langUserPhone == "fr" ? "Site ou application" : "Site or application");
 
       return Container(
         margin: const EdgeInsets.only(left: 7, top: 0, right: 7, bottom: 0),
