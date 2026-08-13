@@ -16,6 +16,7 @@ class MesReseauxPage extends StatefulWidget {
 
 class _MesReseauxPageState extends State<MesReseauxPage> {
   static const _requestTimeout = Duration(seconds: 15);
+  static const _mobileUidHeader = 'X-Dressur-Uid';
 
   bool _isLoading = true;
   String? _errorMessage;
@@ -112,19 +113,22 @@ class _MesReseauxPageState extends State<MesReseauxPage> {
 
   Future<http.Response> _getWithUid(Uri uri) async {
     final request = http.Request('GET', uri)
-      ..headers['Accept'] = 'application/json'
-      ..bodyFields = {'uid': _uid};
+      ..headers.addAll(_authHeaders);
     final streamedResponse = await request.send().timeout(_requestTimeout);
     return http.Response.fromStream(streamedResponse);
   }
 
   Future<http.Response> _deleteWithUid(Uri uri) async {
     final request = http.Request('DELETE', uri)
-      ..headers['Accept'] = 'application/json'
-      ..bodyFields = {'uid': _uid};
+      ..headers.addAll(_authHeaders);
     final streamedResponse = await request.send().timeout(_requestTimeout);
     return http.Response.fromStream(streamedResponse);
   }
+
+  Map<String, String> get _authHeaders => {
+        'Accept': 'application/json',
+        _mobileUidHeader: _uid,
+      };
 
   Map<String, dynamic> _readPayload(http.Response response, String fallback) {
     dynamic decoded;
@@ -186,8 +190,8 @@ class _MesReseauxPageState extends State<MesReseauxPage> {
       final response = await http
           .post(
             Uri.parse('$generalRouteForApi/user/social-networks'),
-            headers: const {'Accept': 'application/json'},
-            body: {'uid': _uid, 'networkType': networkType, 'url': url.trim()},
+            headers: _authHeaders,
+            body: {'networkType': networkType, 'url': url.trim()},
           )
           .timeout(_requestTimeout);
       final payload = _readPayload(
@@ -228,8 +232,8 @@ class _MesReseauxPageState extends State<MesReseauxPage> {
               '$generalRouteForApi/user/social-networks/'
               '${Uri.encodeComponent(network.networkType)}',
             ),
-            headers: const {'Accept': 'application/json'},
-            body: {'uid': _uid, 'url': url.trim()},
+            headers: _authHeaders,
+            body: {'url': url.trim()},
           )
           .timeout(_requestTimeout);
       final payload = _readPayload(
