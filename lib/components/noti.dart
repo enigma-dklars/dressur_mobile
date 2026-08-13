@@ -1,67 +1,69 @@
-import 'package:art_sweetalert/art_sweetalert.dart';
+import 'dart:async';
 
-void voirPlusAdd(titre, text, context) async{
-  ArtSweetAlert.show(
-    context: context,
-    artDialogArgs: ArtDialogArgs(
-      type: ArtSweetAlertType.info,
+import 'package:dressur/components/app_message_bottom_sheet.dart';
+
+void voirPlusAdd(titre, text, context) {
+  unawaited(
+    showAppMessageBottomSheet(
+      context,
+      type: AppMessageType.info,
       title: titre,
-      text: text
-    )
+      message: text,
+    ),
   );
 }
 
-void dangerNoti(titre, text, context) async{
-  ArtSweetAlert.show(
-    context: context,
-    artDialogArgs: ArtDialogArgs(
-      type: ArtSweetAlertType.danger,
+void dangerNoti(titre, text, context) {
+  unawaited(
+    showAppMessageBottomSheet(
+      context,
+      type: AppMessageType.danger,
       title: titre,
-      text: text
-    )
+      message: text,
+    ),
   );
 }
 
-void infoNoti(titre, text, context) async{
-  ArtSweetAlert.show(
-    context: context,
-    artDialogArgs: ArtDialogArgs(
-      type: ArtSweetAlertType.info,
+void infoNoti(titre, text, context) {
+  unawaited(
+    showAppMessageBottomSheet(
+      context,
+      type: AppMessageType.info,
       title: titre,
-      text: text
-    )
+      message: text,
+    ),
   );
 }
 
-void questionNoti(titre, text, context) async{
-  ArtSweetAlert.show(
-    context: context,
-    artDialogArgs: ArtDialogArgs(
-      type: ArtSweetAlertType.question,
+void questionNoti(titre, text, context) {
+  unawaited(
+    showAppMessageBottomSheet(
+      context,
+      type: AppMessageType.question,
       title: titre,
-      text: text
-    )
+      message: text,
+    ),
   );
 }
 
-void successNoti(titre, text, context) async{
-  ArtSweetAlert.show(
-    context: context,
-    artDialogArgs: ArtDialogArgs(
-      type: ArtSweetAlertType.success,
+void successNoti(titre, text, context) {
+  unawaited(
+    showAppMessageBottomSheet(
+      context,
+      type: AppMessageType.success,
       title: titre,
-      text: text
-    )
+      message: text,
+    ),
   );
 }
 
-void warningNoti(titre, text, context) async{
-  ArtSweetAlert.show(
-    context: context,
-    artDialogArgs: ArtDialogArgs(
-      type: ArtSweetAlertType.warning,
+void warningNoti(titre, text, context) {
+  unawaited(
+    showAppMessageBottomSheet(
+      context,
+      type: AppMessageType.warning,
       title: titre,
-      text: text
-    )
+      message: text,
+    ),
   );
 }
