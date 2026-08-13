@@ -1592,8 +1592,11 @@ class _ActuPageState extends State<ActuPage>
         case "logiciel_desktop":
           return langUserPhone == "fr" ? "En savoir plus" : "Learn more";
         case "site_web":
-        default:
           return langUserPhone == "fr" ? "Ouvrir" : "Open";
+        default:
+          return langUserPhone == "fr"
+              ? "Action indisponible"
+              : "Action unavailable";
       }
     }
 
@@ -2310,8 +2313,11 @@ class AdvertisementDetailPage extends StatelessWidget {
       case "logiciel_desktop":
         return langUserPhone == "fr" ? "Savoir plus" : "Learn more";
       case "site_web":
-      default:
         return langUserPhone == "fr" ? "Ouvrir" : "Open";
+      default:
+        return langUserPhone == "fr"
+            ? "Action indisponible"
+            : "Action unavailable";
     }
   }
 
