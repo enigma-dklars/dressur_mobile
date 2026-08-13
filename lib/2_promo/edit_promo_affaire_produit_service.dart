@@ -13,6 +13,7 @@ import 'package:image/image.dart' as img;
 import 'package:dressur/components/constant.dart';
 import 'package:dressur/components/noti.dart';
 import 'package:dressur/components/permission_manager.dart';
+import 'package:dressur/components/promotion_image_cropper.dart';
 import 'package:select_form_field/select_form_field.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -56,11 +57,13 @@ class _ModificationProduitServicesPageState
     super.dispose();
   }
 
-  bool isImageSquare(File imageFile) {
-    final image = img.decodeImage(File(imageFile.path).readAsBytesSync());
-    return image != null &&
-        (image.width / image.height >= 0.8 &&
-            image.width / image.height <= 1.2);
+  bool _hasSupportedImageRatio(img.Image image) {
+    final aspectRatio = image.width / image.height;
+    const tolerance = 0.01;
+    const supportedRatios = <double>[1, 4 / 3, 3 / 4];
+    return supportedRatios.any(
+      (ratio) => (aspectRatio - ratio).abs() <= tolerance,
+    );
   }
 
   Future<void> _selectImage() async {
@@ -72,8 +75,7 @@ class _ModificationProduitServicesPageState
       action: () async {
         if (!mounted) return;
         final picker = ImagePicker();
-        final pickedImage =
-            await picker.pickImage(source: ImageSource.gallery);
+        final pickedImage = await picker.pickImage(source: ImageSource.gallery);
         if (pickedImage == null) return;
 
         final imageFile = File(pickedImage.path);
@@ -81,26 +83,62 @@ class _ModificationProduitServicesPageState
 
         if (fileSizeInMB > 1) {
           dangerNoti(
-              (langUserPhone == "fr") ? "Attention !!!" : "Warning!!!",
-              langUserPhone == "fr"
-                  ? "La taille de l'image ne peut pas dépasser 1 Mo."
-                  : "Image size cannot exceed 1 MB.",
-              context);
+            (langUserPhone == "fr") ? "Attention !!!" : "Warning!!!",
+            langUserPhone == "fr"
+                ? "La taille de l'image ne peut pas dépasser 1 Mo."
+                : "Image size cannot exceed 1 MB.",
+            context,
+          );
           return;
         }
 
-        if (isImageSquare(imageFile)) {
+        final imageBytes = await imageFile.readAsBytes();
+        final decodedImage = img.decodeImage(imageBytes);
+        if (decodedImage == null) {
+          dangerNoti(
+            (langUserPhone == "fr") ? "Attention !!!" : "Warning!!!",
+            langUserPhone == "fr"
+                ? "Cette image ne peut pas être décodée."
+                : "This image cannot be decoded.",
+            context,
+          );
+          return;
+        }
+
+        final orientedImage = img.bakeOrientation(decodedImage);
+        if (_hasSupportedImageRatio(orientedImage)) {
+          if (!mounted) return;
           setState(() {
             _imageFile = imageFile;
           });
-        } else {
-          dangerNoti(
-              (langUserPhone == "fr") ? "Attention !!!" : "Warning!!!",
-              langUserPhone == "fr"
-                  ? "L'image doit être proche d'un carré."
-                  : "The image should be close to a square.",
-              context);
+          return;
         }
+
+        if (!mounted) return;
+        final croppedImage = await showDialog<File>(
+          context: context,
+          barrierDismissible: false,
+          builder: (_) => PromotionImageCropper(
+            imageFile: imageFile,
+            isFrench: langUserPhone == "fr",
+          ),
+        );
+        if (!mounted || croppedImage == null) return;
+
+        if (await croppedImage.length() > 1024 * 1024) {
+          dangerNoti(
+            (langUserPhone == "fr") ? "Attention !!!" : "Warning!!!",
+            langUserPhone == "fr"
+                ? "La taille de l'image ne peut pas dépasser 1 Mo."
+                : "Image size cannot exceed 1 MB.",
+            context,
+          );
+          return;
+        }
+
+        setState(() {
+          _imageFile = croppedImage;
+        });
       },
     );
   }
@@ -113,20 +151,22 @@ class _ModificationProduitServicesPageState
 
     if (_textEditingController.text.isEmpty && _imageFile == null) {
       dangerNoti(
-          (langUserPhone == "fr") ? "Attention !!!" : "Warning!!!",
-          (langUserPhone == "fr")
-              ? 'Veuillez entrer un texte et sélectionner une image.'
-              : 'Please enter a text and select an image.',
-          context);
+        (langUserPhone == "fr") ? "Attention !!!" : "Warning!!!",
+        (langUserPhone == "fr")
+            ? 'Veuillez entrer un texte et sélectionner une image.'
+            : 'Please enter a text and select an image.',
+        context,
+      );
       return;
     }
     if (_textEditingController.text.isEmpty) {
       dangerNoti(
-          (langUserPhone == "fr") ? "Attention !!!" : "Warning!!!",
-          (langUserPhone == "fr")
-              ? 'Veuillez entrer un texte.'
-              : 'Please enter a text.',
-          context);
+        (langUserPhone == "fr") ? "Attention !!!" : "Warning!!!",
+        (langUserPhone == "fr")
+            ? 'Veuillez entrer un texte.'
+            : 'Please enter a text.',
+        context,
+      );
       return;
     }
 
@@ -148,9 +188,23 @@ class _ModificationProduitServicesPageState
       final image = img.decodeImage(_imageFile!.readAsBytesSync());
       final compressedImage = img.encodeJpg(image!, quality: 85);
       File(filePath).writeAsBytesSync(compressedImage);
+      if (await File(filePath).length() > 1024 * 1024) {
+        dangerNoti(
+          (langUserPhone == "fr") ? "Attention !!!" : "Warning!!!",
+          langUserPhone == "fr"
+              ? "La taille de l'image ne peut pas dépasser 1 Mo."
+              : "Image size cannot exceed 1 MB.",
+          context,
+        );
+        setState(() {
+          _isSending = false;
+        });
+        return;
+      }
 
-      final imageStream =
-          http.ByteStream(Stream.castFrom(File(filePath).openRead()));
+      final imageStream = http.ByteStream(
+        Stream.castFrom(File(filePath).openRead()),
+      );
       final imageLength = await File(filePath).length();
 
       final multipartFile = http.MultipartFile(
@@ -178,11 +232,12 @@ class _ModificationProduitServicesPageState
           MaterialPageRoute(builder: (context) => PromotionListPage()),
         );
         successNoti(
-            (langUserPhone == "fr") ? "Succès" : "Success",
-            (langUserPhone == "fr")
-                ? 'Good. Votre demande de promotion a été enregistrée. Elle sera diffusée si elle est acceptée par un administrateur. Dans le cas contraire, vous devrez la modifier en tenant compte des remarques.'
-                : 'Good. Your promotion request has been saved. It will be released if it is accepted by an administrator. Otherwise, you will need to modify it taking into account the comments.',
-            context);
+          (langUserPhone == "fr") ? "Succès" : "Success",
+          (langUserPhone == "fr")
+              ? 'Good. Votre demande de promotion a été enregistrée. Elle sera diffusée si elle est acceptée par un administrateur. Dans le cas contraire, vous devrez la modifier en tenant compte des remarques.'
+              : 'Good. Your promotion request has been saved. It will be released if it is accepted by an administrator. Otherwise, you will need to modify it taking into account the comments.',
+          context,
+        );
       }
       setState(() {
         _textEditingController.clear();
@@ -191,11 +246,12 @@ class _ModificationProduitServicesPageState
       });
     } else {
       dangerNoti(
-          (langUserPhone == "fr") ? "Attention !!!" : "Warning!!!",
-          (langUserPhone == "fr")
-              ? 'Erreur : ${response.statusCode}'
-              : 'Error: ${response.statusCode}',
-          context);
+        (langUserPhone == "fr") ? "Attention !!!" : "Warning!!!",
+        (langUserPhone == "fr")
+            ? 'Erreur : ${response.statusCode}'
+            : 'Error: ${response.statusCode}',
+        context,
+      );
     }
   }
 
@@ -214,8 +270,9 @@ class _ModificationProduitServicesPageState
           ),
         ),
         leading: IconButton(
-            onPressed: () => Navigator.pop(context),
-            icon: FaIcon(FontAwesomeIcons.chevronLeft, color: Colors.white)),
+          onPressed: () => Navigator.pop(context),
+          icon: FaIcon(FontAwesomeIcons.chevronLeft, color: Colors.white),
+        ),
         backgroundColor: primaryColor,
       ),
       body: SingleChildScrollView(
@@ -226,20 +283,23 @@ class _ModificationProduitServicesPageState
             ElevatedButton(
               onPressed: _isSending ? null : _selectImage,
               style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green,
-                  shape: StadiumBorder(),
-                  padding: EdgeInsets.symmetric(vertical: 13)),
+                backgroundColor: Colors.green,
+                shape: StadiumBorder(),
+                padding: EdgeInsets.symmetric(vertical: 13),
+              ),
               child: Text(
-                  langUserPhone == "fr"
-                      ? 'Changer une image'
-                      : 'Change an image',
-                  style: GoogleFonts.poppins(
-                      color: Colors.white, fontWeight: FontWeight.w600)),
+                langUserPhone == "fr" ? 'Changer une image' : 'Change an image',
+                style: GoogleFonts.poppins(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
             ),
             if (_imageFile != null)
               Container(
-                  margin: const EdgeInsets.only(top: 16),
-                  child: Image.file(_imageFile!, fit: BoxFit.contain)),
+                margin: const EdgeInsets.only(top: 16),
+                child: Image.file(_imageFile!, fit: BoxFit.contain),
+              ),
             if (_imageFile == null) ...[
               SizedBox(height: 10),
               ClipRRect(
@@ -259,10 +319,11 @@ class _ModificationProduitServicesPageState
               controller: _textEditingController,
               maxLines: 10,
               decoration: InputDecoration(
-                  labelText: langUserPhone == "fr"
-                      ? 'Description de la promotion'
-                      : 'Description of the promotion',
-                  border: OutlineInputBorder()),
+                labelText: langUserPhone == "fr"
+                    ? 'Description de la promotion'
+                    : 'Description of the promotion',
+                border: OutlineInputBorder(),
+              ),
             ),
             const SizedBox(height: 16),
             TextField(
@@ -283,16 +344,17 @@ class _ModificationProduitServicesPageState
               const SizedBox(height: 16),
               SelectFormField(
                 decoration: InputDecoration(
-                    labelText: langUserPhone == "fr"
-                        ? 'Moyen de paiement mobile ou par carte'
-                        : 'Mobile payment method',
-                    border: OutlineInputBorder()),
+                  labelText: langUserPhone == "fr"
+                      ? 'Moyen de paiement mobile ou par carte'
+                      : 'Mobile payment method',
+                  border: OutlineInputBorder(),
+                ),
                 type: SelectFormFieldType.dropdown,
                 initialValue: "mtn",
                 items: [
                   {"value": "mtn", "label": "Mtn"},
                   {"value": "moov", "label": "Moov"},
-                  {"value": "orange", "label": "Orange"}
+                  {"value": "orange", "label": "Orange"},
                 ],
                 onChanged: (val) => setState(() => valueMethodePaiement = val),
               ),
@@ -301,21 +363,27 @@ class _ModificationProduitServicesPageState
                 controller: telController,
                 keyboardType: TextInputType.phone,
                 decoration: InputDecoration(
-                    labelText: langUserPhone == "fr"
-                        ? "N° de téléphone"
-                        : "Phone number",
-                    border: OutlineInputBorder()),
+                  labelText: langUserPhone == "fr"
+                      ? "N° de téléphone"
+                      : "Phone number",
+                  border: OutlineInputBorder(),
+                ),
               ),
             ],
             ElevatedButton(
               onPressed: _isSending ? null : _sendData,
               style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green,
-                  shape: StadiumBorder(),
-                  padding: EdgeInsets.symmetric(vertical: 13)),
-              child: Text(langUserPhone == "fr" ? 'Modifier' : 'To Modify',
-                  style: GoogleFonts.poppins(
-                      color: Colors.white, fontWeight: FontWeight.w600)),
+                backgroundColor: Colors.green,
+                shape: StadiumBorder(),
+                padding: EdgeInsets.symmetric(vertical: 13),
+              ),
+              child: Text(
+                langUserPhone == "fr" ? 'Modifier' : 'To Modify',
+                style: GoogleFonts.poppins(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
             ),
           ],
         ),
