@@ -267,6 +267,15 @@ class _SettingPageState extends State<SettingPage>
                   () => Navigator.push(context,
                       MaterialPageRoute(builder: (context) => ProfilPage()))),
               _buildMenuRow(
+                  FontAwesomeIcons.shareNodes,
+                  (langUserPhone == "fr") ? "Mes réseaux" : "My networks",
+                  () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const MesReseauxPage(),
+                    ),
+                  )),
+              _buildMenuRow(
                   FontAwesomeIcons.lock,
                   (langUserPhone == "fr")
                       ? "Modifier le mot de passe"
@@ -427,23 +436,6 @@ class _SettingPageState extends State<SettingPage>
                   showChevron: false),
             ]),
 
-            // --- SECTION ABONNEMENT & PARTAGE ---
-            _buildSectionTitle((langUserPhone == "fr")
-                ? "Abonnement et Partage"
-                : "Subscription & Sharing"),
-            _buildMenuContainer(isDark, [
-              _buildMenuRow(
-                FontAwesomeIcons.shareNodes,
-                (langUserPhone == "fr") ? "Mes réseaux" : "My networks",
-                () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const MesReseauxPage(),
-                  ),
-                ),
-              ),
-            ]),
-            const SizedBox(height: 10),
             SociauxPage(),
 
             SizedBox(height: 20),
