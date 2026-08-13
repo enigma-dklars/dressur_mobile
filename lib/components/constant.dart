@@ -43,6 +43,8 @@ const dressurConditionUtilisation =
     "https://dressur.site/conditions-utilisation";
 const dressurPolitiqueConfidentialite =
     "https://dressur.site/politique-confidentialite";
+const dressurConditionsGeneralesVente =
+    "https://dressur.site/conditions-generales-vente";
 const dressurUrlPlaystore =
     "https://play.google.com/store/apps/details?id=com.dressur.ds";
 

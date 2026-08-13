@@ -119,8 +119,8 @@ class _RegisterFormState extends State<RegisterForm> {
         warningNoti(
             (langUserPhone == "fr") ? "Attention !!!" : "Warning !!!",
             (langUserPhone == "fr")
-                ? "Veuillez accepter les conditions pour continuer."
-                : "Please accept the terms to continue.",
+                ? "Veuillez cocher la case pour accepter les Conditions d'utilisation, la Politique de confidentialité et les Conditions Générales de Vente."
+                : "Please check the box to accept the Terms of Use, Privacy Policy, and General Terms and Conditions of Sale.",
             context);
       }
       return;
@@ -149,6 +149,7 @@ class _RegisterFormState extends State<RegisterForm> {
         'mail': _emailController.text.trim(),
         'password': _passwordController.text,
         'confirmPassword': _passwordVerifController.text,
+         'acceptPolicies': '1',
       });
 
       http.StreamedResponse response = await request.send();
@@ -368,8 +369,8 @@ class _RegisterFormState extends State<RegisterForm> {
                   children: [
                     TextSpan(
                         text: (langUserPhone == "fr")
-                            ? "J'ai lu et j'accepte les "
-                            : "I have read and agree to the "),
+                             ? "En cochant cette case, j'accepte les trois documents suivants : "
+                             : "By checking this box, I accept the following three documents: "),
                     TextSpan(
                       text: (langUserPhone == "fr")
                           ? "Conditions d'utilisation"
@@ -382,7 +383,7 @@ class _RegisterFormState extends State<RegisterForm> {
                     ),
                     TextSpan(
                         text:
-                            (langUserPhone == "fr") ? " et la " : " and the "),
+                             (langUserPhone == "fr") ? ", la " : ", "),
                     TextSpan(
                       text: (langUserPhone == "fr")
                           ? "Politique de confidentialité"
@@ -394,7 +395,20 @@ class _RegisterFormState extends State<RegisterForm> {
                         ..onTap =
                             () => _launchURL(dressurPolitiqueConfidentialite),
                     ),
-                    TextSpan(text: "."),
+                     TextSpan(
+                         text: (langUserPhone == "fr") ? " et les " : ", and the "),
+                     TextSpan(
+                       text: (langUserPhone == "fr")
+                           ? "Conditions Générales de Vente"
+                           : "General Terms and Conditions of Sale",
+                       style: GoogleFonts.poppins(
+                           color: Colors.blue,
+                           decoration: TextDecoration.underline),
+                       recognizer: TapGestureRecognizer()
+                         ..onTap =
+                             () => _launchURL(dressurConditionsGeneralesVente),
+                     ),
+                     TextSpan(text: "."),
                   ],
                 ),
               ),
