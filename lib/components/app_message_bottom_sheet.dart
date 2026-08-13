@@ -14,7 +14,7 @@ enum AppMessageType {
 /// The sheet keeps its close action visible while allowing the message itself
 /// to scroll. It is safe to use with large text settings, small screens, and
 /// an on-screen keyboard.
-Future<void?> showAppMessageBottomSheet(
+Future<void> showAppMessageBottomSheet(
   BuildContext context, {
   required AppMessageType type,
   required String title,
@@ -22,8 +22,8 @@ Future<void?> showAppMessageBottomSheet(
   String closeLabel = 'Fermer',
   bool isDismissible = true,
   bool enableDrag = true,
-}) {
-  return showModalBottomSheet<void>(
+}) async {
+  await showModalBottomSheet<void>(
     context: context,
     isScrollControlled: true,
     isDismissible: isDismissible,
