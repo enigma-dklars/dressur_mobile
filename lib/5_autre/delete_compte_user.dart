@@ -1,12 +1,12 @@
 // ignore_for_file: use_build_context_synchronously, prefer_const_constructors
 
-import 'package:art_sweetalert/art_sweetalert.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:dressur/6_login_register/connexion.dart';
 import 'package:dressur/components/constant.dart';
+import 'package:dressur/components/app_message_bottom_sheet.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
 import 'package:dressur/components/sql_helper.dart';
@@ -98,21 +98,22 @@ class _DeletecompteFormState extends State<DeletecompteForm> {
     if (!_formKey.currentState!.validate()) return;
 
     // Double confirmation avec une boîte de dialogue
-    ArtDialogResponse response = await ArtSweetAlert.show(
-      barrierDismissible: false,
-      context: context,
-      artDialogArgs: ArtDialogArgs(
-          title: (langUserPhone == "fr") ? "Dernière chance" : "Last chance",
-          text: (langUserPhone == "fr")
-              ? "Toutes vos données seront perdues. Confirmez-vous la suppression ?"
-              : "All your data will be lost. Do you confirm the deletion?",
-          confirmButtonText:
-              (langUserPhone == "fr") ? "Oui, supprimer" : "Yes, delete",
-          denyButtonText: (langUserPhone == "fr") ? "Annuler" : "Cancel",
-          type: ArtSweetAlertType.danger),
+    final shouldDelete =
+        await showAppMessageConfirmationBottomSheet(
+      context,
+      type: AppMessageType.danger,
+      title: (langUserPhone == "fr") ? "Dernière chance" : "Last chance",
+      message: (langUserPhone == "fr")
+          ? "Toutes vos données seront perdues. Confirmez-vous la suppression ?"
+          : "All your data will be lost. Do you confirm the deletion?",
+      confirmLabel:
+          (langUserPhone == "fr") ? "Oui, supprimer" : "Yes, delete",
+      cancelLabel: (langUserPhone == "fr") ? "Annuler" : "Cancel",
+      isDismissible: false,
+      enableDrag: false,
     );
 
-    if (!response.isTapConfirmButton) return;
+    if (!shouldDelete) return;
 
     final contactsToDelete = List<String>.from(contactsEnregistrer);
     final motifDeleted = motifController.text;

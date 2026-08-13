@@ -6,9 +6,9 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
-import 'package:art_sweetalert/art_sweetalert.dart';
 
 // --- Importez vos pages et constantes ---
+import 'package:dressur/components/app_message_bottom_sheet.dart';
 import 'package:dressur/components/constant.dart';
 import 'package:dressur/components/noti.dart';
 import 'package:dressur/5_autre/support_assistance.dart';
@@ -123,22 +123,23 @@ class _RecuperationFormState extends State<RecuperationForm> {
         modeMotDePasseOublier = true;
         mailConnexion = _emailController.text.trim();
 
-        ArtDialogResponse artResponse = await ArtSweetAlert.show(
-          barrierDismissible: false,
-          context: context,
-          artDialogArgs: ArtDialogArgs(
-            type: ArtSweetAlertType.success,
-            title: (langUserPhone == "fr") ? "E-mail Envoyé !" : "Email Sent!",
-            text: (langUserPhone == "fr")
-                ? "Un nouveau mot de passe a été envoyé à votre adresse e-mail. Veuillez l'utiliser pour vous connecter."
-                : "A new password has been sent to your email address. Please use it to log in.",
-            confirmButtonText: (langUserPhone == "fr")
-                ? "Retour à la Connexion"
-                : "Back to Login",
-          ),
+        final shouldReturnToLogin =
+            await showAppMessageConfirmationBottomSheet(
+          context,
+          type: AppMessageType.success,
+          title: (langUserPhone == "fr") ? "E-mail Envoyé !" : "Email Sent!",
+          message: (langUserPhone == "fr")
+              ? "Un nouveau mot de passe a été envoyé à votre adresse e-mail. Veuillez l'utiliser pour vous connecter."
+              : "A new password has been sent to your email address. Please use it to log in.",
+          confirmLabel: (langUserPhone == "fr")
+              ? "Retour à la Connexion"
+              : "Back to Login",
+          cancelLabel: (langUserPhone == "fr") ? "Fermer" : "Close",
+          isDismissible: false,
+          enableDrag: false,
         );
 
-        if (artResponse.isTapConfirmButton) {
+        if (shouldReturnToLogin && mounted) {
           Navigator.pop(context);
         }
       } else {

@@ -41,6 +41,45 @@ Future<void?> showAppMessageBottomSheet(
   );
 }
 
+/// Displays a message bottom sheet with an explicit confirm/cancel result.
+///
+/// The returned value is `true` only when the primary action is selected.
+/// Closing the sheet, selecting the secondary action, or dismissing it returns
+/// `false`.
+Future<bool> showAppMessageConfirmationBottomSheet(
+  BuildContext context, {
+  required AppMessageType type,
+  required String title,
+  required String message,
+  required String confirmLabel,
+  String cancelLabel = 'Fermer',
+  bool isDismissible = false,
+  bool enableDrag = false,
+}) async {
+  final result = await showModalBottomSheet<bool>(
+    context: context,
+    isScrollControlled: true,
+    isDismissible: isDismissible,
+    enableDrag: enableDrag,
+    backgroundColor: Colors.transparent,
+    builder: (sheetContext) {
+      return AppMessageBottomSheet(
+        type: type,
+        title: title,
+        message: message,
+        closeLabel: cancelLabel,
+        secondaryActionLabel: cancelLabel,
+        primaryActionLabel: confirmLabel,
+        onClose: () => Navigator.of(sheetContext).pop(false),
+        onSecondaryAction: () => Navigator.of(sheetContext).pop(false),
+        onPrimaryAction: () => Navigator.of(sheetContext).pop(true),
+      );
+    },
+  );
+
+  return result ?? false;
+}
+
 /// The reusable content shown inside an application message bottom sheet.
 ///
 /// When used directly, [onClose] can be supplied to control the close action.
@@ -51,7 +90,11 @@ class AppMessageBottomSheet extends StatelessWidget {
     required this.title,
     required this.message,
     this.closeLabel = 'Fermer',
+    this.secondaryActionLabel,
+    this.primaryActionLabel,
     this.onClose,
+    this.onSecondaryAction,
+    this.onPrimaryAction,
     super.key,
   });
 
@@ -59,7 +102,11 @@ class AppMessageBottomSheet extends StatelessWidget {
   final String title;
   final String message;
   final String closeLabel;
+  final String? secondaryActionLabel;
+  final String? primaryActionLabel;
   final VoidCallback? onClose;
+  final VoidCallback? onSecondaryAction;
+  final VoidCallback? onPrimaryAction;
 
   void _handleClose(BuildContext context) {
     if (onClose != null) {
@@ -68,6 +115,54 @@ class AppMessageBottomSheet extends StatelessWidget {
     }
 
     Navigator.of(context).maybePop();
+  }
+
+  void _handleSecondaryAction(BuildContext context) {
+    if (onSecondaryAction != null) {
+      onSecondaryAction!();
+      return;
+    }
+
+    _handleClose(context);
+  }
+
+  void _handlePrimaryAction(BuildContext context) {
+    if (onPrimaryAction != null) {
+      onPrimaryAction!();
+      return;
+    }
+
+    _handleClose(context);
+  }
+
+  Widget _buildActions(BuildContext context) {
+    if (secondaryActionLabel != null && primaryActionLabel != null) {
+      return Row(
+        children: [
+          Expanded(
+            child: OutlinedButton(
+              onPressed: () => _handleSecondaryAction(context),
+              child: Text(secondaryActionLabel!),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: FilledButton(
+              onPressed: () => _handlePrimaryAction(context),
+              child: Text(primaryActionLabel!),
+            ),
+          ),
+        ],
+      );
+    }
+
+    return SizedBox(
+      width: double.infinity,
+      child: FilledButton(
+        onPressed: () => _handleClose(context),
+        child: Text(closeLabel),
+      ),
+    );
   }
 
   @override
@@ -157,13 +252,7 @@ class AppMessageBottomSheet extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 16),
-                    SizedBox(
-                      width: double.infinity,
-                      child: FilledButton(
-                        onPressed: () => _handleClose(context),
-                        child: Text(closeLabel),
-                      ),
-                    ),
+                    _buildActions(context),
                   ],
                 ),
               ),

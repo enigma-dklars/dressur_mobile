@@ -19,7 +19,7 @@ import 'package:dressur/components/notification_bell.dart';
 import 'package:dressur/7_demarage/presentation_ds.dart';
 import 'package:dressur/5_autre/support_assistance.dart';
 import 'package:dressur/6_assistant/assistant_page.dart';
-import 'package:art_sweetalert/art_sweetalert.dart';
+import 'package:dressur/components/app_message_bottom_sheet.dart';
 import 'package:dressur/components/constant.dart';
 import 'package:dressur/components/sql_helper.dart';
 import 'package:dressur/main.dart';
@@ -137,19 +137,21 @@ class _SettingPageState extends State<SettingPage>
   }
 
   void _handleLogout() async {
-    ArtDialogResponse response = await ArtSweetAlert.show(
-        barrierDismissible: false,
-        context: context,
-        artDialogArgs: ArtDialogArgs(
-            title: (langUserPhone == "fr") ? "Déconnexion ?" : "Sign out?",
-            text: (langUserPhone == "fr")
-                ? "Voulez-vous vraiment vous déconnecter ?"
-                : "Do you really want to sign out?",
-            confirmButtonText: (langUserPhone == "fr") ? "Oui" : "Yes",
-            denyButtonText: (langUserPhone == "fr") ? "Non" : "No",
-            type: ArtSweetAlertType.question));
+    final shouldLogout =
+        await showAppMessageConfirmationBottomSheet(
+      context,
+      type: AppMessageType.question,
+      title: (langUserPhone == "fr") ? "Déconnexion ?" : "Sign out?",
+      message: (langUserPhone == "fr")
+          ? "Voulez-vous vraiment vous déconnecter ?"
+          : "Do you really want to sign out?",
+      confirmLabel: (langUserPhone == "fr") ? "Oui" : "Yes",
+      cancelLabel: (langUserPhone == "fr") ? "Non" : "No",
+      isDismissible: false,
+      enableDrag: false,
+    );
 
-    if (response.isTapConfirmButton) {
+    if (shouldLogout) {
       SQLHelper.viderLaBaseDeDonneeLocal();
       Navigator.pushAndRemoveUntil(
         context,

@@ -68,4 +68,49 @@ void main() {
       expect(closed, [true]);
     }
   });
+
+  testWidgets('confirmation bottom sheet preserves the user decision', (
+    tester,
+  ) async {
+    bool? result;
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Builder(
+          builder: (context) {
+            return Scaffold(
+              body: ElevatedButton(
+                onPressed: () async {
+                  result = await showAppMessageConfirmationBottomSheet(
+                    context,
+                    type: AppMessageType.question,
+                    title: 'Confirmer',
+                    message: 'Voulez-vous continuer ?',
+                    confirmLabel: 'Oui',
+                    cancelLabel: 'Non',
+                  );
+                },
+                child: const Text('Ouvrir'),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+
+    await tester.tap(find.text('Ouvrir'));
+    await tester.pumpAndSettle();
+    expect(find.text('Oui'), findsOneWidget);
+    expect(find.text('Non'), findsOneWidget);
+
+    await tester.tap(find.text('Non'));
+    await tester.pumpAndSettle();
+    expect(result, isFalse);
+
+    await tester.tap(find.text('Ouvrir'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Oui'));
+    await tester.pumpAndSettle();
+    expect(result, isTrue);
+  });
 }
