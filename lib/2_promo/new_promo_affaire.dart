@@ -2,8 +2,6 @@
 
 import 'dart:convert';
 import 'dart:convert' as convert;
-import 'dart:math' as math;
-import 'dart:typed_data';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'dart:io';
@@ -17,13 +15,13 @@ import 'package:path_provider/path_provider.dart';
 import 'package:image/image.dart' as img;
 import 'package:dressur/components/constant.dart';
 import 'package:dressur/2_promo/boost_billing.dart';
-import 'package:dressur/2_promo/promotion_crop_geometry.dart';
 import 'package:dressur/components/noti.dart';
 import 'package:dressur/components/noti_sys.dart';
 import 'package:dressur/components/permission_manager.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:select_form_field/select_form_field.dart';
 import 'package:dressur/components/info_service_bottom_sheet.dart';
+import 'package:dressur/components/promotion_image_cropper.dart';
 
 const _supportedPromotionImageRatios = <double>[1, 4 / 3, 3 / 4];
 
@@ -79,10 +77,8 @@ Future<File?> _preparePromotionImage({
     return showDialog<File>(
       context: context,
       barrierDismissible: false,
-      builder: (_) => _PromotionImageCropper(
-        imageFile: imageFile,
-        isFrench: isFrench,
-      ),
+      builder: (_) =>
+          PromotionImageCropper(imageFile: imageFile, isFrench: isFrench),
     );
   } on FileSystemException {
     if (context.mounted) {
@@ -161,8 +157,11 @@ void _showPromotionApiError({
       ? "Une erreur est survenue lors de l'envoi. Veuillez réessayer."
       : "An error occurred while sending. Please try again.";
   final title = data?['titre']?.toString() ?? fallbackTitle;
-  final message = data?['message']?.toString() ??
-      (statusCode > 0 ? '$fallbackMessage (Code : $statusCode)' : fallbackMessage);
+  final message =
+      data?['message']?.toString() ??
+      (statusCode > 0
+          ? '$fallbackMessage (Code : $statusCode)'
+          : fallbackMessage);
   dangerNoti(title, message, context);
 }
 
@@ -269,10 +268,7 @@ class _PromotionFormPageState extends State<PromotionFormPage> {
           onPressed: () {
             Navigator.pop(context);
           },
-          icon: const FaIcon(
-            FontAwesomeIcons.chevronLeft,
-            color: Colors.white,
-          ),
+          icon: const FaIcon(FontAwesomeIcons.chevronLeft, color: Colors.white),
         ),
         backgroundColor: primaryColor,
       ),
@@ -315,10 +311,10 @@ class _PromotionFormPageState extends State<PromotionFormPage> {
             DressurDivider(),
             const SizedBox(height: 5),
             if (type_promo_affaire == "produit_service") ...[
-              ProduitsServices()
+              ProduitsServices(),
             ],
             if (type_promo_affaire == "sites_applications") ...[
-              SitesApplications()
+              SitesApplications(),
             ],
             if (type_promo_affaire == "dmd_emploi") ...[DemandesEmploi()],
             if (type_promo_affaire == "offre_emploi") ...[OffresEmploi()],
@@ -367,16 +363,15 @@ class _ProduitsServicesState extends State<ProduitsServices> {
     return (int.tryParse(_boostFacebookAmountController.text) ?? 0).toDouble();
   }
 
-  double get _subTotal =>
-      BoostBilling.calculateTotal(
-        formulaAmount: prixBoost,
-        rewardEnabled: _participateInReward,
-        rewardBudget: _rewardBudget,
-        facebookEnabled: _boostFacebook,
-        facebookAmount: int.tryParse(_boostFacebookAmountController.text) ?? 0,
-        publishOnDressurStatus: _publishOnDressurStatus,
-        formulaDays: joursBoost,
-      );
+  double get _subTotal => BoostBilling.calculateTotal(
+    formulaAmount: prixBoost,
+    rewardEnabled: _participateInReward,
+    rewardBudget: _rewardBudget,
+    facebookEnabled: _boostFacebook,
+    facebookAmount: int.tryParse(_boostFacebookAmountController.text) ?? 0,
+    publishOnDressurStatus: _publishOnDressurStatus,
+    formulaDays: joursBoost,
+  );
 
   bool _publishOnDressurStatus = false;
 
@@ -534,7 +529,7 @@ class _ProduitsServicesState extends State<ProduitsServices> {
             setState(() => _imageFile = preparedImage);
           }
         }
-      }
+      },
     );
   }
 
@@ -548,11 +543,12 @@ class _ProduitsServicesState extends State<ProduitsServices> {
         _textEditingController.text.isEmpty ||
         _imageFile == null) {
       dangerNoti(
-          "Attention !!!",
-          (langUserPhone == "fr")
-              ? 'Veuillez choisir une formule, entrer un texte et sélectionner une image.'
-              : 'Please choose a formula, enter some text and select an image.',
-          context);
+        "Attention !!!",
+        (langUserPhone == "fr")
+            ? 'Veuillez choisir une formule, entrer un texte et sélectionner une image.'
+            : 'Please choose a formula, enter some text and select an image.',
+        context,
+      );
       return;
     }
     if (!_validateRewardBudget()) {
@@ -562,22 +558,24 @@ class _ProduitsServicesState extends State<ProduitsServices> {
       final amount = int.tryParse(_boostFacebookAmountController.text) ?? 0;
       if (amount < 700) {
         dangerNoti(
-            "Attention !!!",
-            (langUserPhone == "fr")
-                ? "Le montant minimum pour le boost Facebook est de 700 FCFA."
-                : "The minimum amount for the Facebook boost is 700 FCFA.",
-            context);
+          "Attention !!!",
+          (langUserPhone == "fr")
+              ? "Le montant minimum pour le boost Facebook est de 700 FCFA."
+              : "The minimum amount for the Facebook boost is 700 FCFA.",
+          context,
+        );
         return;
       }
     }
     final waRegex = RegExp(r'^\+\d{11,}$');
     if (!waRegex.hasMatch(whatsappContactController.text.trim())) {
       dangerNoti(
-          "Attention !!!",
-          (langUserPhone == "fr")
-              ? "Le numéro WhatsApp de contact doit commencer par + suivi d'au moins 11 chiffres."
-              : "WhatsApp contact number must start with + followed by at least 11 digits.",
-          context);
+        "Attention !!!",
+        (langUserPhone == "fr")
+            ? "Le numéro WhatsApp de contact doit commencer par + suivi d'au moins 11 chiffres."
+            : "WhatsApp contact number must start with + followed by at least 11 digits.",
+        context,
+      );
       return;
     }
     setState(() => _isSending = true);
@@ -590,17 +588,19 @@ class _ProduitsServicesState extends State<ProduitsServices> {
     request.fields['paymentMethod'] = valueMethodePaiement;
     request.fields['tel'] = telController.text;
 
-    request.fields.addAll(BoostBilling.buildOptionFields(
-      formulaAmount: prixBoost,
-      rewardEnabled: _participateInReward,
-      rewardBudget: _rewardBudget,
-      customRewardBudget: _isCustomRewardBudget,
-      publishOnDressurStatus: _publishOnDressurStatus,
-      facebookEnabled: _boostFacebook,
-      facebookAmount: _boostFacebookAmountController.text,
-      includeSource: false,
-      formulaDays: joursBoost,
-    ));
+    request.fields.addAll(
+      BoostBilling.buildOptionFields(
+        formulaAmount: prixBoost,
+        rewardEnabled: _participateInReward,
+        rewardBudget: _rewardBudget,
+        customRewardBudget: _isCustomRewardBudget,
+        publishOnDressurStatus: _publishOnDressurStatus,
+        facebookEnabled: _boostFacebook,
+        facebookAmount: _boostFacebookAmountController.text,
+        includeSource: false,
+        formulaDays: joursBoost,
+      ),
+    );
     request.fields['whatsappContact'] = whatsappContactController.text.trim();
     _debugValidatePromotionRequest(request);
 
@@ -671,27 +671,30 @@ class _ProduitsServicesState extends State<ProduitsServices> {
       cancelPromoReminderNotification();
       if (data["solde_used"] == true) {
         successNoti(
-            (langUserPhone == "fr") ? "Succès" : "Success",
-            data["message"] ??
-                ((langUserPhone == "fr")
-                    ? "Solde débité. Promotion Affaire enregistrée."
-                    : "Balance debited. Promotion registered."),
-            context);
+          (langUserPhone == "fr") ? "Succès" : "Success",
+          data["message"] ??
+              ((langUserPhone == "fr")
+                  ? "Solde débité. Promotion Affaire enregistrée."
+                  : "Balance debited. Promotion registered."),
+          context,
+        );
       } else if (data["direct"] == true) {
         successNoti(
-            (langUserPhone == "fr") ? "Succès" : "Success",
-            (langUserPhone == "fr")
-                ? "Veuillez confirmer le paiement pour finaliser l'enregistrement de votre promotion."
-                : "Please confirm payment to finalize the registration of your promotion.",
-            context);
+          (langUserPhone == "fr") ? "Succès" : "Success",
+          (langUserPhone == "fr")
+              ? "Veuillez confirmer le paiement pour finaliser l'enregistrement de votre promotion."
+              : "Please confirm payment to finalize the registration of your promotion.",
+          context,
+        );
       } else {
         launchPaiement(data["url"]);
         successNoti(
-            (langUserPhone == "fr") ? "Succès" : "Success",
-            (langUserPhone == "fr")
-                ? "Veuillez confirmer le paiement pour finaliser l'enregistrement de votre promotion."
-                : "Please confirm payment to finalize the registration of your promotion.",
-            context);
+          (langUserPhone == "fr") ? "Succès" : "Success",
+          (langUserPhone == "fr")
+              ? "Veuillez confirmer le paiement pour finaliser l'enregistrement de votre promotion."
+              : "Please confirm payment to finalize the registration of your promotion.",
+          context,
+        );
       }
     } catch (_) {
       if (!mounted) return;
@@ -707,17 +710,20 @@ class _ProduitsServicesState extends State<ProduitsServices> {
   void listeFormulePromoAffaire() async {
     if (await isConnectedToInternet()) {
       setState(() => loading_formule_gratuit = true);
-      var response = await http
-          .post(Uri.parse('$generalRouteForApi/listeFormulePromoAffaire'));
+      var response = await http.post(
+        Uri.parse('$generalRouteForApi/listeFormulePromoAffaire'),
+      );
       if (response.statusCode == 200) {
         var data = jsonDecode(response.body);
         if (data["error"] == false) {
           setState(() {
             loading_formule_gratuit = false;
-            listeDesFormules =
-                List<Map<String, dynamic>>.from(data["listeFormulBoost"]);
-            listeMethodePaiements =
-                List<Map<String, dynamic>>.from(data["listeMethodePaiements"]);
+            listeDesFormules = List<Map<String, dynamic>>.from(
+              data["listeFormulBoost"],
+            );
+            listeMethodePaiements = List<Map<String, dynamic>>.from(
+              data["listeMethodePaiements"],
+            );
             _message = (langUserPhone == "fr")
                 ? "Veuillez choisir une formule."
                 : "Please choose a plan.";
@@ -726,18 +732,20 @@ class _ProduitsServicesState extends State<ProduitsServices> {
       }
     } else {
       dangerNoti(
-          "Erreur",
-          (langUserPhone == "fr")
-              ? "Pas de connexion internet."
-              : "No internet connection.",
-          context);
+        "Erreur",
+        (langUserPhone == "fr")
+            ? "Pas de connexion internet."
+            : "No internet connection.",
+        context,
+      );
       setState(() => loading_formule_gratuit = false);
     }
   }
 
   onChangeFormulBoost(val) {
-    final selected = listeDesFormules
-        .firstWhere((e) => e['value'].toString() == val.toString());
+    final selected = listeDesFormules.firstWhere(
+      (e) => e['value'].toString() == val.toString(),
+    );
     setState(() {
       idFormulBoost = int.parse(val.toString());
       prixBoost = selected['prix'];
@@ -782,8 +790,10 @@ class _ProduitsServicesState extends State<ProduitsServices> {
           child: TextField(
             controller: controller,
             keyboardType: TextInputType.number,
-            decoration:
-                InputDecoration(isDense: true, border: OutlineInputBorder()),
+            decoration: InputDecoration(
+              isDense: true,
+              border: OutlineInputBorder(),
+            ),
           ),
         ),
       ],
@@ -795,13 +805,19 @@ class _ProduitsServicesState extends State<ProduitsServices> {
       width: double.infinity,
       padding: EdgeInsets.all(10),
       decoration: BoxDecoration(
-          color: color.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: color.withOpacity(0.3))),
-      child: Text(text,
-          style: GoogleFonts.poppins(
-              color: color, fontWeight: FontWeight.bold, fontSize: 13),
-          textAlign: TextAlign.center),
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: color.withOpacity(0.3)),
+      ),
+      child: Text(
+        text,
+        style: GoogleFonts.poppins(
+          color: color,
+          fontWeight: FontWeight.bold,
+          fontSize: 13,
+        ),
+        textAlign: TextAlign.center,
+      ),
     );
   }
 
@@ -809,45 +825,53 @@ class _ProduitsServicesState extends State<ProduitsServices> {
     return Container(
       padding: EdgeInsets.all(15),
       decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: Colors.grey[300]!)),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: Colors.grey[300]!),
+      ),
       child: Column(
         children: [
-          _recapRow((langUserPhone == "fr") ? "Formule Boost" : "Boost Plan",
-              prixBoost.toDouble()),
+          _recapRow(
+            (langUserPhone == "fr") ? "Formule Boost" : "Boost Plan",
+            prixBoost.toDouble(),
+          ),
           if (_participateInReward)
             _recapRow(
-                (langUserPhone == "fr")
-                    ? "Programme Récompense"
-                    : "Reward Program",
-                _rewardProgramAmount),
+              (langUserPhone == "fr")
+                  ? "Programme Récompense"
+                  : "Reward Program",
+              _rewardProgramAmount,
+            ),
           if (_publishOnDressurStatus)
             _recapRow(
-                (langUserPhone == "fr")
-                    ? "Statut WhatsApp & Story Dressur"
-                    : "WhatsApp Status & Story Dressur",
-                _dressurStatusAmount),
+              (langUserPhone == "fr")
+                  ? "Statut WhatsApp & Story Dressur"
+                  : "WhatsApp Status & Story Dressur",
+              _dressurStatusAmount,
+            ),
           if (_boostFacebook)
             _recapRow(
-                (langUserPhone == "fr")
-                    ? "Boost Facebook"
-                    : "Facebook Boost",
-                _boostFacebookAmount),
+              (langUserPhone == "fr") ? "Boost Facebook" : "Facebook Boost",
+              _boostFacebookAmount,
+            ),
           Divider(height: 20),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text((langUserPhone == "fr") ? "TOTAL" : "TOTAL",
-                  style: GoogleFonts.poppins(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                  )),
-              Text("${_subTotal.toStringAsFixed(0)} FCFA",
-                  style: GoogleFonts.poppins(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                    color: primaryColor,
-                  )),
+              Text(
+                (langUserPhone == "fr") ? "TOTAL" : "TOTAL",
+                style: GoogleFonts.poppins(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                ),
+              ),
+              Text(
+                "${_subTotal.toStringAsFixed(0)} FCFA",
+                style: GoogleFonts.poppins(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                  color: primaryColor,
+                ),
+              ),
             ],
           ),
         ],
@@ -855,21 +879,31 @@ class _ProduitsServicesState extends State<ProduitsServices> {
     );
   }
 
-  Widget _recapRow(String label, double amount,
-      {bool isBold = false, bool isSmall = false}) {
+  Widget _recapRow(
+    String label,
+    double amount, {
+    bool isBold = false,
+    bool isSmall = false,
+  }) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 2),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label,
-              style: GoogleFonts.poppins(
-                  fontSize: isSmall ? 11 : 13,
-                  fontWeight: isBold ? FontWeight.bold : FontWeight.normal)),
-          Text("${amount.toStringAsFixed(0)} F",
-              style: GoogleFonts.poppins(
-                  fontSize: isSmall ? 11 : 13,
-                  fontWeight: isBold ? FontWeight.bold : FontWeight.normal)),
+          Text(
+            label,
+            style: GoogleFonts.poppins(
+              fontSize: isSmall ? 11 : 13,
+              fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
+            ),
+          ),
+          Text(
+            "${amount.toStringAsFixed(0)} F",
+            style: GoogleFonts.poppins(
+              fontSize: isSmall ? 11 : 13,
+              fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
+            ),
+          ),
         ],
       ),
     );
@@ -885,13 +919,15 @@ class _ProduitsServicesState extends State<ProduitsServices> {
           const SizedBox(height: 5),
           loading_formule_gratuit
               ? const Center(
-                  child: CircularProgressIndicator(color: primaryColor))
+                  child: CircularProgressIndicator(color: primaryColor),
+                )
               : SelectFormField(
                   decoration: InputDecoration(
-                      labelText: (langUserPhone == "fr")
-                          ? 'Formule de Boost'
-                          : 'Boost Plan',
-                      border: const OutlineInputBorder()),
+                    labelText: (langUserPhone == "fr")
+                        ? 'Formule de Boost'
+                        : 'Boost Plan',
+                    border: const OutlineInputBorder(),
+                  ),
                   type: SelectFormFieldType.dropdown,
                   initialValue: '0',
                   items: listeDesFormules,
@@ -899,36 +935,43 @@ class _ProduitsServicesState extends State<ProduitsServices> {
                 ),
           const SizedBox(height: 10),
           if (_message.isNotEmpty)
-            Text(_message,
-                style: GoogleFonts.poppins(fontSize: 14, color: primaryColor),
-                textAlign: TextAlign.center),
+            Text(
+              _message,
+              style: GoogleFonts.poppins(fontSize: 14, color: primaryColor),
+              textAlign: TextAlign.center,
+            ),
           const SizedBox(height: 15),
 
           ElevatedButton(
             onPressed: _isSending ? null : _selectImage,
             style: ElevatedButton.styleFrom(
-                backgroundColor: primaryColor,
-                shape: const StadiumBorder(),
-                padding: const EdgeInsets.symmetric(vertical: 13)),
+              backgroundColor: primaryColor,
+              shape: const StadiumBorder(),
+              padding: const EdgeInsets.symmetric(vertical: 13),
+            ),
             child: Text(
-                (langUserPhone == "fr")
-                    ? "Sélectionner l'image"
-                    : 'Select image',
-                style: GoogleFonts.poppins(
-                    color: Colors.white, fontWeight: FontWeight.w600)),
+              (langUserPhone == "fr") ? "Sélectionner l'image" : 'Select image',
+              style: GoogleFonts.poppins(
+                color: Colors.white,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
           ),
           if (_imageFile != null)
             Container(
-                margin: const EdgeInsets.only(top: 10),
-                child: Image.file(_imageFile!, fit: BoxFit.contain)),
+              margin: const EdgeInsets.only(top: 10),
+              child: Image.file(_imageFile!, fit: BoxFit.contain),
+            ),
           const SizedBox(height: 10),
           TextField(
-              controller: _textEditingController,
-              minLines: 1,
-              maxLines: 10,
-              decoration: InputDecoration(
-                  labelText: 'Description',
-                  border: const OutlineInputBorder())),
+            controller: _textEditingController,
+            minLines: 1,
+            maxLines: 10,
+            decoration: InputDecoration(
+              labelText: 'Description',
+              border: const OutlineInputBorder(),
+            ),
+          ),
 
           const SizedBox(height: 10),
 
@@ -959,32 +1002,37 @@ class _ProduitsServicesState extends State<ProduitsServices> {
 
           // --- SECTION PROGRAMME DE RÉCOMPENSE ---
           _buildOptionHeader(
-              FontAwesomeIcons.star,
-              (langUserPhone == "fr")
-                  ? "Programme de Récompense"
-                  : "Reward Program",
-              _participateInReward),
+            FontAwesomeIcons.star,
+            (langUserPhone == "fr")
+                ? "Programme de Récompense"
+                : "Reward Program",
+            _participateInReward,
+          ),
           SwitchListTile(
             title: Text(
-                (langUserPhone == "fr")
-                    ? "Ajouter votre promotion au programme"
-                    : "Add your promotion to the program",
-                style: GoogleFonts.poppins(
-                    fontSize: 14, fontWeight: FontWeight.w500)),
+              (langUserPhone == "fr")
+                  ? "Ajouter votre promotion au programme"
+                  : "Add your promotion to the program",
+              style: GoogleFonts.poppins(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
             subtitle: Text(
-                (langUserPhone == "fr")
-                    ? "Attirez plus de vues en récompensant les utilisateurs qui le publieront sur leur statut WhatsApp. Dressur se charge de la mise en application et de la vérification."
-                    : "Get more views by rewarding users who share it on their WhatsApp status. Dressur handles the implementation and verification.",
-                style: GoogleFonts.poppins(fontSize: 11)),
+              (langUserPhone == "fr")
+                  ? "Attirez plus de vues en récompensant les utilisateurs qui le publieront sur leur statut WhatsApp. Dressur se charge de la mise en application et de la vérification."
+                  : "Get more views by rewarding users who share it on their WhatsApp status. Dressur handles the implementation and verification.",
+              style: GoogleFonts.poppins(fontSize: 11),
+            ),
             value: _participateInReward,
             activeColor: primaryColor,
-             onChanged: (val) => setState(() {
-               _participateInReward = val;
-               _isCustomRewardBudget = false;
-               _rewardBudget = val ? 500 : 0;
-               _rewardBudgetError = null;
-               _customRewardBudgetController.clear();
-             }),
+            onChanged: (val) => setState(() {
+              _participateInReward = val;
+              _isCustomRewardBudget = false;
+              _rewardBudget = val ? 500 : 0;
+              _rewardBudgetError = null;
+              _customRewardBudgetController.clear();
+            }),
           ),
           if (_participateInReward) ...[
             Padding(
@@ -995,7 +1043,10 @@ class _ProduitsServicesState extends State<ProduitsServices> {
                     (langUserPhone == "fr")
                         ? "Choisissez votre budget récompenses"
                         : "Choose your reward budget",
-                    style: GoogleFonts.poppins(fontSize: 13, fontWeight: FontWeight.w500),
+                    style: GoogleFonts.poppins(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                   const SizedBox(height: 10),
                   Wrap(
@@ -1005,30 +1056,41 @@ class _ProduitsServicesState extends State<ProduitsServices> {
                       ...[500, 1000, 2000, 5000].map((budget) {
                         final selected =
                             !_isCustomRewardBudget && _rewardBudget == budget;
-                      return GestureDetector(
-                        onTap: () => setState(() {
-                          _isCustomRewardBudget = false;
-                          _rewardBudget = budget;
-                          _rewardBudgetError = null;
-                          _customRewardBudgetController.clear();
-                        }),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
-                          decoration: BoxDecoration(
-                            color: selected ? primaryColor : Colors.transparent,
-                            borderRadius: BorderRadius.circular(20),
-                            border: Border.all(color: primaryColor),
-                          ),
-                          child: Text(
-                            "${budget == 1000 ? '1 000' : budget == 2000 ? '2 000' : budget == 5000 ? '5 000' : budget} F",
-                            style: GoogleFonts.poppins(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w600,
-                              color: selected ? Colors.white : primaryColor,
+                        return GestureDetector(
+                          onTap: () => setState(() {
+                            _isCustomRewardBudget = false;
+                            _rewardBudget = budget;
+                            _rewardBudgetError = null;
+                            _customRewardBudgetController.clear();
+                          }),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 18,
+                              vertical: 10,
+                            ),
+                            decoration: BoxDecoration(
+                              color: selected
+                                  ? primaryColor
+                                  : Colors.transparent,
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(color: primaryColor),
+                            ),
+                            child: Text(
+                              "${budget == 1000
+                                  ? '1 000'
+                                  : budget == 2000
+                                  ? '2 000'
+                                  : budget == 5000
+                                  ? '5 000'
+                                  : budget} F",
+                              style: GoogleFonts.poppins(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                                color: selected ? Colors.white : primaryColor,
+                              ),
                             ),
                           ),
-                        ),
-                      );
+                        );
                       }),
                       GestureDetector(
                         onTap: () => setState(() {
@@ -1036,12 +1098,14 @@ class _ProduitsServicesState extends State<ProduitsServices> {
                           _rewardBudget = 0;
                           _rewardBudgetError =
                               _customRewardBudgetController.text.trim().isEmpty
-                                  ? _rewardBudgetRequiredMessage
-                                  : null;
+                              ? _rewardBudgetRequiredMessage
+                              : null;
                         }),
                         child: Container(
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 18, vertical: 10),
+                            horizontal: 18,
+                            vertical: 10,
+                          ),
                           decoration: BoxDecoration(
                             color: _isCustomRewardBudget
                                 ? primaryColor
@@ -1068,9 +1132,7 @@ class _ProduitsServicesState extends State<ProduitsServices> {
                     TextField(
                       controller: _customRewardBudgetController,
                       keyboardType: TextInputType.number,
-                      inputFormatters: [
-                        FilteringTextInputFormatter.digitsOnly,
-                      ],
+                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                       onChanged: _onCustomRewardBudgetChanged,
                       decoration: InputDecoration(
                         labelText: langUserPhone == "fr"
@@ -1092,67 +1154,75 @@ class _ProduitsServicesState extends State<ProduitsServices> {
 
           // --- SECTION STATUT WHATSAPP & STORY DRESSUR (formule >= 1000 FCFA) ---
           if (prixBoost >= 1000) ...[
-          _buildOptionHeader(
-            FontAwesomeIcons.solidCircleCheck,
-            (langUserPhone == "fr")
-                ? "Statut WhatsApp de Dressur et Story"
-                : "Dressur WhatsApp Status & Story",
-            _publishOnDressurStatus,
-          ),
-          SwitchListTile(
-            title: Text(
+            _buildOptionHeader(
+              FontAwesomeIcons.solidCircleCheck,
               (langUserPhone == "fr")
-                  ? "Ajouter au statut WhatsApp de Dressur et à la Story sur Dressur"
-                  : "Add to Dressur WhatsApp status and Dressur Story",
-              style: GoogleFonts.poppins(
-                  fontSize: 14, fontWeight: FontWeight.w500),
+                  ? "Statut WhatsApp de Dressur et Story"
+                  : "Dressur WhatsApp Status & Story",
+              _publishOnDressurStatus,
             ),
-            subtitle: Text(
-              (langUserPhone == "fr")
-                  ? "Bénéficiez d'une visibilité maximale : votre promotion sera publiée sur le statut WhatsApp de Dressur et apparaîtra dans les Stories sur l'application pendant toute la durée de votre promotion."
-                  : "Get maximum visibility: your promotion will be published on Dressur's WhatsApp status and appear in Stories on the app for the entire duration of your promotion.",
-              style: GoogleFonts.poppins(fontSize: 11),
+            SwitchListTile(
+              title: Text(
+                (langUserPhone == "fr")
+                    ? "Ajouter au statut WhatsApp de Dressur et à la Story sur Dressur"
+                    : "Add to Dressur WhatsApp status and Dressur Story",
+                style: GoogleFonts.poppins(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              subtitle: Text(
+                (langUserPhone == "fr")
+                    ? "Bénéficiez d'une visibilité maximale : votre promotion sera publiée sur le statut WhatsApp de Dressur et apparaîtra dans les Stories sur l'application pendant toute la durée de votre promotion."
+                    : "Get maximum visibility: your promotion will be published on Dressur's WhatsApp status and appear in Stories on the app for the entire duration of your promotion.",
+                style: GoogleFonts.poppins(fontSize: 11),
+              ),
+              value: _publishOnDressurStatus,
+              activeColor: primaryColor,
+              onChanged: (val) => setState(() => _publishOnDressurStatus = val),
             ),
-            value: _publishOnDressurStatus,
-            activeColor: primaryColor,
-            onChanged: (val) => setState(() => _publishOnDressurStatus = val),
-          ),
-          if (_publishOnDressurStatus)
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10),
-              child: Column(
-                children: [
-                  _infoBox(
+            if (_publishOnDressurStatus)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                child: Column(
+                  children: [
+                    _infoBox(
                       (langUserPhone == "fr")
                           ? "Frais Statut WhatsApp & Story Dressur : ${_dressurStatusAmount.toStringAsFixed(0)} FCFA"
                           : "WhatsApp Status & Story Dressur fee: ${_dressurStatusAmount.toStringAsFixed(0)} FCFA",
-                      Colors.blue),
-                ],
+                      Colors.blue,
+                    ),
+                  ],
+                ),
               ),
-            ),
           ], // fin if (prixBoost >= 1000)
 
           const SizedBox(height: 15),
 
           // --- SECTION BOOST PAGE FACEBOOK ---
           _buildOptionHeader(
-              FontAwesomeIcons.facebookF,
-              (langUserPhone == "fr")
-                  ? "Boost Page Facebook Dressur"
-                  : "Dressur Facebook Page Boost",
-              _boostFacebook),
+            FontAwesomeIcons.facebookF,
+            (langUserPhone == "fr")
+                ? "Boost Page Facebook Dressur"
+                : "Dressur Facebook Page Boost",
+            _boostFacebook,
+          ),
           SwitchListTile(
             title: Text(
-                (langUserPhone == "fr")
-                    ? "Publier et booster sur la page Facebook de Dressur"
-                    : "Post and boost on Dressur's Facebook page",
-                style: GoogleFonts.poppins(
-                    fontSize: 14, fontWeight: FontWeight.w500)),
+              (langUserPhone == "fr")
+                  ? "Publier et booster sur la page Facebook de Dressur"
+                  : "Post and boost on Dressur's Facebook page",
+              style: GoogleFonts.poppins(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
             subtitle: Text(
-                (langUserPhone == "fr")
-                    ? "Votre promotion sera publiée sur la page Facebook officielle de Dressur et boostée auprès d'une audience ciblée. Budget minimum 700 FCFA."
-                    : "Your promotion will be posted on Dressur's official Facebook page and boosted to a targeted audience. Minimum budget 700 FCFA.",
-                style: GoogleFonts.poppins(fontSize: 11)),
+              (langUserPhone == "fr")
+                  ? "Votre promotion sera publiée sur la page Facebook officielle de Dressur et boostée auprès d'une audience ciblée. Budget minimum 700 FCFA."
+                  : "Your promotion will be posted on Dressur's official Facebook page and boosted to a targeted audience. Minimum budget 700 FCFA.",
+              style: GoogleFonts.poppins(fontSize: 11),
+            ),
             value: _boostFacebook,
             activeColor: primaryColor,
             onChanged: (val) => setState(() => _boostFacebook = val),
@@ -1181,7 +1251,9 @@ class _ProduitsServicesState extends State<ProduitsServices> {
 
           SelectFormField(
             decoration: const InputDecoration(
-                labelText: 'Moyen de paiement', border: OutlineInputBorder()),
+              labelText: 'Moyen de paiement',
+              border: OutlineInputBorder(),
+            ),
             type: SelectFormFieldType.dropdown,
             initialValue: 'mtn',
             items: listeMethodePaiements,
@@ -1189,20 +1261,23 @@ class _ProduitsServicesState extends State<ProduitsServices> {
           ),
           const SizedBox(height: 10),
           TextField(
-              controller: telController,
-              decoration: InputDecoration(
-                  labelText: (langUserPhone == "fr")
-                      ? 'Numéro du paiement'
-                      : 'Payment number',
-                  border: const OutlineInputBorder())),
+            controller: telController,
+            decoration: InputDecoration(
+              labelText: (langUserPhone == "fr")
+                  ? 'Numéro du paiement'
+                  : 'Payment number',
+              border: const OutlineInputBorder(),
+            ),
+          ),
 
           const SizedBox(height: 15),
           ElevatedButton(
             onPressed: _isSending ? null : _sendData,
             style: ElevatedButton.styleFrom(
-                backgroundColor: primaryColor,
-                shape: const StadiumBorder(),
-                padding: const EdgeInsets.symmetric(vertical: 15)),
+              backgroundColor: primaryColor,
+              shape: const StadiumBorder(),
+              padding: const EdgeInsets.symmetric(vertical: 15),
+            ),
             child: _isSending
                 ? const CircularProgressIndicator(color: Colors.white)
                 : Text(
@@ -1210,7 +1285,10 @@ class _ProduitsServicesState extends State<ProduitsServices> {
                         ? 'VALIDER ET PAYER'
                         : 'VALIDATE AND PAY',
                     style: GoogleFonts.poppins(
-                        color: Colors.white, fontWeight: FontWeight.bold)),
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
           ),
         ],
       ),
@@ -1222,445 +1300,17 @@ class _ProduitsServicesState extends State<ProduitsServices> {
       children: [
         FaIcon(icon, color: isActive ? primaryColor : Colors.grey, size: 20),
         SizedBox(width: 10),
-        Text(title,
-            style: GoogleFonts.poppins(
-                fontWeight: FontWeight.bold,
-                fontSize: 15,
-                color: isActive ? primaryColor : Colors.grey[700])),
+        Text(
+          title,
+          style: GoogleFonts.poppins(
+            fontWeight: FontWeight.bold,
+            fontSize: 15,
+            color: isActive ? primaryColor : Colors.grey[700],
+          ),
+        ),
       ],
     );
   }
-}
-
-class _PromotionImageCropper extends StatefulWidget {
-  const _PromotionImageCropper({
-    required this.imageFile,
-    required this.isFrench,
-  });
-
-  final File imageFile;
-  final bool isFrench;
-
-  @override
-  State<_PromotionImageCropper> createState() => _PromotionImageCropperState();
-}
-
-class _PromotionImageCropperState extends State<_PromotionImageCropper> {
-  static const _ratios = <_PromotionCropRatio>[
-    _PromotionCropRatio(label: '1:1', width: 1, height: 1),
-    _PromotionCropRatio(label: '4:3', width: 4, height: 3),
-    _PromotionCropRatio(label: '3:4', width: 3, height: 4),
-  ];
-
-  img.Image? _decodedImage;
-  Uint8List? _imageBytes;
-  _PromotionCropRatio _selectedRatio = _ratios.first;
-  double _zoom = 1;
-  Offset _offset = Offset.zero;
-  double _gestureZoom = 1;
-  Offset _gestureOffset = Offset.zero;
-  Offset _gestureFocalPoint = Offset.zero;
-  bool _isSaving = false;
-  String? _errorMessage;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadImage();
-  }
-
-  Future<void> _loadImage() async {
-    try {
-      final bytes = await widget.imageFile.readAsBytes();
-      final decoded = img.decodeImage(bytes);
-      if (decoded == null) {
-        throw const FormatException('Unsupported image format');
-      }
-      final orientedImage = img.bakeOrientation(decoded);
-      if (!mounted) return;
-      setState(() {
-        _imageBytes = Uint8List.fromList(img.encodePng(orientedImage));
-        _decodedImage = orientedImage;
-      });
-    } catch (_) {
-      if (!mounted) return;
-      setState(() {
-        _errorMessage = widget.isFrench
-            ? "Cette image ne peut pas être recadrée."
-            : "This image cannot be cropped.";
-      });
-    }
-  }
-
-  double _baseScale(Size frameSize) {
-    final image = _decodedImage!;
-    return PromotionCropGeometry.baseScale(
-      imageWidth: image.width,
-      imageHeight: image.height,
-      frameWidth: frameSize.width,
-      frameHeight: frameSize.height,
-    );
-  }
-
-  Offset _clampOffset({
-    required Offset offset,
-    required Size frameSize,
-    required double baseScale,
-    required double zoom,
-  }) {
-    final image = _decodedImage!;
-    final clamped = PromotionCropGeometry.clampOffset(
-      imageWidth: image.width,
-      imageHeight: image.height,
-      frameWidth: frameSize.width,
-      frameHeight: frameSize.height,
-      baseScale: baseScale,
-      zoom: zoom,
-      offsetX: offset.dx,
-      offsetY: offset.dy,
-    );
-    return Offset(
-      clamped.dx,
-      clamped.dy,
-    );
-  }
-
-  void _onScaleStart(ScaleStartDetails details) {
-    _gestureZoom = _zoom;
-    _gestureOffset = _offset;
-    _gestureFocalPoint = details.localFocalPoint;
-  }
-
-  void _onScaleUpdate(
-    ScaleUpdateDetails details,
-    Size frameSize,
-    double baseScale,
-  ) {
-    final nextZoom = (details.scale * _gestureZoom).clamp(1.0, 4.0).toDouble();
-    final zoomOffset = PromotionCropGeometry.zoomCompensation(
-      focalX: _gestureFocalPoint.dx,
-      focalY: _gestureFocalPoint.dy,
-      frameWidth: frameSize.width,
-      frameHeight: frameSize.height,
-      previousZoom: _gestureZoom,
-      nextZoom: nextZoom,
-    );
-    final panOffset = details.localFocalPoint - _gestureFocalPoint;
-    final nextOffset = _clampOffset(
-      offset: _gestureOffset +
-          Offset(zoomOffset.dx, zoomOffset.dy) +
-          panOffset,
-      frameSize: frameSize,
-      baseScale: baseScale,
-      zoom: nextZoom,
-    );
-    setState(() {
-      _zoom = nextZoom;
-      _offset = nextOffset;
-    });
-  }
-
-  Future<void> _confirmCrop(Size frameSize, double baseScale) async {
-    if (_decodedImage == null || _isSaving) return;
-    setState(() => _isSaving = true);
-
-    try {
-      final image = _decodedImage!;
-      final cropRect = PromotionCropGeometry.sourceRect(
-        imageWidth: image.width,
-        imageHeight: image.height,
-        frameWidth: frameSize.width,
-        frameHeight: frameSize.height,
-        baseScale: baseScale,
-        zoom: _zoom,
-        offsetX: _offset.dx,
-        offsetY: _offset.dy,
-        aspectWidth: _selectedRatio.width,
-        aspectHeight: _selectedRatio.height,
-      );
-      final cropped = img.copyCrop(
-        image,
-        x: cropRect.x,
-        y: cropRect.y,
-        width: cropRect.width,
-        height: cropRect.height,
-      );
-
-      // PNG keeps the crop lossless. The existing upload pipeline remains
-      // unchanged and no additional compression is introduced here.
-      final encodedCrop = img.encodePng(cropped);
-      final tempDirectory = await getTemporaryDirectory();
-      final outputFile = File(
-        '${tempDirectory.path}/promotion_crop_${DateTime.now().microsecondsSinceEpoch}.png',
-      );
-      await outputFile.writeAsBytes(encodedCrop, flush: true);
-
-      if (!mounted) return;
-      Navigator.of(context).pop(outputFile);
-    } catch (_) {
-      if (!mounted) return;
-      setState(() => _isSaving = false);
-      dangerNoti(
-        widget.isFrench ? "Attention !!!" : "Warning !!!",
-        widget.isFrench
-            ? "Impossible de recadrer cette image."
-            : "Unable to crop this image.",
-        context,
-      );
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Dialog(
-      insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-      backgroundColor: const Color(0xff101114),
-      child: ConstrainedBox(
-        constraints: BoxConstraints(
-          maxWidth: 620,
-          maxHeight: MediaQuery.sizeOf(context).height * 0.9,
-        ),
-        child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
-            child: _buildContent(context),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildContent(BuildContext context) {
-    if (_errorMessage != null) {
-      return Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            _errorMessage!,
-            style: const TextStyle(color: Colors.white),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 16),
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text(widget.isFrench ? "Fermer" : "Close"),
-          ),
-        ],
-      );
-    }
-
-    if (_decodedImage == null || _imageBytes == null) {
-      return const SizedBox(
-        height: 260,
-        child: Center(
-          child: CircularProgressIndicator(color: Colors.white),
-        ),
-      );
-    }
-
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final ratio = _selectedRatio.value;
-        final availableWidth = constraints.maxWidth;
-        final availableHeight = math.max(180.0, constraints.maxHeight - 190);
-        final frameWidth =
-            math.min(availableWidth, availableHeight * ratio).toDouble();
-        final frameSize = Size(frameWidth, frameWidth / ratio);
-        final baseScale = _baseScale(frameSize);
-        final image = _decodedImage!;
-        final renderedWidth = (image.width * baseScale).toDouble();
-        final renderedHeight = (image.height * baseScale).toDouble();
-
-        return Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    widget.isFrench ? "Recadrer l'image" : "Crop image",
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ),
-                IconButton(
-                  tooltip: widget.isFrench ? "Annuler" : "Cancel",
-                  onPressed:
-                      _isSaving ? null : () => Navigator.of(context).pop(),
-                  icon: const Icon(Icons.close, color: Colors.white),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            SizedBox(
-              width: frameSize.width,
-              height: frameSize.height,
-              child: ClipRect(
-                child: GestureDetector(
-                  behavior: HitTestBehavior.opaque,
-                  onScaleStart: _onScaleStart,
-                  onScaleUpdate: (details) =>
-                      _onScaleUpdate(details, frameSize, baseScale),
-                  child: Stack(
-                    fit: StackFit.expand,
-                    children: [
-                      Container(color: Colors.black),
-                      Center(
-                        child: Transform.translate(
-                          offset: _offset,
-                          child: Transform.scale(
-                            scale: _zoom,
-                            child: SizedBox(
-                              width: renderedWidth,
-                              height: renderedHeight,
-                              child: Image.memory(
-                                _imageBytes!,
-                                fit: BoxFit.cover,
-                                filterQuality: FilterQuality.high,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      IgnorePointer(
-                        child: CustomPaint(
-                          painter: _PromotionCropOverlayPainter(),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              widget.isFrench
-                  ? "Déplacez l'image et pincez pour zoomer"
-                  : "Move the image and pinch to zoom",
-              style: TextStyle(color: Colors.white.withOpacity(0.72)),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 10),
-            Wrap(
-              alignment: WrapAlignment.center,
-              spacing: 8,
-              children: _ratios.map((ratioOption) {
-                final selected = ratioOption == _selectedRatio;
-                return ChoiceChip(
-                  label: Text(ratioOption.label),
-                  selected: selected,
-                  onSelected: _isSaving
-                      ? null
-                      : (_) => setState(() {
-                            _selectedRatio = ratioOption;
-                            _zoom = 1;
-                            _offset = Offset.zero;
-                          }),
-                  selectedColor: Colors.white,
-                  backgroundColor: Colors.white.withOpacity(0.12),
-                  labelStyle: TextStyle(
-                    color: selected ? Colors.black : Colors.white,
-                    fontWeight: FontWeight.w700,
-                  ),
-                );
-              }).toList(),
-            ),
-            const SizedBox(height: 14),
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton(
-                    onPressed:
-                        _isSaving ? null : () => Navigator.of(context).pop(),
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: Colors.white,
-                      side: BorderSide(color: Colors.white.withOpacity(0.5)),
-                    ),
-                    child: Text(widget.isFrench ? "Annuler" : "Cancel"),
-                  ),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: _isSaving
-                        ? null
-                        : () => _confirmCrop(frameSize, baseScale),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.white,
-                      foregroundColor: Colors.black,
-                    ),
-                    child: _isSaving
-                        ? const SizedBox(
-                            height: 18,
-                            width: 18,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: Colors.black,
-                            ),
-                          )
-                        : Text(widget.isFrench ? "Utiliser l'image" : "Use image"),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        );
-      },
-    );
-  }
-}
-
-class _PromotionCropRatio {
-  const _PromotionCropRatio({
-    required this.label,
-    required this.width,
-    required this.height,
-  });
-
-  final String label;
-  final int width;
-  final int height;
-
-  double get value => width / height;
-}
-
-class _PromotionCropOverlayPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final borderPaint = Paint()
-      ..color = Colors.white
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 2;
-    final gridPaint = Paint()
-      ..color = Colors.white.withOpacity(0.5)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1;
-
-    canvas.drawRect(
-      Rect.fromLTWH(1, 1, size.width - 2, size.height - 2),
-      borderPaint,
-    );
-    final thirdWidth = size.width / 3;
-    final thirdHeight = size.height / 3;
-    for (var index = 1; index < 3; index++) {
-      canvas.drawLine(
-        Offset(thirdWidth * index, 0),
-        Offset(thirdWidth * index, size.height),
-        gridPaint,
-      );
-      canvas.drawLine(
-        Offset(0, thirdHeight * index),
-        Offset(size.width, thirdHeight * index),
-        gridPaint,
-      );
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
 class DemandesEmploi extends StatefulWidget {
@@ -1684,17 +1334,18 @@ class _DemandesEmploiState extends State<DemandesEmploi> {
   final coordonne_demandeur_controller = TextEditingController();
 
   void add_dmd_emploi(
-      String titre_demande_poste_rechercher,
-      String description_profil_demandeur,
-      String competence_qualification,
-      String niveau_experience,
-      String secteur_activite_rechercher,
-      String type_contrat_rechercher,
-      String localisation_souhaite,
-      String salaire_souhaite,
-      String langues_parle,
-      String lien_portfolio,
-      String coordonne_demandeur) async {
+    String titre_demande_poste_rechercher,
+    String description_profil_demandeur,
+    String competence_qualification,
+    String niveau_experience,
+    String secteur_activite_rechercher,
+    String type_contrat_rechercher,
+    String localisation_souhaite,
+    String salaire_souhaite,
+    String langues_parle,
+    String lien_portfolio,
+    String coordonne_demandeur,
+  ) async {
     bool isConnected = await isConnectedToInternet();
     if (isConnected) {
       setState(() {
@@ -1702,7 +1353,9 @@ class _DemandesEmploiState extends State<DemandesEmploi> {
       });
 
       var request = http.MultipartRequest(
-          'POST', Uri.parse('$generalRouteForApi/newDmdEmploi'));
+        'POST',
+        Uri.parse('$generalRouteForApi/newDmdEmploi'),
+      );
       request.fields.addAll({
         'uid': uidUser,
         'titre_demande_poste_rechercher': titre_demande_poste_rechercher,
@@ -1734,11 +1387,12 @@ class _DemandesEmploiState extends State<DemandesEmploi> {
           });
           cancelPromoReminderNotification();
           successNoti(
-              "Good",
-              (langUserPhone == "fr")
-                  ? "Votre demande d'emploi a été enregistrée et sera publiée après accord d'un des administrateurs de Dressur."
-                  : "Your job application has been registered and will be published after approval by one of Dressur's administrators.",
-              context);
+            "Good",
+            (langUserPhone == "fr")
+                ? "Votre demande d'emploi a été enregistrée et sera publiée après accord d'un des administrateurs de Dressur."
+                : "Your job application has been registered and will be published after approval by one of Dressur's administrators.",
+            context,
+          );
           titre_demande_poste_rechercher_controller.clear();
           description_profil_demandeur_controller.clear();
           competence_qualification_controller.clear();
@@ -1753,13 +1407,17 @@ class _DemandesEmploiState extends State<DemandesEmploi> {
         }
       } else {
         if (langUserPhone != "fr") {
-          dangerNoti("Mistake!",
-              "We encountered a problem, contact the administrators.", context);
+          dangerNoti(
+            "Mistake!",
+            "We encountered a problem, contact the administrators.",
+            context,
+          );
         } else {
           dangerNoti(
-              "Erreur!",
-              "Nous avons rencontré un problème, contacter les administrateurs.",
-              context);
+            "Erreur!",
+            "Nous avons rencontré un problème, contacter les administrateurs.",
+            context,
+          );
         }
         setState(() {
           _desactive = false;
@@ -1768,7 +1426,10 @@ class _DemandesEmploiState extends State<DemandesEmploi> {
     } else {
       if (langUserPhone != "fr") {
         dangerNoti(
-            "Mistake!", "You are not connected to the internet.", context);
+          "Mistake!",
+          "You are not connected to the internet.",
+          context,
+        );
       } else {
         dangerNoti("Erreur!", "Vous n'ètes pas connecté a internet.", context);
       }
@@ -1936,18 +1597,16 @@ class _DemandesEmploiState extends State<DemandesEmploi> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: primaryColor,
                 shape: const StadiumBorder(),
-                padding: const EdgeInsets.symmetric(
-                  vertical: 16,
-                ),
+                padding: const EdgeInsets.symmetric(vertical: 16),
               ),
               child: Text(
                 _desactive
                     ? (langUserPhone == "fr")
-                        ? "Patientez..."
-                        : "Wait..."
+                          ? "Patientez..."
+                          : "Wait..."
                     : (langUserPhone == "fr")
-                        ? "ENREGISTRER"
-                        : "SAVED",
+                    ? "ENREGISTRER"
+                    : "SAVED",
                 style: GoogleFonts.poppins(
                   fontWeight: FontWeight.w400,
                   color: Colors.white,
@@ -2001,19 +1660,20 @@ class _OffresEmploiState extends State<OffresEmploi> {
   final Lien_information_otionel_controller = TextEditingController();
 
   void add_offre_emploi(
-      String titre_poste,
-      String description_poste,
-      String competences_requises,
-      String type_contrat,
-      String lieu_travail,
-      String salaire,
-      String niveau_experience,
-      String horaire_travail,
-      String avantages,
-      String dure_contrat_not_cdi,
-      String contact_emploiyeur,
-      String date_limite_candidature,
-      String Lien_information_otionel) async {
+    String titre_poste,
+    String description_poste,
+    String competences_requises,
+    String type_contrat,
+    String lieu_travail,
+    String salaire,
+    String niveau_experience,
+    String horaire_travail,
+    String avantages,
+    String dure_contrat_not_cdi,
+    String contact_emploiyeur,
+    String date_limite_candidature,
+    String Lien_information_otionel,
+  ) async {
     bool isConnected = await isConnectedToInternet();
     if (isConnected) {
       setState(() {
@@ -2021,7 +1681,9 @@ class _OffresEmploiState extends State<OffresEmploi> {
       });
 
       var request = http.MultipartRequest(
-          'POST', Uri.parse('$generalRouteForApi/newOffreEmploi'));
+        'POST',
+        Uri.parse('$generalRouteForApi/newOffreEmploi'),
+      );
       request.fields.addAll({
         'uid': uidUser,
         'titre_poste': titre_poste,
@@ -2056,11 +1718,12 @@ class _OffresEmploiState extends State<OffresEmploi> {
           });
           cancelPromoReminderNotification();
           successNoti(
-              "Good",
-              (langUserPhone == "fr")
-                  ? "Votre offre d'emploi a été enregistrée et sera publiée après accord d'un des administrateurs de Dressur."
-                  : "Your job offer has been recorded and will be published after approval from one of the Dressur administrators.",
-              context);
+            "Good",
+            (langUserPhone == "fr")
+                ? "Votre offre d'emploi a été enregistrée et sera publiée après accord d'un des administrateurs de Dressur."
+                : "Your job offer has been recorded and will be published after approval from one of the Dressur administrators.",
+            context,
+          );
           titre_poste_controller.clear();
           description_poste_controller.clear();
           competences_requises_controller.clear();
@@ -2077,13 +1740,17 @@ class _OffresEmploiState extends State<OffresEmploi> {
         }
       } else {
         if (langUserPhone != "fr") {
-          dangerNoti("Mistake!",
-              "We encountered a problem, contact the administrators.", context);
+          dangerNoti(
+            "Mistake!",
+            "We encountered a problem, contact the administrators.",
+            context,
+          );
         } else {
           dangerNoti(
-              "Erreur!",
-              "Nous avons rencontré un problème, contacter les administrateurs.",
-              context);
+            "Erreur!",
+            "Nous avons rencontré un problème, contacter les administrateurs.",
+            context,
+          );
         }
         setState(() {
           _desactive = false;
@@ -2092,7 +1759,10 @@ class _OffresEmploiState extends State<OffresEmploi> {
     } else {
       if (langUserPhone != "fr") {
         dangerNoti(
-            "Mistake!", "You are not connected to the internet.", context);
+          "Mistake!",
+          "You are not connected to the internet.",
+          context,
+        );
       } else {
         dangerNoti("Erreur!", "Vous n'ètes pas connecté a internet.", context);
       }
@@ -2119,8 +1789,9 @@ class _OffresEmploiState extends State<OffresEmploi> {
             maxLines: 1,
             decoration: InputDecoration(
               labelStyle: GoogleFonts.poppins(color: Colors.grey[400]),
-              labelText:
-                  (langUserPhone == "fr") ? "Titre du poste" : 'Job title',
+              labelText: (langUserPhone == "fr")
+                  ? "Titre du poste"
+                  : 'Job title',
               border: const OutlineInputBorder(),
             ),
           ),
@@ -2170,8 +1841,9 @@ class _OffresEmploiState extends State<OffresEmploi> {
             maxLines: 2,
             decoration: InputDecoration(
               labelStyle: GoogleFonts.poppins(color: Colors.grey[400]),
-              labelText:
-                  (langUserPhone == "fr") ? "Lieu de travail" : 'Workplace',
+              labelText: (langUserPhone == "fr")
+                  ? "Lieu de travail"
+                  : 'Workplace',
               border: const OutlineInputBorder(),
             ),
           ),
@@ -2282,18 +1954,16 @@ class _OffresEmploiState extends State<OffresEmploi> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: primaryColor,
                 shape: const StadiumBorder(),
-                padding: const EdgeInsets.symmetric(
-                  vertical: 16,
-                ),
+                padding: const EdgeInsets.symmetric(vertical: 16),
               ),
               child: Text(
                 _desactive
                     ? (langUserPhone == "fr")
-                        ? "Patientez..."
-                        : "Wait..."
+                          ? "Patientez..."
+                          : "Wait..."
                     : (langUserPhone == "fr")
-                        ? "ENREGISTRER"
-                        : "SAVED",
+                    ? "ENREGISTRER"
+                    : "SAVED",
                 style: GoogleFonts.poppins(
                   fontWeight: FontWeight.w400,
                   color: Colors.white,
@@ -2367,7 +2037,7 @@ class _SitesApplicationsState extends State<SitesApplications> {
             setState(() => _imageFile = preparedImage);
           }
         }
-      }
+      },
     );
   }
 
@@ -2375,14 +2045,16 @@ class _SitesApplicationsState extends State<SitesApplications> {
     if (listeMethodePaiements.isNotEmpty) return;
     setState(() => _loadingPaiements = true);
     try {
-      final response = await http
-          .post(Uri.parse('$generalRouteForApi/listeFormulePromoAffaire'));
+      final response = await http.post(
+        Uri.parse('$generalRouteForApi/listeFormulePromoAffaire'),
+      );
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         if (data["error"] == false) {
           setState(() {
             listeMethodePaiements = List<Map<String, dynamic>>.from(
-                data["listeMethodePaiements"]);
+              data["listeMethodePaiements"],
+            );
             if (listeMethodePaiements.isNotEmpty) {
               _valueMethodePaiement = listeMethodePaiements[0]['value'];
             }
@@ -2429,20 +2101,22 @@ class _SitesApplicationsState extends State<SitesApplications> {
 
     if (nom.isEmpty || url.isEmpty || _imageFile == null) {
       dangerNoti(
-          "Attention !!!",
-          (langUserPhone == "fr")
-              ? "Veuillez remplir tous les champs obligatoires et sélectionner une image."
-              : "Please fill in all required fields and select an image.",
-          context);
+        "Attention !!!",
+        (langUserPhone == "fr")
+            ? "Veuillez remplir tous les champs obligatoires et sélectionner une image."
+            : "Please fill in all required fields and select an image.",
+        context,
+      );
       return;
     }
     if (!url.startsWith('http://') && !url.startsWith('https://')) {
       dangerNoti(
-          "Attention !!!",
-          (langUserPhone == "fr")
-              ? "L'URL doit commencer par http:// ou https://"
-              : "The URL must start with http:// or https://",
-          context);
+        "Attention !!!",
+        (langUserPhone == "fr")
+            ? "L'URL doit commencer par http:// ou https://"
+            : "The URL must start with http:// or https://",
+        context,
+      );
       return;
     }
 
@@ -2496,11 +2170,12 @@ class _SitesApplicationsState extends State<SitesApplications> {
       _descriptionController.clear();
       cancelPromoReminderNotification();
       successNoti(
-          (langUserPhone == "fr") ? "Succès" : "Success",
-          (langUserPhone == "fr")
-              ? "Votre promotion est en attente de validation par notre équipe."
-              : "Your promotion is pending validation by our team.",
-          context);
+        (langUserPhone == "fr") ? "Succès" : "Success",
+        (langUserPhone == "fr")
+            ? "Votre promotion est en attente de validation par notre équipe."
+            : "Your promotion is pending validation by our team.",
+        context,
+      );
     } catch (_) {
       if (!mounted) return;
       setState(() => _isSending = false);
@@ -2530,21 +2205,24 @@ class _SitesApplicationsState extends State<SitesApplications> {
           items: [
             DropdownMenuItem(
               value: 'site_web',
-              child: Text(isFr ? 'Site web' : 'Website',
-                  style: GoogleFonts.poppins(fontSize: 14)),
+              child: Text(
+                isFr ? 'Site web' : 'Website',
+                style: GoogleFonts.poppins(fontSize: 14),
+              ),
             ),
             DropdownMenuItem(
               value: 'app_mobile',
-              child: Text(isFr ? 'Application mobile' : 'Mobile app',
-                  style: GoogleFonts.poppins(fontSize: 14)),
+              child: Text(
+                isFr ? 'Application mobile' : 'Mobile app',
+                style: GoogleFonts.poppins(fontSize: 14),
+              ),
             ),
             DropdownMenuItem(
               value: 'logiciel_desktop',
               child: Text(
-                  isFr
-                      ? 'Logiciel / Application desktop'
-                      : 'Desktop software',
-                  style: GoogleFonts.poppins(fontSize: 14)),
+                isFr ? 'Logiciel / Application desktop' : 'Desktop software',
+                style: GoogleFonts.poppins(fontSize: 14),
+              ),
             ),
           ],
           onChanged: (val) {
@@ -2602,13 +2280,17 @@ class _SitesApplicationsState extends State<SitesApplications> {
         ElevatedButton(
           onPressed: _isSending ? null : _selectImage,
           style: ElevatedButton.styleFrom(
-              backgroundColor: primaryColor,
-              shape: const StadiumBorder(),
-              padding: const EdgeInsets.symmetric(vertical: 13)),
+            backgroundColor: primaryColor,
+            shape: const StadiumBorder(),
+            padding: const EdgeInsets.symmetric(vertical: 13),
+          ),
           child: Text(
-              isFr ? "Sélectionner l'image" : 'Select image',
-              style: GoogleFonts.poppins(
-                  color: Colors.white, fontWeight: FontWeight.w600)),
+            isFr ? "Sélectionner l'image" : 'Select image',
+            style: GoogleFonts.poppins(
+              color: Colors.white,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
         ),
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 4),
@@ -2616,15 +2298,15 @@ class _SitesApplicationsState extends State<SitesApplications> {
             isFr
                 ? "Formats acceptés : 1:1, 4:3 ou 3:4"
                 : "Accepted formats: 1:1, 4:3 or 3:4",
-            style:
-                GoogleFonts.poppins(fontSize: 12, color: Colors.grey[600]),
+            style: GoogleFonts.poppins(fontSize: 12, color: Colors.grey[600]),
             textAlign: TextAlign.center,
           ),
         ),
         if (_imageFile != null)
           Container(
-              margin: const EdgeInsets.only(top: 10),
-              child: Image.file(_imageFile!, fit: BoxFit.contain)),
+            margin: const EdgeInsets.only(top: 10),
+            child: Image.file(_imageFile!, fit: BoxFit.contain),
+          ),
         const SizedBox(height: 15),
 
         // Prix fixe
@@ -2639,9 +2321,10 @@ class _SitesApplicationsState extends State<SitesApplications> {
           child: Text(
             isFr ? "Prix : 7 750 FCFA / an" : "Price: 7,750 FCFA / year",
             style: GoogleFonts.poppins(
-                color: primaryColor,
-                fontWeight: FontWeight.bold,
-                fontSize: 15),
+              color: primaryColor,
+              fontWeight: FontWeight.bold,
+              fontSize: 15,
+            ),
             textAlign: TextAlign.center,
           ),
         ),
@@ -2650,45 +2333,50 @@ class _SitesApplicationsState extends State<SitesApplications> {
         // Méthode de paiement
         _loadingPaiements
             ? const Center(
-                child: CircularProgressIndicator(color: primaryColor))
+                child: CircularProgressIndicator(color: primaryColor),
+              )
             : listeMethodePaiements.isNotEmpty
-                ? SelectFormField(
-                    decoration: InputDecoration(
-                        labelText:
-                            isFr ? 'Moyen de paiement' : 'Payment method',
-                        border: const OutlineInputBorder()),
-                    type: SelectFormFieldType.dropdown,
-                    initialValue: _valueMethodePaiement,
-                    items: listeMethodePaiements,
-                    onChanged: (val) =>
-                        setState(() => _valueMethodePaiement = val),
-                  )
-                : const SizedBox.shrink(),
+            ? SelectFormField(
+                decoration: InputDecoration(
+                  labelText: isFr ? 'Moyen de paiement' : 'Payment method',
+                  border: const OutlineInputBorder(),
+                ),
+                type: SelectFormFieldType.dropdown,
+                initialValue: _valueMethodePaiement,
+                items: listeMethodePaiements,
+                onChanged: (val) => setState(() => _valueMethodePaiement = val),
+              )
+            : const SizedBox.shrink(),
         const SizedBox(height: 10),
 
         // Numéro de paiement
         TextField(
-            controller: _telController,
-            keyboardType: TextInputType.phone,
-            decoration: InputDecoration(
-                labelText:
-                    isFr ? 'Numéro du paiement' : 'Payment number',
-                border: const OutlineInputBorder())),
+          controller: _telController,
+          keyboardType: TextInputType.phone,
+          decoration: InputDecoration(
+            labelText: isFr ? 'Numéro du paiement' : 'Payment number',
+            border: const OutlineInputBorder(),
+          ),
+        ),
         const SizedBox(height: 15),
 
         // Bouton soumettre
         ElevatedButton(
           onPressed: _isSending ? null : _sendData,
           style: ElevatedButton.styleFrom(
-              backgroundColor: primaryColor,
-              shape: const StadiumBorder(),
-              padding: const EdgeInsets.symmetric(vertical: 15)),
+            backgroundColor: primaryColor,
+            shape: const StadiumBorder(),
+            padding: const EdgeInsets.symmetric(vertical: 15),
+          ),
           child: _isSending
               ? const CircularProgressIndicator(color: Colors.white)
               : Text(
                   isFr ? 'Publier et Payer' : 'Publish & Pay',
                   style: GoogleFonts.poppins(
-                      color: Colors.white, fontWeight: FontWeight.bold)),
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
         ),
         const SizedBox(height: 10),
       ],
