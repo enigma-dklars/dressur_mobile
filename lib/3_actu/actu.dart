@@ -164,6 +164,81 @@ class Advertisement {
   });
 }
 
+class SiteApplicationInfo {
+  static const unknownSubtype = "unknown";
+  static const _knownSubtypes = {
+    "site_web",
+    "app_mobile",
+    "logiciel_desktop",
+  };
+
+  final String nom;
+  final String url;
+  final String sousType;
+  final Map<String, dynamic> additionalInfo;
+
+  const SiteApplicationInfo({
+    required this.nom,
+    required this.url,
+    required this.sousType,
+    required this.additionalInfo,
+  });
+
+  factory SiteApplicationInfo.fromAdvertisement(
+    Advertisement advertisement,
+  ) {
+    final additionalInfo = _parseAdditionalInfo(advertisement.annotherInfo);
+
+    return SiteApplicationInfo(
+      nom: _firstNonEmpty(advertisement.nomSiteApp, additionalInfo["nom"]),
+      url: _firstNonEmpty(advertisement.urlSiteApp, additionalInfo["url"]),
+      sousType: _normalizeSubtype(
+        _firstNonEmpty(
+          advertisement.sousTypeSiteApp,
+          additionalInfo["sousType"],
+        ),
+      ),
+      additionalInfo: additionalInfo,
+    );
+  }
+
+  String iconUrl(String fallbackImage) {
+    const iconKeys = ["iconUrl", "urlIcon", "imageIcon", "icone", "icon"];
+    for (final key in iconKeys) {
+      final value = additionalInfo[key]?.toString().trim() ?? "";
+      if (value.isNotEmpty) return value;
+    }
+    return fallbackImage;
+  }
+
+  static Map<String, dynamic> _parseAdditionalInfo(String rawInfo) {
+    if (rawInfo.trim().isEmpty) return {};
+
+    try {
+      dynamic decoded = jsonDecode(rawInfo);
+      if (decoded is String) {
+        decoded = jsonDecode(decoded);
+      }
+      if (decoded is Map) {
+        return Map<String, dynamic>.from(decoded);
+      }
+    } catch (_) {}
+
+    return {};
+  }
+
+  static String _firstNonEmpty(String primary, dynamic fallback) {
+    final primaryValue = primary.trim();
+    if (primaryValue.isNotEmpty) return primaryValue;
+    return fallback?.toString().trim() ?? "";
+  }
+
+  static String _normalizeSubtype(String value) {
+    if (value.isEmpty) return "";
+    return _knownSubtypes.contains(value) ? value : unknownSubtype;
+  }
+}
+
 class StoryModel {
   final int id;
   final String user;
@@ -504,9 +579,11 @@ class _ActuPageState extends State<ActuPage>
           nomSiteApp: data['nomSiteApp'] ?? '',
           urlSiteApp: data['urlSiteApp'] ?? '',
           sousTypeSiteApp: data['sousTypeSiteApp'] ?? '',
-          annotherInfo: data['annotherInfo'] != null
-              ? jsonEncode(data['annotherInfo'])
-              : "",
+          annotherInfo: data['annotherInfo'] is String
+              ? data['annotherInfo']
+              : data['annotherInfo'] != null
+                  ? jsonEncode(data['annotherInfo'])
+                  : "",
           inProgrammeRecompense: data['inProgrammeRecompense'] == 1,
         );
       }).toList();
@@ -1493,37 +1570,7 @@ class _ActuPageState extends State<ActuPage>
     );
   }
 
-  Map<String, dynamic> _parseSiteApplicationInfo(String rawInfo) {
-    if (rawInfo.trim().isEmpty) return {};
-
-    try {
-      final decoded = jsonDecode(rawInfo);
-      if (decoded is Map) {
-        return Map<String, dynamic>.from(decoded);
-      }
-    } catch (_) {}
-
-    return {};
-  }
-
-  String _siteApplicationValue(
-      Map<String, dynamic> info, String primaryKey, String fallbackKey) {
-    final primaryValue = info[primaryKey]?.toString().trim() ?? "";
-    if (primaryValue.isNotEmpty) return primaryValue;
-    return info[fallbackKey]?.toString().trim() ?? "";
-  }
-
-  String _siteApplicationIconUrl(
-        Map<String, dynamic> info, String fallbackImage) {
-      const iconKeys = ["iconUrl", "urlIcon", "imageIcon", "icone", "icon"];
-      for (final key in iconKeys) {
-        final value = info[key]?.toString().trim() ?? "";
-        if (value.isNotEmpty) return value;
-      }
-      return fallbackImage;
-    }
-
-    String _siteApplicationTypeLabel(String subtype) {
+  String _siteApplicationTypeLabel(String subtype) {
       switch (subtype) {
         case "app_mobile":
           return langUserPhone == "fr" ? "Application mobile" : "Mobile application";
@@ -1532,8 +1579,9 @@ class _ActuPageState extends State<ActuPage>
               ? "Logiciel / application desktop"
               : "Desktop software/application";
         case "site_web":
-        default:
           return langUserPhone == "fr" ? "Site web" : "Website";
+        default:
+          return langUserPhone == "fr" ? "Type inconnu" : "Unknown type";
       }
     }
 
@@ -1600,17 +1648,13 @@ class _ActuPageState extends State<ActuPage>
   }
 
   Widget _buildSiteApplicationCard(Advertisement advertisement) {
-      final info = _parseSiteApplicationInfo(advertisement.annotherInfo);
-      final nom = _siteApplicationValue(info, "nom", "nomSiteApp");
-      final sousType =
-          _siteApplicationValue(info, "sousType", "sousTypeSiteApp");
-      final url = _siteApplicationValue(info, "url", "urlSiteApp");
-      final iconUrl = _siteApplicationIconUrl(info, advertisement.image);
-      final normalizedSubtype =
-          const {"site_web", "app_mobile", "logiciel_desktop"}.contains(sousType)
-              ? sousType
-              : "site_web";
-      final displayName = nom.isNotEmpty ? nom : advertisement.pseudoAnnonceur;
+    final siteApplicationInfo =
+        SiteApplicationInfo.fromAdvertisement(advertisement);
+    final nom = siteApplicationInfo.nom;
+    final sousType = siteApplicationInfo.sousType;
+    final url = siteApplicationInfo.url;
+    final iconUrl = siteApplicationInfo.iconUrl(advertisement.image);
+    final displayName = nom;
 
       return Container(
         margin: const EdgeInsets.only(left: 7, top: 0, right: 7, bottom: 0),
@@ -1699,8 +1743,7 @@ class _ActuPageState extends State<ActuPage>
                                         ),
                                         const SizedBox(height: 8),
                                         Text(
-                                          _siteApplicationTypeLabel(
-                                              normalizedSubtype),
+                                          _siteApplicationTypeLabel(sousType),
                                           maxLines: 1,
                                           overflow: TextOverflow.ellipsis,
                                           style: GoogleFonts.poppins(
@@ -1790,7 +1833,7 @@ class _ActuPageState extends State<ActuPage>
                             child: FittedBox(
                               fit: BoxFit.scaleDown,
                               child: Text(
-                                _siteApplicationActionLabel(normalizedSubtype),
+                                _siteApplicationActionLabel(sousType),
                                 maxLines: 1,
                                 style: GoogleFonts.poppins(
                                   fontWeight: FontWeight.w600,
@@ -2245,26 +2288,6 @@ class AdvertisementDetailPage extends StatelessWidget {
 
   AdvertisementDetailPage({required this.advertisement});
 
-  Map<String, dynamic> _parseSiteApplicationInfo(String rawInfo) {
-    if (rawInfo.trim().isEmpty) return {};
-
-    try {
-      final decoded = jsonDecode(rawInfo);
-      if (decoded is Map) {
-        return Map<String, dynamic>.from(decoded);
-      }
-    } catch (_) {}
-
-    return {};
-  }
-
-  String _siteApplicationValue(
-      Map<String, dynamic> info, String primaryKey, String fallbackKey) {
-    final primaryValue = info[primaryKey]?.toString().trim() ?? "";
-    if (primaryValue.isNotEmpty) return primaryValue;
-    return info[fallbackKey]?.toString().trim() ?? "";
-  }
-
   String _siteApplicationTypeLabel(String subtype) {
     switch (subtype) {
       case "app_mobile":
@@ -2272,8 +2295,9 @@ class AdvertisementDetailPage extends StatelessWidget {
       case "logiciel_desktop":
         return langUserPhone == "fr" ? "Logiciel desktop" : "Desktop software";
       case "site_web":
-      default:
         return langUserPhone == "fr" ? "Site web" : "Website";
+      default:
+        return langUserPhone == "fr" ? "Type inconnu" : "Unknown type";
     }
   }
 
@@ -2377,22 +2401,14 @@ class AdvertisementDetailPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final infoMap = _parseSiteApplicationInfo(advertisement.annotherInfo);
+    final siteApplicationInfo =
+        SiteApplicationInfo.fromAdvertisement(advertisement);
+    final infoMap = siteApplicationInfo.additionalInfo;
     final isSiteApplication =
         advertisement.typePromotionAffaire == "sites_applications";
-    final siteApplicationName =
-        _siteApplicationValue(infoMap, "nom", "nomSiteApp");
-    final siteApplicationSubtype =
-        _siteApplicationValue(infoMap, "sousType", "sousTypeSiteApp");
-    final siteApplicationUrl =
-        _siteApplicationValue(infoMap, "url", "urlSiteApp");
-    final normalizedSiteApplicationSubtype = const {
-      "site_web",
-      "app_mobile",
-      "logiciel_desktop",
-    }.contains(siteApplicationSubtype)
-        ? siteApplicationSubtype
-        : "site_web";
+    final siteApplicationName = siteApplicationInfo.nom;
+    final siteApplicationSubtype = siteApplicationInfo.sousType;
+    final siteApplicationUrl = siteApplicationInfo.url;
 
     return Scaffold(
       appBar: AppBar(
@@ -2459,12 +2475,12 @@ class AdvertisementDetailPage extends StatelessWidget {
                   if (isSiteApplication) ...[
                     _buildSiteApplicationIdentity(
                       name: siteApplicationName,
-                      subtype: normalizedSiteApplicationSubtype,
+                      subtype: siteApplicationSubtype,
                     ),
                     const SizedBox(height: 18),
                     _buildSiteApplicationActions(
                       context,
-                      subtype: normalizedSiteApplicationSubtype,
+                      subtype: siteApplicationSubtype,
                       url: siteApplicationUrl,
                     ),
                   ] else
