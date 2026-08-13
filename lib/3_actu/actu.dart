@@ -1602,11 +1602,13 @@ class _ActuPageState extends State<ActuPage>
 
       Future<void> _openSiteApplicationUrl(
       BuildContext context, String rawUrl) async {
-    final url = rawUrl.trim();
-    final uri = Uri.tryParse(url);
+    final normalizedUrl = rawUrl.trim();
+    final uri = Uri.tryParse(normalizedUrl);
     final isValidUrl = uri != null &&
+        uri.hasAuthority &&
         uri.hasScheme &&
         uri.host.isNotEmpty &&
+        !normalizedUrl.contains(RegExp(r'\s')) &&
         (uri.scheme == "http" || uri.scheme == "https");
 
     if (!isValidUrl) {
