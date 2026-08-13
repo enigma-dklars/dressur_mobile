@@ -151,50 +151,73 @@ class _DeletecompteFormState extends State<DeletecompteForm> {
         'motifDeleted': motifDeleted,
       });
       http.StreamedResponse httpResponse = await request.send();
-      if (httpResponse.statusCode == 200) {
-        var data =
-            convert.jsonDecode(await httpResponse.stream.bytesToString());
-        if (data["error"] == true) {
-          dangerNoti(data["titre"], data["message"], context);
-        } else {
-          // Logique de nettoyage local
-          if (contactsToDelete.isNotEmpty) {
-            List<Contact> contacts =
-                await FlutterContacts.getContacts(withProperties: true, withAccounts: true);
-            for (var contact in contacts) {
-              bool shouldDelete = false;
-              for (var phone in contact.phones) {
-                if (contactsToDelete.contains(
-                    (phone.number).replaceAll(" ", "").replaceAll("-", ""))) {
-                  shouldDelete = true;
-                  break;
-                }
-              }
-              if (shouldDelete) {
-                await contact.delete();
-              }
-            }
-          }
-          SQLHelper.viderLaBaseDeDonneeLocal();
-          Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(builder: (context) => LoginPage()),
-            (route) => false,
-          );
+      final responseBody = await httpResponse.stream.bytesToString();
+
+      dynamic data;
+      try {
+        data = convert.jsonDecode(responseBody);
+      } on FormatException {
+        data = null;
+      }
+
+      final responseMessage = data is Map &&
+              data["message"] is String &&
+              (data["message"] as String).trim().isNotEmpty
+          ? data["message"] as String
+          : (langUserPhone == "fr"
+              ? "La suppression du compte a échoué. Veuillez réessayer."
+              : "Account deletion failed. Please try again.");
+      final responseTitle = data is Map &&
+              data["titre"] is String &&
+              (data["titre"] as String).trim().isNotEmpty
+          ? data["titre"] as String
+          : (langUserPhone == "fr" ? "Erreur" : "Error");
+      final deletionSucceeded = httpResponse.statusCode >= 200 &&
+          httpResponse.statusCode < 300 &&
+          data is Map &&
+          data["error"] == false;
+
+      if (!deletionSucceeded) {
+        if (mounted) {
+          dangerNoti(responseTitle, responseMessage, context);
         }
       } else {
-        dangerNoti(
-          (langUserPhone == "fr") ? "Erreur" : "Error",
-          (langUserPhone == "fr") ? "Un problème est survenu." : "A problem occurred.",
+        // Logique de nettoyage local, uniquement après error:false.
+        if (contactsToDelete.isNotEmpty) {
+          List<Contact> contacts = await FlutterContacts.getContacts(
+              withProperties: true, withAccounts: true);
+          for (var contact in contacts) {
+            bool shouldDelete = false;
+            for (var phone in contact.phones) {
+              if (contactsToDelete.contains(
+                  (phone.number).replaceAll(" ", "").replaceAll("-", ""))) {
+                shouldDelete = true;
+                break;
+              }
+            }
+            if (shouldDelete) {
+              await contact.delete();
+            }
+          }
+        }
+        await SQLHelper.viderLaBaseDeDonneeLocal();
+        if (!mounted) return;
+        Navigator.pushAndRemoveUntil(
           context,
+          MaterialPageRoute(builder: (context) => LoginPage()),
+          (route) => false,
         );
       }
     } catch (e) {
-      dangerNoti(
-        (langUserPhone == "fr") ? "Erreur" : "Error",
-        (langUserPhone == "fr") ? "Impossible de se connecter au serveur." : "Unable to connect to the server.",
-        context,
-      );
+      if (mounted) {
+        dangerNoti(
+          (langUserPhone == "fr") ? "Erreur" : "Error",
+          (langUserPhone == "fr")
+              ? "Impossible de se connecter au serveur."
+              : "Unable to connect to the server.",
+          context,
+        );
+      }
     }
 
     if (mounted) {
