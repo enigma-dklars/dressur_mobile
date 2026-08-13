@@ -139,6 +139,9 @@ class Advertisement {
   final String nombreDeVues;
   final String nombreImpression;
   final String typePromotionAffaire;
+  final String nomSiteApp;
+  final String urlSiteApp;
+  final String sousTypeSiteApp;
   final String annotherInfo;
   final bool inProgrammeRecompense;
 
@@ -153,6 +156,9 @@ class Advertisement {
     required this.nombreDeVues,
     required this.nombreImpression,
     required this.typePromotionAffaire,
+    required this.nomSiteApp,
+    required this.urlSiteApp,
+    required this.sousTypeSiteApp,
     required this.annotherInfo,
     required this.inProgrammeRecompense,
   });
@@ -495,6 +501,9 @@ class _ActuPageState extends State<ActuPage>
           nombreDeVues: data['nombreDeVues'],
           nombreImpression: data['nombreImpression'],
           typePromotionAffaire: data['typePromotionAffaire'],
+          nomSiteApp: data['nomSiteApp'] ?? '',
+          urlSiteApp: data['urlSiteApp'] ?? '',
+          sousTypeSiteApp: data['sousTypeSiteApp'] ?? '',
           annotherInfo: data['annotherInfo'] != null
               ? jsonEncode(data['annotherInfo'])
               : "",
