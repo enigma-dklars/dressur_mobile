@@ -112,6 +112,64 @@ void main() {
   });
 
   testWidgets(
+    'storage permission already granted allows gallery access without requesting photos',
+    (tester) async {
+      final requestedPermissions = <Permission>[];
+      final manager = PermissionManager.forTesting(
+        checkPermission: (permission) async => AppPermissionResult(
+          permission: permission,
+          status: permission == Permission.storage
+              ? AppPermissionStatus.granted
+              : AppPermissionStatus.denied,
+        ),
+        requestPermission: (permission) async {
+          requestedPermissions.add(permission);
+          return AppPermissionResult(
+            permission: permission,
+            status: AppPermissionStatus.denied,
+          );
+        },
+        recoveryAction: () async => PermissionRecoveryAction.cancel,
+      );
+
+      final result = await manager.ensureGalleryAccess();
+
+      expect(result.permission, Permission.storage);
+      expect(result.canProceed, isTrue);
+      expect(requestedPermissions, isEmpty);
+    },
+  );
+
+  testWidgets(
+    'gallery access falls back to storage when photo permission is unavailable',
+    (tester) async {
+      final requestedPermissions = <Permission>[];
+      final manager = PermissionManager.forTesting(
+        checkPermission: (permission) async => AppPermissionResult(
+          permission: permission,
+          status: AppPermissionStatus.denied,
+        ),
+        requestPermission: (permission) async {
+          requestedPermissions.add(permission);
+          return AppPermissionResult(
+            permission: permission,
+            status: permission == Permission.storage
+                ? AppPermissionStatus.granted
+                : AppPermissionStatus.denied,
+          );
+        },
+        recoveryAction: () async => PermissionRecoveryAction.cancel,
+      );
+
+      final result = await manager.ensureGalleryAccess();
+
+      expect(result.permission, Permission.storage);
+      expect(result.canProceed, isTrue);
+      expect(requestedPermissions, [Permission.photos, Permission.storage]);
+    },
+  );
+
+  testWidgets(
     'permanently denied permission can resume after accepting in settings',
     (tester) async {
       late BuildContext context;

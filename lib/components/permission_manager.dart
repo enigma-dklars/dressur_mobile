@@ -149,6 +149,16 @@ class PermissionManager {
     final override = _ensureOverride;
     if (override != null) return override(permission);
 
+    if (permission == Permission.photos) {
+      return ensureGalleryAccess();
+    }
+
+    return _ensureSinglePermission(permission);
+  }
+
+  Future<AppPermissionResult> _ensureSinglePermission(
+    Permission permission,
+  ) async {
     final current = await check(permission);
     if (current.canProceed || current.needsSettings) {
       return current;
@@ -243,7 +253,7 @@ class PermissionManager {
 
         if (recoveryAction == PermissionRecoveryAction.openSettings) {
           await openSettings();
-          final afterSettings = await check(permission);
+          final afterSettings = await _checkPermissionForAction(permission);
           if (afterSettings.canProceed) {
             await action();
             pending.complete();
@@ -255,7 +265,7 @@ class PermissionManager {
       if (_isPermissionException(error)) {
         await _recoverAfterPermissionException(
           context,
-          result: await check(permission),
+          result: await _checkPermissionForAction(permission),
           permission: permission,
           isFrench: isFrench,
           titleFr: titleFr,
@@ -276,7 +286,23 @@ class PermissionManager {
   }
 
   Future<AppPermissionResult> ensureGalleryAccess() {
-    return ensure(Permission.photos);
+    return _ensureGalleryAccessCompat();
+  }
+
+  /// Retourne l'autorisation actuellement suffisante pour ouvrir la galerie.
+  ///
+  /// Contrairement à [ensureGalleryAccess], cette méthode ne déclenche aucune
+  /// demande système. Elle permet notamment aux écrans de démarrage de ne pas
+  /// considérer [Permission.photos] comme obligatoire sur un ancien Android
+  /// lorsque [Permission.storage] est déjà accordée.
+  Future<AppPermissionResult> checkGalleryAccess() async {
+    final photosResult = await check(Permission.photos);
+    if (photosResult.canProceed) return photosResult;
+
+    final storageResult = await check(Permission.storage);
+    if (storageResult.canProceed) return storageResult;
+
+    return _selectGalleryFailure(photosResult, storageResult);
   }
 
   /// Protège une action qui ouvre la galerie sans interrompre la session.
@@ -380,7 +406,7 @@ class PermissionManager {
       );
       if (action == PermissionRecoveryAction.openSettings) {
         await openSettings();
-        return (await check(permission)).canProceed;
+        return (await _checkPermissionForAction(permission)).canProceed;
       }
       if (action != PermissionRecoveryAction.retry) return false;
     }
@@ -512,6 +538,48 @@ class PermissionManager {
       return isFrench ? 'votre position' : 'your location';
     }
     return isFrench ? 'cette autorisation' : 'this permission';
+  }
+
+  /// Vérifie les deux modèles de permission utilisés par Android :
+  ///
+  /// - Android 13+ expose les images via [Permission.photos].
+  /// - Les versions plus anciennes exposent la galerie via
+  ///   [Permission.storage].
+  ///
+  /// On ne dépend pas d'un numéro de version Android : si l'une des deux
+  /// permissions est déjà accordée, l'action peut continuer. Si aucune ne
+  /// l'est, on tente d'abord l'autorisation moderne puis l'autorisation de
+  /// stockage comme solution de repli pour les anciens appareils.
+  Future<AppPermissionResult> _ensureGalleryAccessCompat() async {
+    final current = await checkGalleryAccess();
+    if (current.canProceed) return current;
+
+    final photosResult = await _ensureSinglePermission(Permission.photos);
+    if (photosResult.canProceed) return photosResult;
+
+    final storageResult = await _ensureSinglePermission(Permission.storage);
+    if (storageResult.canProceed) return storageResult;
+
+    return _selectGalleryFailure(photosResult, storageResult);
+  }
+
+  Future<AppPermissionResult> _checkPermissionForAction(
+    Permission permission,
+  ) async {
+    if (permission == Permission.photos) {
+      return checkGalleryAccess();
+    }
+    return check(permission);
+  }
+
+  AppPermissionResult _selectGalleryFailure(
+    AppPermissionResult photosResult,
+    AppPermissionResult storageResult,
+  ) {
+    if (storageResult.needsSettings && !photosResult.needsSettings) {
+      return storageResult;
+    }
+    return photosResult;
   }
 
   Future<AppPermissionResult> _requestPermission(Permission permission) async {

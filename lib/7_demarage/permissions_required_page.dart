@@ -58,8 +58,7 @@ class _PermissionsRequiredPageState extends State<PermissionsRequiredPage>
     try {
       final statuses = await Future.wait<AppPermissionResult>([
         PermissionManager.instance.check(Permission.contacts),
-        PermissionManager.instance.check(Permission.storage),
-        PermissionManager.instance.check(Permission.photos),
+        PermissionManager.instance.checkGalleryAccess(),
         PermissionManager.instance.check(Permission.notification),
         PermissionManager.instance.check(Permission.scheduleExactAlarm),
       ]).timeout(_permissionCheckTimeout);
