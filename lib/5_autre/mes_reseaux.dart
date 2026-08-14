@@ -504,14 +504,20 @@ class _MesReseauxPageState extends State<MesReseauxPage> {
       );
     }
 
-    if (_errorMessage != null) {
+    if (_errorMessage != null || _catalogError != null) {
+      final loadError = _errorMessage ?? _catalogError!;
+      final hasNetworksError = _errorMessage != null;
       return _buildScrollableState(
         _StateMessage(
           icon: FontAwesomeIcons.triangleExclamation,
-          title: _isFrench
-              ? 'Impossible de charger vos réseaux'
-              : 'Unable to load your networks',
-          message: _errorMessage!,
+          title: hasNetworksError
+              ? (_isFrench
+                  ? 'Impossible de charger vos réseaux'
+                  : 'Unable to load your networks')
+              : (_isFrench
+                  ? 'Impossible de charger le catalogue'
+                  : 'Unable to load the catalog'),
+          message: loadError,
           actionLabel: _isFrench ? 'Réessayer' : 'Retry',
           onAction: _loadNetworks,
           isError: true,
