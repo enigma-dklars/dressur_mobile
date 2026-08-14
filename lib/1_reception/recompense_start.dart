@@ -1,10 +1,12 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
 
 import 'package:dressur/1_reception/recompense_dashboard.dart';
+import 'package:dressur/components/app_theme.dart';
+import 'package:dressur/components/feature_hero.dart';
+import 'package:dressur/components/feature_sections.dart';
 import 'package:dressur/components/noti.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:dressur/components/constant.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
@@ -43,8 +45,7 @@ class _ProgrammeRecompensePageState extends State<ProgrammeRecompensePage> {
 
   Future<void> _fetchConditions() async {
     try {
-      var request = http.MultipartRequest(
-          'POST',
+      var request = http.MultipartRequest('POST',
           Uri.parse('$generalRouteForApi/getConditionsProgrammeRecompense'));
       request.fields.addAll({'uid': uidUser});
 
@@ -56,11 +57,11 @@ class _ProgrammeRecompensePageState extends State<ProgrammeRecompensePage> {
           final c = decoded['conditions'];
           if (mounted) {
             setState(() {
-              _condInscrit7j  = c['inscritDepuis7Jours'] == true;
-              _condMail       = c['mailConfirme'] == true;
-              _condWhatsapp   = c['whatsappConfirme'] == true;
-              _condCommandes  = c['cinqCommandes'] == true;
-              _nbrCommandes   = c['nbrCommandes'] ?? 0;
+              _condInscrit7j = c['inscritDepuis7Jours'] == true;
+              _condMail = c['mailConfirme'] == true;
+              _condWhatsapp = c['whatsappConfirme'] == true;
+              _condCommandes = c['cinqCommandes'] == true;
+              _nbrCommandes = c['nbrCommandes'] ?? 0;
               _conditionsLoaded = true;
             });
           }
@@ -139,10 +140,9 @@ class _ProgrammeRecompensePageState extends State<ProgrammeRecompensePage> {
         elevation: 0,
         title: Text(
           isFr ? "Programme des récompenses" : "Rewards Program",
-          style: GoogleFonts.poppins(
+          style: theme.textTheme.titleMedium?.copyWith(
             color: Colors.white,
             fontWeight: FontWeight.w400,
-            fontSize: 18,
           ),
         ),
         leading: IconButton(
@@ -164,7 +164,6 @@ class _ProgrammeRecompensePageState extends State<ProgrammeRecompensePage> {
   // ---------------------------------------------------------------------------
   Widget _pagePresentationProgramme(BuildContext context) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
     final bool isFr = langUserPhone == "fr";
 
     return SingleChildScrollView(
@@ -172,54 +171,22 @@ class _ProgrammeRecompensePageState extends State<ProgrammeRecompensePage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header
-          Container(
-            width: double.infinity,
-            padding: EdgeInsets.all(24),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [primaryColor, primaryColor.withOpacity(0.8)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                FaIcon(FontAwesomeIcons.star, size: 48, color: Colors.white),
-                SizedBox(height: 16),
-                Text(
-                  isFr
-                      ? "Gagnez des récompenses avec Dressur"
-                      : "Earn rewards with Dressur",
-                  style: GoogleFonts.poppins(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-                SizedBox(height: 8),
-                Text(
-                  isFr
-                      ? "Partagez des promotions sur votre statut WhatsApp et soyez récompensé."
-                      : "Share promotions on your WhatsApp status and get rewarded.",
-                  style: GoogleFonts.poppins(
-                    fontSize: 14,
-                    color: Colors.white.withOpacity(0.9),
-                  ),
-                ),
-              ],
-            ),
+          FeatureHero(
+            icon: FontAwesomeIcons.star,
+            title: isFr
+                ? "Gagnez des récompenses avec Dressur"
+                : "Earn rewards with Dressur",
+            subtitle: isFr
+                ? "Partagez des promotions sur votre statut WhatsApp et soyez récompensé."
+                : "Share promotions on your WhatsApp status and get rewarded.",
           ),
-
           Padding(
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.all(AppSpacing.xLarge),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // 1. Présentation
-                _sectionTitle(
-                    context, isFr ? "Présentation" : "Presentation"),
+                _sectionTitle(context, isFr ? "Présentation" : "Presentation"),
                 _paragraph(
                   context,
                   isFr
@@ -236,8 +203,8 @@ class _ProgrammeRecompensePageState extends State<ProgrammeRecompensePage> {
                 _divider(context),
 
                 // 2. Réseau concerné
-                _sectionTitle(context,
-                    isFr ? "Réseau concerné" : "Supported network"),
+                _sectionTitle(
+                    context, isFr ? "Réseau concerné" : "Supported network"),
                 _bulletItem(
                   context,
                   FontAwesomeIcons.solidCircleCheck,
@@ -260,31 +227,45 @@ class _ProgrammeRecompensePageState extends State<ProgrammeRecompensePage> {
                 // 3. Principe de fonctionnement
                 _sectionTitle(context,
                     isFr ? "Principe de fonctionnement" : "How it works"),
-                _stepItem(context, "1",
+                _stepItem(
+                    context,
+                    "1",
                     isFr
                         ? "Identifiez une promotion éligible au programme."
                         : "Identify a promotion eligible for the program."),
-                _stepItem(context, "2",
+                _stepItem(
+                    context,
+                    "2",
                     isFr
                         ? "Partagez la promotion directement depuis l'application Dressur vers votre statut WhatsApp."
                         : "Share the promotion directly from the Dressur app to your WhatsApp status."),
-                _stepItem(context, "3",
+                _stepItem(
+                    context,
+                    "3",
                     isFr
                         ? "Le contenu partagé (image + texte) est officiel et validé par Dressur."
                         : "The shared content (image + text) is official and validated by Dressur."),
-                _stepItem(context, "4",
+                _stepItem(
+                    context,
+                    "4",
                     isFr
                         ? "Aucune modification n'est autorisée (image, texte, description)."
                         : "No modifications are allowed (image, text, description)."),
-                _stepItem(context, "5",
+                _stepItem(
+                    context,
+                    "5",
                     isFr
                         ? "Après 20 heures, vous pouvez soumettre vos preuves."
                         : "After 20 hours, you can submit your proofs."),
-                _stepItem(context, "6",
+                _stepItem(
+                    context,
+                    "6",
                     isFr
                         ? "Les preuves sont analysées."
                         : "The proofs are reviewed."),
-                _stepItem(context, "7",
+                _stepItem(
+                    context,
+                    "7",
                     isFr
                         ? "Si elles sont validées et que le quota n'est pas atteint, votre solde est crédité."
                         : "If validated and the quota is not reached, your balance is credited."),
@@ -319,8 +300,8 @@ class _ProgrammeRecompensePageState extends State<ProgrammeRecompensePage> {
                 _divider(context),
 
                 // 5. Règles essentielles
-                _sectionTitle(context,
-                    isFr ? "Règles essentielles" : "Essential rules"),
+                _sectionTitle(
+                    context, isFr ? "Règles essentielles" : "Essential rules"),
                 _bulletItem(
                   context,
                   FontAwesomeIcons.circleInfo,
@@ -616,36 +597,14 @@ class _ProgrammeRecompensePageState extends State<ProgrammeRecompensePage> {
                 SizedBox(height: 20),
                 if (isInscritProgrammeRecompense == false) ...[
                   // --- Checklist des conditions d'accès ---
-                  Container(
-                    width: double.infinity,
-                    padding: EdgeInsets.all(18),
-                    decoration: BoxDecoration(
-                      color: isDark
-                          ? Colors.white.withOpacity(0.05)
-                          : Colors.grey[50],
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(
-                        color: _conditionsLoaded
-                            ? (_toutesConditions
-                                ? Colors.green.withOpacity(0.4)
-                                : Colors.orange.withOpacity(0.4))
-                            : theme.dividerColor.withOpacity(0.15),
-                      ),
-                    ),
+                  FeatureInfoCard(
+                    title: isFr
+                        ? "Conditions d'accès au programme"
+                        : "Program access conditions",
+                    padding: const EdgeInsets.all(AppSpacing.large),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          isFr
-                              ? "Conditions d'accès au programme"
-                              : "Program access conditions",
-                          style: GoogleFonts.poppins(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            color: theme.textTheme.bodyLarge?.color,
-                          ),
-                        ),
-                        SizedBox(height: 12),
                         _conditionRow(
                           context,
                           isFr
@@ -679,45 +638,13 @@ class _ProgrammeRecompensePageState extends State<ProgrammeRecompensePage> {
                   ),
                   SizedBox(height: 16),
                   // --- Bouton Participer ---
-                  SizedBox(
-                    width: double.infinity,
-                    height: 55,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: (_conditionsLoaded && _toutesConditions)
-                            ? primaryColor
-                            : Colors.grey[400],
-                        elevation: 0,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                      ),
-                      onPressed: () {
-                        if (_desactive) return;
-                        if (!_conditionsLoaded || !_toutesConditions) return;
-                        addToRecompenseProgramme();
-                      },
-                      child: _desactive
-                          ? SizedBox(
-                              width: 30,
-                              height: 30,
-                              child: CircularProgressIndicator.adaptive(
-                                strokeWidth: 2.5,
-                                valueColor:
-                                    AlwaysStoppedAnimation(Colors.white),
-                              ),
-                            )
-                          : Text(
-                              isFr
-                                  ? "Participer au programme"
-                                  : "Join the program",
-                              style: GoogleFonts.poppins(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.white,
-                              ),
-                            ),
-                    ),
+                  FeaturePrimaryButton(
+                    label:
+                        isFr ? "Participer au programme" : "Join the program",
+                    isLoading: _desactive,
+                    onPressed: !_conditionsLoaded || !_toutesConditions
+                        ? null
+                        : addToRecompenseProgramme,
                   ),
                   if (_conditionsLoaded && !_toutesConditions) ...[
                     SizedBox(height: 10),
@@ -726,8 +653,7 @@ class _ProgrammeRecompensePageState extends State<ProgrammeRecompensePage> {
                           ? "Complétez toutes les conditions pour débloquer le programme."
                           : "Complete all conditions to unlock the program.",
                       textAlign: TextAlign.center,
-                      style: GoogleFonts.poppins(
-                        fontSize: 12,
+                      style: theme.textTheme.bodySmall?.copyWith(
                         color: Colors.orange[700],
                       ),
                     ),
@@ -737,7 +663,6 @@ class _ProgrammeRecompensePageState extends State<ProgrammeRecompensePage> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       SizedBox(height: 10),
-
                       Container(
                         padding: EdgeInsets.all(20),
                         decoration: BoxDecoration(
@@ -750,48 +675,29 @@ class _ProgrammeRecompensePageState extends State<ProgrammeRecompensePage> {
                           color: Colors.green,
                         ),
                       ),
-
                       SizedBox(height: 24),
-
                       Text(
                         isFr
                             ? "Vous participez déjà au programme"
                             : "You are already in the program",
                         textAlign: TextAlign.center,
-                        style: GoogleFonts.poppins(
-                          fontSize: 22,
+                        style: theme.textTheme.headlineSmall?.copyWith(
                           fontWeight: FontWeight.bold,
-                          color: theme.textTheme.bodyLarge?.color,
                         ),
                       ),
-
                       SizedBox(height: 12),
-
                       Text(
                         isFr
                             ? "Votre compte est actif. Vous pouvez commencer à partager des promotions pour gagner des récompenses."
                             : "Your account is active. You can start sharing promotions to earn rewards.",
                         textAlign: TextAlign.center,
-                        style: GoogleFonts.poppins(
-                          fontSize: 15,
-                          color: isDark ? Colors.grey[400] : Colors.grey[600],
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: theme.colorScheme.onSurfaceVariant,
                         ),
                       ),
-
                       SizedBox(height: 40),
-
-                      Container(
-                        width: double.infinity,
-                        padding: EdgeInsets.all(20),
-                        decoration: BoxDecoration(
-                          color: isDark
-                              ? Colors.white.withOpacity(0.05)
-                              : Colors.grey[50],
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(
-                            color: theme.dividerColor.withOpacity(0.1),
-                          ),
-                        ),
+                      FeatureInfoCard(
+                        padding: const EdgeInsets.all(AppSpacing.xLarge),
                         child: Column(
                           children: [
                             Text(
@@ -799,29 +705,21 @@ class _ProgrammeRecompensePageState extends State<ProgrammeRecompensePage> {
                                   ? "Besoin de quitter le programme ?"
                                   : "Need to leave the program?",
                               textAlign: TextAlign.center,
-                              style: GoogleFonts.poppins(
-                                fontSize: 15,
+                              style: theme.textTheme.titleMedium?.copyWith(
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
-
                             SizedBox(height: 10),
-
                             Text(
                               isFr
                                   ? "Pour vous désinscrire du programme des récompenses, veuillez contacter notre équipe d'assistance."
                                   : "To unsubscribe from the rewards program, please contact our support team.",
                               textAlign: TextAlign.center,
-                              style: GoogleFonts.poppins(
-                                fontSize: 13,
-                                color: isDark
-                                    ? Colors.grey[400]
-                                    : Colors.grey[600],
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: theme.colorScheme.onSurfaceVariant,
                               ),
                             ),
-
                             SizedBox(height: 20),
-
                             InkWell(
                               onTap: () {
                                 // TODO: ouvrir WhatsApp / support
@@ -852,10 +750,10 @@ class _ProgrammeRecompensePageState extends State<ProgrammeRecompensePage> {
                                       isFr
                                           ? "Contacter l'assistance"
                                           : "Contact support",
-                                      style: GoogleFonts.poppins(
+                                      style:
+                                          theme.textTheme.labelLarge?.copyWith(
                                         color: Color(0xFF25D366),
                                         fontWeight: FontWeight.bold,
-                                        fontSize: 14,
                                       ),
                                     ),
                                   ],
@@ -895,10 +793,8 @@ class _ProgrammeRecompensePageState extends State<ProgrammeRecompensePage> {
           SizedBox(height: 24),
           Text(
             isFr ? "Inscription confirmée" : "Registration confirmed",
-            style: GoogleFonts.poppins(
-              fontSize: 22,
+            style: theme.textTheme.headlineSmall?.copyWith(
               fontWeight: FontWeight.bold,
-              color: theme.textTheme.bodyLarge?.color,
             ),
           ),
           SizedBox(height: 12),
@@ -907,32 +803,19 @@ class _ProgrammeRecompensePageState extends State<ProgrammeRecompensePage> {
                 ? "Vous pouvez maintenant commencer à promouvoir des offres et soumettre vos preuves."
                 : "You can now start promoting offers and submitting your proofs.",
             textAlign: TextAlign.center,
-            style: GoogleFonts.poppins(fontSize: 14),
+            style: theme.textTheme.bodyMedium,
           ),
           SizedBox(height: 40),
-          SizedBox(
-            width: double.infinity,
-            height: 55,
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: primaryColor,
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(15)),
-              ),
-              onPressed: () {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => ProgrammeRecompenseDashboard(),
-                  ),
-                );
-              },
-              child: Text(
-                isFr ? "Commencer" : "Get started",
-                style: GoogleFonts.poppins(
-                    color: Colors.white, fontWeight: FontWeight.w600),
-              ),
-            ),
+          FeaturePrimaryButton(
+            label: isFr ? "Commencer" : "Get started",
+            onPressed: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => ProgrammeRecompenseDashboard(),
+                ),
+              );
+            },
           ),
         ],
       ),
@@ -945,9 +828,12 @@ class _ProgrammeRecompensePageState extends State<ProgrammeRecompensePage> {
 
   /// [met] = true → vert ✅, false → rouge ❌, null → gris (chargement)
   Widget _conditionRow(BuildContext context, String label, bool? met) {
-    final Color iconColor = met == null
-        ? Colors.grey
-        : (met ? Colors.green : Colors.red);
+    if (met != null) {
+      return FeatureCondition(label: label, isValid: met);
+    }
+
+    final Color iconColor =
+        met == null ? Colors.grey : (met ? Colors.green : Colors.red);
     final IconData icon = met == null
         ? Icons.radio_button_unchecked
         : (met ? Icons.check_circle : Icons.cancel);
@@ -961,10 +847,7 @@ class _ProgrammeRecompensePageState extends State<ProgrammeRecompensePage> {
           Expanded(
             child: Text(
               label,
-              style: GoogleFonts.poppins(
-                fontSize: 13,
-                color: Theme.of(context).textTheme.bodyMedium?.color,
-              ),
+              style: Theme.of(context).textTheme.bodyMedium,
             ),
           ),
         ],
@@ -973,17 +856,7 @@ class _ProgrammeRecompensePageState extends State<ProgrammeRecompensePage> {
   }
 
   Widget _sectionTitle(BuildContext context, String title) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12, top: 8),
-      child: Text(
-        title,
-        style: GoogleFonts.poppins(
-          fontSize: 18,
-          fontWeight: FontWeight.bold,
-          color: primaryColor,
-        ),
-      ),
-    );
+    return FeatureSectionTitle(title: title);
   }
 
   Widget _paragraph(BuildContext context, String text) {
@@ -991,99 +864,57 @@ class _ProgrammeRecompensePageState extends State<ProgrammeRecompensePage> {
       padding: const EdgeInsets.only(bottom: 10),
       child: Text(
         text,
-        style: GoogleFonts.poppins(
-          fontSize: 14,
-          height: 1.5,
-          color: Theme.of(context).textTheme.bodyMedium?.color,
-        ),
+        style: Theme.of(context).textTheme.bodyMedium?.copyWith(height: 1.5),
       ),
     );
   }
 
   Widget _bulletItem(BuildContext context, IconData icon, String text,
       [Color? iconColor]) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          FaIcon(icon,
-              size: 18, color: iconColor ?? primaryColor.withOpacity(0.7)),
-          SizedBox(width: 10),
-          Expanded(
-            child: Text(
-              text,
-              style: GoogleFonts.poppins(fontSize: 14),
-            ),
-          ),
-        ],
-      ),
+    return FeatureBulletRow(
+      text: text,
+      icon: icon,
+      color: iconColor,
     );
   }
 
   Widget _stepItem(BuildContext context, String number, String text) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          CircleAvatar(
-            radius: 12,
-            backgroundColor: primaryColor,
-            child: Text(number,
-                style: GoogleFonts.poppins(
-                    color: Colors.white,
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold)),
-          ),
-          SizedBox(width: 12),
-          Expanded(
-            child: Text(text, style: GoogleFonts.poppins(fontSize: 14)),
-          ),
-        ],
-      ),
+    return FeatureNumberedStep(
+      number: int.parse(number),
+      title: text,
     );
   }
 
   Widget _rewardRow(
       BuildContext context, String views, String amount, Color color) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    return Container(
-      margin: EdgeInsets.only(bottom: 10),
-      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(15),
-        border: Border.all(color: color.withOpacity(0.3)),
+    final theme = Theme.of(context);
+    return FeatureInfoCard(
+      color: color,
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.large,
+        vertical: AppSpacing.medium,
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Row(
             children: [
-              FaIcon(FontAwesomeIcons.eye, color: color, size: 20),
-              SizedBox(width: 12),
+              Icon(Icons.visibility, color: color, size: 20),
+              const SizedBox(width: AppSpacing.medium),
               Text(
                 views,
-                style: GoogleFonts.poppins(
+                style: theme.textTheme.bodyLarge?.copyWith(
                   fontWeight: FontWeight.w600,
-                  fontSize: 15,
-                  color: isDark ? Colors.white : Colors.black87,
                 ),
               ),
             ],
           ),
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-            decoration: BoxDecoration(
-              color: color,
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Text(
+          Chip(
+            backgroundColor: color,
+            label: Text(
               "$amount FCFA",
-              style: GoogleFonts.poppins(
+              style: theme.textTheme.labelMedium?.copyWith(
                 fontWeight: FontWeight.bold,
-                fontSize: 14,
                 color: Colors.white,
               ),
             ),
@@ -1096,82 +927,34 @@ class _ProgrammeRecompensePageState extends State<ProgrammeRecompensePage> {
   Widget _infoText(BuildContext context, String text) {
     return Text(
       text,
-      style: GoogleFonts.poppins(
-        fontSize: 13,
-        fontWeight: FontWeight.w500,
-        fontStyle: FontStyle.italic,
-        color: Theme.of(context).textTheme.bodySmall?.color,
-      ),
+      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+            fontWeight: FontWeight.w500,
+            fontStyle: FontStyle.italic,
+          ),
     );
   }
 
   Widget _proofCard(
       BuildContext context, String number, String title, String content) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    return Container(
-      width: double.infinity,
-      margin: EdgeInsets.only(bottom: 12),
-      padding: EdgeInsets.all(15),
-      decoration: BoxDecoration(
-        color: isDark ? Colors.white.withOpacity(0.05) : Colors.green[50],
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              CircleAvatar(
-                radius: 12,
-                backgroundColor: primaryColor,
-                child: Text(number,
-                    style: GoogleFonts.poppins(
-                        color: Colors.white,
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold)),
-              ),
-              SizedBox(width: 10),
-              Expanded(
-                child: Text(
-                  title,
-                  style: GoogleFonts.poppins(
-                      fontWeight: FontWeight.bold, fontSize: 14),
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: 8),
-          Padding(
-            padding: const EdgeInsets.only(left: 30),
-            child: Text(content,
-                style: GoogleFonts.poppins(fontSize: 13, height: 1.4)),
-          ),
-        ],
+    return FeatureInfoCard(
+      child: FeatureNumberedStep(
+        number: int.parse(number),
+        title: title,
+        description: content,
+        margin: EdgeInsets.zero,
       ),
     );
   }
 
   Widget _warningBox(BuildContext context, String text) {
-    return Container(
-      padding: EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.red.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.red.withOpacity(0.3)),
-      ),
-      child: Row(
-        children: [
-          FaIcon(FontAwesomeIcons.triangleExclamation,
-              color: Colors.red, size: 20),
-          SizedBox(width: 10),
-          Expanded(
-            child: Text(text,
-                style: GoogleFonts.poppins(
-                    fontSize: 12,
-                    color: Colors.red[700],
-                    fontWeight: FontWeight.w500)),
-          ),
-        ],
+    return FeatureInfoCard(
+      color: Colors.red,
+      padding: const EdgeInsets.all(AppSpacing.medium),
+      child: FeatureBulletRow(
+        text: text,
+        icon: FontAwesomeIcons.triangleExclamation,
+        color: Colors.red,
+        padding: EdgeInsets.zero,
       ),
     );
   }
