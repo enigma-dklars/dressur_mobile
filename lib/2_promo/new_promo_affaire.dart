@@ -2187,6 +2187,87 @@ class _SitesApplicationsState extends State<SitesApplications> {
     }
   }
 
+  Widget _buildPaymentSummary(bool isFr) {
+    const frenchPrice = '7 750 FCFA';
+    const englishPrice = '7,750 FCFA';
+    final price = isFr ? frenchPrice : englishPrice;
+
+    Widget summaryRow(String title, String value, {bool emphasized = false}) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 4),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: Text(
+                title,
+                style: GoogleFonts.poppins(
+                  fontSize: 13,
+                  color: Colors.grey[700],
+                ),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Flexible(
+              child: Text(
+                value,
+                textAlign: TextAlign.end,
+                style: GoogleFonts.poppins(
+                  fontSize: 13,
+                  fontWeight:
+                      emphasized ? FontWeight.w700 : FontWeight.w500,
+                  color: emphasized ? primaryColor : Colors.black87,
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: primaryColor.withOpacity(0.08),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: primaryColor.withOpacity(0.3)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            isFr ? 'Récapitulatif' : 'Summary',
+            style: GoogleFonts.poppins(
+              color: primaryColor,
+              fontWeight: FontWeight.bold,
+              fontSize: 15,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            isFr
+                ? 'Promotion Sites & Applications'
+                : 'Sites & Applications promotion',
+            style: GoogleFonts.poppins(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 6),
+          summaryRow(isFr ? 'Durée' : 'Duration', isFr ? '365 jours' : '365 days'),
+          summaryRow(isFr ? 'Prix' : 'Price', price),
+          const Divider(height: 12),
+          summaryRow(
+            isFr ? 'Total à payer' : 'Total to pay',
+            price,
+            emphasized: true,
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final isFr = langUserPhone == "fr";
@@ -2309,25 +2390,8 @@ class _SitesApplicationsState extends State<SitesApplications> {
           ),
         const SizedBox(height: 15),
 
-        // Prix fixe
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: primaryColor.withOpacity(0.08),
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: primaryColor.withOpacity(0.3)),
-          ),
-          child: Text(
-            isFr ? "Prix : 7 750 FCFA / an" : "Price: 7,750 FCFA / year",
-            style: GoogleFonts.poppins(
-              color: primaryColor,
-              fontWeight: FontWeight.bold,
-              fontSize: 15,
-            ),
-            textAlign: TextAlign.center,
-          ),
-        ),
+        // Récapitulatif du prix fixé côté serveur
+        _buildPaymentSummary(isFr),
         const SizedBox(height: 15),
 
         // Méthode de paiement
