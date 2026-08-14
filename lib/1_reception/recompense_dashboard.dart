@@ -63,12 +63,10 @@ class _ProgrammeRecompenseDashboardState
   Future<List<HistoriqueRecompense>> partageInProgrammeRecompense() async {
     try {
       var request = http.MultipartRequest(
-          'POST',
-          Uri.parse(
-              '$generalRouteForApi/getMyProgrammeRecompenseInformations'));
-      request.fields.addAll({
-        'uid': uidUser,
-      });
+        'POST',
+        Uri.parse('$generalRouteForApi/getMyProgrammeRecompenseInformations'),
+      );
+      request.fields.addAll({'uid': uidUser});
 
       http.StreamedResponse response = await request.send();
 
@@ -133,8 +131,11 @@ class _ProgrammeRecompenseDashboardState
           ),
         ),
         leading: IconButton(
-          icon: FaIcon(FontAwesomeIcons.chevronLeft,
-              color: Colors.white, size: 20),
+          icon: FaIcon(
+            FontAwesomeIcons.chevronLeft,
+            color: Colors.white,
+            size: 20,
+          ),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -149,19 +150,29 @@ class _ProgrammeRecompenseDashboardState
           children: [
             // ── Statistiques ─────────────────────────────────────────────
             _sectionTitle(
-                context, isFr ? "Mes Statistiques" : "My Statistics", 12),
+              context,
+              isFr ? "Mes Statistiques" : "My Statistics",
+              12,
+            ),
             Row(
               children: [
-                _statItem(context, isFr ? "Vues Totales" : "Total Views",
-                    "$vuesTotales", FontAwesomeIcons.eye, Colors.blue, theme),
+                _statItem(
+                  context,
+                  isFr ? "Vues Totales" : "Total Views",
+                  "$vuesTotales",
+                  FontAwesomeIcons.eye,
+                  Colors.blue,
+                  theme,
+                ),
                 SizedBox(width: AppSpacing.medium),
                 _statItem(
-                    context,
-                    isFr ? "Gains Totaux" : "Total Earnings",
-                    "$gainsTotales F",
-                    FontAwesomeIcons.wallet,
-                    Colors.green,
-                    theme),
+                  context,
+                  isFr ? "Gains Totaux" : "Total Earnings",
+                  "$gainsTotales F",
+                  FontAwesomeIcons.wallet,
+                  Colors.green,
+                  theme,
+                ),
               ],
             ),
 
@@ -172,19 +183,19 @@ class _ProgrammeRecompenseDashboardState
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 _sectionTitle(
-                    context,
-                    isFr
-                        ? "Historique de participation"
-                        : "Participation history",
-                    0),
+                  context,
+                  isFr
+                      ? "Historique de participation"
+                      : "Participation history",
+                  0,
+                ),
                 TextButton(
                   onPressed: () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => HistoriqueCompletPage(
-                          allHistorique: allHistorique,
-                        ),
+                        builder: (context) =>
+                            HistoriqueCompletPage(allHistorique: allHistorique),
                       ),
                     );
                   },
@@ -194,7 +205,7 @@ class _ProgrammeRecompenseDashboardState
                       color: primaryColor,
                     ),
                   ),
-                )
+                ),
               ],
             ),
             Padding(
@@ -215,25 +226,37 @@ class _ProgrammeRecompenseDashboardState
                   return const Padding(
                     padding: EdgeInsets.symmetric(vertical: AppSpacing.section),
                     child: Center(
-                        child: CircularProgressIndicator(color: primaryColor)),
+                      child: CircularProgressIndicator(color: primaryColor),
+                    ),
                   );
                 }
 
                 if (snapshot.hasError) {
-                  return Center(
-                      child: Text(
-                          isFr ? "Erreur de chargement" : "Loading error"));
+                  return FeatureInfoCard(
+                    margin: EdgeInsets.zero,
+                    padding: const EdgeInsets.all(AppSpacing.medium),
+                    child: FeatureBulletRow(
+                      text: isFr ? "Erreur de chargement" : "Loading error",
+                      icon: FontAwesomeIcons.triangleExclamation,
+                      color: theme.colorScheme.error,
+                      padding: EdgeInsets.zero,
+                    ),
+                  );
                 }
 
                 if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return Center(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 20),
+                  return FeatureInfoCard(
+                    margin: EdgeInsets.zero,
+                    padding: const EdgeInsets.all(AppSpacing.medium),
+                    child: Center(
                       child: Text(
                         isFr
                             ? "Aucun historique disponible"
                             : "No history available",
-                        style: theme.textTheme.bodySmall,
+                        textAlign: TextAlign.center,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
                       ),
                     ),
                   );
@@ -271,14 +294,18 @@ class _ProgrammeRecompenseDashboardState
   // ---------------------------------------------------------------------------
 
   Widget _buildAccessProgramButton(
-      BuildContext context, ThemeData theme, bool isFr) {
+    BuildContext context,
+    ThemeData theme,
+    bool isFr,
+  ) {
     return InkWell(
       onTap: () {
         Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) =>
-                    ProgrammeRecompensePage(optionPage: true)));
+          context,
+          MaterialPageRoute(
+            builder: (context) => ProgrammeRecompensePage(optionPage: true),
+          ),
+        );
       },
       child: FeatureInfoCard(
         margin: EdgeInsets.zero,
@@ -309,8 +336,11 @@ class _ProgrammeRecompenseDashboardState
                 ],
               ),
             ),
-            FaIcon(FontAwesomeIcons.chevronRight,
-                size: 14, color: theme.colorScheme.primary),
+            FaIcon(
+              FontAwesomeIcons.chevronRight,
+              size: 14,
+              color: theme.colorScheme.primary,
+            ),
           ],
         ),
       ),
@@ -318,11 +348,16 @@ class _ProgrammeRecompenseDashboardState
   }
 
   Widget _buildBusinessPromotionsButton(
-      BuildContext context, theme, bool isFr) {
+    BuildContext context,
+    theme,
+    bool isFr,
+  ) {
     return InkWell(
       onTap: () {
-        Navigator.push(context,
-            MaterialPageRoute(builder: (context) => BusinessPromotionsPage()));
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => BusinessPromotionsPage()),
+        );
       },
       child: FeatureInfoCard(
         margin: EdgeInsets.zero,
@@ -355,16 +390,25 @@ class _ProgrammeRecompenseDashboardState
                 ],
               ),
             ),
-            FaIcon(FontAwesomeIcons.chevronRight,
-                size: 14, color: theme.colorScheme.primary),
+            FaIcon(
+              FontAwesomeIcons.chevronRight,
+              size: 14,
+              color: theme.colorScheme.primary,
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _statItem(BuildContext context, String label, String value,
-      IconData icon, Color color, ThemeData theme) {
+  Widget _statItem(
+    BuildContext context,
+    String label,
+    String value,
+    IconData icon,
+    Color color,
+    ThemeData theme,
+  ) {
     return Expanded(
       child: FeatureInfoCard(
         margin: EdgeInsets.zero,
@@ -393,18 +437,21 @@ class _ProgrammeRecompenseDashboardState
   }
 
   Widget _sectionTitle(
-      BuildContext context, String title, double padingBottom) {
+    BuildContext context,
+    String title,
+    double padingBottom,
+  ) {
     return FeatureSectionTitle(
       title: title,
-      padding: EdgeInsets.only(
-        top: AppSpacing.small,
-        bottom: padingBottom,
-      ),
+      padding: EdgeInsets.only(top: AppSpacing.small, bottom: padingBottom),
     );
   }
 
   Widget _promotionItem(
-      BuildContext context, HistoriqueRecompense item, bool isFr) {
+    BuildContext context,
+    HistoriqueRecompense item,
+    bool isFr,
+  ) {
     final theme = Theme.of(context);
     final statusConfig = getStatusBadgeConfig(item.status);
     final statusColor = statusConfig["color"] as Color;
@@ -436,11 +483,13 @@ class _ProgrammeRecompenseDashboardState
                       height: 55,
                       fit: BoxFit.cover,
                       placeholder: (context, url) => Image.asset(
-                          'images/placeholder.png',
-                          fit: BoxFit.cover),
+                        'images/placeholder.png',
+                        fit: BoxFit.cover,
+                      ),
                       errorWidget: (context, url, error) => Image.asset(
-                          'images/error_image.png',
-                          fit: BoxFit.cover),
+                        'images/error_image.png',
+                        fit: BoxFit.cover,
+                      ),
                     ),
                   ),
                   Positioned(
@@ -452,11 +501,11 @@ class _ProgrammeRecompenseDashboardState
                         color: (item.status == "approuver")
                             ? Colors.green
                             : (item.status == "echouer" ||
-                                    item.status == "refuser")
-                                ? Colors.red
-                                : (item.status == "en_attente")
-                                    ? Colors.orange
-                                    : Colors.black,
+                                  item.status == "refuser")
+                            ? Colors.red
+                            : (item.status == "en_attente")
+                            ? Colors.orange
+                            : Colors.black,
                         shape: BoxShape.circle,
                         border: Border.all(color: Colors.white, width: 1.5),
                       ),
@@ -464,11 +513,11 @@ class _ProgrammeRecompenseDashboardState
                         (item.status == "approuver")
                             ? FontAwesomeIcons.solidCircleCheck
                             : (item.status == "echouer" ||
-                                    item.status == "refuser")
-                                ? FontAwesomeIcons.xmark
-                                : (item.status == "en_attente")
-                                    ? FontAwesomeIcons.clock
-                                    : FontAwesomeIcons.circleQuestion,
+                                  item.status == "refuser")
+                            ? FontAwesomeIcons.xmark
+                            : (item.status == "en_attente")
+                            ? FontAwesomeIcons.clock
+                            : FontAwesomeIcons.circleQuestion,
                         color: Colors.white,
                         size: 10,
                       ),
@@ -493,10 +542,16 @@ class _ProgrammeRecompenseDashboardState
                   const SizedBox(height: 10),
                   Row(
                     children: [
-                      Text(item.date,
+                      Flexible(
+                        child: Text(
+                          item.date,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                           style: theme.textTheme.bodySmall?.copyWith(
                             color: theme.colorScheme.onSurfaceVariant,
-                          )),
+                          ),
+                        ),
+                      ),
                       const SizedBox(width: AppSpacing.small),
                       Container(
                         width: 3,
@@ -507,54 +562,66 @@ class _ProgrammeRecompenseDashboardState
                         ),
                       ),
                       const SizedBox(width: AppSpacing.small),
-                      const FaIcon(FontAwesomeIcons.eye,
-                          size: 12, color: Colors.grey),
+                      const FaIcon(
+                        FontAwesomeIcons.eye,
+                        size: 12,
+                        color: Colors.grey,
+                      ),
                       const SizedBox(width: AppSpacing.xSmall),
-                      Text(item.views,
+                      Flexible(
+                        child: Text(
+                          item.views,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                           style: theme.textTheme.bodySmall?.copyWith(
                             color: theme.colorScheme.onSurfaceVariant,
-                          )),
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                 ],
               ),
             ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Text(
-                  item.amount,
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: (item.status == "approuver")
-                        ? Colors.green
-                        : (item.status == "echouer" || item.status == "refuser")
-                            ? Colors.red
-                            : (item.status == "en_attente")
-                                ? Colors.orange
-                                : null,
-                  ),
-                ),
-                const SizedBox(height: 5),
-                Chip(
-                  avatar: Icon(
-                    statusIcon,
-                    size: 12,
-                    color: statusColor,
-                  ),
-                  label: Text(
-                    statusLabel,
-                    style: theme.textTheme.labelSmall?.copyWith(
+            Flexible(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    item.amount,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: theme.textTheme.bodyMedium?.copyWith(
                       fontWeight: FontWeight.bold,
-                      color: statusColor,
+                      color: (item.status == "approuver")
+                          ? Colors.green
+                          : (item.status == "echouer" ||
+                                item.status == "refuser")
+                          ? Colors.red
+                          : (item.status == "en_attente")
+                          ? Colors.orange
+                          : null,
                     ),
                   ),
-                  backgroundColor: statusColor.withOpacity(0.15),
-                  side: BorderSide.none,
-                  visualDensity: VisualDensity.compact,
-                  padding: EdgeInsets.zero,
-                ),
-              ],
+                  const SizedBox(height: 5),
+                  Chip(
+                    avatar: Icon(statusIcon, size: 12, color: statusColor),
+                    label: Text(
+                      statusLabel,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: statusColor,
+                      ),
+                    ),
+                    backgroundColor: statusColor.withOpacity(0.15),
+                    side: BorderSide.none,
+                    visualDensity: VisualDensity.compact,
+                    padding: EdgeInsets.zero,
+                  ),
+                ],
+              ),
             ),
           ],
         ),
@@ -563,7 +630,9 @@ class _ProgrammeRecompenseDashboardState
   }
 
   void _showStatusDetailsBottomSheet(
-      BuildContext context, HistoriqueRecompense item) {
+    BuildContext context,
+    HistoriqueRecompense item,
+  ) {
     final bool isFr = langUserPhone == "fr";
     setState(() {
       _proofImage1 = null;
@@ -573,8 +642,9 @@ class _ProgrammeRecompenseDashboardState
       context: context,
       isScrollControlled: true,
       shape: RoundedRectangleBorder(
-        borderRadius:
-            BorderRadius.vertical(top: Radius.circular(AppRadii.extraLarge)),
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(AppRadii.extraLarge),
+        ),
       ),
       builder: (context) {
         return StatefulBuilder(
@@ -605,17 +675,17 @@ class _ProgrammeRecompenseDashboardState
                       Text(
                         item.title,
                         style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                              fontWeight: FontWeight.bold,
-                            ),
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                       Text(
                         isFr
                             ? "Récompense : ${item.amount} FCFA"
                             : "Reward: ${item.amount} FCFA",
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: primaryColor,
-                              fontWeight: FontWeight.w500,
-                            ),
+                          color: primaryColor,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                       const Divider(height: AppSpacing.section),
                       _buildStatusContent(item, setModalState, isFr),
@@ -636,7 +706,10 @@ class _ProgrammeRecompenseDashboardState
   }
 
   Widget _buildStatusContent(
-      HistoriqueRecompense item, StateSetter setModalState, bool isFr) {
+    HistoriqueRecompense item,
+    StateSetter setModalState,
+    bool isFr,
+  ) {
     switch (item.status) {
       case "en_attente":
         return _statusInfo(
@@ -712,7 +785,11 @@ class _ProgrammeRecompenseDashboardState
   }
 
   Widget _statusInfo(
-      IconData icon, Color color, String title, String description) {
+    IconData icon,
+    Color color,
+    String title,
+    String description,
+  ) {
     final theme = Theme.of(context);
     return FeatureInfoCard(
       color: color,
@@ -748,31 +825,36 @@ class _ProgrammeRecompenseDashboardState
   }
 
   Widget _buildSubmissionForm(
-      HistoriqueRecompense item, StateSetter setModalState, bool isFr) {
+    HistoriqueRecompense item,
+    StateSetter setModalState,
+    bool isFr,
+  ) {
     return FeatureInfoCard(
       title: isFr ? "Formulaire de soumission" : "Submission form",
       padding: const EdgeInsets.all(AppSpacing.large),
       child: Column(
         children: [
           _proofCard(
-              "1",
-              isFr ? "Capture – Liste des statuts" : "Screenshot – Status list",
-              isFr
-                  ? "• Affiche la liste des statuts WhatsApp\n• Le statut de la promotion doit être visible"
-                  : "• Shows the WhatsApp status list\n• The promotion status must be visible",
-              _proofImage1,
-              () => _pickImage(1, setModalState),
-              isFr),
+            "1",
+            isFr ? "Capture – Liste des statuts" : "Screenshot – Status list",
+            isFr
+                ? "• Affiche la liste des statuts WhatsApp\n• Le statut de la promotion doit être visible"
+                : "• Shows the WhatsApp status list\n• The promotion status must be visible",
+            _proofImage1,
+            () => _pickImage(1, setModalState),
+            isFr,
+          ),
           const SizedBox(height: AppSpacing.large),
           _proofCard(
-              "2",
-              isFr ? "Capture – Statut ouvert" : "Screenshot – Open status",
-              isFr
-                  ? "• Image complète\n• Texte descriptif complet\n• Nombre de vues, date et heure visibles"
-                  : "• Full image\n• Complete descriptive text\n• Number of views, date and time visible",
-              _proofImage2,
-              () => _pickImage(2, setModalState),
-              isFr),
+            "2",
+            isFr ? "Capture – Statut ouvert" : "Screenshot – Open status",
+            isFr
+                ? "• Image complète\n• Texte descriptif complet\n• Nombre de vues, date et heure visibles"
+                : "• Full image\n• Complete descriptive text\n• Number of views, date and time visible",
+            _proofImage2,
+            () => _pickImage(2, setModalState),
+            isFr,
+          ),
           const SizedBox(height: AppSpacing.xLarge),
           FeaturePrimaryButton(
             label: isFr ? "Soumettre les preuves" : "Submit proofs",
@@ -786,8 +868,14 @@ class _ProgrammeRecompenseDashboardState
     );
   }
 
-  Widget _proofCard(String number, String title, String instructions,
-      File? image, VoidCallback onTap, bool isFr) {
+  Widget _proofCard(
+    String number,
+    String title,
+    String instructions,
+    File? image,
+    VoidCallback onTap,
+    bool isFr,
+  ) {
     final theme = Theme.of(context);
     return FeatureInfoCard(
       margin: const EdgeInsets.only(bottom: AppSpacing.medium),
@@ -833,8 +921,9 @@ class _ProgrammeRecompenseDashboardState
               height: 120,
               width: double.infinity,
               decoration: BoxDecoration(
-                color:
-                    theme.colorScheme.surfaceContainerHighest.withOpacity(0.35),
+                color: theme.colorScheme.surfaceContainerHighest.withOpacity(
+                  0.35,
+                ),
                 borderRadius: BorderRadius.circular(AppRadii.small),
                 border: Border.all(color: theme.colorScheme.outlineVariant),
                 image: image != null
@@ -848,8 +937,11 @@ class _ProgrammeRecompenseDashboardState
                   ? Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        FaIcon(FontAwesomeIcons.camera,
-                            color: primaryColor, size: 30),
+                        FaIcon(
+                          FontAwesomeIcons.camera,
+                          color: primaryColor,
+                          size: 30,
+                        ),
                         const SizedBox(height: AppSpacing.xSmall),
                         Text(
                           isFr ? "Cliquez pour choisir" : "Tap to choose",
@@ -873,7 +965,7 @@ class _ProgrammeRecompenseDashboardState
                               color: Colors.white,
                             ),
                           ),
-                        )
+                        ),
                       ],
                     ),
             ),
@@ -909,7 +1001,10 @@ class _ProgrammeRecompenseDashboardState
   }
 
   Future<void> _submitProofs(
-      HistoriqueRecompense item, StateSetter setModalState, bool isFr) async {
+    HistoriqueRecompense item,
+    StateSetter setModalState,
+    bool isFr,
+  ) async {
     if (_proofImage1 == null || _proofImage2 == null) {
       dangerNoti(
         isFr ? "Attention" : "Warning",
@@ -925,16 +1020,20 @@ class _ProgrammeRecompenseDashboardState
     setState(() => _isSubmitting = true);
 
     try {
-      var request = http.MultipartRequest('POST',
-          Uri.parse('$generalRouteForApi/submitProgrammeRecompenseProofs'));
+      var request = http.MultipartRequest(
+        'POST',
+        Uri.parse('$generalRouteForApi/submitProgrammeRecompenseProofs'),
+      );
 
       request.fields['uid'] = uidUser;
       request.fields['idHistorique'] = item.id.toString();
 
       request.files.add(
-          await http.MultipartFile.fromPath('capture1', _proofImage1!.path));
+        await http.MultipartFile.fromPath('capture1', _proofImage1!.path),
+      );
       request.files.add(
-          await http.MultipartFile.fromPath('capture2', _proofImage2!.path));
+        await http.MultipartFile.fromPath('capture2', _proofImage2!.path),
+      );
 
       var response = await request.send();
       var responseData = await response.stream.bytesToString();
@@ -988,13 +1087,15 @@ class _ProgrammeRecompenseDashboardState
         },
         icon: FaIcon(FontAwesomeIcons.solidComment, size: 18),
         label: Text(
-            isFr ? "Envoyer la vidéo sur WhatsApp" : "Send video on WhatsApp"),
+          isFr ? "Envoyer la vidéo sur WhatsApp" : "Send video on WhatsApp",
+        ),
         style: OutlinedButton.styleFrom(
           foregroundColor: Colors.green.shade700,
           side: BorderSide(color: Colors.green.shade600),
           padding: const EdgeInsets.symmetric(vertical: AppSpacing.medium),
           shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(AppRadii.large)),
+            borderRadius: BorderRadius.circular(AppRadii.large),
+          ),
           textStyle: theme.textTheme.labelLarge?.copyWith(
             fontWeight: FontWeight.w600,
           ),

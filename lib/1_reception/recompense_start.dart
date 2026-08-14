@@ -45,8 +45,10 @@ class _ProgrammeRecompensePageState extends State<ProgrammeRecompensePage> {
 
   Future<void> _fetchConditions() async {
     try {
-      var request = http.MultipartRequest('POST',
-          Uri.parse('$generalRouteForApi/getConditionsProgrammeRecompense'));
+      var request = http.MultipartRequest(
+        'POST',
+        Uri.parse('$generalRouteForApi/getConditionsProgrammeRecompense'),
+      );
       request.fields.addAll({'uid': uidUser});
 
       http.StreamedResponse response = await request.send();
@@ -80,10 +82,10 @@ class _ProgrammeRecompensePageState extends State<ProgrammeRecompensePage> {
       });
 
       var request = http.MultipartRequest(
-          'POST', Uri.parse('$generalRouteForApi/addToRecompenseProgramme'));
-      request.fields.addAll({
-        'uid': uidUser,
-      });
+        'POST',
+        Uri.parse('$generalRouteForApi/addToRecompenseProgramme'),
+      );
+      request.fields.addAll({'uid': uidUser});
 
       http.StreamedResponse response = await request.send();
 
@@ -106,13 +108,17 @@ class _ProgrammeRecompensePageState extends State<ProgrammeRecompensePage> {
           _desactive = false;
         });
         if (langUserPhone != "fr") {
-          dangerNoti("Mistake!",
-              "We encountered a problem, contact the administrators.", context);
+          dangerNoti(
+            "Mistake!",
+            "We encountered a problem, contact the administrators.",
+            context,
+          );
         } else {
           dangerNoti(
-              "Erreur!",
-              "Nous avons rencontré un problème, contacter les administrateurs.",
-              context);
+            "Erreur!",
+            "Nous avons rencontré un problème, contacter les administrateurs.",
+            context,
+          );
         }
       }
     } else {
@@ -121,7 +127,10 @@ class _ProgrammeRecompensePageState extends State<ProgrammeRecompensePage> {
       });
       if (langUserPhone != "fr") {
         dangerNoti(
-            "Mistake!", "You are not connected to the internet.", context);
+          "Mistake!",
+          "You are not connected to the internet.",
+          context,
+        );
       } else {
         dangerNoti("Erreur!", "Vous n'ètes pas connecté a internet.", context);
       }
@@ -146,16 +155,19 @@ class _ProgrammeRecompensePageState extends State<ProgrammeRecompensePage> {
           ),
         ),
         leading: IconButton(
-          icon: FaIcon(FontAwesomeIcons.chevronLeft,
-              color: Colors.white, size: 20),
+          icon: FaIcon(
+            FontAwesomeIcons.chevronLeft,
+            color: Colors.white,
+            size: 20,
+          ),
           onPressed: () => Navigator.pop(context),
         ),
       ),
       body: widget.optionPage
           ? _pagePresentationProgramme(context)
           : isInscritProgrammeRecompense
-              ? _pageInformationApresInscription(context)
-              : _pagePresentationProgramme(context),
+          ? _pageInformationApresInscription(context)
+          : _pagePresentationProgramme(context),
     );
   }
 
@@ -204,7 +216,9 @@ class _ProgrammeRecompensePageState extends State<ProgrammeRecompensePage> {
 
                 // 2. Réseau concerné
                 _sectionTitle(
-                    context, isFr ? "Réseau concerné" : "Supported network"),
+                  context,
+                  isFr ? "Réseau concerné" : "Supported network",
+                ),
                 _bulletItem(
                   context,
                   FontAwesomeIcons.solidCircleCheck,
@@ -225,50 +239,59 @@ class _ProgrammeRecompensePageState extends State<ProgrammeRecompensePage> {
                 _divider(context),
 
                 // 3. Principe de fonctionnement
-                _sectionTitle(context,
-                    isFr ? "Principe de fonctionnement" : "How it works"),
+                _sectionTitle(
+                  context,
+                  isFr ? "Principe de fonctionnement" : "How it works",
+                ),
                 _stepItem(
-                    context,
-                    "1",
-                    isFr
-                        ? "Identifiez une promotion éligible au programme."
-                        : "Identify a promotion eligible for the program."),
+                  context,
+                  "1",
+                  isFr
+                      ? "Identifiez une promotion éligible au programme."
+                      : "Identify a promotion eligible for the program.",
+                ),
                 _stepItem(
-                    context,
-                    "2",
-                    isFr
-                        ? "Partagez la promotion directement depuis l'application Dressur vers votre statut WhatsApp."
-                        : "Share the promotion directly from the Dressur app to your WhatsApp status."),
+                  context,
+                  "2",
+                  isFr
+                      ? "Partagez la promotion directement depuis l'application Dressur vers votre statut WhatsApp."
+                      : "Share the promotion directly from the Dressur app to your WhatsApp status.",
+                ),
                 _stepItem(
-                    context,
-                    "3",
-                    isFr
-                        ? "Le contenu partagé (image + texte) est officiel et validé par Dressur."
-                        : "The shared content (image + text) is official and validated by Dressur."),
+                  context,
+                  "3",
+                  isFr
+                      ? "Le contenu partagé (image + texte) est officiel et validé par Dressur."
+                      : "The shared content (image + text) is official and validated by Dressur.",
+                ),
                 _stepItem(
-                    context,
-                    "4",
-                    isFr
-                        ? "Aucune modification n'est autorisée (image, texte, description)."
-                        : "No modifications are allowed (image, text, description)."),
+                  context,
+                  "4",
+                  isFr
+                      ? "Aucune modification n'est autorisée (image, texte, description)."
+                      : "No modifications are allowed (image, text, description).",
+                ),
                 _stepItem(
-                    context,
-                    "5",
-                    isFr
-                        ? "Après 20 heures, vous pouvez soumettre vos preuves."
-                        : "After 20 hours, you can submit your proofs."),
+                  context,
+                  "5",
+                  isFr
+                      ? "Après 20 heures, vous pouvez soumettre vos preuves."
+                      : "After 20 hours, you can submit your proofs.",
+                ),
                 _stepItem(
-                    context,
-                    "6",
-                    isFr
-                        ? "Les preuves sont analysées."
-                        : "The proofs are reviewed."),
+                  context,
+                  "6",
+                  isFr
+                      ? "Les preuves sont analysées."
+                      : "The proofs are reviewed.",
+                ),
                 _stepItem(
-                    context,
-                    "7",
-                    isFr
-                        ? "Si elles sont validées et que le quota n'est pas atteint, votre solde est crédité."
-                        : "If validated and the quota is not reached, your balance is credited."),
+                  context,
+                  "7",
+                  isFr
+                      ? "Si elles sont validées et que le quota n'est pas atteint, votre solde est crédité."
+                      : "If validated and the quota is not reached, your balance is credited.",
+                ),
 
                 _divider(context),
 
@@ -285,11 +308,36 @@ class _ProgrammeRecompensePageState extends State<ProgrammeRecompensePage> {
                       ? "Gagnez plus d'argent en atteignant des paliers de vues plus élevés sur votre statut."
                       : "Earn more money by reaching higher view thresholds on your status.",
                 ),
-                _rewardRow(context, "250 vues", "100", Colors.green),
-                _rewardRow(context, "500 vues", "200", Colors.blue),
-                _rewardRow(context, "1 000 vues", "500", Colors.purple),
-                _rewardRow(context, "2 000 vues", "1 000", Colors.orange),
-                _rewardRow(context, "4 000 vues", "2 500", Colors.red),
+                _rewardRow(
+                  context,
+                  isFr ? "250 vues" : "250 views",
+                  "100",
+                  Colors.green,
+                ),
+                _rewardRow(
+                  context,
+                  isFr ? "500 vues" : "500 views",
+                  "200",
+                  Colors.blue,
+                ),
+                _rewardRow(
+                  context,
+                  isFr ? "1 000 vues" : "1,000 views",
+                  "500",
+                  Colors.purple,
+                ),
+                _rewardRow(
+                  context,
+                  isFr ? "2 000 vues" : "2,000 views",
+                  "1 000",
+                  Colors.orange,
+                ),
+                _rewardRow(
+                  context,
+                  isFr ? "4 000 vues" : "4,000 views",
+                  "2 500",
+                  Colors.red,
+                ),
                 _infoText(
                   context,
                   isFr
@@ -301,7 +349,9 @@ class _ProgrammeRecompensePageState extends State<ProgrammeRecompensePage> {
 
                 // 5. Règles essentielles
                 _sectionTitle(
-                    context, isFr ? "Règles essentielles" : "Essential rules"),
+                  context,
+                  isFr ? "Règles essentielles" : "Essential rules",
+                ),
                 _bulletItem(
                   context,
                   FontAwesomeIcons.circleInfo,
@@ -349,8 +399,10 @@ class _ProgrammeRecompensePageState extends State<ProgrammeRecompensePage> {
                 _divider(context),
 
                 // 6. Délais importants
-                _sectionTitle(context,
-                    isFr ? "Délais importants" : "Important deadlines"),
+                _sectionTitle(
+                  context,
+                  isFr ? "Délais importants" : "Important deadlines",
+                ),
                 _bulletItem(
                   context,
                   FontAwesomeIcons.hourglassHalf,
@@ -426,8 +478,10 @@ class _ProgrammeRecompensePageState extends State<ProgrammeRecompensePage> {
                 _divider(context),
 
                 // 8. Validation et quota
-                _sectionTitle(context,
-                    isFr ? "Validation et quota" : "Validation and quota"),
+                _sectionTitle(
+                  context,
+                  isFr ? "Validation et quota" : "Validation and quota",
+                ),
                 _bulletItem(
                   context,
                   FontAwesomeIcons.chartSimple,
@@ -453,8 +507,10 @@ class _ProgrammeRecompensePageState extends State<ProgrammeRecompensePage> {
                 _divider(context),
 
                 // 9. Récompense et solde
-                _sectionTitle(context,
-                    isFr ? "Récompense et solde" : "Reward and balance"),
+                _sectionTitle(
+                  context,
+                  isFr ? "Récompense et solde" : "Reward and balance",
+                ),
                 _bulletItem(
                   context,
                   FontAwesomeIcons.wallet,
@@ -473,8 +529,10 @@ class _ProgrammeRecompensePageState extends State<ProgrammeRecompensePage> {
                 _divider(context),
 
                 // 10. Utilisation du solde
-                _sectionTitle(context,
-                    isFr ? "Utilisation de votre solde" : "Using your balance"),
+                _sectionTitle(
+                  context,
+                  isFr ? "Utilisation de votre solde" : "Using your balance",
+                ),
                 _bulletItem(
                   context,
                   FontAwesomeIcons.moneyBillTrendUp,
@@ -493,8 +551,10 @@ class _ProgrammeRecompensePageState extends State<ProgrammeRecompensePage> {
                 _divider(context),
 
                 // 11. Politique anti-fraude
-                _sectionTitle(context,
-                    isFr ? "Politique anti-fraude" : "Anti-fraud policy"),
+                _sectionTitle(
+                  context,
+                  isFr ? "Politique anti-fraude" : "Anti-fraud policy",
+                ),
                 _paragraph(
                   context,
                   isFr
@@ -575,7 +635,9 @@ class _ProgrammeRecompensePageState extends State<ProgrammeRecompensePage> {
 
                 // 14. Message important
                 _sectionTitle(
-                    context, isFr ? "Message important" : "Important message"),
+                  context,
+                  isFr ? "Message important" : "Important message",
+                ),
                 _paragraph(
                   context,
                   isFr
@@ -639,8 +701,9 @@ class _ProgrammeRecompensePageState extends State<ProgrammeRecompensePage> {
                   SizedBox(height: 16),
                   // --- Bouton Participer ---
                   FeaturePrimaryButton(
-                    label:
-                        isFr ? "Participer au programme" : "Join the program",
+                    label: isFr
+                        ? "Participer au programme"
+                        : "Join the program",
                     isLoading: _desactive,
                     onPressed: !_conditionsLoaded || !_toutesConditions
                         ? null
@@ -750,11 +813,11 @@ class _ProgrammeRecompensePageState extends State<ProgrammeRecompensePage> {
                                       isFr
                                           ? "Contacter l'assistance"
                                           : "Contact support",
-                                      style:
-                                          theme.textTheme.labelLarge?.copyWith(
-                                        color: Color(0xFF25D366),
-                                        fontWeight: FontWeight.bold,
-                                      ),
+                                      style: theme.textTheme.labelLarge
+                                          ?.copyWith(
+                                            color: Color(0xFF25D366),
+                                            fontWeight: FontWeight.bold,
+                                          ),
                                     ),
                                   ],
                                 ),
@@ -788,8 +851,11 @@ class _ProgrammeRecompensePageState extends State<ProgrammeRecompensePage> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          FaIcon(FontAwesomeIcons.solidCircleCheck,
-              size: 80, color: Colors.green),
+          FaIcon(
+            FontAwesomeIcons.solidCircleCheck,
+            size: 80,
+            color: Colors.green,
+          ),
           SizedBox(height: 24),
           Text(
             isFr ? "Inscription confirmée" : "Registration confirmed",
@@ -832,8 +898,9 @@ class _ProgrammeRecompensePageState extends State<ProgrammeRecompensePage> {
       return FeatureCondition(label: label, isValid: met);
     }
 
-    final Color iconColor =
-        met == null ? Colors.grey : (met ? Colors.green : Colors.red);
+    final Color iconColor = met == null
+        ? Colors.grey
+        : (met ? Colors.green : Colors.red);
     final IconData icon = met == null
         ? Icons.radio_button_unchecked
         : (met ? Icons.check_circle : Icons.cancel);
@@ -845,10 +912,7 @@ class _ProgrammeRecompensePageState extends State<ProgrammeRecompensePage> {
           Icon(icon, size: 20, color: iconColor),
           SizedBox(width: 10),
           Expanded(
-            child: Text(
-              label,
-              style: Theme.of(context).textTheme.bodyMedium,
-            ),
+            child: Text(label, style: Theme.of(context).textTheme.bodyMedium),
           ),
         ],
       ),
@@ -869,24 +933,25 @@ class _ProgrammeRecompensePageState extends State<ProgrammeRecompensePage> {
     );
   }
 
-  Widget _bulletItem(BuildContext context, IconData icon, String text,
-      [Color? iconColor]) {
-    return FeatureBulletRow(
-      text: text,
-      icon: icon,
-      color: iconColor,
-    );
+  Widget _bulletItem(
+    BuildContext context,
+    IconData icon,
+    String text, [
+    Color? iconColor,
+  ]) {
+    return FeatureBulletRow(text: text, icon: icon, color: iconColor);
   }
 
   Widget _stepItem(BuildContext context, String number, String text) {
-    return FeatureNumberedStep(
-      number: int.parse(number),
-      title: text,
-    );
+    return FeatureNumberedStep(number: int.parse(number), title: text);
   }
 
   Widget _rewardRow(
-      BuildContext context, String views, String amount, Color color) {
+    BuildContext context,
+    String views,
+    String amount,
+    Color color,
+  ) {
     final theme = Theme.of(context);
     return FeatureInfoCard(
       color: color,
@@ -897,18 +962,25 @@ class _ProgrammeRecompensePageState extends State<ProgrammeRecompensePage> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Row(
-            children: [
-              Icon(Icons.visibility, color: color, size: 20),
-              const SizedBox(width: AppSpacing.medium),
-              Text(
-                views,
-                style: theme.textTheme.bodyLarge?.copyWith(
-                  fontWeight: FontWeight.w600,
+          Expanded(
+            child: Row(
+              children: [
+                Icon(Icons.visibility, color: color, size: 20),
+                const SizedBox(width: AppSpacing.medium),
+                Flexible(
+                  child: Text(
+                    views,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: theme.textTheme.bodyLarge?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
+          const SizedBox(width: AppSpacing.small),
           Chip(
             backgroundColor: color,
             label: Text(
@@ -928,14 +1000,18 @@ class _ProgrammeRecompensePageState extends State<ProgrammeRecompensePage> {
     return Text(
       text,
       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-            fontWeight: FontWeight.w500,
-            fontStyle: FontStyle.italic,
-          ),
+        fontWeight: FontWeight.w500,
+        fontStyle: FontStyle.italic,
+      ),
     );
   }
 
   Widget _proofCard(
-      BuildContext context, String number, String title, String content) {
+    BuildContext context,
+    String number,
+    String title,
+    String content,
+  ) {
     return FeatureInfoCard(
       child: FeatureNumberedStep(
         number: int.parse(number),
@@ -963,7 +1039,9 @@ class _ProgrammeRecompensePageState extends State<ProgrammeRecompensePage> {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 15),
       child: Divider(
-          thickness: 1, color: Theme.of(context).dividerColor.withOpacity(0.5)),
+        thickness: 1,
+        color: Theme.of(context).dividerColor.withOpacity(0.5),
+      ),
     );
   }
 }

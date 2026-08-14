@@ -79,13 +79,11 @@ class _EspacePartenairePageState extends State<EspacePartenairePage> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     final isFr = _isFrench;
     final bool toutesConditions =
         condNom && condTel && condMail && condAnciennete && condCumul;
     return Scaffold(
-      backgroundColor:
-          isDark ? const Color(0xFF121212) : const Color(0xFFF8F9FA),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         elevation: 0,
         backgroundColor: primaryColor,
@@ -96,13 +94,16 @@ class _EspacePartenairePageState extends State<EspacePartenairePage> {
         title: Text(
           isFr ? 'Espace Partenaire' : 'Partner Space',
           style: GoogleFonts.poppins(
-              color: Colors.white, fontWeight: FontWeight.w500, fontSize: 18),
+            color: Colors.white,
+            fontWeight: FontWeight.w500,
+            fontSize: 18,
+          ),
         ),
       ),
       body: _loading
           ? const Center(child: CircularProgressIndicator())
           : _errorMessage != null
-              ? _buildErrorState(context, isFr)
+          ? _buildErrorState(context, isFr)
           : SingleChildScrollView(
               physics: const BouncingScrollPhysics(),
               padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 16),
@@ -134,10 +135,8 @@ class _EspacePartenairePageState extends State<EspacePartenairePage> {
                             ? '▼  Présentation de l\'Espace Partenaire'
                             : '▼  Partner Space overview',
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onSurfaceVariant,
-                            ),
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
                       ),
                     ),
                     const SizedBox(height: AppSpacing.xSmall),
@@ -153,9 +152,9 @@ class _EspacePartenairePageState extends State<EspacePartenairePage> {
                           ? 'Le Partenaire Dressur est un utilisateur confirmé qui maîtrise la plateforme et s\'engage à accompagner, aider et expliquer Dressur aux personnes qui utilisent son code d\'affiliation. C\'est un rôle actif, pas seulement un statut.'
                           : 'A Dressur Partner is a trusted user who understands the platform and commits to guiding, helping, and explaining Dressur to people who use their referral code. It is an active role, not just a status.',
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: Theme.of(context).colorScheme.onSurfaceVariant,
-                            height: 1.5,
-                          ),
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        height: 1.5,
+                      ),
                     ),
                   ),
                   const SizedBox(height: 12),
@@ -241,7 +240,8 @@ class _EspacePartenairePageState extends State<EspacePartenairePage> {
                           icon: FontAwesomeIcons.shield,
                           color: Colors.orange.shade600,
                           padding: const EdgeInsets.symmetric(
-                              vertical: AppSpacing.small),
+                            vertical: AppSpacing.small,
+                          ),
                         ),
                         if (!estPartenaire) ...[
                           const SizedBox(height: AppSpacing.medium),
@@ -256,18 +256,24 @@ class _EspacePartenairePageState extends State<EspacePartenairePage> {
                                         ? 'Bonjour, j\'aimerais passer l\'entretien pour devenir Partenaire Dressur. Mon pseudo est : $pseudo'
                                         : 'Hello, I would like to take the interview to become a Dressur Partner. My username is: $pseudo';
                                     final uri = Uri.parse(
-                                        'https://wa.me/22964044294?text=${Uri.encodeComponent(message)}');
-                                    if (!await launchUrl(uri,
-                                        mode: LaunchMode.externalApplication)) {
+                                      'https://wa.me/22964044294?text=${Uri.encodeComponent(message)}',
+                                    );
+                                    if (!await launchUrl(
+                                      uri,
+                                      mode: LaunchMode.externalApplication,
+                                    )) {
                                       if (!context.mounted) return;
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(SnackBar(
-                                        content: Text(
-                                          isFr
-                                              ? 'Impossible d\'ouvrir WhatsApp.'
-                                              : 'Unable to open WhatsApp.',
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        SnackBar(
+                                          content: Text(
+                                            isFr
+                                                ? 'Impossible d\'ouvrir WhatsApp.'
+                                                : 'Unable to open WhatsApp.',
+                                          ),
                                         ),
-                                      ));
+                                      );
                                     }
                                   }
                                 : null,
@@ -275,18 +281,18 @@ class _EspacePartenairePageState extends State<EspacePartenairePage> {
                           if (!toutesConditions)
                             Padding(
                               padding: const EdgeInsets.only(
-                                  top: AppSpacing.small),
+                                top: AppSpacing.small,
+                              ),
                               child: Text(
                                 isFr
                                     ? 'Complétez toutes les conditions ci-dessus pour débloquer l\'entretien.'
                                     : 'Complete all the requirements above to unlock the interview.',
                                 textAlign: TextAlign.center,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodySmall
+                                style: Theme.of(context).textTheme.bodySmall
                                     ?.copyWith(
-                                      color:
-                                          Theme.of(context).colorScheme.error,
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.error,
                                     ),
                               ),
                             ),
@@ -316,7 +322,9 @@ class _EspacePartenairePageState extends State<EspacePartenairePage> {
             children: [
               Expanded(
                 child: FeatureSectionTitle(
-                  title: isFr ? 'Votre Espace Partenaire' : 'Your Partner Space',
+                  title: isFr
+                      ? 'Votre Espace Partenaire'
+                      : 'Your Partner Space',
                   icon: FontAwesomeIcons.star,
                   color: accentColor,
                   padding: EdgeInsets.zero,
@@ -324,14 +332,15 @@ class _EspacePartenairePageState extends State<EspacePartenairePage> {
               ),
               Chip(
                 label: Text(
-                   isFr ? 'Actif' : 'Active',
+                  isFr ? 'Actif' : 'Active',
                   style: theme.textTheme.labelSmall?.copyWith(
                     color: theme.colorScheme.primary,
                     fontWeight: FontWeight.w700,
                   ),
                 ),
-                backgroundColor:
-                    theme.colorScheme.primary.withValues(alpha: 0.12),
+                backgroundColor: theme.colorScheme.primary.withValues(
+                  alpha: 0.12,
+                ),
                 side: BorderSide.none,
                 visualDensity: VisualDensity.compact,
                 padding: EdgeInsets.zero,
@@ -340,7 +349,7 @@ class _EspacePartenairePageState extends State<EspacePartenairePage> {
           ),
           const SizedBox(height: AppSpacing.large),
           Text(
-             isFr ? 'Votre code partenaire' : 'Your partner code',
+            isFr ? 'Votre code partenaire' : 'Your partner code',
             style: theme.textTheme.labelLarge?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
               fontWeight: FontWeight.w700,
@@ -373,15 +382,13 @@ class _EspacePartenairePageState extends State<EspacePartenairePage> {
           ),
           const SizedBox(height: AppSpacing.medium),
           FeaturePrimaryButton(
-             label: isFr ? 'Copier' : 'Copy',
+            label: isFr ? 'Copier' : 'Copy',
             icon: FontAwesomeIcons.copy,
             onPressed: () {
-              Clipboard.setData(
-                ClipboardData(text: monCodePartenaire ?? ''),
-              );
+              Clipboard.setData(ClipboardData(text: monCodePartenaire ?? ''));
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                   content: Text(isFr ? 'Code copié !' : 'Code copied!'),
+                  content: Text(isFr ? 'Code copié !' : 'Code copied!'),
                   backgroundColor: Colors.green.shade700,
                   duration: const Duration(seconds: 2),
                 ),
@@ -390,9 +397,9 @@ class _EspacePartenairePageState extends State<EspacePartenairePage> {
           ),
           const SizedBox(height: AppSpacing.small),
           Text(
-             isFr
-                 ? 'Ce code change automatiquement après chaque utilisation.'
-                 : 'This code changes automatically after each use.',
+            isFr
+                ? 'Ce code change automatiquement après chaque utilisation.'
+                : 'This code changes automatically after each use.',
             style: theme.textTheme.bodySmall?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
             ),
@@ -416,7 +423,7 @@ class _EspacePartenairePageState extends State<EspacePartenairePage> {
             children: [
               Expanded(
                 child: FeatureSectionTitle(
-                   title: isFr ? 'Mes accompagnés' : 'My referrals',
+                  title: isFr ? 'Mes accompagnés' : 'My referrals',
                   icon: FontAwesomeIcons.users,
                   padding: EdgeInsets.zero,
                 ),
@@ -442,9 +449,9 @@ class _EspacePartenairePageState extends State<EspacePartenairePage> {
               padding: const EdgeInsets.symmetric(vertical: AppSpacing.medium),
               child: Center(
                 child: Text(
-                   isFr
-                       ? 'Aucun accompagné pour l\'instant.\nPartagez votre code !'
-                       : 'No referrals yet.\nShare your code!',
+                  isFr
+                      ? 'Aucun accompagné pour l\'instant.\nPartagez votre code !'
+                      : 'No referrals yet.\nShare your code!',
                   textAlign: TextAlign.center,
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: theme.colorScheme.onSurfaceVariant,
@@ -462,7 +469,9 @@ class _EspacePartenairePageState extends State<EspacePartenairePage> {
   }
 
   Widget _buildActiveAccompagneCard(
-      BuildContext context, Map<String, dynamic> acc) {
+    BuildContext context,
+    Map<String, dynamic> acc,
+  ) {
     final theme = Theme.of(context);
     final isFr = _isFrench;
 
@@ -505,9 +514,9 @@ class _EspacePartenairePageState extends State<EspacePartenairePage> {
           const SizedBox(height: AppSpacing.xSmall),
           _buildActiveAccInfo(
             FontAwesomeIcons.calendarDay,
-             isFr
-                 ? 'Affilié le ${acc['dateAffiliation'] ?? '—'}'
-                 : 'Joined on ${acc['dateAffiliation'] ?? '—'}',
+            isFr
+                ? 'Affilié le ${acc['dateAffiliation'] ?? '—'}'
+                : 'Joined on ${acc['dateAffiliation'] ?? '—'}',
             theme.colorScheme.onSurfaceVariant,
           ),
         ],
@@ -538,7 +547,9 @@ class _EspacePartenairePageState extends State<EspacePartenairePage> {
         padding: const EdgeInsets.all(AppSpacing.xLarge),
         child: FeatureInfoCard(
           icon: FontAwesomeIcons.triangleExclamation,
-          title: isFr ? 'Espace partenaire indisponible' : 'Partner space unavailable',
+          title: isFr
+              ? 'Espace partenaire indisponible'
+              : 'Partner space unavailable',
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -548,8 +559,8 @@ class _EspacePartenairePageState extends State<EspacePartenairePage> {
                         ? 'Impossible de charger les données.'
                         : 'Unable to load the data.'),
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    ),
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
               ),
               const SizedBox(height: AppSpacing.large),
               FeaturePrimaryButton(
@@ -571,7 +582,11 @@ class _EspacePartenairePageState extends State<EspacePartenairePage> {
   }
 
   Widget _buildCondition(
-      BuildContext context, bool isValid, String label, bool isFr) {
+    BuildContext context,
+    bool isValid,
+    String label,
+    bool isFr,
+  ) {
     return FeatureCondition(
       label: label,
       isValid: isValid,
