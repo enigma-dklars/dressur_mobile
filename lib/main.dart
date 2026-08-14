@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:dressur/7_demarage/welcome_page.dart';
+import 'package:dressur/components/app_theme.dart';
 import 'package:dressur/components/constant.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -267,7 +268,8 @@ class MyApp extends StatelessWidget {
           },
           debugShowCheckedModeBanner: false,
           title: 'Dressur',
-          darkTheme: ThemeData.dark(),
+          theme: AppTheme.light,
+          darkTheme: AppTheme.dark,
           themeMode: currentMode,
         );
       },
