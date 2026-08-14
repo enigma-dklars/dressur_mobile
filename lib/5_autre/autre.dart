@@ -718,6 +718,12 @@ class _SettingPageState extends State<SettingPage>
           Row(
             children: [
               _buildStatusChip(
+                icon: FontAwesomeIcons.handshake,
+                label: isFr ? "Partenaire" : "Partner",
+                active: estPartenaire,
+              ),
+              const SizedBox(width: 8),
+              _buildStatusChip(
                 icon: FontAwesomeIcons.store,
                 label: isFr ? "Vendeur" : "Vendor",
                 active: isVendeur,
