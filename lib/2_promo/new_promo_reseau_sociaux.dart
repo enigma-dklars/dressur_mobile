@@ -12,6 +12,7 @@ import 'dart:convert' as convert;
 import 'package:dressur/components/noti.dart';
 import 'package:select_form_field/select_form_field.dart';
 import 'package:dressur/components/info_service_bottom_sheet.dart';
+import 'package:dressur/components/payment_summary.dart';
 
 class PromotionReseauSociauxFormPage extends StatefulWidget {
   @override
@@ -38,28 +39,38 @@ class _PromotionReseauSociauxFormPageState
       items: const [
         ServiceInfoItem(
           icon: FontAwesomeIcons.sliders,
-          textFr: "Vos préférences sur Dressur ne s'appliquent pas aux promotions sur les réseaux sociaux.",
-          textEn: "Your Dressur preferences do not apply to social media promotions.",
+          textFr:
+              "Vos préférences sur Dressur ne s'appliquent pas aux promotions sur les réseaux sociaux.",
+          textEn:
+              "Your Dressur preferences do not apply to social media promotions.",
         ),
         ServiceInfoItem(
           icon: FontAwesomeIcons.shareNodes,
-          textFr: "Les comptes qui interagiront avec votre promotion seront sélectionnés directement par le réseau social.",
-          textEn: "The accounts that will interact with your promotion will be selected directly by the social network.",
+          textFr:
+              "Les comptes qui interagiront avec votre promotion seront sélectionnés directement par le réseau social.",
+          textEn:
+              "The accounts that will interact with your promotion will be selected directly by the social network.",
         ),
         ServiceInfoItem(
           icon: FontAwesomeIcons.thumbsUp,
-          textFr: "Ce service peut vous aider à obtenir des votes, likes, commentaires et partages.",
-          textEn: "This service can help you get votes, likes, comments and shares.",
+          textFr:
+              "Ce service peut vous aider à obtenir des votes, likes, commentaires et partages.",
+          textEn:
+              "This service can help you get votes, likes, comments and shares.",
         ),
         ServiceInfoItem(
           icon: FontAwesomeIcons.userGroup,
-          textFr: "Ce service vous permet d'attirer davantage l'attention sur vos réseaux sociaux.",
-          textEn: "This service allows you to attract more attention on your social media.",
+          textFr:
+              "Ce service vous permet d'attirer davantage l'attention sur vos réseaux sociaux.",
+          textEn:
+              "This service allows you to attract more attention on your social media.",
         ),
         ServiceInfoItem(
           icon: FontAwesomeIcons.fileLines,
-          textFr: "Lisez correctement la description du service réseau auquel vous voulez souscrire.",
-          textEn: "Read carefully the description of the network service you want to subscribe to.",
+          textFr:
+              "Lisez correctement la description du service réseau auquel vous voulez souscrire.",
+          textEn:
+              "Read carefully the description of the network service you want to subscribe to.",
         ),
       ],
     );
@@ -71,7 +82,9 @@ class _PromotionReseauSociauxFormPageState
       onPressed: () => _showInfoModal(countdown: 0),
       icon: const FaIcon(FontAwesomeIcons.circleInfo, size: 14),
       label: Text(
-        isFr ? "Voir les informations sur le service" : "View service information",
+        isFr
+            ? "Voir les informations sur le service"
+            : "View service information",
         style: GoogleFonts.poppins(fontSize: 13, fontWeight: FontWeight.w500),
       ),
       style: OutlinedButton.styleFrom(
@@ -104,10 +117,7 @@ class _PromotionReseauSociauxFormPageState
           onPressed: () {
             Navigator.pop(context);
           },
-          icon: const FaIcon(
-            FontAwesomeIcons.chevronLeft,
-            color: Colors.white,
-          ),
+          icon: const FaIcon(FontAwesomeIcons.chevronLeft, color: Colors.white),
         ),
       ),
       body: SingleChildScrollView(
@@ -212,28 +222,39 @@ class _RegisterForm3State extends State<RegisterForm3> {
   }
 
   void calculerPrixTotal() {
-    _message = "";
+    var nextMessage = "";
+    var nextPrice = "";
+
     if (qte != 0) {
       int qteDemander = int.tryParse(quantityController.text) ?? 0;
       if (qteDemander >= qteMin && qteDemander <= qteMax) {
         int prixQteDemander = ((prix * qteDemander) / qte).round();
-        quantityController.text = "$qteDemander";
-        priceController.text = "$prixQteDemander";
+        nextPrice = "$prixQteDemander";
         if (prixQteDemander < 100) {
-          _message = (langUserPhone == "fr")
+          nextMessage = (langUserPhone == "fr")
               ? "Le prix minimum pour une transaction est de 100 FCFA."
               : "The minimum price for a transaction is 100 FCFA.";
         }
       } else {
-        _message = (langUserPhone == "fr")
+        nextMessage = (langUserPhone == "fr")
             ? "La quantité doit être comprise entre $qteMin et $qteMax"
             : "The quantity must be between $qteMin and $qteMax";
       }
     } else {
-      _message = (langUserPhone == "fr")
+      nextMessage = (langUserPhone == "fr")
           ? "Veuillez choisir un réseau social puis un service."
           : "Please choose a social network then a service.";
     }
+
+    if (!mounted) return;
+    setState(() {
+      _message = nextMessage;
+      if (nextPrice.isEmpty) {
+        priceController.clear();
+      } else {
+        priceController.text = nextPrice;
+      }
+    });
   }
 
   void listeFormPromoReseau() async {
@@ -244,10 +265,10 @@ class _RegisterForm3State extends State<RegisterForm3> {
       });
 
       var request = http.MultipartRequest(
-          'POST', Uri.parse('$generalRouteForApi/listeFormulePromoReseau'));
-      request.fields.addAll({
-        
-      });
+        'POST',
+        Uri.parse('$generalRouteForApi/listeFormulePromoReseau'),
+      );
+      request.fields.addAll({});
 
       http.StreamedResponse response = await request.send();
 
@@ -268,7 +289,10 @@ class _RegisterForm3State extends State<RegisterForm3> {
     } else {
       if (langUserPhone != "fr") {
         dangerNoti(
-            "Mistake!", "You are not connected to the internet.", context);
+          "Mistake!",
+          "You are not connected to the internet.",
+          context,
+        );
       } else {
         dangerNoti("Erreur!", "Vous n'êtes pas connecté à internet.", context);
       }
@@ -280,8 +304,11 @@ class _RegisterForm3State extends State<RegisterForm3> {
 
   void newPromoReseau() async {
     if (_message != "") {
-      dangerNoti((langUserPhone == "fr") ? "Attention !!!" : "Attention !!!",
-          _message, context);
+      dangerNoti(
+        (langUserPhone == "fr") ? "Attention !!!" : "Attention !!!",
+        _message,
+        context,
+      );
     } else {
       setState(() {
         _desactive3 = true;
@@ -290,9 +317,10 @@ class _RegisterForm3State extends State<RegisterForm3> {
       bool isConnected = await isConnectedToInternet();
       if (isConnected) {
         var request = http.MultipartRequest(
-            'POST', Uri.parse('$generalRouteForApi/newPromoReseau'));
+          'POST',
+          Uri.parse('$generalRouteForApi/newPromoReseau'),
+        );
         request.fields.addAll({
-          
           'uid': uidUser,
           'idFormulePromoReseau': idFormulePromoReseau.toString(),
           'qteDemander': quantityController.text,
@@ -314,26 +342,32 @@ class _RegisterForm3State extends State<RegisterForm3> {
             });
             if (data["solde_used"] == true) {
               successNoti(
-                  (langUserPhone == "fr") ? "Succès" : "Success",
-                  data["message"] ?? ((langUserPhone == "fr") ? "Solde débité. Promotion Réseau enregistrée." : "Balance debited. Social media promotion registered."),
-                  context);
+                (langUserPhone == "fr") ? "Succès" : "Success",
+                data["message"] ??
+                    ((langUserPhone == "fr")
+                        ? "Solde débité. Promotion Réseau enregistrée."
+                        : "Balance debited. Social media promotion registered."),
+                context,
+              );
             } else if (data["direct"] == true) {
               dangerNoti(
-                  (langUserPhone == "fr") ? "Attention !!!" : "Attention !!!",
-                  (langUserPhone == "fr")
-                      ? "Après confirmation du paiement, veuillez consulter la liste de vos promotions réseaux sociaux."
-                      : "After payment confirmation, please view the list of your social media promotions.",
-                  context);
+                (langUserPhone == "fr") ? "Attention !!!" : "Attention !!!",
+                (langUserPhone == "fr")
+                    ? "Après confirmation du paiement, veuillez consulter la liste de vos promotions réseaux sociaux."
+                    : "After payment confirmation, please view the list of your social media promotions.",
+                context,
+              );
             } else {
               launchPaiement(data["url"]);
               await showNotification(
-                  (langUserPhone == "fr")
-                      ? "Paiement en cours !"
-                      : "Payment in progress !",
-                  (langUserPhone == "fr")
-                      ? "Après confirmation du paiement, veuillez consulter la liste de vos promotions réseaux sociaux."
-                      : "After payment confirmation, please view the list of your social media promotions.",
-                  context: context);
+                (langUserPhone == "fr")
+                    ? "Paiement en cours !"
+                    : "Payment in progress !",
+                (langUserPhone == "fr")
+                    ? "Après confirmation du paiement, veuillez consulter la liste de vos promotions réseaux sociaux."
+                    : "After payment confirmation, please view the list of your social media promotions.",
+                context: context,
+              );
               if (mounted) Navigator.pop(context);
             }
           } else {
@@ -351,10 +385,16 @@ class _RegisterForm3State extends State<RegisterForm3> {
       } else {
         if (langUserPhone != "fr") {
           dangerNoti(
-              "Mistake!", "You are not connected to the internet.", context);
+            "Mistake!",
+            "You are not connected to the internet.",
+            context,
+          );
         } else {
           dangerNoti(
-              "Erreur!", "Vous n'ètes pas connecté a internet.", context);
+            "Erreur!",
+            "Vous n'ètes pas connecté a internet.",
+            context,
+          );
         }
         setState(() {
           _desactive3 = false;
@@ -399,75 +439,84 @@ class _RegisterForm3State extends State<RegisterForm3> {
                   child: CircularProgressIndicator(color: primaryColor),
                 )
               : listSocialNetworks.isEmpty
-                  ? Center(
-                      child: Text(
-                        (langUserPhone == "fr")
-                            ? "Erreur lors du chargement des formules de promotion réseau sociaux. Veuillez Contacter l'assistance Dressur."
-                            : "Error loading social network promotion formulas. Please Contact Dressur Support.",
-                        style: GoogleFonts.poppins(fontSize: 16),
-                      ),
-                    )
-                  : SizedBox(
-                      height: 60,
-                      child: Scrollbar(
-                        controller: _scrollController,
-                        thumbVisibility: true,
-                        thickness: 5,
-                        radius: const Radius.circular(5),
-                        child: SingleChildScrollView(
-                          controller:
-                              _scrollController, // Attach the ScrollController here
-                          scrollDirection: Axis.horizontal,
-                          child: Row(
-                            spacing: 10,
-                            children: List.generate(
-                              listSocialNetworks.length,
-                              (index) => ActionChip(
-                                label: Row(
-                                  children: [
-                                    FaIcon(
-                                      selectedSocialNetwork ==
-                                              listSocialNetworks[index]['titre']
-                                          ? FontAwesomeIcons.solidCircleCheck
-                                          : FontAwesomeIcons.circle,
-                                      size: 15,
-                                    ),
-                                    const SizedBox(width: 10),
-                                    Text(
-                                      listSocialNetworks[index]['titre'],
-                                      style: GoogleFonts.poppins(
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.w400,
-                                      ),
-                                    ),
-                                  ],
+              ? Center(
+                  child: Text(
+                    (langUserPhone == "fr")
+                        ? "Erreur lors du chargement des formules de promotion réseau sociaux. Veuillez Contacter l'assistance Dressur."
+                        : "Error loading social network promotion formulas. Please Contact Dressur Support.",
+                    style: GoogleFonts.poppins(fontSize: 16),
+                  ),
+                )
+              : SizedBox(
+                  height: 60,
+                  child: Scrollbar(
+                    controller: _scrollController,
+                    thumbVisibility: true,
+                    thickness: 5,
+                    radius: const Radius.circular(5),
+                    child: SingleChildScrollView(
+                      controller:
+                          _scrollController, // Attach the ScrollController here
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        spacing: 10,
+                        children: List.generate(
+                          listSocialNetworks.length,
+                          (index) => ActionChip(
+                            label: Row(
+                              children: [
+                                FaIcon(
+                                  selectedSocialNetwork ==
+                                          listSocialNetworks[index]['titre']
+                                      ? FontAwesomeIcons.solidCircleCheck
+                                      : FontAwesomeIcons.circle,
+                                  size: 15,
                                 ),
-                                onPressed: () {
-                                  setState(() {
-                                    idFormulePromoReseau = 0;
-                                    description = (langUserPhone == "fr")
-                                        ? "Veuillez choisir un réseau social puis un service."
-                                        : "Please choose a social network then a service.";
-                                    _message = description;
-                                    selectedSocialNetwork =
-                                        listSocialNetworks[index]['titre'];
-                                    listServices = (listSocialNetworks[index]
-                                                ['lesFormulesFils']
-                                            as List<dynamic>)
-                                        .map((item) =>
-                                            item as Map<String, dynamic>)
-                                        .toList();
-                                    initialService = listServices.isNotEmpty
-                                        ? listServices.first['id']
-                                        : null;
-                                  });
-                                },
-                              ),
+                                const SizedBox(width: 10),
+                                Text(
+                                  listSocialNetworks[index]['titre'],
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                ),
+                              ],
                             ),
+                            onPressed: () {
+                              setState(() {
+                                idFormulePromoReseau = 0;
+                                titre = "";
+                                prix = 0;
+                                qte = 0;
+                                qteMin = 0;
+                                qteMax = 0;
+                                quantityController.text = "0";
+                                priceController.clear();
+                                description = (langUserPhone == "fr")
+                                    ? "Veuillez choisir un réseau social puis un service."
+                                    : "Please choose a social network then a service.";
+                                _message = description;
+                                selectedSocialNetwork =
+                                    listSocialNetworks[index]['titre'];
+                                listServices =
+                                    (listSocialNetworks[index]['lesFormulesFils']
+                                            as List<dynamic>)
+                                        .map(
+                                          (item) =>
+                                              item as Map<String, dynamic>,
+                                        )
+                                        .toList();
+                                initialService = listServices.isNotEmpty
+                                    ? listServices.first['id']
+                                    : null;
+                              });
+                            },
                           ),
                         ),
                       ),
                     ),
+                  ),
+                ),
           const SizedBox(height: 20),
           SelectFormField(
             decoration: InputDecoration(
@@ -484,20 +533,21 @@ class _RegisterForm3State extends State<RegisterForm3> {
           const SizedBox(height: 10),
           Card(
             child: Container(
-                width: MediaQuery.of(context).size.width * 1,
-                padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      description,
-                      style: GoogleFonts.poppins(
-                        fontWeight: FontWeight.w400,
-                        fontSize: 16,
-                      ),
+              width: MediaQuery.of(context).size.width * 1,
+              padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    description,
+                    style: GoogleFonts.poppins(
+                      fontWeight: FontWeight.w400,
+                      fontSize: 16,
                     ),
-                  ],
-                )),
+                  ),
+                ],
+              ),
+            ),
           ),
           const SizedBox(height: 15),
           Row(
@@ -509,7 +559,9 @@ class _RegisterForm3State extends State<RegisterForm3> {
                   controller: quantityController,
                   keyboardType: TextInputType.number,
                   decoration: InputDecoration(
-                    labelText: (langUserPhone == "fr") ? "Quantité" : "Quantity",
+                    labelText: (langUserPhone == "fr")
+                        ? "Quantité"
+                        : "Quantity",
                     helperText: "Min : $qteMin - Max : $qteMax",
                     border: const OutlineInputBorder(),
                   ),
@@ -522,8 +574,9 @@ class _RegisterForm3State extends State<RegisterForm3> {
                   controller: priceController,
                   maxLines: 3,
                   minLines: 1,
-                  keyboardType:
-                      const TextInputType.numberWithOptions(decimal: true),
+                  keyboardType: const TextInputType.numberWithOptions(
+                    decimal: true,
+                  ),
                   decoration: InputDecoration(
                     labelText: (langUserPhone == "fr") ? "Prix" : "Price",
                     helperText: "FCFA",
@@ -545,26 +598,36 @@ class _RegisterForm3State extends State<RegisterForm3> {
               border: const OutlineInputBorder(),
               errorText: _isValidLink
                   ? null
-                  : (langUserPhone == "fr") ? "Veuillez saisir un lien valide." : "Please enter a valid link.",
+                  : (langUserPhone == "fr")
+                  ? "Veuillez saisir un lien valide."
+                  : "Please enter a valid link.",
             ),
             onChanged: (text) {
               setState(() {
                 // Basic URL validation using a regular expression
-                final RegExp urlRegex = RegExp(r"^(?:(?:https?|ftp)://)?\S+$",
-                    caseSensitive: false);
+                final RegExp urlRegex = RegExp(
+                  r"^(?:(?:https?|ftp)://)?\S+$",
+                  caseSensitive: false,
+                );
                 _isValidLink = urlRegex.hasMatch(text);
               });
             },
           ),
           const SizedBox(height: 15),
+          _buildPaymentSummary(context),
+          const SizedBox(height: 15),
           SelectFormField(
             decoration: InputDecoration(
-              labelText: (langUserPhone == "fr") ? 'Moyen de paiement mobile ou par carte' : 'Mobile or card payment method',
+              labelText: (langUserPhone == "fr")
+                  ? 'Moyen de paiement mobile ou par carte'
+                  : 'Mobile or card payment method',
               border: const OutlineInputBorder(),
             ),
             type: SelectFormFieldType.dropdown,
             initialValue: 'mtn',
-            labelText: (langUserPhone == "fr") ? 'Moyen de paiement mobile ou par carte' : 'Mobile or card payment method',
+            labelText: (langUserPhone == "fr")
+                ? 'Moyen de paiement mobile ou par carte'
+                : 'Mobile or card payment method',
             items: listeMethodePaiements,
             onChanged: (val) => onChangeMethodePaiement(val),
             onSaved: (val) => print(val),
@@ -574,7 +637,9 @@ class _RegisterForm3State extends State<RegisterForm3> {
             controller: telController,
             decoration: InputDecoration(
               labelStyle: GoogleFonts.poppins(color: Colors.grey[400]),
-              labelText: (langUserPhone == "fr") ? 'Indicatif + Numéro du paiement' : 'Country code + Payment number',
+              labelText: (langUserPhone == "fr")
+                  ? 'Indicatif + Numéro du paiement'
+                  : 'Country code + Payment number',
               border: const OutlineInputBorder(),
             ),
           ),
@@ -585,21 +650,17 @@ class _RegisterForm3State extends State<RegisterForm3> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: primaryColor,
                 shape: const StadiumBorder(),
-                padding: const EdgeInsets.symmetric(
-                  vertical: 13,
-                ),
+                padding: const EdgeInsets.symmetric(vertical: 13),
               ),
               child: Text(
                 _desactive3
                     ? (langUserPhone == "fr")
-                        ? "Patientez..."
-                        : "Wait..."
+                          ? "Patientez..."
+                          : "Wait..."
                     : (langUserPhone == "fr")
-                        ? "Payer et Démarrer"
-                        : "Pay and Get Started",
-                style: GoogleFonts.poppins(
-                  color: Colors.white,
-                ),
+                    ? "Payer et Démarrer"
+                    : "Pay and Get Started",
+                style: GoogleFonts.poppins(color: Colors.white),
               ),
               onPressed: () {
                 _desactive3 ? null : newPromoReseau();
@@ -607,6 +668,88 @@ class _RegisterForm3State extends State<RegisterForm3> {
             ),
           ),
           const SizedBox(height: 15),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPaymentSummary(BuildContext context) {
+    final bool isFrench = langUserPhone == "fr";
+    final int calculatedAmount = int.tryParse(priceController.text) ?? 0;
+    final String quantity =
+        int.tryParse(quantityController.text)?.toString() ?? "0";
+
+    return Card(
+      margin: EdgeInsets.zero,
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(
+              isFrench ? "Récapitulatif du paiement" : "Payment summary",
+              style: GoogleFonts.poppins(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: 10),
+            _summaryValueRow(
+              isFrench ? "Réseau social" : "Social network",
+              selectedSocialNetwork?.isNotEmpty == true
+                  ? selectedSocialNetwork!
+                  : "—",
+            ),
+            _summaryValueRow(
+              isFrench ? "Service choisi" : "Selected service",
+              titre.isNotEmpty ? titre : "—",
+            ),
+            _summaryValueRow(
+              isFrench ? "Quantité" : "Quantity",
+              quantity == "0" ? "—" : quantity,
+            ),
+            const SizedBox(height: 10),
+            PaymentSummary(
+              lines: [
+                PaymentSummaryLine(
+                  labelFr: "Prix calculé",
+                  labelEn: "Calculated price",
+                  amount: calculatedAmount,
+                ),
+              ],
+              total: calculatedAmount,
+              languageCode: isFrench ? "fr" : "en",
+              totalLabelFr: "Total à payer",
+              totalLabelEn: "Total to pay",
+              padding: EdgeInsets.zero,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _summaryValueRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 3),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            child: Text(label, style: GoogleFonts.poppins(fontSize: 13)),
+          ),
+          const SizedBox(width: 12),
+          Flexible(
+            child: Text(
+              value,
+              textAlign: TextAlign.end,
+              softWrap: true,
+              style: GoogleFonts.poppins(
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
         ],
       ),
     );
