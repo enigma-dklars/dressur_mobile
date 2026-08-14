@@ -21,6 +21,8 @@ class _MesReseauxPageState extends State<MesReseauxPage> {
   bool _isLoading = true;
   String? _errorMessage;
   String? _catalogError;
+  bool _networksLoadedSuccessfully = false;
+  bool _catalogLoadedSuccessfully = false;
   List<_UserNetwork> _networks = [];
   List<_NetworkCatalogItem> _catalog = [];
   String? _deletingNetworkType;
@@ -30,6 +32,12 @@ class _MesReseauxPageState extends State<MesReseauxPage> {
   bool get _isFrench => langUserPhone == 'fr';
   bool get _isMutating =>
       _deletingNetworkType != null || _updatingNetworkType != null;
+  bool get _canManageNetworks =>
+      !_isLoading &&
+      _networksLoadedSuccessfully &&
+      _catalogLoadedSuccessfully &&
+      _errorMessage == null &&
+      _catalogError == null;
 
   @override
   void initState() {
@@ -44,6 +52,8 @@ class _MesReseauxPageState extends State<MesReseauxPage> {
       _isLoading = true;
       _errorMessage = null;
       _catalogError = null;
+      _networksLoadedSuccessfully = false;
+      _catalogLoadedSuccessfully = false;
     });
 
     if (_uid.isEmpty) {
@@ -128,6 +138,8 @@ class _MesReseauxPageState extends State<MesReseauxPage> {
       _isLoading = false;
       _errorMessage = networksError;
       _catalogError = catalogError;
+      _networksLoadedSuccessfully = loadedNetworks != null;
+      _catalogLoadedSuccessfully = loadedCatalog != null;
     });
   }
 
@@ -358,6 +370,18 @@ class _MesReseauxPageState extends State<MesReseauxPage> {
   Future<void> _showAddNetworkDialog() async {
     if (_isMutating) return;
 
+    if (!_canManageNetworks) {
+      _showSnackBar(
+        _errorMessage ??
+            _catalogError ??
+            (_isFrench
+                ? 'Les données des réseaux ne sont pas disponibles. Réessayez.'
+                : 'Network data is not available. Please try again.'),
+        isError: true,
+      );
+      return;
+    }
+
     final availableNetworks = _availableNetworks;
     if (availableNetworks.isEmpty) {
       _showSnackBar(
@@ -447,7 +471,9 @@ class _MesReseauxPageState extends State<MesReseauxPage> {
         ),
         actions: [
           IconButton(
-            onPressed: _isLoading || _isMutating ? null : _showAddNetworkDialog,
+            onPressed: _canManageNetworks && !_isMutating
+                ? _showAddNetworkDialog
+                : null,
             tooltip: _isFrench ? 'Ajouter un réseau' : 'Add a network',
             icon: const FaIcon(FontAwesomeIcons.plus, color: Colors.white),
           ),
