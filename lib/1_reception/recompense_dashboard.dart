@@ -15,10 +15,8 @@ import 'package:dressur/1_reception/business_promotions_page.dart';
 import 'package:dressur/1_reception/recompense_start.dart';
 import 'package:flutter/material.dart';
 import 'package:dressur/components/constant.dart';
-import 'package:dressur/components/permission_manager.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 class HistoriqueRecompense {
   final int id;
@@ -976,28 +974,20 @@ class _ProgrammeRecompenseDashboardState
   }
 
   Future<void> _pickImage(int index, StateSetter setModalState) async {
-    await PermissionManager.instance.runWithPermissionRecovery(
-      context,
-      actionKey: 'recompense_dashboard:pick_image:$index',
-      permission: Permission.photos,
-      isFrench: langUserPhone == "fr",
-      action: () async {
-        if (!mounted) return;
-        final XFile? pickedFile = await _picker.pickImage(
-          source: ImageSource.gallery,
-          imageQuality: 80,
-        );
-        if (pickedFile != null) {
-          setState(() {
-            if (index == 1)
-              _proofImage1 = File(pickedFile.path);
-            else
-              _proofImage2 = File(pickedFile.path);
-          });
-          setModalState(() {});
-        }
-      },
+    if (!mounted) return;
+    final XFile? pickedFile = await _picker.pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 80,
     );
+    if (pickedFile != null) {
+      setState(() {
+        if (index == 1)
+          _proofImage1 = File(pickedFile.path);
+        else
+          _proofImage2 = File(pickedFile.path);
+      });
+      setModalState(() {});
+    }
   }
 
   Future<void> _submitProofs(

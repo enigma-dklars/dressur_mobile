@@ -12,10 +12,8 @@ import 'package:path_provider/path_provider.dart';
 import 'package:image/image.dart' as img;
 import 'package:dressur/components/constant.dart';
 import 'package:dressur/components/noti.dart';
-import 'package:dressur/components/permission_manager.dart';
 import 'package:dressur/components/promotion_image_cropper.dart';
 import 'package:select_form_field/select_form_field.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 class ModificationProduitServicesPage extends StatefulWidget {
   final Promotion promotion;
@@ -67,80 +65,72 @@ class _ModificationProduitServicesPageState
   }
 
   Future<void> _selectImage() async {
-    await PermissionManager.instance.runWithPermissionRecovery(
-      context,
-      actionKey: 'edit_promo_affaire:select_image',
-      permission: Permission.photos,
-      isFrench: langUserPhone == "fr",
-      action: () async {
-        if (!mounted) return;
-        final picker = ImagePicker();
-        final pickedImage = await picker.pickImage(source: ImageSource.gallery);
-        if (pickedImage == null) return;
+    if (!mounted) return;
+    final picker = ImagePicker();
+    final pickedImage = await picker.pickImage(source: ImageSource.gallery);
+    if (pickedImage == null) return;
 
-        final imageFile = File(pickedImage.path);
-        final fileSizeInMB = await imageFile.length() / (1024 * 1024);
+    final imageFile = File(pickedImage.path);
+    final fileSizeInMB = await imageFile.length() / (1024 * 1024);
 
-        if (fileSizeInMB > 1) {
-          dangerNoti(
-            (langUserPhone == "fr") ? "Attention !!!" : "Warning!!!",
-            langUserPhone == "fr"
-                ? "La taille de l'image ne peut pas dépasser 1 Mo."
-                : "Image size cannot exceed 1 MB.",
-            context,
-          );
-          return;
-        }
+    if (fileSizeInMB > 1) {
+      dangerNoti(
+        (langUserPhone == "fr") ? "Attention !!!" : "Warning!!!",
+        langUserPhone == "fr"
+            ? "La taille de l'image ne peut pas dépasser 1 Mo."
+            : "Image size cannot exceed 1 MB.",
+        context,
+      );
+      return;
+    }
 
-        final imageBytes = await imageFile.readAsBytes();
-        final decodedImage = img.decodeImage(imageBytes);
-        if (decodedImage == null) {
-          dangerNoti(
-            (langUserPhone == "fr") ? "Attention !!!" : "Warning!!!",
-            langUserPhone == "fr"
-                ? "Cette image ne peut pas être décodée."
-                : "This image cannot be decoded.",
-            context,
-          );
-          return;
-        }
+    final imageBytes = await imageFile.readAsBytes();
+    final decodedImage = img.decodeImage(imageBytes);
+    if (decodedImage == null) {
+      dangerNoti(
+        (langUserPhone == "fr") ? "Attention !!!" : "Warning!!!",
+        langUserPhone == "fr"
+            ? "Cette image ne peut pas être décodée."
+            : "This image cannot be decoded.",
+        context,
+      );
+      return;
+    }
 
-        final orientedImage = img.bakeOrientation(decodedImage);
-        if (_hasSupportedImageRatio(orientedImage)) {
-          if (!mounted) return;
-          setState(() {
-            _imageFile = imageFile;
-          });
-          return;
-        }
+    final orientedImage = img.bakeOrientation(decodedImage);
+    if (_hasSupportedImageRatio(orientedImage)) {
+      if (!mounted) return;
+      setState(() {
+        _imageFile = imageFile;
+      });
+      return;
+    }
 
-        if (!mounted) return;
-        final croppedImage = await showDialog<File>(
-          context: context,
-          barrierDismissible: false,
-          builder: (_) => PromotionImageCropper(
-            imageFile: imageFile,
-            isFrench: langUserPhone == "fr",
-          ),
-        );
-        if (!mounted || croppedImage == null) return;
-
-        if (await croppedImage.length() > 1024 * 1024) {
-          dangerNoti(
-            (langUserPhone == "fr") ? "Attention !!!" : "Warning!!!",
-            langUserPhone == "fr"
-                ? "La taille de l'image ne peut pas dépasser 1 Mo."
-                : "Image size cannot exceed 1 MB.",
-            context,
-          );
-          return;
-        }
-
-        setState(() {
-          _imageFile = croppedImage;
-        });
-      },
+    if (!mounted) return;
+    final croppedImage = await showDialog<File>(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => PromotionImageCropper(
+        imageFile: imageFile,
+        isFrench: langUserPhone == "fr",
+      ),
     );
+    if (!mounted || croppedImage == null) return;
+
+    if (await croppedImage.length() > 1024 * 1024) {
+      dangerNoti(
+        (langUserPhone == "fr") ? "Attention !!!" : "Warning!!!",
+        langUserPhone == "fr"
+            ? "La taille de l'image ne peut pas dépasser 1 Mo."
+            : "Image size cannot exceed 1 MB.",
+        context,
+      );
+      return;
+    }
+
+    setState(() {
+      _imageFile = croppedImage;
+    });
   }
 
   Future<void> _sendData() async {

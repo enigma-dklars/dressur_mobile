@@ -17,8 +17,6 @@ import 'package:dressur/components/constant.dart';
 import 'package:dressur/2_promo/boost_billing.dart';
 import 'package:dressur/components/noti.dart';
 import 'package:dressur/components/noti_sys.dart';
-import 'package:dressur/components/permission_manager.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:select_form_field/select_form_field.dart';
 import 'package:dressur/components/info_service_bottom_sheet.dart';
 import 'package:dressur/components/promotion_image_cropper.dart';
@@ -509,28 +507,20 @@ class _ProduitsServicesState extends State<ProduitsServices> {
   }
 
   Future<void> _selectImage() async {
-    await PermissionManager.instance.runWithPermissionRecovery(
-      context,
-      actionKey: 'new_promo_affaire:select_image',
-      permission: Permission.photos,
-      isFrench: langUserPhone == "fr",
-      action: () async {
-        if (!mounted) return;
-        final picker = ImagePicker();
-        final pickedImage = await picker.pickImage(source: ImageSource.gallery);
-        if (pickedImage != null) {
-          final imageFile = File(pickedImage.path);
-          final preparedImage = await _preparePromotionImage(
-            context: context,
-            imageFile: imageFile,
-            isFrench: langUserPhone == "fr",
-          );
-          if (preparedImage != null && mounted) {
-            setState(() => _imageFile = preparedImage);
-          }
-        }
-      },
-    );
+    if (!mounted) return;
+    final picker = ImagePicker();
+    final pickedImage = await picker.pickImage(source: ImageSource.gallery);
+    if (pickedImage != null) {
+      final imageFile = File(pickedImage.path);
+      final preparedImage = await _preparePromotionImage(
+        context: context,
+        imageFile: imageFile,
+        isFrench: langUserPhone == "fr",
+      );
+      if (preparedImage != null && mounted) {
+        setState(() => _imageFile = preparedImage);
+      }
+    }
   }
 
   Future<void> _sendData() async {
@@ -2017,28 +2007,20 @@ class _SitesApplicationsState extends State<SitesApplications> {
   bool _loadingPaiements = false;
 
   Future<void> _selectImage() async {
-    await PermissionManager.instance.runWithPermissionRecovery(
-      context,
-      actionKey: 'sites_applications:select_image',
-      permission: Permission.photos,
-      isFrench: langUserPhone == "fr",
-      action: () async {
-        if (!mounted) return;
-        final picker = ImagePicker();
-        final pickedImage = await picker.pickImage(source: ImageSource.gallery);
-        if (pickedImage != null) {
-          final imageFile = File(pickedImage.path);
-          final preparedImage = await _preparePromotionImage(
-            context: context,
-            imageFile: imageFile,
-            isFrench: langUserPhone == "fr",
-          );
-          if (preparedImage != null && mounted) {
-            setState(() => _imageFile = preparedImage);
-          }
-        }
-      },
-    );
+    if (!mounted) return;
+    final picker = ImagePicker();
+    final pickedImage = await picker.pickImage(source: ImageSource.gallery);
+    if (pickedImage != null) {
+      final imageFile = File(pickedImage.path);
+      final preparedImage = await _preparePromotionImage(
+        context: context,
+        imageFile: imageFile,
+        isFrench: langUserPhone == "fr",
+      );
+      if (preparedImage != null && mounted) {
+        setState(() => _imageFile = preparedImage);
+      }
+    }
   }
 
   Future<void> _loadMethodesPaiement() async {
