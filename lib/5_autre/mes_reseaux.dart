@@ -162,7 +162,20 @@ class _MesReseauxPageState extends State<MesReseauxPage> {
         _mobileUidHeader: _uid,
       };
 
+  String get _sessionRenewalMessage => _isFrench
+      ? 'Votre session n’est plus valide. Veuillez vous reconnecter.'
+      : 'Your session is no longer valid. Please sign in again.';
+
+  bool _hasAuthenticationErrorCode(Map<String, dynamic> payload) {
+    final code = payload['code']?.toString().trim().toLowerCase();
+    return code == 'authentication_required' || code == 'session_invalid';
+  }
+
   Map<String, dynamic> _readPayload(http.Response response, String fallback) {
+    if (response.statusCode == 401) {
+      throw _NetworkApiException(_sessionRenewalMessage);
+    }
+
     dynamic decoded;
     try {
       decoded = jsonDecode(response.body);
@@ -175,6 +188,10 @@ class _MesReseauxPageState extends State<MesReseauxPage> {
     }
 
     final payload = Map<String, dynamic>.from(decoded);
+    if (_hasAuthenticationErrorCode(payload)) {
+      throw _NetworkApiException(_sessionRenewalMessage);
+    }
+
     final statusIsError =
         response.statusCode < 200 || response.statusCode >= 300;
     if (statusIsError || payload['error'] == true) {
