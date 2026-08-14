@@ -611,6 +611,90 @@ class _RegisterForm2State extends State<RegisterForm2> {
   onChangeMethodePaiement(val) async {
     setState(() => valueMethodePaiement = val);
   }
+
+  Widget _buildPaidBoostSummary(bool isFr) {
+    final bool hasSelectedFormula = label.isNotEmpty;
+    final String durationOrQuota = !hasSelectedFormula
+        ? "—"
+        : widget.typeBoost == 'quota'
+            ? "${nbContactsMax ?? 0} ${isFr ? 'contact(s)' : 'contact(s)'}"
+            : "${jours} ${isFr ? 'jour(s)' : 'day(s)'}";
+    final String formulaPrice = hasSelectedFormula ? "$prix FCFA" : "—";
+
+    Widget summaryRow(String title, String value, {bool emphasized = false}) {
+      final textStyle = GoogleFonts.poppins(
+        fontSize: 13,
+        fontWeight: emphasized ? FontWeight.w700 : FontWeight.w500,
+        color: emphasized ? primaryColor : Colors.black87,
+      );
+
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 4),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: Text(
+                title,
+                style: GoogleFonts.poppins(fontSize: 13, color: Colors.grey[700]),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Flexible(
+              child: Text(
+                value,
+                textAlign: TextAlign.end,
+                style: textStyle,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: Colors.grey[50],
+        border: Border.all(color: primaryColor.withOpacity(0.25)),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            isFr ? "Récapitulatif" : "Summary",
+            style: GoogleFonts.poppins(
+              fontSize: 15,
+              fontWeight: FontWeight.w700,
+              color: primaryColor,
+            ),
+          ),
+          const SizedBox(height: 8),
+          summaryRow(
+            isFr ? "Formule sélectionnée" : "Selected plan",
+            hasSelectedFormula ? label : "—",
+          ),
+          summaryRow(
+            isFr ? "Durée ou quota" : "Duration or quota",
+            durationOrQuota,
+          ),
+          summaryRow(
+            isFr ? "Prix de la formule" : "Plan price",
+            formulaPrice,
+          ),
+          const Divider(height: 12),
+          summaryRow(
+            isFr ? "Total à payer" : "Total to pay",
+            formulaPrice,
+            emphasized: true,
+          ),
+        ],
+      ),
+    );
+  }
+
   void newBoostPayant() async {
     if (telIsVerified == true) {
       bool isConnected = await isConnectedToInternet();
@@ -720,6 +804,8 @@ class _RegisterForm2State extends State<RegisterForm2> {
           style: GoogleFonts.poppins(fontSize: 14),
           textAlign: TextAlign.center,
         ),
+        const SizedBox(height: 10),
+        _buildPaidBoostSummary(isFr),
         const SizedBox(height: 10),
         SelectFormField(
           decoration: InputDecoration(
