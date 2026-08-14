@@ -20,6 +20,7 @@ class _MesReseauxPageState extends State<MesReseauxPage> {
 
   bool _isLoading = true;
   String? _errorMessage;
+  String? _catalogError;
   List<_UserNetwork> _networks = [];
   List<_NetworkCatalogItem> _catalog = [];
   String? _deletingNetworkType;
@@ -42,6 +43,7 @@ class _MesReseauxPageState extends State<MesReseauxPage> {
     setState(() {
       _isLoading = true;
       _errorMessage = null;
+      _catalogError = null;
     });
 
     if (_uid.isEmpty) {
@@ -54,61 +56,79 @@ class _MesReseauxPageState extends State<MesReseauxPage> {
       return;
     }
 
-    try {
-      final responses = await Future.wait([
-        _getWithUid(Uri.parse('$generalRouteForApi/user/social-networks')),
-        http
-            .get(Uri.parse('$generalRouteForApi/social-networks/catalog'))
-            .timeout(_requestTimeout),
-      ]);
+    List<_UserNetwork>? loadedNetworks;
+    List<_NetworkCatalogItem>? loadedCatalog;
+    String? networksError;
+    String? catalogError;
 
-      final networksPayload = _readPayload(
-        responses[0],
+    try {
+      final response = await _getWithUid(
+        Uri.parse('$generalRouteForApi/user/social-networks'),
+      );
+      final payload = _readPayload(
+        response,
         _isFrench
             ? 'Impossible de charger vos réseaux.'
             : 'Unable to load your networks.',
       );
-      final catalogPayload = _readPayload(
-        responses[1],
-        _isFrench
-            ? 'Impossible de charger les réseaux disponibles.'
-            : 'Unable to load available networks.',
-      );
-
-      final rawNetworks = networksPayload['networks'];
-      final rawCatalog = catalogPayload['networks'];
-      if (rawNetworks is! List || rawCatalog is! List) {
+      final rawNetworks = payload['networks'];
+      if (rawNetworks is! List) {
         throw _NetworkApiException(
           _isFrench
-              ? 'La réponse du serveur est invalide.'
-              : 'The server response is invalid.',
+              ? 'La réponse de vos réseaux est invalide.'
+              : 'Your networks response is invalid.',
         );
       }
 
-      final networks = rawNetworks
+      loadedNetworks = rawNetworks
           .whereType<Map>()
           .map(_UserNetwork.fromJson)
           .where((network) => network.networkType.isNotEmpty)
           .toList();
-      final catalog = rawCatalog
+    } catch (error) {
+      networksError = _errorMessageFor(error);
+    }
+
+    try {
+      final response = await http
+          .get(Uri.parse('$generalRouteForApi/social-networks/catalog'))
+          .timeout(_requestTimeout);
+      final payload = _readPayload(
+        response,
+        _isFrench
+            ? 'Impossible de charger les réseaux disponibles.'
+            : 'Unable to load available networks.',
+      );
+      final rawCatalog = payload['networks'];
+      if (rawCatalog is! List) {
+        throw _NetworkApiException(
+          _isFrench
+              ? 'La réponse du catalogue est invalide.'
+              : 'The catalog response is invalid.',
+        );
+      }
+
+      loadedCatalog = rawCatalog
           .whereType<Map>()
           .map(_NetworkCatalogItem.fromJson)
           .where((network) => network.id.isNotEmpty)
           .toList();
-
-      if (!mounted) return;
-      setState(() {
-        _networks = networks;
-        _catalog = catalog;
-        _isLoading = false;
-      });
     } catch (error) {
-      if (!mounted) return;
-      setState(() {
-        _isLoading = false;
-        _errorMessage = _errorMessageFor(error);
-      });
+      catalogError = _errorMessageFor(error);
     }
+
+    if (!mounted) return;
+    setState(() {
+      if (loadedNetworks != null) {
+        _networks = loadedNetworks;
+      }
+      if (loadedCatalog != null) {
+        _catalog = loadedCatalog;
+      }
+      _isLoading = false;
+      _errorMessage = networksError;
+      _catalogError = catalogError;
+    });
   }
 
   Future<http.Response> _getWithUid(Uri uri) async {
