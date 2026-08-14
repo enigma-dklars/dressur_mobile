@@ -5,6 +5,8 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dressur/1_reception/historique_recompense_complet.dart';
+import 'package:dressur/components/app_theme.dart';
+import 'package:dressur/components/feature_sections.dart';
 import 'package:dressur/components/noti.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:http/http.dart' as http;
@@ -12,7 +14,6 @@ import 'dart:convert' as convert;
 import 'package:dressur/1_reception/business_promotions_page.dart';
 import 'package:dressur/1_reception/recompense_start.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:dressur/components/constant.dart';
 import 'package:dressur/components/permission_manager.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -126,10 +127,9 @@ class _ProgrammeRecompenseDashboardState
         elevation: 0,
         title: Text(
           isFr ? "Mon Programme" : "My Program",
-          style: GoogleFonts.poppins(
+          style: theme.textTheme.titleMedium?.copyWith(
             color: Colors.white,
             fontWeight: FontWeight.w400,
-            fontSize: 18,
           ),
         ),
         leading: IconButton(
@@ -140,24 +140,21 @@ class _ProgrammeRecompenseDashboardState
       ),
       body: SingleChildScrollView(
         physics: BouncingScrollPhysics(),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.xLarge,
+          vertical: AppSpacing.xLarge,
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-
             // ── Statistiques ─────────────────────────────────────────────
-            _sectionTitle(context,
-                isFr ? "Mes Statistiques" : "My Statistics", 12),
+            _sectionTitle(
+                context, isFr ? "Mes Statistiques" : "My Statistics", 12),
             Row(
               children: [
-                _statItem(
-                    context,
-                    isFr ? "Vues Totales" : "Total Views",
-                    "$vuesTotales",
-                    FontAwesomeIcons.eye,
-                    Colors.blue,
-                    theme),
-                SizedBox(width: 12),
+                _statItem(context, isFr ? "Vues Totales" : "Total Views",
+                    "$vuesTotales", FontAwesomeIcons.eye, Colors.blue, theme),
+                SizedBox(width: AppSpacing.medium),
                 _statItem(
                     context,
                     isFr ? "Gains Totaux" : "Total Earnings",
@@ -168,7 +165,7 @@ class _ProgrammeRecompenseDashboardState
               ],
             ),
 
-            SizedBox(height: 28),
+            SizedBox(height: AppSpacing.section),
 
             // ── Historique de participation ───────────────────────────────
             Row(
@@ -193,24 +190,21 @@ class _ProgrammeRecompenseDashboardState
                   },
                   child: Text(
                     isFr ? "Voir tout" : "See all",
-                    style: GoogleFonts.poppins(
+                    style: theme.textTheme.labelMedium?.copyWith(
                       color: primaryColor,
-                      fontSize: 12,
                     ),
                   ),
                 )
               ],
             ),
             Padding(
-              padding: const EdgeInsets.only(bottom: 12),
+              padding: const EdgeInsets.only(bottom: AppSpacing.medium),
               child: Text(
                 isFr
                     ? "Sélectionnez un historique pour voir les options possibles…"
                     : "Select a history entry to see available options…",
-                style: GoogleFonts.poppins(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w400,
-                  color: Colors.grey[500],
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
                 ),
               ),
             ),
@@ -219,16 +213,16 @@ class _ProgrammeRecompenseDashboardState
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 30),
-                    child: Center(child: CircularProgressIndicator(color: primaryColor)),
+                    padding: EdgeInsets.symmetric(vertical: AppSpacing.section),
+                    child: Center(
+                        child: CircularProgressIndicator(color: primaryColor)),
                   );
                 }
 
                 if (snapshot.hasError) {
                   return Center(
-                      child: Text(isFr
-                          ? "Erreur de chargement"
-                          : "Loading error"));
+                      child: Text(
+                          isFr ? "Erreur de chargement" : "Loading error"));
                 }
 
                 if (!snapshot.hasData || snapshot.data!.isEmpty) {
@@ -239,7 +233,7 @@ class _ProgrammeRecompenseDashboardState
                         isFr
                             ? "Aucun historique disponible"
                             : "No history available",
-                        style: GoogleFonts.poppins(fontSize: 12),
+                        style: theme.textTheme.bodySmall,
                       ),
                     ),
                   );
@@ -257,15 +251,15 @@ class _ProgrammeRecompenseDashboardState
               },
             ),
 
-            SizedBox(height: 28),
+            SizedBox(height: AppSpacing.section),
 
             // ── Actions secondaires ───────────────────────────────────────
             _sectionTitle(context, isFr ? "Programme" : "Program", 12),
             _buildBusinessPromotionsButton(context, theme, isFr),
-            SizedBox(height: 10),
+            SizedBox(height: AppSpacing.small),
             _buildAccessProgramButton(context, theme, isFr),
 
-            SizedBox(height: 20),
+            SizedBox(height: AppSpacing.large),
           ],
         ),
       ),
@@ -286,44 +280,37 @@ class _ProgrammeRecompenseDashboardState
                 builder: (context) =>
                     ProgrammeRecompensePage(optionPage: true)));
       },
-      child: Container(
-        padding: EdgeInsets.all(10),
-        decoration: BoxDecoration(
-          color: primaryColor.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: primaryColor.withOpacity(0.3)),
-        ),
+      child: FeatureInfoCard(
+        margin: EdgeInsets.zero,
+        padding: const EdgeInsets.all(AppSpacing.medium),
         child: Row(
           children: [
             FaIcon(FontAwesomeIcons.circleInfo, color: primaryColor),
-            SizedBox(width: 10),
+            SizedBox(width: AppSpacing.small),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     isFr ? "Conditions du programme" : "Program conditions",
-                    style: GoogleFonts.poppins(
+                    style: theme.textTheme.titleSmall?.copyWith(
                       fontWeight: FontWeight.bold,
-                      fontSize: 14,
-                      color: theme.textTheme.bodyLarge?.color,
                     ),
                   ),
-                  SizedBox(height: 2),
+                  SizedBox(height: AppSpacing.xSmall),
                   Text(
                     isFr
                         ? "Relire les conditions ou quitter le programme"
                         : "Review conditions or leave the program",
-                    style: GoogleFonts.poppins(
-                      fontSize: 11,
-                      color: Colors.grey[600],
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
                     ),
                   ),
                 ],
               ),
             ),
             FaIcon(FontAwesomeIcons.chevronRight,
-                size: 14, color: primaryColor),
+                size: 14, color: theme.colorScheme.primary),
           ],
         ),
       ),
@@ -337,17 +324,13 @@ class _ProgrammeRecompenseDashboardState
         Navigator.push(context,
             MaterialPageRoute(builder: (context) => BusinessPromotionsPage()));
       },
-      child: Container(
-        padding: EdgeInsets.all(10),
-        decoration: BoxDecoration(
-          color: primaryColor.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: primaryColor.withOpacity(0.3)),
-        ),
+      child: FeatureInfoCard(
+        margin: EdgeInsets.zero,
+        padding: const EdgeInsets.all(AppSpacing.medium),
         child: Row(
           children: [
             FaIcon(FontAwesomeIcons.briefcase, color: primaryColor),
-            SizedBox(width: 10),
+            SizedBox(width: AppSpacing.small),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -356,27 +339,24 @@ class _ProgrammeRecompenseDashboardState
                     isFr
                         ? "Explorer les promotions affaires"
                         : "Explore business promotions",
-                    style: GoogleFonts.poppins(
+                    style: theme.textTheme.titleSmall?.copyWith(
                       fontWeight: FontWeight.bold,
-                      fontSize: 14,
-                      color: theme.textTheme.bodyLarge?.color,
                     ),
                   ),
-                  SizedBox(height: 2),
+                  SizedBox(height: AppSpacing.xSmall),
                   Text(
                     isFr
                         ? "Découvrez les offres du programme de récompenses"
                         : "Discover the rewards program offers",
-                    style: GoogleFonts.poppins(
-                      fontSize: 11,
-                      color: Colors.grey[600],
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
                     ),
                   ),
                 ],
               ),
             ),
             FaIcon(FontAwesomeIcons.chevronRight,
-                size: 14, color: primaryColor),
+                size: 14, color: theme.colorScheme.primary),
           ],
         ),
       ),
@@ -384,34 +364,26 @@ class _ProgrammeRecompenseDashboardState
   }
 
   Widget _statItem(BuildContext context, String label, String value,
-      IconData icon, Color color, theme) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+      IconData icon, Color color, ThemeData theme) {
     return Expanded(
-      child: Container(
-        padding: EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: isDark ? Colors.white.withOpacity(0.05) : Colors.grey[50],
-          borderRadius: BorderRadius.circular(15),
-          border: Border.all(color: theme.dividerColor.withOpacity(0.1)),
-        ),
+      child: FeatureInfoCard(
+        margin: EdgeInsets.zero,
+        padding: const EdgeInsets.all(AppSpacing.large),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             FaIcon(icon, color: color, size: 24),
-            SizedBox(height: 12),
+            SizedBox(height: AppSpacing.medium),
             Text(
               value,
-              style: GoogleFonts.poppins(
-                fontSize: 20,
+              style: theme.textTheme.headlineSmall?.copyWith(
                 fontWeight: FontWeight.bold,
-                color: theme.textTheme.bodyLarge?.color,
               ),
             ),
             Text(
               label,
-              style: GoogleFonts.poppins(
-                fontSize: 12,
-                color: isDark ? Colors.grey[400] : Colors.grey[600],
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
               ),
             ),
           ],
@@ -422,190 +394,169 @@ class _ProgrammeRecompenseDashboardState
 
   Widget _sectionTitle(
       BuildContext context, String title, double padingBottom) {
-    return Padding(
-      padding: EdgeInsets.only(bottom: padingBottom),
-      child: Text(
-        title,
-        style: GoogleFonts.poppins(
-          fontSize: 16,
-          fontWeight: FontWeight.bold,
-          color: Theme.of(context).textTheme.bodyLarge?.color,
-        ),
+    return FeatureSectionTitle(
+      title: title,
+      padding: EdgeInsets.only(
+        top: AppSpacing.small,
+        bottom: padingBottom,
       ),
     );
   }
 
   Widget _promotionItem(
       BuildContext context, HistoriqueRecompense item, bool isFr) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final theme = Theme.of(context);
     final statusConfig = getStatusBadgeConfig(item.status);
+    final statusColor = statusConfig["color"] as Color;
+    final statusIcon = statusConfig["icon"] as IconData;
+    final statusLabel = statusConfig["label"] as String;
 
     return InkWell(
       onTap: () => _showStatusDetailsBottomSheet(context, item),
       onDoubleTap: () => _showStatusDetailsBottomSheet(context, item),
       onLongPress: () => _showStatusDetailsBottomSheet(context, item),
-      child: Padding(
-        padding: const EdgeInsets.only(bottom: 10),
-        child: Container(
-          padding: const EdgeInsets.all(10),
-          decoration: BoxDecoration(
-            color: isDark ? Colors.white.withOpacity(0.05) : Colors.white,
-            borderRadius: BorderRadius.circular(15),
-            border: Border.all(
-                color: Theme.of(context).dividerColor.withOpacity(0.1)),
-          ),
-          child: Row(
-            children: [
-              Container(
-                width: 55,
-                height: 55,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Stack(
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(12),
-                      child: CachedNetworkImage(
-                        imageUrl: item.imageUrl,
-                        width: 55,
-                        height: 55,
-                        fit: BoxFit.cover,
-                        placeholder: (context, url) => Image.asset(
-                            'images/placeholder.png',
-                            fit: BoxFit.cover),
-                        errorWidget: (context, url, error) => Image.asset(
-                            'images/error_image.png',
-                            fit: BoxFit.cover),
-                      ),
-                    ),
-                    Positioned(
-                      bottom: 2,
-                      right: 2,
-                      child: Container(
-                        padding: const EdgeInsets.all(2),
-                        decoration: BoxDecoration(
-                          color: (item.status == "approuver")
-                              ? Colors.green
-                              : (item.status == "echouer" ||
-                                      item.status == "refuser")
-                                  ? Colors.red
-                                  : (item.status == "en_attente")
-                                      ? Colors.orange
-                                      : Colors.black,
-                          shape: BoxShape.circle,
-                          border: Border.all(color: Colors.white, width: 1.5),
-                        ),
-                        child: FaIcon(
-                          (item.status == "approuver")
-                              ? FontAwesomeIcons.solidCircleCheck
-                              : (item.status == "echouer" ||
-                                      item.status == "refuser")
-                                  ? FontAwesomeIcons.xmark
-                                  : (item.status == "en_attente")
-                                      ? FontAwesomeIcons.clock
-                                      : FontAwesomeIcons.circleQuestion,
-                          color: Colors.white,
-                          size: 10,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+      child: FeatureInfoCard(
+        padding: const EdgeInsets.all(AppSpacing.medium),
+        margin: const EdgeInsets.only(bottom: AppSpacing.small),
+        child: Row(
+          children: [
+            Container(
+              width: 55,
+              height: 55,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
               ),
-              const SizedBox(width: 10),
-
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      item.title,
-                      style: GoogleFonts.poppins(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 14,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 10),
-                    Row(
-                      children: [
-                        Text(item.date,
-                            style: GoogleFonts.poppins(
-                                fontSize: 12, color: Colors.grey)),
-                        const SizedBox(width: 8),
-                        Container(
-                          width: 3,
-                          height: 3,
-                          decoration: const BoxDecoration(
-                            color: Colors.grey,
-                            shape: BoxShape.circle,
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        const FaIcon(FontAwesomeIcons.eye,
-                            size: 12, color: Colors.grey),
-                        const SizedBox(width: 4),
-                        Text(item.views,
-                            style: GoogleFonts.poppins(
-                                fontSize: 12, color: Colors.grey)),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
+              child: Stack(
                 children: [
-                  Text(
-                    item.amount,
-                    style: GoogleFonts.poppins(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14,
-                      color: (item.status == "approuver")
-                          ? Colors.green
-                          : (item.status == "echouer" ||
-                                  item.status == "refuser")
-                              ? Colors.red
-                              : (item.status == "en_attente")
-                                  ? Colors.orange
-                                  : null,
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: CachedNetworkImage(
+                      imageUrl: item.imageUrl,
+                      width: 55,
+                      height: 55,
+                      fit: BoxFit.cover,
+                      placeholder: (context, url) => Image.asset(
+                          'images/placeholder.png',
+                          fit: BoxFit.cover),
+                      errorWidget: (context, url, error) => Image.asset(
+                          'images/error_image.png',
+                          fit: BoxFit.cover),
                     ),
                   ),
-                  const SizedBox(height: 5),
-                  Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: statusConfig["color"].withOpacity(0.15),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        FaIcon(
-                          statusConfig["icon"],
-                          size: 12,
-                          color: statusConfig["color"],
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          statusConfig["label"],
-                          style: GoogleFonts.poppins(
-                            fontSize: 10,
-                            fontWeight: FontWeight.bold,
-                            color: statusConfig["color"],
-                          ),
-                        ),
-                      ],
+                  Positioned(
+                    bottom: 2,
+                    right: 2,
+                    child: Container(
+                      padding: const EdgeInsets.all(2),
+                      decoration: BoxDecoration(
+                        color: (item.status == "approuver")
+                            ? Colors.green
+                            : (item.status == "echouer" ||
+                                    item.status == "refuser")
+                                ? Colors.red
+                                : (item.status == "en_attente")
+                                    ? Colors.orange
+                                    : Colors.black,
+                        shape: BoxShape.circle,
+                        border: Border.all(color: Colors.white, width: 1.5),
+                      ),
+                      child: FaIcon(
+                        (item.status == "approuver")
+                            ? FontAwesomeIcons.solidCircleCheck
+                            : (item.status == "echouer" ||
+                                    item.status == "refuser")
+                                ? FontAwesomeIcons.xmark
+                                : (item.status == "en_attente")
+                                    ? FontAwesomeIcons.clock
+                                    : FontAwesomeIcons.circleQuestion,
+                        color: Colors.white,
+                        size: 10,
+                      ),
                     ),
                   ),
                 ],
               ),
-            ],
-          ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    item.title,
+                    style: theme.textTheme.bodyLarge?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      Text(item.date,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: theme.colorScheme.onSurfaceVariant,
+                          )),
+                      const SizedBox(width: AppSpacing.small),
+                      Container(
+                        width: 3,
+                        height: 3,
+                        decoration: const BoxDecoration(
+                          color: Colors.grey,
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                      const SizedBox(width: AppSpacing.small),
+                      const FaIcon(FontAwesomeIcons.eye,
+                          size: 12, color: Colors.grey),
+                      const SizedBox(width: AppSpacing.xSmall),
+                      Text(item.views,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: theme.colorScheme.onSurfaceVariant,
+                          )),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text(
+                  item.amount,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: (item.status == "approuver")
+                        ? Colors.green
+                        : (item.status == "echouer" || item.status == "refuser")
+                            ? Colors.red
+                            : (item.status == "en_attente")
+                                ? Colors.orange
+                                : null,
+                  ),
+                ),
+                const SizedBox(height: 5),
+                Chip(
+                  avatar: Icon(
+                    statusIcon,
+                    size: 12,
+                    color: statusColor,
+                  ),
+                  label: Text(
+                    statusLabel,
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: statusColor,
+                    ),
+                  ),
+                  backgroundColor: statusColor.withOpacity(0.15),
+                  side: BorderSide.none,
+                  visualDensity: VisualDensity.compact,
+                  padding: EdgeInsets.zero,
+                ),
+              ],
+            ),
+          ],
         ),
       ),
     );
@@ -622,7 +573,8 @@ class _ProgrammeRecompenseDashboardState
       context: context,
       isScrollControlled: true,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+        borderRadius:
+            BorderRadius.vertical(top: Radius.circular(AppRadii.extraLarge)),
       ),
       builder: (context) {
         return StatefulBuilder(
@@ -635,7 +587,7 @@ class _ProgrammeRecompenseDashboardState
               builder: (context, scrollController) {
                 return SingleChildScrollView(
                   controller: scrollController,
-                  padding: const EdgeInsets.all(20),
+                  padding: const EdgeInsets.all(AppSpacing.xLarge),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -649,27 +601,25 @@ class _ProgrammeRecompenseDashboardState
                           ),
                         ),
                       ),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: AppSpacing.xLarge),
                       Text(
                         item.title,
-                        style: GoogleFonts.poppins(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
                       ),
                       Text(
                         isFr
                             ? "Récompense : ${item.amount} FCFA"
                             : "Reward: ${item.amount} FCFA",
-                        style: GoogleFonts.poppins(
-                          fontSize: 14,
-                          color: primaryColor,
-                          fontWeight: FontWeight.w500,
-                        ),
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              color: primaryColor,
+                              fontWeight: FontWeight.w500,
+                            ),
                       ),
-                      const Divider(height: 30),
+                      const Divider(height: AppSpacing.section),
                       _buildStatusContent(item, setModalState, isFr),
-                      const SizedBox(height: 30),
+                      const SizedBox(height: AppSpacing.section),
                       if (item.status == "terminer" ||
                           item.status == "en_cours" ||
                           item.status == "en_attente")
@@ -763,68 +713,57 @@ class _ProgrammeRecompenseDashboardState
 
   Widget _statusInfo(
       IconData icon, Color color, String title, String description) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            FaIcon(icon, color: color, size: 28),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                title,
-                style: GoogleFonts.poppins(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: color,
+    final theme = Theme.of(context);
+    return FeatureInfoCard(
+      color: color,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              FaIcon(icon, color: color, size: 28),
+              const SizedBox(width: AppSpacing.medium),
+              Expanded(
+                child: Text(
+                  title,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: color,
+                  ),
                 ),
               ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 15),
-        Text(
-          description,
-          style: GoogleFonts.poppins(
-            fontSize: 14,
-            color: Colors.grey[700],
-            height: 1.5,
+            ],
           ),
-        ),
-      ],
+          const SizedBox(height: AppSpacing.large),
+          Text(
+            description,
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+              height: 1.5,
+            ),
+          ),
+        ],
+      ),
     );
   }
 
   Widget _buildSubmissionForm(
       HistoriqueRecompense item, StateSetter setModalState, bool isFr) {
-    return Container(
-      padding: const EdgeInsets.all(15),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(15),
-        border: Border.all(color: Colors.grey[300]!),
-      ),
+    return FeatureInfoCard(
+      title: isFr ? "Formulaire de soumission" : "Submission form",
+      padding: const EdgeInsets.all(AppSpacing.large),
       child: Column(
         children: [
-          Text(
-            isFr ? "Formulaire de soumission" : "Submission form",
-            style: GoogleFonts.poppins(fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 15),
-
           _proofCard(
               "1",
-              isFr
-                  ? "Capture – Liste des statuts"
-                  : "Screenshot – Status list",
+              isFr ? "Capture – Liste des statuts" : "Screenshot – Status list",
               isFr
                   ? "• Affiche la liste des statuts WhatsApp\n• Le statut de la promotion doit être visible"
                   : "• Shows the WhatsApp status list\n• The promotion status must be visible",
               _proofImage1,
               () => _pickImage(1, setModalState),
               isFr),
-
-          const SizedBox(height: 15),
-
+          const SizedBox(height: AppSpacing.large),
           _proofCard(
               "2",
               isFr ? "Capture – Statut ouvert" : "Screenshot – Open status",
@@ -834,32 +773,13 @@ class _ProgrammeRecompenseDashboardState
               _proofImage2,
               () => _pickImage(2, setModalState),
               isFr),
-
-          const SizedBox(height: 20),
-
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              onPressed: _isSubmitting
-                  ? null
-                  : () => _submitProofs(item, setModalState, isFr),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: primaryColor,
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10)),
-                padding: EdgeInsets.symmetric(vertical: 12),
-              ),
-              child: _isSubmitting
-                  ? SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(
-                          color: Colors.white, strokeWidth: 2))
-                  : Text(
-                      isFr ? "Soumettre les preuves" : "Submit proofs",
-                      style: GoogleFonts.poppins(
-                          color: Colors.white, fontWeight: FontWeight.bold)),
-            ),
+          const SizedBox(height: AppSpacing.xLarge),
+          FeaturePrimaryButton(
+            label: isFr ? "Soumettre les preuves" : "Submit proofs",
+            isLoading: _isSubmitting,
+            onPressed: _isSubmitting
+                ? null
+                : () => _submitProofs(item, setModalState, isFr),
           ),
         ],
       ),
@@ -868,67 +788,98 @@ class _ProgrammeRecompenseDashboardState
 
   Widget _proofCard(String number, String title, String instructions,
       File? image, VoidCallback onTap, bool isFr) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            CircleAvatar(
+    final theme = Theme.of(context);
+    return FeatureInfoCard(
+      margin: const EdgeInsets.only(bottom: AppSpacing.medium),
+      padding: const EdgeInsets.all(AppSpacing.medium),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              CircleAvatar(
                 radius: 10,
                 backgroundColor: primaryColor,
-                child: Text(number,
-                    style: GoogleFonts.poppins(
-                        color: Colors.white, fontSize: 10))),
-            const SizedBox(width: 8),
-            Text(title,
-                style: GoogleFonts.poppins(
-                    fontSize: 13, fontWeight: FontWeight.w600)),
-          ],
-        ),
-        const SizedBox(height: 5),
-        Text(instructions,
-            style: GoogleFonts.poppins(fontSize: 11, color: Colors.grey[600])),
-        const SizedBox(height: 10),
-        InkWell(
-          onTap: onTap,
-          child: Container(
-            height: 120,
-            width: double.infinity,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: Colors.grey[300]!),
-              image: image != null
-                  ? DecorationImage(image: FileImage(image), fit: BoxFit.cover)
-                  : null,
+                child: Text(
+                  number,
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+              const SizedBox(width: AppSpacing.small),
+              Expanded(
+                child: Text(
+                  title,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.xSmall),
+          Text(
+            instructions,
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
             ),
-            child: image == null
-                ? Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      FaIcon(FontAwesomeIcons.camera,
-                          color: primaryColor, size: 30),
-                      const SizedBox(height: 5),
-                      Text(isFr ? "Cliquez pour choisir" : "Tap to choose",
-                          style: GoogleFonts.poppins(
-                              fontSize: 12, color: Colors.grey)),
-                    ],
-                  )
-                : Stack(
-                    children: [
-                      Positioned(
-                        top: 5,
-                        right: 5,
-                        child: CircleAvatar(
+          ),
+          const SizedBox(height: AppSpacing.small),
+          InkWell(
+            onTap: onTap,
+            borderRadius: BorderRadius.circular(AppRadii.small),
+            child: Container(
+              height: 120,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color:
+                    theme.colorScheme.surfaceContainerHighest.withOpacity(0.35),
+                borderRadius: BorderRadius.circular(AppRadii.small),
+                border: Border.all(color: theme.colorScheme.outlineVariant),
+                image: image != null
+                    ? DecorationImage(
+                        image: FileImage(image),
+                        fit: BoxFit.cover,
+                      )
+                    : null,
+              ),
+              child: image == null
+                  ? Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        FaIcon(FontAwesomeIcons.camera,
+                            color: primaryColor, size: 30),
+                        const SizedBox(height: AppSpacing.xSmall),
+                        Text(
+                          isFr ? "Cliquez pour choisir" : "Tap to choose",
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: theme.colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                      ],
+                    )
+                  : Stack(
+                      children: [
+                        Positioned(
+                          top: AppSpacing.xSmall,
+                          right: AppSpacing.xSmall,
+                          child: CircleAvatar(
                             radius: 12,
                             backgroundColor: Colors.black54,
-                            child: FaIcon(FontAwesomeIcons.pen,
-                                size: 14, color: Colors.white)),
-                      )
-                    ],
-                  ),
+                            child: FaIcon(
+                              FontAwesomeIcons.pen,
+                              size: 14,
+                              color: Colors.white,
+                            ),
+                          ),
+                        )
+                      ],
+                    ),
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -1027,23 +978,26 @@ class _ProgrammeRecompenseDashboardState
   }
 
   Widget _buildWhatsAppButton(bool isFr) {
+    final theme = Theme.of(context);
     return SizedBox(
       width: double.infinity,
       child: OutlinedButton.icon(
         onPressed: () async {
           final Uri _url = Uri.parse(whatsappDSURL);
-          if (!await launchUrl(_url, mode: LaunchMode.externalApplication)) {
-          }
+          if (!await launchUrl(_url, mode: LaunchMode.externalApplication)) {}
         },
         icon: FaIcon(FontAwesomeIcons.solidComment, size: 18),
         label: Text(
             isFr ? "Envoyer la vidéo sur WhatsApp" : "Send video on WhatsApp"),
         style: OutlinedButton.styleFrom(
-          foregroundColor: Colors.green,
-          side: BorderSide(color: Colors.green),
-          padding: EdgeInsets.symmetric(vertical: 12),
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+          foregroundColor: Colors.green.shade700,
+          side: BorderSide(color: Colors.green.shade600),
+          padding: const EdgeInsets.symmetric(vertical: AppSpacing.medium),
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(AppRadii.large)),
+          textStyle: theme.textTheme.labelLarge?.copyWith(
+            fontWeight: FontWeight.w600,
+          ),
         ),
       ),
     );
