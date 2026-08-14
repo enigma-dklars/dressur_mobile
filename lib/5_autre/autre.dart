@@ -675,7 +675,9 @@ class _SettingPageState extends State<SettingPage>
                 ),
               ),
               const Spacer(),
-              if (isVendeur)
+              if (isVendeur ||
+                  estPartenaire ||
+                  isInscritProgrammeRecompense)
                 GestureDetector(
                   onTap: () => Navigator.push(
                     context,
