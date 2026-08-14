@@ -51,3 +51,17 @@ Ces exemples illustrent la diversité des informations et des services que la pl
 ### En Tous
 
 En d'autres termes, Dressur aspire à devenir une plateforme centralisée où les utilisateurs peuvent trouver des informations pertinentes pour tous les aspects de leur vie quotidienne, qu'il s'agisse de recherches liées à leur carrière professionnelle ou de besoins personnels tels que le logement, les biens de consommation, etc. Cela offre une approche holistique pour répondre aux divers besoins et intérêts de l'utilisateur.
+
+### Vérification Google Play des photos et vidéos
+
+Avant de générer un AAB ou de soumettre une nouvelle version à Google Play,
+exécutez la suite de régression :
+
+```bash
+python3 tool/test_play_photo_picker.py
+```
+
+Elle vérifie le manifeste Android, les permissions médias transitives, la
+version `image_picker`, le numéro de build et les parcours de sélection
+d'images. Après un build Android, elle vérifie également les manifestes
+fusionnés lorsqu'ils sont disponibles.
