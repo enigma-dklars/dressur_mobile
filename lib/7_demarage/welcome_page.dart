@@ -330,23 +330,27 @@ class _PageDepartState extends State<PageDepart> {
 
   void _openStartupRecovery(_StartupFailure failure) {
     if (_navigationStarted || !mounted) return;
+    final navigator = Navigator.of(context);
     _navigationStarted = true;
-    Navigator.of(context).pushAndRemoveUntil(
+    var recoveryActionStarted = false;
+
+    void replaceRecoveryPage(Widget page) {
+      if (recoveryActionStarted || !navigator.mounted) return;
+      recoveryActionStarted = true;
+      navigator.pushAndRemoveUntil(
+        MaterialPageRoute(builder: (_) => page),
+        (_) => false,
+      );
+    }
+
+    // PageDepart is removed by pushAndRemoveUntil, so its BuildContext cannot
+    // be used by the recovery actions afterward.
+    navigator.pushAndRemoveUntil(
       MaterialPageRoute(
         builder: (_) => StartupRecoveryPage(
           failure: failure,
-          onRetry: () {
-            Navigator.of(context).pushAndRemoveUntil(
-              MaterialPageRoute(builder: (_) => const WelcomePage()),
-              (_) => false,
-            );
-          },
-          onLogin: () {
-            Navigator.of(context).pushAndRemoveUntil(
-              MaterialPageRoute(builder: (_) => LoginPage()),
-              (_) => false,
-            );
-          },
+          onRetry: () => replaceRecoveryPage(const WelcomePage()),
+          onLogin: () => replaceRecoveryPage(LoginPage()),
         ),
       ),
       (_) => false,
