@@ -69,7 +69,7 @@ class _AssistantPageState extends State<AssistantPage> {
         Uri.parse('$generalRouteForApi/chat/history'),
       )..fields['uid'] = uidUser ?? '';
       final streamed =
-          await request.send().timeout(const Duration(seconds: 10));
+          await request.send().timeout(const Duration(seconds: 20));
       final response = await http.Response.fromStream(streamed);
       if (!mounted) return;
       final data = jsonDecode(response.body);

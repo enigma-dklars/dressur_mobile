@@ -15,7 +15,7 @@ class MesReseauxPage extends StatefulWidget {
 }
 
 class _MesReseauxPageState extends State<MesReseauxPage> {
-  static const _requestTimeout = Duration(seconds: 15);
+  static const _requestTimeout = Duration(seconds: 30);
   static const _mobileUidHeader = 'X-Dressur-Uid';
 
   bool _isLoading = true;

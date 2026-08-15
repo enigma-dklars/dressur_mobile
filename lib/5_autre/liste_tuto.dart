@@ -69,7 +69,7 @@ class _ListeTutoState extends State<ListeTuto> {
     try {
       final url = Uri.parse('$generalRouteForApi/getTutos');
       final response = await http
-          .post(url, body: {'uid': '$uidUser'}).timeout(const Duration(seconds: 15));
+          .post(url, body: {'uid': '$uidUser'}).timeout(const Duration(seconds: 30));
       if (!mounted) return;
       final Map<String, dynamic> body = jsonDecode(response.body);
       if (body['error'] == false) {

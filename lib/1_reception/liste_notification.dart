@@ -168,7 +168,7 @@ class _ListeNotificationState extends State<ListeNotification> {
       final response = await http.post(
         url,
         body: {'uid': '$uidUser'},
-      ).timeout(const Duration(seconds: 15));
+      ).timeout(const Duration(seconds: 30));
 
       if (!mounted) return;
       final Map<String, dynamic> body = jsonDecode(response.body);

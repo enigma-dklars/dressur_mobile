@@ -81,7 +81,7 @@ class BottomBar extends StatefulWidget {
 }
 
 class _BottomBarState extends State<BottomBar> with WidgetsBindingObserver {
-  static const _refreshTimeout = Duration(seconds: 12);
+  static const _refreshTimeout = Duration(seconds: 24);
 
   // L'index 1 correspond à la page "Actu"
   int _selectedIndex = 1;
@@ -244,7 +244,7 @@ class _BottomBarState extends State<BottomBar> with WidgetsBindingObserver {
     try {
       final permission = await PermissionManager.instance
           .check(Permission.contacts)
-          .timeout(const Duration(seconds: 3));
+          .timeout(const Duration(seconds: 6));
       if (!permission.canProceed) return;
 
       await task().timeout(_refreshTimeout);
@@ -488,7 +488,7 @@ class _BottomBarState extends State<BottomBar> with WidgetsBindingObserver {
     _timerSync?.cancel();
     uidUser = null;
     try {
-      await SQLHelper.clearCachedSession().timeout(const Duration(seconds: 3));
+      await SQLHelper.clearCachedSession().timeout(const Duration(seconds: 6));
     } catch (_) {
       // Continue to the login page even if local cleanup fails.
     }
@@ -506,7 +506,7 @@ class _BottomBarState extends State<BottomBar> with WidgetsBindingObserver {
     _timerSync?.cancel();
     uidUser = null;
     try {
-      await SQLHelper.clearCachedSession().timeout(const Duration(seconds: 3));
+      await SQLHelper.clearCachedSession().timeout(const Duration(seconds: 6));
     } catch (_) {
       // Continue to the blocked-account screen even if local cleanup fails.
     }

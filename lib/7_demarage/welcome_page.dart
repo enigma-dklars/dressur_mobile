@@ -43,7 +43,7 @@ class PageDepart extends StatefulWidget {
 }
 
 class _PageDepartState extends State<PageDepart> {
-  static const _requestTimeout = Duration(seconds: 12);
+  static const _requestTimeout = Duration(seconds: 24);
   static const _splashMinimum = Duration(milliseconds: 2500);
   bool _navigationStarted = false;
 
@@ -204,7 +204,7 @@ class _PageDepartState extends State<PageDepart> {
     uidUser = null;
     try {
       await SQLHelper.clearCachedSession()
-          .timeout(const Duration(seconds: 3));
+          .timeout(const Duration(seconds: 6));
     } catch (_) {
       // The recovery screen remains available even if local cleanup fails.
     }

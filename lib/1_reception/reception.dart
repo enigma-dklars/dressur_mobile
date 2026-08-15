@@ -46,7 +46,7 @@ class _ReceptionPageState extends State<ReceptionPage>
       final response = await http.post(
         Uri.parse('$generalRouteForApi/getNotifications'),
         body: {'uid': '$uidUser'},
-      ).timeout(const Duration(seconds: 10));
+      ).timeout(const Duration(seconds: 20));
 
       final body = jsonDecode(response.body) as Map<String, dynamic>;
       if (body['error'] == true) return;

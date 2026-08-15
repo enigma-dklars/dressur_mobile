@@ -22,8 +22,8 @@ class PermissionsRequiredPage extends StatefulWidget {
 
 class _PermissionsRequiredPageState extends State<PermissionsRequiredPage>
     with WidgetsBindingObserver {
-  static const _permissionCheckTimeout = Duration(seconds: 8);
-  static const _settingsTimeout = Duration(seconds: 3);
+  static const _permissionCheckTimeout = Duration(seconds: 16);
+  static const _settingsTimeout = Duration(seconds: 6);
 
   bool _checking = false;
   bool _navigationStarted = false;

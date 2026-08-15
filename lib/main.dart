@@ -116,7 +116,7 @@ Future<void> _runOptionalInitialization(
   Future<void> Function() initialize,
 ) async {
   try {
-    await initialize().timeout(const Duration(seconds: 3));
+    await initialize().timeout(const Duration(seconds: 6));
   } catch (_) {
     // Optional startup work must not block runApp().
   }

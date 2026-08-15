@@ -34,7 +34,7 @@ class _AdminPromosDressurStatusPageState
     try {
       final response = await http.get(
         Uri.parse('$generalRouteForApi/getPromotionsDressurStatus?uid=$uidUser'),
-      ).timeout(const Duration(seconds: 20));
+      ).timeout(const Duration(seconds: 40));
 
       if (!mounted) return;
 

@@ -62,7 +62,7 @@ class _UtiliserCodePartenairePageState
           'uid': '$uidUser',
           'codePartenaire': code,
         },
-      ).timeout(const Duration(seconds: 15));
+      ).timeout(const Duration(seconds: 30));
       final body = jsonDecode(response.body) as Map<String, dynamic>;
       if (!mounted) return;
       if (body['error'] == false) {
