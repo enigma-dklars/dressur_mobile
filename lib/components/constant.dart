@@ -201,6 +201,52 @@ Future<void> initUserInformations(userInfos) async {
   });
 }
 
+/// Clears the in-memory authentication state without touching local contacts.
+///
+/// This is used before showing the unauthenticated entry point so a stale
+/// session cannot leak into the login or registration flow.
+void resetUserInformationState() {
+  myDressurVersion = '1.3.3';
+  mailIsMaxxFire = false;
+  uidUser = null;
+  name_complete = null;
+  pseudo = null;
+  nom = null;
+  mail = null;
+  pays = null;
+  tel = null;
+  apropos = null;
+  createdAt = null;
+  mailIsVerified = false;
+  telIsVerified = false;
+  langUserPhone = 'fr';
+  admin = false;
+  permissionAdd = false;
+  messageErreurPermissionAdd = null;
+  lesPublicites = null;
+  preferencePaysText = '';
+  addPageActu = true;
+  nombreContactDispo = 0;
+  nombreContacts = 0;
+  boostEnCours = false;
+  isInscritProgrammeRecompense = false;
+  soldeProgrammeRecompense = 0;
+  isVendeur = false;
+  aUnPartenaire = false;
+  monCodePartenaire = null;
+  estPartenaire = false;
+  codePartenaireDisponible = null;
+  condNom = false;
+  condTel = false;
+  condMail = false;
+  condAnciennete = false;
+  condCumul = false;
+  joursInscrit = 0;
+  cumulFcfa = 0;
+  userChatInfo = [];
+  contactsEnregistrer = [];
+}
+
 String preferencePaysToText(preferencePays) {
   preferencePaysText = "";
   countryCodes.entries.map((entry) {

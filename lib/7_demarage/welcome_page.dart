@@ -2,7 +2,6 @@
 
 import 'dart:async';
 import 'dart:io';
-import 'package:dressur/6_login_register/connexion.dart';
 import 'package:dressur/5_autre/support_assistance.dart';
 import 'package:dressur/7_demarage/permissions_required_page.dart';
 import 'package:flutter/material.dart';
@@ -17,6 +16,7 @@ import 'package:dressur/components/noti_sys.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert' as convert;
+import 'package:dressur/7_demarage/startup_session_actions.dart';
 
 class WelcomePage extends StatelessWidget {
   const WelcomePage({this.notificationAppLaunchDetails, Key? key})
@@ -333,6 +333,7 @@ class _PageDepartState extends State<PageDepart> {
     final navigator = Navigator.of(context);
     _navigationStarted = true;
     var recoveryActionStarted = false;
+    final sessionActions = StartupSessionActions();
 
     void replaceRecoveryPage(Widget page) {
       if (recoveryActionStarted || !navigator.mounted) return;
@@ -350,7 +351,11 @@ class _PageDepartState extends State<PageDepart> {
         builder: (_) => StartupRecoveryPage(
           failure: failure,
           onRetry: () => replaceRecoveryPage(const WelcomePage()),
-          onLogin: () => replaceRecoveryPage(LoginPage()),
+          onLogin: () {
+            if (recoveryActionStarted || !navigator.mounted) return;
+            recoveryActionStarted = true;
+            unawaited(sessionActions.clearAndOpenAuthChoices(navigator));
+          },
         ),
       ),
       (_) => false,
