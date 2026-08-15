@@ -238,20 +238,20 @@ class _PageDepartState extends State<PageDepart> {
         await _clearCachedSessionSafely();
         await _waitForMinimumSplash(startedAt);
         if (!mounted) return;
-        _openStartupRecovery(_StartupFailure.sessionInvalid);
+        _openStartupRecovery(StartupFailure.sessionInvalid);
         return;
       }
       if (result == _SessionRestoreResult.blocked) {
         await _clearCachedSessionSafely();
         await _waitForMinimumSplash(startedAt);
         if (!mounted) return;
-        _openStartupRecovery(_StartupFailure.accountBlocked);
+        _openStartupRecovery(StartupFailure.accountBlocked);
         return;
       }
       if (result != _SessionRestoreResult.restored) {
         await _waitForMinimumSplash(startedAt);
         if (!mounted) return;
-        _openStartupRecovery(_StartupFailure.serverUnavailable);
+        _openStartupRecovery(StartupFailure.serverUnavailable);
         return;
       }
 
@@ -264,16 +264,16 @@ class _PageDepartState extends State<PageDepart> {
       unawaited(_runOptionalStartupReminder());
     } on TimeoutException {
       await _waitForMinimumSplash(startedAt);
-      if (mounted) _openStartupRecovery(_StartupFailure.networkTimeout);
+      if (mounted) _openStartupRecovery(StartupFailure.networkTimeout);
     } on SocketException {
       await _waitForMinimumSplash(startedAt);
-      if (mounted) _openStartupRecovery(_StartupFailure.networkUnavailable);
+      if (mounted) _openStartupRecovery(StartupFailure.networkUnavailable);
     } on FormatException {
       await _waitForMinimumSplash(startedAt);
-      if (mounted) _openStartupRecovery(_StartupFailure.serverUnavailable);
+      if (mounted) _openStartupRecovery(StartupFailure.serverUnavailable);
     } catch (_) {
       await _waitForMinimumSplash(startedAt);
-      if (mounted) _openStartupRecovery(_StartupFailure.unknown);
+      if (mounted) _openStartupRecovery(StartupFailure.unknown);
     }
   }
 
@@ -328,7 +328,7 @@ class _PageDepartState extends State<PageDepart> {
     );
   }
 
-  void _openStartupRecovery(_StartupFailure failure) {
+  void _openStartupRecovery(StartupFailure failure) {
     if (_navigationStarted || !mounted) return;
     final navigator = Navigator.of(context);
     _navigationStarted = true;
@@ -429,7 +429,7 @@ enum _SessionRestoreResult {
   serverError,
 }
 
-enum _StartupFailure {
+enum StartupFailure {
   networkTimeout,
   networkUnavailable,
   serverUnavailable,
@@ -446,7 +446,7 @@ class StartupRecoveryPage extends StatelessWidget {
     super.key,
   });
 
-  final _StartupFailure failure;
+  final StartupFailure failure;
   final VoidCallback onRetry;
   final VoidCallback onLogin;
 
@@ -454,13 +454,13 @@ class StartupRecoveryPage extends StatelessWidget {
 
   String get _title {
     switch (failure) {
-      case _StartupFailure.sessionInvalid:
+      case StartupFailure.sessionInvalid:
         return _isFr ? 'Session expirée' : 'Session expired';
-      case _StartupFailure.accountBlocked:
+      case StartupFailure.accountBlocked:
         return _isFr ? 'Compte indisponible' : 'Account unavailable';
-      case _StartupFailure.networkTimeout:
+      case StartupFailure.networkTimeout:
         return _isFr ? 'Connexion trop lente' : 'Connection timed out';
-      case _StartupFailure.networkUnavailable:
+      case StartupFailure.networkUnavailable:
         return _isFr ? 'Connexion impossible' : 'Unable to connect';
       default:
         return _isFr ? 'Dressur n’a pas pu démarrer' : 'Dressur could not start';
@@ -469,19 +469,19 @@ class StartupRecoveryPage extends StatelessWidget {
 
   String get _message {
     switch (failure) {
-      case _StartupFailure.sessionInvalid:
+      case StartupFailure.sessionInvalid:
         return _isFr
             ? 'Votre ancienne session n’est plus valide. Connectez-vous à nouveau pour retrouver votre compte.'
             : 'Your previous session is no longer valid. Sign in again to access your account.';
-      case _StartupFailure.accountBlocked:
+      case StartupFailure.accountBlocked:
         return _isFr
             ? 'Cette session est liée à un compte bloqué. Contactez l’assistance si vous pensez qu’il s’agit d’une erreur.'
             : 'This session belongs to a blocked account. Contact support if you think this is a mistake.';
-      case _StartupFailure.networkTimeout:
+      case StartupFailure.networkTimeout:
         return _isFr
             ? 'Le serveur met trop de temps à répondre. Vérifiez votre connexion puis réessayez.'
             : 'The server is taking too long to respond. Check your connection and try again.';
-      case _StartupFailure.networkUnavailable:
+      case StartupFailure.networkUnavailable:
         return _isFr
             ? 'Aucune connexion internet fiable n’a été détectée.'
             : 'A reliable internet connection was not detected.';
