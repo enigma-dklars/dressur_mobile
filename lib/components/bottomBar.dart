@@ -99,6 +99,7 @@ class _BottomBarState extends State<BottomBar> with WidgetsBindingObserver {
   bool _interruptLock = false;
   bool _actualiseInProgress = false;
   bool _sessionRedirectStarted = false;
+  bool _contactStartupTaskInProgress = false;
 
   final PageController _pageController = PageController(initialPage: 1);
 
@@ -242,6 +243,9 @@ class _BottomBarState extends State<BottomBar> with WidgetsBindingObserver {
   Future<void> _runOptionalContactStartupTask(
     Future<void> Function() task,
   ) async {
+    if (_contactStartupTaskInProgress) return;
+    _contactStartupTaskInProgress = true;
+
     try {
       final permission = await PermissionManager.instance
           .check(Permission.contacts)
@@ -253,13 +257,22 @@ class _BottomBarState extends State<BottomBar> with WidgetsBindingObserver {
       // Les contacts ne doivent jamais empêcher l'utilisateur d'entrer dans
       // l'application. Les fonctionnalités concernées pourront réessayer
       // depuis leur écran dédié.
+    } finally {
+      _contactStartupTaskInProgress = false;
     }
+  }
+
+  Future<void> _runDeferredOptionalContactTask(
+    Future<void> Function() task,
+  ) async {
+    await Future<void>.delayed(const Duration(seconds: 2));
+    if (!mounted) return;
+    await _runOptionalContactStartupTask(task);
   }
 
   @override
   void initState() {
     super.initState();
-    unawaited(_runOptionalContactStartupTask(saveContactDsIfNotExiste));
     WidgetsBinding.instance.addObserver(this);
 
     // Charger les infos utilisateur depuis l'API au démarrage, puis vérifier
@@ -270,10 +283,8 @@ class _BottomBarState extends State<BottomBar> with WidgetsBindingObserver {
       actualise(false);
     });
     if (modeReconnaissanceContactArrierePlan == true) {
-      unawaited(_runOptionalContactStartupTask(synchroAvanceFunction));
-      setState(() {
-        modeReconnaissanceContactArrierePlan = false;
-      });
+      modeReconnaissanceContactArrierePlan = false;
+      unawaited(_runDeferredOptionalContactTask(synchroAvanceFunction));
     }
 
     // Exécute la fonction toutes les 6 heures
@@ -290,7 +301,6 @@ class _BottomBarState extends State<BottomBar> with WidgetsBindingObserver {
 
     _timerSync = Timer.periodic(const Duration(hours: 6), (timer) {
       if (!_isInBackground) {
-        unawaited(_runOptionalContactStartupTask(saveContactDsIfNotExiste));
         actualise(false);
       }
     });
@@ -316,7 +326,6 @@ class _BottomBarState extends State<BottomBar> with WidgetsBindingObserver {
           now.difference(_lastActualise!) > const Duration(minutes: 5)) {
         _lastActualise = now;
         actualise(false);
-        unawaited(_runOptionalContactStartupTask(saveContactDsIfNotExiste));
       }
     } else if (state == AppLifecycleState.paused) {
       _isInBackground = true;
@@ -346,15 +355,6 @@ class _BottomBarState extends State<BottomBar> with WidgetsBindingObserver {
   Future<void> actualise(bool affMessage) async {
     if (_sessionRedirectStarted || _actualiseInProgress) return;
     _actualiseInProgress = true;
-
-    if (affMessage && mounted) {
-      _showRefreshMessage(
-        (langUserPhone == "fr")
-            ? 'Actualisation en cours…'
-            : 'Update in progress…',
-        Colors.red,
-      );
-    }
 
     try {
       final request = http.MultipartRequest(
@@ -387,11 +387,10 @@ class _BottomBarState extends State<BottomBar> with WidgetsBindingObserver {
         });
         await _maybeShowContactsInterrupt();
         if (affMessage && mounted) {
-          _showRefreshMessage(
+          _showRefreshSuccessMessage(
             (langUserPhone == "fr")
                 ? 'Actualisation terminée.'
                 : 'Refresh complete.',
-            Colors.green,
           );
         }
         return;
@@ -402,7 +401,6 @@ class _BottomBarState extends State<BottomBar> with WidgetsBindingObserver {
           (langUserPhone == "fr")
               ? 'Actualisation impossible pour le moment.'
               : 'Refresh is unavailable right now.',
-          Colors.red,
         );
       }
     } on TimeoutException {
@@ -531,6 +529,15 @@ class _BottomBarState extends State<BottomBar> with WidgetsBindingObserver {
     if (!mounted || _sessionRedirectStarted) return;
     dangerNoti(
       (langUserPhone == "fr") ? 'Erreur' : 'Error',
+      message,
+      context,
+    );
+  }
+
+  void _showRefreshSuccessMessage(String message) {
+    if (!mounted || _sessionRedirectStarted) return;
+    successNoti(
+      (langUserPhone == "fr") ? 'Succès' : 'Success',
       message,
       context,
     );

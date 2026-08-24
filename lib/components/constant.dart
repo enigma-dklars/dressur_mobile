@@ -1039,13 +1039,60 @@ void showConfNumeroWhatsapp(BuildContext context) {
   );
 }
 
+Future<bool> _insertDressurContactSafely({
+  required String name,
+  required String phone,
+}) async {
+  Contact buildContact({required bool withAccount}) {
+    final contact = Contact()
+      ..name.first = name
+      ..phones = [Phone(phone)];
+
+    if (withAccount &&
+        selectedContactAccountName != null &&
+        selectedContactAccountType != null) {
+      contact.accounts = [
+        Account(
+          '',
+          selectedContactAccountType!,
+          selectedContactAccountName!,
+          [],
+        ),
+      ];
+    }
+    return contact;
+  }
+
+  try {
+    await buildContact(withAccount: true)
+        .insert()
+        .timeout(const Duration(seconds: 10));
+    return true;
+  } catch (_) {
+    // Certains appareils refusent l’écriture dans un compte synchronisé
+    // devenu indisponible. On retente une seule fois dans le compte local.
+    if (selectedContactAccountName == null ||
+        selectedContactAccountType == null) {
+      return false;
+    }
+
+    try {
+      await buildContact(withAccount: false)
+          .insert()
+          .timeout(const Duration(seconds: 10));
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+}
+
 Future<void> saveContactDsIfNotExiste() async {
   final permission =
       await PermissionManager.instance.check(Permission.contacts);
   if (!permission.canProceed) return;
 
   int nombreNewContact = 0;
-  nombreNewContact = 0;
   contactsEnregistrer = [];
   final url = Uri.parse('$generalRouteForApi/listContactDS/$uidUser/fr');
   final response = await http.get(url);
@@ -1053,41 +1100,32 @@ Future<void> saveContactDsIfNotExiste() async {
     final jsonData = jsonDecode(response.body) as List<dynamic>;
     if (jsonData.isNotEmpty) {
       for (var contact in jsonData) {
-        if (contact['tel'] != "+22964044294" &&
-            contact['tel'] != "22964044294" &&
-            contact['tel'] != "64044294" &&
-            !contactsEnregistrer.contains(contact['tel'])) {
-          contactsEnregistrer.add(contact['tel']);
+        final String phone = (contact['tel'] ?? '').toString().trim();
+        if (phone.isEmpty) continue;
+
+        if (phone != "+22964044294" &&
+            phone != "22964044294" &&
+            phone != "64044294" &&
+            !contactsEnregistrer.contains(phone)) {
+          contactsEnregistrer.add(phone);
         }
-        if ((await SQLHelper.getOneNumsTelUser(contact['tel'])).isEmpty) {
-          final String _nom = (contact["nom"] ?? "").toString().trim();
-          final String _pseudo = (contact["pseudo"] ?? "").toString();
-          final String _telSansPlus = contact["tel"].toString().replaceAll(
-                "+",
-                "",
-              );
-          final List<String> _nameParts = [
-            _nom,
-            _pseudo,
-            _telSansPlus,
+        if ((await SQLHelper.getOneNumsTelUser(phone)).isEmpty) {
+          final String nomContact = (contact["nom"] ?? "").toString().trim();
+          final String pseudoContact = (contact["pseudo"] ?? "").toString();
+          final String telSansPlus = phone.replaceAll("+", "");
+          final List<String> nameParts = [
+            nomContact,
+            pseudoContact,
+            telSansPlus,
           ].where((s) => s.isNotEmpty).toList();
-          final String _expectedName = "${_nameParts.join(" - ")} #DS";
-          final newContact = Contact()
-            ..name.first = _expectedName
-            ..phones = [Phone(contact["tel"])]
-            ..accounts = (selectedContactAccountName != null &&
-                    selectedContactAccountType != null)
-                ? [
-                    Account(
-                      '',
-                      selectedContactAccountType!,
-                      selectedContactAccountName!,
-                      [],
-                    ),
-                  ]
-                : [];
-          await newContact.insert();
-          await insertNumTelUserIntoDataBase(contact["tel"]);
+          final String expectedName = "${nameParts.join(" - ")} #DS";
+          final inserted = await _insertDressurContactSafely(
+            name: expectedName,
+            phone: phone,
+          );
+          if (!inserted) continue;
+
+          await insertNumTelUserIntoDataBase(phone);
           nombreNewContact++;
         }
       }
