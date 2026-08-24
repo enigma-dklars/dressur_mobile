@@ -208,12 +208,24 @@ class _ModificationProduitServicesPageState
     }
 
     final response = await request.send();
+    final responseBody = await response.stream.bytesToString();
+    Map<String, dynamic>? data;
+    try {
+      final decoded = jsonDecode(responseBody);
+      if (decoded is Map<String, dynamic>) {
+        data = decoded;
+      }
+    } catch (_) {
+      data = null;
+    }
 
     if (response.statusCode == 200) {
-      var data1 = await response.stream.bytesToString();
-      var data = jsonDecode(data1);
-      if (data["error"] == true) {
-        dangerNoti(data["titre"], data["message"], context);
+      if (data?["error"] == true) {
+        dangerNoti(
+          data?["titre"] ?? ((langUserPhone == "fr") ? "Erreur" : "Error"),
+          data?["message"] ?? ((langUserPhone == "fr") ? "La modification a échoué." : "The modification failed."),
+          context,
+        );
       } else {
         Navigator.pop(context);
         Navigator.pop(context);
@@ -229,19 +241,19 @@ class _ModificationProduitServicesPageState
           context,
         );
       }
-      setState(() {
-        _textEditingController.clear();
-        _imageFile = null;
-        _isSending = false;
-      });
     } else {
       dangerNoti(
-        (langUserPhone == "fr") ? "Attention !!!" : "Warning!!!",
-        (langUserPhone == "fr")
-            ? 'Erreur : ${response.statusCode}'
-            : 'Error: ${response.statusCode}',
+        data?["titre"] ?? ((langUserPhone == "fr") ? "Erreur" : "Error"),
+        data?["message"] ??
+            ((langUserPhone == "fr")
+                ? 'Erreur : ${response.statusCode}'
+                : 'Error: ${response.statusCode}'),
         context,
       );
+    }
+
+    if (mounted) {
+      setState(() => _isSending = false);
     }
   }
 
