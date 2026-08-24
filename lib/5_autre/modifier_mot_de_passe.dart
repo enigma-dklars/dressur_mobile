@@ -121,15 +121,13 @@ class _PasswordChangeFormState extends State<PasswordChangeForm> {
           ancienPasswordController.clear();
           passwordController.clear();
           passwordVerifController.clear();
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            backgroundColor: Colors.green,
-            behavior: SnackBarBehavior.floating,
-            content: Text(
-                (langUserPhone == "fr")
-                    ? 'Mot de passe modifié avec succès !'
-                    : 'Password changed successfully!',
-                style: GoogleFonts.poppins(color: Colors.white)),
-          ));
+          successNoti(
+            (langUserPhone == "fr") ? "Succès" : "Success",
+            (langUserPhone == "fr")
+                ? 'Mot de passe modifié avec succès !'
+                : 'Password changed successfully!',
+            context,
+          );
         }
       } else {
         dangerNoti(

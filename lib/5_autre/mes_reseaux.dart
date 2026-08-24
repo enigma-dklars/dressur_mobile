@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:dressur/components/constant.dart';
+import 'package:dressur/components/noti.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -347,7 +348,7 @@ class _MesReseauxPageState extends State<MesReseauxPage> {
 
     if (shouldDelete != true || _isMutating) return;
     if (_uid.isEmpty) {
-      _showSnackBar(
+      _showFeedback(
         _isFrench
             ? 'Votre session est invalide. Veuillez vous reconnecter.'
             : 'Your session is invalid. Please sign in again.',
@@ -375,10 +376,10 @@ class _MesReseauxPageState extends State<MesReseauxPage> {
             .where((item) => item.networkType != network.networkType)
             .toList();
       });
-      _showSnackBar(_isFrench ? 'Réseau supprimé.' : 'Network deleted.');
+      _showFeedback(_isFrench ? 'Réseau supprimé.' : 'Network deleted.');
     } catch (error) {
       if (!mounted) return;
-      _showSnackBar(_errorMessageFor(error), isError: true);
+      _showFeedback(_errorMessageFor(error), isError: true);
     } finally {
       if (mounted) setState(() => _deletingNetworkType = null);
     }
@@ -388,7 +389,7 @@ class _MesReseauxPageState extends State<MesReseauxPage> {
     if (_isMutating) return;
 
     if (!_canManageNetworks) {
-      _showSnackBar(
+      _showFeedback(
         _errorMessage ??
             _catalogError ??
             (_isFrench
@@ -401,7 +402,7 @@ class _MesReseauxPageState extends State<MesReseauxPage> {
 
     final availableNetworks = _availableNetworks;
     if (availableNetworks.isEmpty) {
-      _showSnackBar(
+      _showFeedback(
         _isFrench
             ? 'Tous les réseaux disponibles sont déjà ajoutés.'
             : 'All available networks have already been added.',
@@ -419,7 +420,7 @@ class _MesReseauxPageState extends State<MesReseauxPage> {
       ),
     );
     if (wasAdded == true && mounted) {
-      _showSnackBar(_isFrench ? 'Réseau ajouté.' : 'Network added.');
+      _showFeedback(_isFrench ? 'Réseau ajouté.' : 'Network added.');
     }
   }
 
@@ -454,18 +455,25 @@ class _MesReseauxPageState extends State<MesReseauxPage> {
     );
     if (mounted) setState(() => _updatingNetworkType = null);
     if (wasUpdated == true && mounted) {
-      _showSnackBar(_isFrench ? 'Réseau modifié.' : 'Network updated.');
+      _showFeedback(_isFrench ? 'Réseau modifié.' : 'Network updated.');
     }
   }
 
-  void _showSnackBar(String message, {bool isError = false}) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: isError ? Colors.red[700] : Colors.green[700],
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
+  void _showFeedback(String message, {bool isError = false}) {
+    if (!mounted) return;
+    if (isError) {
+      dangerNoti(
+        _isFrench ? 'Erreur' : 'Error',
+        message,
+        context,
+      );
+    } else {
+      successNoti(
+        _isFrench ? 'Succès' : 'Success',
+        message,
+        context,
+      );
+    }
   }
 
   @override

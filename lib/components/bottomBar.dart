@@ -20,6 +20,7 @@ import 'package:dressur/components/constant.dart';
 import 'package:dressur/components/contacts_pending_interrupt.dart';
 import 'package:dressur/components/permission_manager.dart';
 import 'package:dressur/components/sql_helper.dart';
+import 'package:dressur/components/noti.dart';
 import 'package:dressur/components/noti_sys.dart';
 
 class _AccountBlockedPage extends StatelessWidget {
@@ -523,21 +524,15 @@ class _BottomBarState extends State<BottomBar> with WidgetsBindingObserver {
       (langUserPhone == "fr")
           ? 'Impossible de joindre Dressur. Réessayez.'
           : 'Dressur could not be reached. Try again.',
-      Colors.red,
     );
   }
 
-  void _showRefreshMessage(String message, Color backgroundColor) {
+  void _showRefreshMessage(String message) {
     if (!mounted || _sessionRedirectStarted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        backgroundColor: backgroundColor,
-        behavior: SnackBarBehavior.floating,
-        content: Text(
-          message,
-          style: GoogleFonts.poppins(color: Colors.white),
-        ),
-      ),
+    dangerNoti(
+      (langUserPhone == "fr") ? 'Erreur' : 'Error',
+      message,
+      context,
     );
   }
 

@@ -17,6 +17,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:dressur/5_autre/confirme_mail_user.dart';
 import 'package:dressur/components/constant.dart';
+import 'package:dressur/components/noti.dart';
 import 'package:dressur/components/notification_bell.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
@@ -419,20 +420,6 @@ class _ActuPageState extends State<ActuPage>
   }
 
   void actualise(affMessage) async {
-    if (affMessage == true) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        backgroundColor: Colors.red,
-        behavior: SnackBarBehavior.floating,
-        content: Text(
-          (langUserPhone == "fr")
-              ? 'Actualisation en cours…'
-              : 'Update in progress…',
-          style: GoogleFonts.poppins(
-            color: Colors.white,
-          ),
-        ),
-      ));
-    }
     setState(() {
       _loading = true;
     });
@@ -486,19 +473,12 @@ class _ActuPageState extends State<ActuPage>
       }
       if (!mounted) return;
       if (affMessage == true) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            backgroundColor: Colors.green,
-            behavior: SnackBarBehavior.floating,
-            content: Text(
-              (langUserPhone == "fr")
-                  ? 'Actualisation terminée.'
-                  : 'Refresh complete.',
-              style: GoogleFonts.poppins(
-                color: Colors.white,
-              ),
-            ),
-          ),
+        successNoti(
+          (langUserPhone == "fr") ? "Succès" : "Success",
+          (langUserPhone == "fr")
+              ? 'Actualisation terminée.'
+              : 'Refresh complete.',
+          context,
         );
       }
     } catch (_) {
@@ -741,19 +721,13 @@ class _ActuPageState extends State<ActuPage>
         nombreAddNow = (data["contactsAdd"]).length;
         nombreContactDispo = nombreContactDispo - nombreAddNow;
       });
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        backgroundColor: Colors.green,
-        behavior: SnackBarBehavior.floating,
-        duration: const Duration(seconds: 15),
-        content: Text(
-          (langUserPhone == "fr")
-              ? 'ADD de $nombreAddNow contact(s) avec succès.'
-              : 'ADD of $nombreAddNow contacts successfully.',
-          style: GoogleFonts.poppins(
-            color: Colors.white,
-          ),
-        ),
-      ));
+      successNoti(
+        (langUserPhone == "fr") ? "Succès" : "Success",
+        (langUserPhone == "fr")
+            ? 'ADD de $nombreAddNow contact(s) avec succès.'
+            : 'ADD of $nombreAddNow contacts successfully.',
+        context,
+      );
     }
   }
 
@@ -1612,42 +1586,36 @@ class _ActuPageState extends State<ActuPage>
         (uri.scheme == "http" || uri.scheme == "https");
 
     if (!isValidUrl) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            langUserPhone == "fr"
-                ? "L’URL de cette promotion n’est pas valide."
-                : "The URL for this promotion is invalid.",
-          ),
-        ),
+      dangerNoti(
+        langUserPhone == "fr" ? "Erreur" : "Error",
+        langUserPhone == "fr"
+            ? "L’URL de cette promotion n’est pas valide."
+            : "The URL for this promotion is invalid.",
+        context,
       );
       return;
     }
 
     if (!await canLaunchUrl(uri)) {
       if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            langUserPhone == "fr"
-                ? "Impossible d’ouvrir cette URL."
-                : "This URL could not be opened.",
-          ),
-        ),
+      dangerNoti(
+        langUserPhone == "fr" ? "Erreur" : "Error",
+        langUserPhone == "fr"
+            ? "Impossible d’ouvrir cette URL."
+            : "This URL could not be opened.",
+        context,
       );
       return;
     }
 
     final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
     if (!launched && context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            langUserPhone == "fr"
-                ? "Impossible d’ouvrir cette URL."
-                : "This URL could not be opened.",
-          ),
-        ),
+      dangerNoti(
+        langUserPhone == "fr" ? "Erreur" : "Error",
+        langUserPhone == "fr"
+            ? "Impossible d’ouvrir cette URL."
+            : "This URL could not be opened.",
+        context,
       );
     }
   }
@@ -2336,42 +2304,36 @@ class AdvertisementDetailPage extends StatelessWidget {
 
     if (!isValidUrl) {
       if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            langUserPhone == "fr"
-                ? "L’URL n’est pas valide."
-                : "The URL is invalid.",
-          ),
-        ),
+      dangerNoti(
+        langUserPhone == "fr" ? "Erreur" : "Error",
+        langUserPhone == "fr"
+            ? "L’URL n’est pas valide."
+            : "The URL is invalid.",
+        context,
       );
       return;
     }
 
     if (!await canLaunchUrl(uri)) {
       if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            langUserPhone == "fr"
-                ? "Impossible d’ouvrir cette URL."
-                : "This URL could not be opened.",
-          ),
-        ),
+      dangerNoti(
+        langUserPhone == "fr" ? "Erreur" : "Error",
+        langUserPhone == "fr"
+            ? "Impossible d’ouvrir cette URL."
+            : "This URL could not be opened.",
+        context,
       );
       return;
     }
 
     final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
     if (!launched && context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            langUserPhone == "fr"
-                ? "Impossible d’ouvrir cette URL."
-                : "This URL could not be opened.",
-          ),
-        ),
+      dangerNoti(
+        langUserPhone == "fr" ? "Erreur" : "Error",
+        langUserPhone == "fr"
+            ? "Impossible d’ouvrir cette URL."
+            : "This URL could not be opened.",
+        context,
       );
     }
   }

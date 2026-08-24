@@ -2,6 +2,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:dressur/components/constant.dart';
+import 'package:dressur/components/app_message_bottom_sheet.dart';
+import 'package:dressur/components/noti.dart';
 
 class ContactsPendingInterruptPage extends StatefulWidget {
   final int nombreContacts;
@@ -60,22 +62,16 @@ class _ContactsPendingInterruptPageState
 
       if (!mounted) return;
 
-      // Feedback de succès bref avant de quitter la page.
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          backgroundColor: const Color(0xFF4CAF50),
-          behavior: SnackBarBehavior.floating,
-          duration: const Duration(seconds: 2),
-          content: Text(
-            langUserPhone == 'fr'
-                ? 'Contacts enregistrés dans votre répertoire !'
-                : 'Contacts saved to your phone!',
-            style: GoogleFonts.poppins(color: Colors.white),
-          ),
-        ),
+      // Afficher le feedback avant de quitter la page afin que le bottom sheet
+      // soit fermé par l’utilisateur et non par le Navigator de l’écran.
+      await showAppMessageBottomSheet(
+        context,
+        type: AppMessageType.success,
+        title: langUserPhone == 'fr' ? 'Succès' : 'Success',
+        message: langUserPhone == 'fr'
+            ? 'Contacts enregistrés dans votre répertoire !'
+            : 'Contacts saved to your phone!',
       );
-
-      await Future.delayed(const Duration(milliseconds: 600));
       if (!mounted) return;
       Navigator.of(context).pop();
     } catch (_) {
@@ -83,17 +79,12 @@ class _ContactsPendingInterruptPageState
       setState(() => _saving = false);
 
       // Feedback d'erreur : l'utilisateur sait que ça n'a pas fonctionné.
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          backgroundColor: Colors.redAccent,
-          behavior: SnackBarBehavior.floating,
-          content: Text(
-            langUserPhone == 'fr'
-                ? 'Erreur lors de l\'enregistrement. Réessayez depuis l\'onglet Actu.'
-                : 'Error saving contacts. Try again from the News tab.',
-            style: GoogleFonts.poppins(color: Colors.white),
-          ),
-        ),
+      dangerNoti(
+        langUserPhone == 'fr' ? 'Erreur' : 'Error',
+        langUserPhone == 'fr'
+            ? 'Erreur lors de l\'enregistrement. Réessayez depuis l\'onglet Actu.'
+            : 'Error saving contacts. Try again from the News tab.',
+        context,
       );
     }
   }

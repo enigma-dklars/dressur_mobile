@@ -6,6 +6,7 @@ import 'dart:io';
 import 'package:animate_do/animate_do.dart';
 import 'package:dressur/components/111_generaleApiDomaine.dart';
 import 'package:dressur/components/app_theme.dart';
+import 'package:dressur/components/noti.dart';
 import 'package:dressur/components/noti_sys.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show ByteData, Uint8List, rootBundle;
@@ -679,17 +680,12 @@ Future<void> sharePromotion(
     );
   } else {
     // Gérer les erreurs de téléchargement
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        backgroundColor: Colors.red,
-        behavior: SnackBarBehavior.floating,
-        content: Text(
-          (langUserPhone == 'fr')
-              ? 'Erreur de téléchargement de l\'image'
-              : 'Image download error',
-          style: GoogleFonts.poppins(color: Colors.white),
-        ),
-      ),
+    dangerNoti(
+      (langUserPhone == 'fr') ? 'Erreur' : 'Error',
+      (langUserPhone == 'fr')
+          ? 'Erreur de téléchargement de l\'image'
+          : 'Image download error',
+      context,
     );
   }
 }

@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:dressur/components/constant.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
+import 'package:dressur/components/app_message_bottom_sheet.dart';
 import 'package:dressur/components/noti.dart';
 
 class SuggestionsPage extends StatelessWidget {
@@ -119,17 +120,16 @@ class _SuggestionsFormState extends State<SuggestionsForm> {
         if (data["error"] == true) {
           dangerNoti(data["titre"], data["message"], context);
         } else {
+          await showAppMessageBottomSheet(
+            context,
+            type: AppMessageType.success,
+            title: (langUserPhone == "fr") ? "Succès" : "Success",
+            message: (langUserPhone == "fr")
+                ? 'Merci pour votre suggestion !'
+                : 'Thanks for your suggestion!',
+          );
+          if (!mounted) return;
           Navigator.pop(context);
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            backgroundColor: Colors.green,
-            behavior: SnackBarBehavior.floating,
-            content: Text(
-              (langUserPhone == "fr")
-                  ? 'Merci pour votre suggestion !'
-                  : 'Thanks for your suggestion!',
-              style: GoogleFonts.poppins(color: Colors.white),
-            ),
-          ));
         }
       } else {
         dangerNoti(

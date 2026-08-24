@@ -7,6 +7,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:dressur/components/constant.dart';
+import 'package:dressur/components/noti.dart';
 
 class AdminPromoEnAttentePage extends StatefulWidget {
   const AdminPromoEnAttentePage({Key? key}) : super(key: key);
@@ -81,11 +82,19 @@ class _AdminPromoEnAttentePageState extends State<AdminPromoEnAttentePage> {
 
   void _showSnack(String msg, bool ok) {
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      backgroundColor: ok ? Colors.green : Colors.red,
-      behavior: SnackBarBehavior.floating,
-      content: Text(msg, style: GoogleFonts.poppins(color: Colors.white)),
-    ));
+    if (ok) {
+      successNoti(
+        (langUserPhone == "fr") ? 'Succès' : 'Success',
+        msg,
+        context,
+      );
+    } else {
+      dangerNoti(
+        (langUserPhone == "fr") ? 'Erreur' : 'Error',
+        msg,
+        context,
+      );
+    }
   }
 
   void _showRefuserDialog(int id) {

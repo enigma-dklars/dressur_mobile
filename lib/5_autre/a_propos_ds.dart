@@ -12,12 +12,8 @@ class AproposPage extends StatelessWidget {
   Future<void> _launchURL(String url) async {
     final Uri uri = Uri.parse(url);
     if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
-      // Si le lancement échoue, on peut afficher un message d'erreur
+      // Si le lancement échoue, journaliser l’erreur sans afficher de notification.
       print('Could not launch $url');
-      // Optionnel : Afficher un SnackBar à l'utilisateur
-      // ScaffoldMessenger.of(context).showSnackBar(
-      //   SnackBar(content: Text('Impossible d\'ouvrir le lien.')),
-      // );
     }
   }
 

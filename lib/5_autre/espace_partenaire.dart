@@ -9,6 +9,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:dressur/components/app_theme.dart';
 import 'package:dressur/components/constant.dart';
 import 'package:dressur/components/feature_hero.dart';
+import 'package:dressur/components/noti.dart';
 import 'package:dressur/components/feature_sections.dart';
 
 class EspacePartenairePage extends StatefulWidget {
@@ -263,16 +264,12 @@ class _EspacePartenairePageState extends State<EspacePartenairePage> {
                                       mode: LaunchMode.externalApplication,
                                     )) {
                                       if (!context.mounted) return;
-                                      ScaffoldMessenger.of(
+                                      dangerNoti(
+                                        isFr ? 'Erreur' : 'Error',
+                                        isFr
+                                            ? 'Impossible d\'ouvrir WhatsApp.'
+                                            : 'Unable to open WhatsApp.',
                                         context,
-                                      ).showSnackBar(
-                                        SnackBar(
-                                          content: Text(
-                                            isFr
-                                                ? 'Impossible d\'ouvrir WhatsApp.'
-                                                : 'Unable to open WhatsApp.',
-                                          ),
-                                        ),
                                       );
                                     }
                                   }
@@ -386,12 +383,10 @@ class _EspacePartenairePageState extends State<EspacePartenairePage> {
             icon: FontAwesomeIcons.copy,
             onPressed: () {
               Clipboard.setData(ClipboardData(text: monCodePartenaire ?? ''));
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(isFr ? 'Code copié !' : 'Code copied!'),
-                  backgroundColor: Colors.green.shade700,
-                  duration: const Duration(seconds: 2),
-                ),
+              successNoti(
+                isFr ? 'Succès' : 'Success',
+                isFr ? 'Code copié !' : 'Code copied!',
+                context,
               );
             },
           ),
