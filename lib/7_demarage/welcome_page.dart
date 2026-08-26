@@ -261,7 +261,6 @@ class _PageDepartState extends State<PageDepart> {
           ? "Initialization complete"
           : "Initialisation terminée";
       _openHome();
-      unawaited(_runOptionalStartupReminder());
     } on TimeoutException {
       await _waitForMinimumSplash(startedAt);
       if (mounted) _openStartupRecovery(StartupFailure.networkTimeout);
@@ -281,14 +280,6 @@ class _PageDepartState extends State<PageDepart> {
     final elapsed = DateTime.now().difference(startedAt);
     final remaining = _splashMinimum - elapsed;
     if (remaining > Duration.zero) await Future<void>.delayed(remaining);
-  }
-
-  Future<void> _runOptionalStartupReminder() async {
-    try {
-      await _checkSynchroAvanceReminder();
-    } catch (_) {
-      // Notifications are optional and must never affect session restoration.
-    }
   }
 
   void _openHome() {
@@ -360,23 +351,6 @@ class _PageDepartState extends State<PageDepart> {
       ),
       (_) => false,
     );
-  }
-
-  Future<void> _checkSynchroAvanceReminder() async {
-    final prefs = await SharedPreferences.getInstance();
-    final String? lastDateStr = prefs.getString('lastSynchroAvanceDate');
-    final bool shouldNotify = lastDateStr == null ||
-        DateTime.now().difference(DateTime.parse(lastDateStr)).inDays >= 30;
-    if (shouldNotify) {
-      final bool isFr = langUserPhone == 'fr';
-      await showNotification(
-        isFr ? 'Synchronisation conseillée' : 'Sync recommended',
-        isFr
-            ? 'Mettez à jour vos contacts Dressur en lançant une Synchronisation Avancée.'
-            : 'Update your Dressur contacts by running an Advanced Synchronization.',
-        context: context,
-      );
-    }
   }
 
   @override
