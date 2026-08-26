@@ -150,6 +150,7 @@ class _AdminPromosDressurStatusPageState
     final String pseudo = p['pseudo'] ?? '';
     final String whatsapp = p['whatsapp'] ?? '';
     final String dateExp = p['dateExp'] ?? '';
+    final String description = p['description'] as String? ?? '';
 
     return Card(
       color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
@@ -203,7 +204,9 @@ class _AdminPromosDressurStatusPageState
 
                 // ── Description ──
                 Text(
-                  '${p['description'] ?? ''}',
+                  description,
+                  maxLines: 3,
+                  overflow: TextOverflow.ellipsis,
                   style: GoogleFonts.poppins(
                     fontSize: 13,
                     color: isDark ? Colors.grey[300] : Colors.grey[800],
