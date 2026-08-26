@@ -141,6 +141,18 @@ class _EspacePartenairePageState extends State<EspacePartenairePage> {
                       ),
                     ),
                     const SizedBox(height: AppSpacing.xSmall),
+                  ] else ...[
+                    FeatureHero(
+                      icon: FontAwesomeIcons.handshake,
+                      title: isFr
+                          ? 'Devenez Partenaire Dressur'
+                          : 'Become a Dressur Partner',
+                      subtitle: isFr
+                          ? 'Accompagnez les utilisateurs Dressur et développez votre réseau avec votre code partenaire.'
+                          : 'Guide Dressur users and grow your network with your partner code.',
+                      margin: EdgeInsets.zero,
+                    ),
+                    const SizedBox(height: AppSpacing.medium),
                   ],
                   // ── PRÉSENTATION (toujours visible) ────────────────────────
                   FeatureInfoCard(
@@ -186,6 +198,47 @@ class _EspacePartenairePageState extends State<EspacePartenairePage> {
                     ),
                   ),
                   const SizedBox(height: 12),
+                  if (!estPartenaire) ...[
+                    FeatureInfoCard(
+                      icon: FontAwesomeIcons.route,
+                      title: isFr
+                          ? 'Comment devenir Partenaire ?'
+                          : 'How to become a Partner?',
+                      child: Column(
+                        children: [
+                          FeatureNumberedStep(
+                            number: 1,
+                            title: isFr
+                                ? 'Préparez votre profil'
+                                : 'Prepare your profile',
+                            description: isFr
+                                ? 'Renseignez et confirmez vos informations personnelles.'
+                                : 'Complete and confirm your personal information.',
+                          ),
+                          FeatureNumberedStep(
+                            number: 2,
+                            title: isFr
+                                ? 'Utilisez Dressur'
+                                : 'Use Dressur',
+                            description: isFr
+                                ? 'Découvrez la plateforme et remplissez les conditions d’accès.'
+                                : 'Discover the platform and meet the access requirements.',
+                          ),
+                          FeatureNumberedStep(
+                            number: 3,
+                            title: isFr
+                                ? 'Passez l’entretien WhatsApp'
+                                : 'Take the WhatsApp interview',
+                            description: isFr
+                                ? 'Lorsque les conditions sont remplies, contactez l’équipe Dressur pour la validation finale.'
+                                : 'When the requirements are met, contact the Dressur team for final validation.',
+                            margin: EdgeInsets.zero,
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.medium),
+                  ],
                   // ── Conditions ─────────────────────────────────────────────
                   FeatureInfoCard(
                     icon: FontAwesomeIcons.listCheck,
