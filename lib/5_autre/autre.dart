@@ -438,9 +438,11 @@ class _SettingPageState extends State<SettingPage>
                   showChevron: false),
             ]),
 
+            // Espacement cohérent entre les sections Application et social.
+            const SizedBox(height: 20),
             SociauxPage(),
 
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
           ],
         ),
       ),
