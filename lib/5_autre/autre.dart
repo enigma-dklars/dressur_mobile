@@ -727,26 +727,26 @@ class _SettingPageState extends State<SettingPage>
             color: isDark ? Colors.grey[800] : Colors.grey[200],
           ),
           const SizedBox(height: 12),
-          Row(
+          Wrap(
+            alignment: WrapAlignment.start,
+            spacing: 8,
+            runSpacing: 8,
             children: [
               _buildStatusChip(
                 icon: FontAwesomeIcons.handshake,
                 label: isFr ? "Partenaire" : "Partner",
                 active: estPartenaire,
               ),
-              const SizedBox(width: 8),
               _buildStatusChip(
                 icon: FontAwesomeIcons.store,
                 label: isFr ? "Vendeur" : "Vendor",
                 active: isVendeur,
               ),
-              const SizedBox(width: 8),
               _buildStatusChip(
                 icon: FontAwesomeIcons.trophy,
                 label: isFr ? "Récompenses" : "Rewards",
                 active: isInscritProgrammeRecompense,
               ),
-              const SizedBox(width: 8),
               _buildStatusChip(
                 icon: FontAwesomeIcons.code,
                 label: isFr ? "Développeur" : "Developer",
