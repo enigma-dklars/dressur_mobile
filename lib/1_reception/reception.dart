@@ -346,7 +346,7 @@ class _ReceptionPageState extends State<ReceptionPage>
 
           // ── Montant ─────────────────────────────────────────────────
           Text(
-            "${soldeProgrammeRecompense ?? 0} FCFA",
+            "${soldeDressur ?? 0} FCFA",
             style: GoogleFonts.poppins(
               fontSize: 28,
               fontWeight: FontWeight.w700,

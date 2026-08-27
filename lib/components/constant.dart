@@ -131,7 +131,7 @@ var tel;
 var apropos;
 var createdAt;
 var messageErreurPermissionAdd;
-var soldeProgrammeRecompense;
+var soldeDressur;
 int fraisAdhesionVendeur = 2000;
 
 Future<bool> isConnectedToInternet() async {
@@ -179,7 +179,7 @@ Future<void> initUserInformations(userInfos) async {
   boostEnCours = userInfos["boostEnCours"];
   isInscritProgrammeRecompense =
       userInfos["isInscritProgrammeRecompense"] ?? false;
-  soldeProgrammeRecompense = userInfos["soldeProgrammeRecompense"] ?? 0;
+  soldeDressur = userInfos["soldeDressur"] ?? 0;
   fraisAdhesionVendeur = (userInfos["fraisAdhesionVendeur"] as num?)?.toInt() ?? 2000;
   isVendeur = userInfos["vendeur"] ?? false;
   aUnPartenaire = userInfos["aUnPartenaire"] ?? false;
@@ -233,7 +233,7 @@ void resetUserInformationState() {
   nombreContacts = 0;
   boostEnCours = false;
   isInscritProgrammeRecompense = false;
-  soldeProgrammeRecompense = 0;
+  soldeDressur = 0;
   fraisAdhesionVendeur = 2000;
   isVendeur = false;
   aUnPartenaire = false;

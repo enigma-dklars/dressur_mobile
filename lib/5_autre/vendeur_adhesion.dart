@@ -128,8 +128,8 @@ class _VendeurAdhesionPageState extends State<VendeurAdhesionPage> {
           setState(() {
             isVendeur = true;
             if (montantRecharge > 0) {
-              soldeProgrammeRecompense =
-                  (soldeProgrammeRecompense) + montantRecharge;
+              soldeDressur =
+                  (soldeDressur) + montantRecharge;
             }
             _desactive = false;
           });

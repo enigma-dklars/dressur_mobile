@@ -706,7 +706,7 @@ class _SettingPageState extends State<SettingPage>
           ),
           const SizedBox(height: 6),
           Text(
-            "${soldeProgrammeRecompense ?? 0} FCFA",
+            "${soldeDressur ?? 0} FCFA",
             style: GoogleFonts.poppins(
               fontSize: 28,
               fontWeight: FontWeight.w700,

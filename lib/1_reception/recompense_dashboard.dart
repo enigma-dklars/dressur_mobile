@@ -79,7 +79,7 @@ class _ProgrammeRecompenseDashboardState
           setState(() {
             vuesTotales = data["vuesTotales"];
             gainsTotales = data["gainsTotales"];
-            soldeProgrammeRecompense = data["soldeDisponible"];
+            soldeDressur = data["soldeDisponible"];
           });
 
           allHistorique = data["allHistorique"];

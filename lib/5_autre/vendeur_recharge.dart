@@ -143,8 +143,8 @@ class _VendeurRechargePageState extends State<VendeurRechargePage> {
             context,
           );
           setState(() {
-            soldeProgrammeRecompense =
-                (soldeProgrammeRecompense ?? 0) + montant;
+            soldeDressur =
+                (soldeDressur ?? 0) + montant;
             _desactive = false;
           });
           Navigator.pop(context);
@@ -220,7 +220,7 @@ class _VendeurRechargePageState extends State<VendeurRechargePage> {
                                 fontSize: 12, color: Colors.grey[500]),
                           ),
                           Text(
-                            "${soldeProgrammeRecompense ?? 0} FCFA",
+                            "${soldeDressur ?? 0} FCFA",
                             style: GoogleFonts.poppins(
                                 fontSize: 20,
                                 fontWeight: FontWeight.w700,
