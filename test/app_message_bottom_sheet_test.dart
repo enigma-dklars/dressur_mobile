@@ -280,19 +280,22 @@ void _setTestWindow(
   double textScaleFactor = 1.0,
   EdgeInsets viewInsets = EdgeInsets.zero,
 }) {
-  final window = tester.binding.window;
-  window.physicalSizeTestValue = size;
-  window.devicePixelRatioTestValue = 1.0;
-  window.textScaleFactorTestValue = textScaleFactor;
-  window.viewInsetsTestValue = viewInsets;
+  tester.view.physicalSize = size;
+  tester.view.devicePixelRatio = 1.0;
+  tester.binding.platformDispatcher.textScaleFactorTestValue = textScaleFactor;
+  tester.view.viewInsets = FakeViewPadding(
+    left: viewInsets.left,
+    top: viewInsets.top,
+    right: viewInsets.right,
+    bottom: viewInsets.bottom,
+  );
 }
 
 void _resetTestWindow(WidgetTester tester) {
-  final window = tester.binding.window;
-  window.clearPhysicalSizeTestValue();
-  window.clearDevicePixelRatioTestValue();
-  window.clearTextScaleFactorTestValue();
-  window.clearViewInsetsTestValue();
+  tester.view.resetPhysicalSize();
+  tester.view.resetDevicePixelRatio();
+  tester.binding.platformDispatcher.clearTextScaleFactorTestValue();
+  tester.view.resetViewInsets();
 }
 
 void _expectCloseButtonVisible(

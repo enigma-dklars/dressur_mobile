@@ -216,38 +216,43 @@ class AppMessageBottomSheet extends StatelessWidget {
                         icon: const Icon(Icons.close),
                       ),
                     ),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _MessageIcon(
-                          visuals: visuals,
-                        ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: Padding(
-                            padding: const EdgeInsets.only(top: 6),
-                            child: Text(
-                              title,
-                              style: theme.textTheme.titleLarge?.copyWith(
-                                fontWeight: FontWeight.w700,
-                                color: visuals.accent,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
                     Flexible(
                       fit: FlexFit.loose,
                       child: SingleChildScrollView(
                         padding: const EdgeInsets.only(bottom: 4),
-                        child: Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            message,
-                            style: theme.textTheme.bodyLarge,
-                          ),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                _MessageIcon(
+                                  visuals: visuals,
+                                ),
+                                const SizedBox(width: 16),
+                                Expanded(
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(top: 6),
+                                    child: Text(
+                                      title,
+                                      style: theme.textTheme.titleLarge?.copyWith(
+                                        fontWeight: FontWeight.w700,
+                                        color: visuals.accent,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 16),
+                            Align(
+                              alignment: Alignment.centerLeft,
+                              child: Text(
+                                message,
+                                style: theme.textTheme.bodyLarge,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ),
