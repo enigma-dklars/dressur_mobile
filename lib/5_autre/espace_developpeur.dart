@@ -1,6 +1,9 @@
 import 'dart:convert';
 
+import 'package:dressur/components/app_theme.dart';
 import 'package:dressur/components/constant.dart';
+import 'package:dressur/components/feature_hero.dart';
+import 'package:dressur/components/feature_sections.dart';
 import 'package:dressur/components/noti.dart';
 import 'package:dressur/components/app_message_bottom_sheet.dart';
 import 'package:flutter/material.dart';
@@ -22,7 +25,9 @@ class _EspaceDeveloppeurPageState extends State<EspaceDeveloppeurPage> {
   List<dynamic> _keys = [];
   List<dynamic> _orders = [];
   bool _loading = true;
+  String? _errorMessage;
   bool _busy = false;
+  bool _conditionsAccepted = false;
   dynamic _selectedMethod;
   final _amountController = TextEditingController();
   late final _telController = TextEditingController(text: '$tel');
@@ -49,7 +54,13 @@ class _EspaceDeveloppeurPageState extends State<EspaceDeveloppeurPage> {
       {Map<String, String>? fields}) async {
     final uri = Uri.parse('$generalRouteForApi$path');
     if (method == 'GET') {
-      final response = await http.get(uri.replace(queryParameters: {'uid': '$uidUser'})).timeout(const Duration(seconds: 20));
+      final response = await http.get(
+        uri,
+        headers: {
+          'Accept': 'application/json',
+          'X-Dressur-Uid': '$uidUser',
+        },
+      ).timeout(const Duration(seconds: 20));
       return (jsonDecode(response.body) as Map).cast<String, dynamic>();
     }
     final request = http.MultipartRequest(method, uri);
@@ -61,26 +72,39 @@ class _EspaceDeveloppeurPageState extends State<EspaceDeveloppeurPage> {
   }
 
   Future<void> _loadPage() async {
+    if (mounted) {
+      setState(() => _errorMessage = null);
+    }
     try {
       final results = await Future.wait([
         _jsonRequest('GET', '/developpeur/conditions'),
-        _jsonRequest('POST', '/listeFormuleBoost', fields: {'typeBoost': 'date'}),
+        _jsonRequest('POST', '/listeFormuleBoost',
+            fields: {'typeBoost': 'date'}),
       ]);
       if (!mounted) return;
       final conditions = results[0];
       final methods = results[1];
+      if (conditions['error'] == true || methods['error'] == true) {
+        throw StateError('Developer space response is unavailable.');
+      }
       setState(() {
         _conditions = conditions;
         _methods = (methods['listeMethodePaiements'] as List?) ?? [];
         if (_methods.isNotEmpty) _selectedMethod = _methods.first['value'];
-        _amountController.text = '${conditions['minimumRecharge'] ?? montantRechargeInitialeDeveloppeur}';
+        _amountController.text =
+            '${conditions['minimumRecharge'] ?? montantRechargeInitialeDeveloppeur}';
         _loading = false;
       });
       if (_active) await _loadActiveData();
     } catch (_) {
       if (!mounted) return;
-      setState(() => _loading = false);
-      dangerNoti(_isFr ? 'Erreur' : 'Error', _isFr ? 'Impossible de charger l’espace développeur.' : 'Developer space could not be loaded.', context);
+      setState(() {
+        _loading = false;
+        _errorMessage = _isFr
+            ? 'Impossible de charger l’espace développeur. Vérifiez votre connexion puis réessayez.'
+            : 'The developer space could not be loaded. Check your connection and try again.';
+      });
+      dangerNoti(_isFr ? 'Erreur' : 'Error', _errorMessage!, context);
     }
   }
 
@@ -96,41 +120,87 @@ class _EspaceDeveloppeurPageState extends State<EspaceDeveloppeurPage> {
         _orders = (results[1]['orders'] as List?) ?? [];
       });
     } catch (_) {
-      if (mounted) dangerNoti(_isFr ? 'Information' : 'Notice', _isFr ? 'Les données de vos commandes ne sont pas disponibles.' : 'Your order data is unavailable.', context);
+      if (mounted) {
+        dangerNoti(
+            _isFr ? 'Information' : 'Notice',
+            _isFr
+                ? 'Les données de vos commandes ne sont pas disponibles.'
+                : 'Your order data is unavailable.',
+            context);
+      }
     }
   }
 
   Future<void> _activate() async {
     final amount = int.tryParse(_amountController.text.trim()) ?? 0;
-    final minimum = (_conditions?['minimumRecharge'] as num?)?.toInt() ?? montantRechargeInitialeDeveloppeur;
+    final minimum = (_conditions?['minimumRecharge'] as num?)?.toInt() ??
+        montantRechargeInitialeDeveloppeur;
     if (amount < minimum) {
-      dangerNoti(_isFr ? 'Montant insuffisant' : 'Insufficient amount', _isFr ? 'Le minimum est de $minimum FCFA.' : 'The minimum is $minimum FCFA.', context);
+      dangerNoti(
+          _isFr ? 'Montant insuffisant' : 'Insufficient amount',
+          _isFr
+              ? 'Le minimum est de $minimum FCFA.'
+              : 'The minimum is $minimum FCFA.',
+          context);
+      return;
+    }
+    if (!_conditionsAccepted) {
+      dangerNoti(
+          _isFr ? 'Conditions requises' : 'Terms required',
+          _isFr
+              ? 'Acceptez les conditions d’utilisation de l’API développeur.'
+              : 'Accept the developer API terms.',
+          context);
       return;
     }
     if (_selectedMethod == null || _telController.text.trim().isEmpty) {
-      dangerNoti(_isFr ? 'Informations requises' : 'Information required', _isFr ? 'Choisissez un moyen de paiement et renseignez votre numéro.' : 'Choose a payment method and enter your phone number.', context);
+      dangerNoti(
+          _isFr ? 'Informations requises' : 'Information required',
+          _isFr
+              ? 'Choisissez un moyen de paiement et renseignez votre numéro.'
+              : 'Choose a payment method and enter your phone number.',
+          context);
       return;
     }
     setState(() => _busy = true);
     try {
-      final data = await _jsonRequest('POST', '/developpeur/activation', fields: {
+      final data =
+          await _jsonRequest('POST', '/developpeur/activation', fields: {
         'montantRecharge': '$amount',
         'methodePaiementId': '$_selectedMethod',
         'tel': _telController.text.trim(),
-        'conditionsAccepted': '1',
+        'conditionsAccepted': _conditionsAccepted ? '1' : '0',
       });
       if (!mounted) return;
       if (data['error'] == true) {
-        dangerNoti(data['titre'] ?? (_isFr ? 'Activation impossible' : 'Activation failed'), data['message'] ?? '', context);
+        dangerNoti(
+            data['titre'] ??
+                (_isFr ? 'Activation impossible' : 'Activation failed'),
+            data['message'] ?? '',
+            context);
       } else {
-        successNoti(_isFr ? 'Paiement démarré' : 'Payment started', data['message'] ?? (_isFr ? 'Suivez les instructions de paiement.' : 'Follow the payment instructions.'), context);
+        successNoti(
+            _isFr ? 'Paiement démarré' : 'Payment started',
+            data['message'] ??
+                (_isFr
+                    ? 'Suivez les instructions de paiement.'
+                    : 'Follow the payment instructions.'),
+            context);
         final redirect = data['url'] ?? data['redirect'];
         if (redirect is String && redirect.isNotEmpty && redirect != 'none') {
-          await launchUrl(Uri.parse(redirect), mode: LaunchMode.externalApplication);
+          await launchUrl(Uri.parse(redirect),
+              mode: LaunchMode.externalApplication);
         }
       }
     } catch (_) {
-      if (mounted) dangerNoti(_isFr ? 'Erreur' : 'Error', _isFr ? 'Une erreur réseau est survenue.' : 'A network error occurred.', context);
+      if (mounted) {
+        dangerNoti(
+            _isFr ? 'Erreur' : 'Error',
+            _isFr
+                ? 'Une erreur réseau est survenue.'
+                : 'A network error occurred.',
+            context);
+      }
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -139,49 +209,86 @@ class _EspaceDeveloppeurPageState extends State<EspaceDeveloppeurPage> {
   Future<void> _createKey() async {
     final label = _keyLabelController.text.trim();
     if (label.isEmpty) {
-      dangerNoti(_isFr ? 'Libellé requis' : 'Label required', _isFr ? 'Donnez un nom à cette clé.' : 'Give this key a name.', context);
+      dangerNoti(
+          _isFr ? 'Libellé requis' : 'Label required',
+          _isFr ? 'Donnez un nom à cette clé.' : 'Give this key a name.',
+          context);
       return;
     }
     setState(() => _busy = true);
     try {
-      final data = await _jsonRequest('POST', '/developpeur/cles', fields: {'label': label});
+      final data = await _jsonRequest('POST', '/developpeur/cles',
+          fields: {'label': label});
       if (!mounted) return;
       if (data['error'] == true) {
-        dangerNoti(_isFr ? 'Création impossible' : 'Creation failed', data['message'] ?? '', context);
+        dangerNoti(_isFr ? 'Création impossible' : 'Creation failed',
+            data['message'] ?? '', context);
       } else {
         final token = data['token'] ?? '';
-        await showAppMessageBottomSheet(context, type: AppMessageType.success, title: _isFr ? 'Clé créée' : 'Key created', message: '${_isFr ? 'Copiez maintenant ce token. Il ne sera plus affiché.' : 'Copy this token now. It will not be shown again.'}\n\n$token', closeLabel: _isFr ? 'Fermer' : 'Close');
+        await showAppMessageBottomSheet(context,
+            type: AppMessageType.success,
+            title: _isFr ? 'Clé créée' : 'Key created',
+            message:
+                '${_isFr ? 'Copiez maintenant ce token. Il ne sera plus affiché.' : 'Copy this token now. It will not be shown again.'}\n\n$token',
+            closeLabel: _isFr ? 'Fermer' : 'Close');
         _keyLabelController.clear();
         await _loadActiveData();
       }
     } catch (_) {
-      if (mounted) dangerNoti(_isFr ? 'Erreur' : 'Error', _isFr ? 'Impossible de créer la clé.' : 'Could not create the key.', context);
+      if (mounted) {
+        dangerNoti(
+            _isFr ? 'Erreur' : 'Error',
+            _isFr ? 'Impossible de créer la clé.' : 'Could not create the key.',
+            context);
+      }
     } finally {
       if (mounted) setState(() => _busy = false);
     }
   }
 
   Future<void> _revokeKey(String keyId) async {
-    final confirmed = await showAppMessageConfirmationBottomSheet(context, type: AppMessageType.question, title: _isFr ? 'Révoquer la clé ?' : 'Revoke key?', message: _isFr ? 'Cette action est définitive pour cette clé.' : 'This action is final for this key.', confirmLabel: _isFr ? 'Révoquer' : 'Revoke', cancelLabel: _isFr ? 'Annuler' : 'Cancel');
+    final confirmed = await showAppMessageConfirmationBottomSheet(context,
+        type: AppMessageType.question,
+        title: _isFr ? 'Révoquer la clé ?' : 'Revoke key?',
+        message: _isFr
+            ? 'Cette action est définitive pour cette clé.'
+            : 'This action is final for this key.',
+        confirmLabel: _isFr ? 'Révoquer' : 'Revoke',
+        cancelLabel: _isFr ? 'Annuler' : 'Cancel');
     if (confirmed != true) return;
     try {
-      final data = await _jsonRequest('POST', '/developpeur/cles/${Uri.encodeComponent(keyId)}/revoquer');
+      final data = await _jsonRequest(
+          'POST', '/developpeur/cles/${Uri.encodeComponent(keyId)}/revoquer');
       if (!mounted) return;
       if (data['error'] == true) {
         dangerNoti(_isFr ? 'Erreur' : 'Error', data['message'] ?? '', context);
       } else {
-        successNoti(_isFr ? 'Clé révoquée' : 'Key revoked', data['message'] ?? '', context);
+        successNoti(_isFr ? 'Clé révoquée' : 'Key revoked',
+            data['message'] ?? '', context);
         await _loadActiveData();
       }
     } catch (_) {
-      if (mounted) dangerNoti(_isFr ? 'Erreur' : 'Error', _isFr ? 'Impossible de révoquer la clé.' : 'Could not revoke the key.', context);
+      if (mounted) {
+        dangerNoti(
+            _isFr ? 'Erreur' : 'Error',
+            _isFr
+                ? 'Impossible de révoquer la clé.'
+                : 'Could not revoke the key.',
+            context);
+      }
     }
   }
 
   Future<void> _openDocumentation() async {
     final uri = Uri.parse('https://dressur.site/documentation-api');
-    if (!await launchUrl(uri, mode: LaunchMode.externalApplication) && mounted) {
-      dangerNoti(_isFr ? 'Erreur' : 'Error', _isFr ? 'Impossible d’ouvrir la documentation.' : 'Could not open documentation.', context);
+    if (!await launchUrl(uri, mode: LaunchMode.externalApplication) &&
+        mounted) {
+      dangerNoti(
+          _isFr ? 'Erreur' : 'Error',
+          _isFr
+              ? 'Impossible d’ouvrir la documentation.'
+              : 'Could not open documentation.',
+          context);
     }
   }
 
@@ -189,38 +296,352 @@ class _EspaceDeveloppeurPageState extends State<EspaceDeveloppeurPage> {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
-      backgroundColor: isDark ? const Color(0xFF121212) : const Color(0xFFF8F9FA),
+      backgroundColor:
+          isDark ? const Color(0xFF121212) : const Color(0xFFF8F9FA),
       appBar: AppBar(
         backgroundColor: primaryColor,
         elevation: 0,
-        title: Text(_isFr ? 'Espace développeur' : 'Developer space', style: GoogleFonts.poppins(color: Colors.white, fontSize: 18)),
-        leading: IconButton(onPressed: () => Navigator.pop(context), icon: const FaIcon(FontAwesomeIcons.chevronLeft, color: Colors.white)),
+        title: Text(_isFr ? 'Espace développeur' : 'Developer space',
+            style: GoogleFonts.poppins(color: Colors.white, fontSize: 18)),
+        leading: IconButton(
+            onPressed: () => Navigator.pop(context),
+            icon: const FaIcon(FontAwesomeIcons.chevronLeft,
+                color: Colors.white)),
       ),
-      body: _loading ? const Center(child: CircularProgressIndicator()) : RefreshIndicator(onRefresh: _loadPage, child: ListView(padding: const EdgeInsets.all(14), children: [
-        _hero(isDark),
-        const SizedBox(height: 12),
-        _balanceCard(isDark),
-        const SizedBox(height: 12),
-        _documentationCard(isDark),
-        const SizedBox(height: 12),
-        if (!_active) ...[_eligibilityCard(isDark), const SizedBox(height: 12), _activationCard(isDark)] else ...[_keysCard(isDark), const SizedBox(height: 12), _ordersCard(isDark)],
-      ])),
+      body: _loading
+          ? const Center(child: CircularProgressIndicator())
+          : RefreshIndicator(
+              onRefresh: _loadPage,
+              child: _errorMessage != null
+                  ? _errorState()
+                  : ListView(
+                      physics: const BouncingScrollPhysics(),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 15, vertical: 16),
+                      children: [
+                        _hero(),
+                        const SizedBox(height: AppSpacing.medium),
+                        if (!_active) ...[
+                          _overviewCard(),
+                          _stepsCard(),
+                        ],
+                        _balanceCard(),
+                        const SizedBox(height: AppSpacing.medium),
+                        _documentationCard(),
+                        const SizedBox(height: AppSpacing.medium),
+                        if (!_active) ...[
+                          _eligibilityCard(),
+                          _activationCard(isDark),
+                        ] else ...[
+                          _keysCard(isDark),
+                          const SizedBox(height: AppSpacing.medium),
+                          _ordersCard(isDark),
+                        ],
+                        const SizedBox(height: AppSpacing.large),
+                      ],
+                    ),
+            ),
     );
   }
 
-  Widget _hero(bool isDark) => Container(padding: const EdgeInsets.all(20), decoration: BoxDecoration(color: isDark ? const Color(0xFF20242A) : Colors.white, borderRadius: BorderRadius.circular(20)), child: Column(children: [const FaIcon(FontAwesomeIcons.code, size: 34, color: primaryColor), const SizedBox(height: 10), Text(_active ? (_isFr ? 'Votre accès API est actif' : 'Your API access is active') : (_isFr ? 'Connectez vos outils à Dressur' : 'Connect your tools to Dressur'), textAlign: TextAlign.center, style: GoogleFonts.poppins(fontSize: 20, fontWeight: FontWeight.w700, color: isDark ? Colors.white : Colors.black87)), const SizedBox(height: 6), Text(_isFr ? 'Promotions Réseaux Sociaux · HTTP/JSON' : 'Social Network Promotions · HTTP/JSON', style: GoogleFonts.poppins(color: isDark ? Colors.grey[300] : Colors.grey[700]))]));
+  Widget _errorState() => ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 16),
+        children: [
+          const SizedBox(height: 80),
+          FeatureInfoCard(
+            icon: FontAwesomeIcons.triangleExclamation,
+            title: _isFr
+                ? 'Espace développeur indisponible'
+                : 'Developer space unavailable',
+            child: Column(
+              children: [
+                Text(
+                  _errorMessage ??
+                      (_isFr
+                          ? 'Une erreur est survenue.'
+                          : 'An error occurred.'),
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        height: 1.4,
+                      ),
+                ),
+                const SizedBox(height: AppSpacing.large),
+                FeaturePrimaryButton(
+                  label: _isFr ? 'Réessayer' : 'Retry',
+                  icon: FontAwesomeIcons.arrowsRotate,
+                  onPressed: _loadPage,
+                ),
+              ],
+            ),
+          ),
+        ],
+      );
 
-  Widget _balanceCard(bool isDark) => _card(isDark, Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(_isFr ? 'Solde Dressur' : 'Dressur balance', style: GoogleFonts.poppins(color: isDark ? Colors.grey[300] : Colors.grey[700])), const SizedBox(height: 4), Text('${soldeDressur ?? 0} FCFA', style: GoogleFonts.poppins(fontSize: 28, fontWeight: FontWeight.w700, color: isDark ? Colors.white : Colors.black87)), if (_active) _tag(_isFr ? 'Développeur actif' : 'Active developer', Colors.green)]));
+  Widget _hero() => FeatureHero(
+        icon: FontAwesomeIcons.code,
+        title: _active
+            ? (_isFr ? 'Votre Espace développeur' : 'Your Developer Space')
+            : (_isFr
+                ? 'Devenez développeur Dressur'
+                : 'Become a Dressur Developer'),
+        subtitle: _active
+            ? (_isFr
+                ? 'Gérez vos clés et vos commandes API HTTP/JSON.'
+                : 'Manage your keys and HTTP/JSON API orders.')
+            : (_isFr
+                ? 'Connectez vos outils à Dressur avec une API sécurisée.'
+                : 'Connect your tools to Dressur with a secure API.'),
+        margin: EdgeInsets.zero,
+      );
 
-  Widget _documentationCard(bool isDark) => _card(isDark, Row(children: [const FaIcon(FontAwesomeIcons.bookOpen, color: primaryColor), const SizedBox(width: 12), Expanded(child: Text(_isFr ? 'Consultez la documentation universelle HTTP/JSON.' : 'Read the universal HTTP/JSON documentation.', style: GoogleFonts.poppins(color: isDark ? Colors.white : Colors.black87))), IconButton(onPressed: _openDocumentation, icon: const Icon(Icons.open_in_new, color: primaryColor))]));
+  Widget _overviewCard() => FeatureInfoCard(
+        icon: FontAwesomeIcons.code,
+        title: _isFr
+            ? 'Qu’est-ce que l’Espace développeur ?'
+            : 'What is the Developer Space?',
+        child: Text(
+          _isFr
+              ? 'L’Espace développeur permet d’utiliser l’API HTTP/JSON de Dressur pour automatiser les Promotions Réseaux Sociaux, consulter votre solde et suivre vos commandes avec des clés privées.'
+              : 'The Developer Space lets you use Dressur’s HTTP/JSON API to automate Social Network Promotions, check your balance, and track orders with private keys.',
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+                height: 1.5,
+              ),
+        ),
+      );
 
-  Widget _eligibilityCard(bool isDark) {
-    final eligibility = (_conditions?['eligibility'] as Map?)?.cast<String, dynamic>() ?? {};
-    final labels = {'accountActive': _isFr ? 'Compte actif' : 'Active account', 'emailVerified': _isFr ? 'Adresse e-mail confirmée' : 'Verified email', 'phoneVerified': _isFr ? 'Numéro confirmé' : 'Verified phone', 'profileComplete': _isFr ? 'Profil complet' : 'Complete profile', 'conditionsAccepted': _isFr ? 'Conditions API acceptées' : 'API terms accepted'};
-    return _card(isDark, Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(_isFr ? 'Conditions d’accès' : 'Access conditions', style: GoogleFonts.poppins(fontSize: 17, fontWeight: FontWeight.w700, color: isDark ? Colors.white : Colors.black87)), const SizedBox(height: 8), ...labels.entries.map((entry) => Padding(padding: const EdgeInsets.symmetric(vertical: 3), child: Row(children: [Icon(eligibility[entry.key] == true ? Icons.check_circle : Icons.radio_button_unchecked, size: 18, color: eligibility[entry.key] == true ? Colors.green : Colors.orange), const SizedBox(width: 8), Expanded(child: Text(entry.value, style: GoogleFonts.poppins(color: isDark ? Colors.grey[200] : Colors.grey[800])))])))]));
+  Widget _stepsCard() => FeatureInfoCard(
+        icon: FontAwesomeIcons.route,
+        title: _isFr
+            ? 'Comment devenir développeur ?'
+            : 'How to become a developer?',
+        child: Column(
+          children: [
+            FeatureNumberedStep(
+              number: 1,
+              title: _isFr ? 'Préparez votre compte' : 'Prepare your account',
+              description: _isFr
+                  ? 'Complétez et confirmez vos informations personnelles.'
+                  : 'Complete and verify your personal information.',
+            ),
+            FeatureNumberedStep(
+              number: 2,
+              title: _isFr
+                  ? 'Acceptez les conditions API'
+                  : 'Accept the API terms',
+              description: _isFr
+                  ? 'Lisez les règles d’utilisation de l’API HTTP/JSON Dressur.'
+                  : 'Read the Dressur HTTP/JSON API usage rules.',
+            ),
+            FeatureNumberedStep(
+              number: 3,
+              title: _isFr
+                  ? 'Effectuez la recharge minimale'
+                  : 'Make the minimum recharge',
+              description: _isFr
+                  ? 'Le montant est crédité intégralement sur votre solde Dressur.'
+                  : 'The amount is credited in full to your Dressur balance.',
+              margin: EdgeInsets.zero,
+            ),
+          ],
+        ),
+      );
+
+  Widget _balanceCard() => FeatureInfoCard(
+        icon: FontAwesomeIcons.wallet,
+        title: _isFr ? 'Solde Dressur' : 'Dressur balance',
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('${soldeDressur ?? 0} FCFA',
+                style: GoogleFonts.poppins(
+                    fontSize: 28, fontWeight: FontWeight.w700)),
+            const SizedBox(height: 4),
+            Text(
+              _isFr
+                  ? 'Le même solde est utilisé pour vos services Dressur et vos commandes API.'
+                  : 'The same balance is used for Dressur services and API orders.',
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant),
+            ),
+            if (_active) ...[
+              const SizedBox(height: 8),
+              _tag(_isFr ? 'Développeur actif' : 'Active developer',
+                  Colors.green),
+            ],
+          ],
+        ),
+      );
+
+  Widget _documentationCard() => FeatureInfoCard(
+        icon: FontAwesomeIcons.bookOpen,
+        title: _isFr ? 'Documentation API' : 'API documentation',
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              _isFr
+                  ? 'Consultez la documentation universelle HTTP/JSON avant de connecter vos outils.'
+                  : 'Read the universal HTTP/JSON documentation before connecting your tools.',
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant),
+            ),
+            const SizedBox(height: AppSpacing.medium),
+            FeaturePrimaryButton(
+              label: _isFr ? 'Ouvrir la documentation' : 'Open documentation',
+              icon: FontAwesomeIcons.arrowUpRightFromSquare,
+              onPressed: _openDocumentation,
+            ),
+          ],
+        ),
+      );
+
+  Widget _eligibilityCard() {
+    final eligibility =
+        (_conditions?['eligibility'] as Map?)?.cast<String, dynamic>() ?? {};
+    final labels = <String, String>{
+      'accountActive': _isFr ? 'Compte actif' : 'Active account',
+      'emailVerified': _isFr ? 'Adresse e-mail confirmée' : 'Verified email',
+      'phoneVerified': _isFr ? 'Numéro confirmé' : 'Verified phone',
+      'profileComplete': _isFr ? 'Profil complet' : 'Complete profile',
+    };
+
+    return FeatureInfoCard(
+      icon: FontAwesomeIcons.listCheck,
+      title: _isFr ? 'Conditions d’accès' : 'Access conditions',
+      child: Column(
+        children: [
+          ...labels.entries.map(
+            (entry) => FeatureCondition(
+              label: entry.value,
+              isValid: eligibility[entry.key] == true,
+              padding: const EdgeInsets.symmetric(vertical: AppSpacing.small),
+            ),
+          ),
+          FeatureCondition(
+            label: _isFr ? 'Conditions API acceptées' : 'API terms accepted',
+            isValid: _conditionsAccepted,
+            description: _isFr
+                ? 'Cette condition est validée au moment de la demande d’activation.'
+                : 'This condition is validated when activation is requested.',
+            padding: const EdgeInsets.symmetric(vertical: AppSpacing.small),
+          ),
+        ],
+      ),
+    );
   }
 
-  Widget _activationCard(bool isDark) => _card(isDark, Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(_conditions?['activationConfigured'] == true ? (_isFr ? 'Activer l’accès développeur' : 'Activate developer access') : (_isFr ? 'Activation indisponible' : 'Activation unavailable'), style: GoogleFonts.poppins(fontSize: 17, fontWeight: FontWeight.w700, color: isDark ? Colors.white : Colors.black87)), const SizedBox(height: 8), if (_conditions?['activationConfigured'] != true) Text(_isFr ? 'Le service est temporairement indisponible. Contactez l’assistance par WhatsApp.' : 'The service is temporarily unavailable. Contact WhatsApp support.', style: GoogleFonts.poppins(color: isDark ? Colors.grey[300] : Colors.grey[700])) else ...[_field(_isFr ? 'Montant minimum (FCFA)' : 'Minimum amount (FCFA)', _amountController, TextInputType.number, isDark), _field(_isFr ? 'Numéro de téléphone' : 'Phone number', _telController, TextInputType.phone, isDark), DropdownButtonFormField<dynamic>(value: _selectedMethod, decoration: _inputDecoration(_isFr ? 'Moyen de paiement' : 'Payment method', isDark), dropdownColor: isDark ? const Color(0xFF2A2A2A) : Colors.white, items: _methods.map((method) => DropdownMenuItem(value: method['value'], child: Text('${method['label'] ?? method['titre'] ?? method['value']}', style: TextStyle(color: isDark ? Colors.white : Colors.black87)))).toList(), onChanged: (value) => setState(() => _selectedMethod = value)), const SizedBox(height: 12), SizedBox(width: double.infinity, child: ElevatedButton(onPressed: _busy ? null : _activate, child: Text(_busy ? (_isFr ? 'Chargement…' : 'Loading…') : (_isFr ? 'Continuer vers le paiement' : 'Continue to payment'))))]]));
+  Widget _activationCard(bool isDark) {
+    final configured = _conditions?['activationConfigured'] == true;
+    final minimum = (_conditions?['minimumRecharge'] as num?)?.toInt() ??
+        montantRechargeInitialeDeveloppeur;
+    final eligibility =
+        (_conditions?['eligibility'] as Map?)?.cast<String, dynamic>() ?? {};
+    final accountReady = [
+      'accountActive',
+      'emailVerified',
+      'phoneVerified',
+      'profileComplete'
+    ].every((key) => eligibility[key] == true);
+
+    return FeatureInfoCard(
+      icon: configured
+          ? FontAwesomeIcons.wallet
+          : FontAwesomeIcons.triangleExclamation,
+      title: configured
+          ? (_isFr
+              ? 'Activer l’accès développeur'
+              : 'Activate developer access')
+          : (_isFr ? 'Activation indisponible' : 'Activation unavailable'),
+      child: configured
+          ? Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  _isFr
+                      ? 'Une recharge minimale de $minimum FCFA est requise. Le montant versé est crédité intégralement sur votre solde Dressur et vous pouvez payer davantage.'
+                      : 'A minimum recharge of $minimum FCFA is required. The full amount is credited to your Dressur balance and you may pay more.',
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        height: 1.4,
+                      ),
+                ),
+                const SizedBox(height: AppSpacing.medium),
+                _field(
+                    _isFr
+                        ? 'Montant de recharge (FCFA)'
+                        : 'Recharge amount (FCFA)',
+                    _amountController,
+                    TextInputType.number,
+                    isDark),
+                _field(_isFr ? 'Numéro de téléphone' : 'Phone number',
+                    _telController, TextInputType.phone, isDark),
+                const SizedBox(height: AppSpacing.small),
+                DropdownButtonFormField<dynamic>(
+                  initialValue: _selectedMethod,
+                  decoration: _inputDecoration(
+                      _isFr ? 'Moyen de paiement' : 'Payment method', isDark),
+                  dropdownColor:
+                      isDark ? const Color(0xFF2A2A2A) : Colors.white,
+                  items: _methods
+                      .map((method) => DropdownMenuItem(
+                          value: method['value'],
+                          child: Text(
+                              '${method['label'] ?? method['titre'] ?? method['value']}',
+                              style: TextStyle(
+                                  color:
+                                      isDark ? Colors.white : Colors.black87))))
+                      .toList(),
+                  onChanged: (value) => setState(() => _selectedMethod = value),
+                ),
+                const SizedBox(height: AppSpacing.small),
+                CheckboxListTile(
+                  contentPadding: EdgeInsets.zero,
+                  value: _conditionsAccepted,
+                  onChanged: _busy
+                      ? null
+                      : (value) =>
+                          setState(() => _conditionsAccepted = value ?? false),
+                  title: Text(_isFr
+                      ? 'J’accepte les conditions d’utilisation de l’API développeur.'
+                      : 'I accept the developer API terms.'),
+                  controlAffinity: ListTileControlAffinity.leading,
+                ),
+                if (!accountReady)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: AppSpacing.small),
+                    child: Text(
+                      _isFr
+                          ? 'Complétez les conditions non validées ci-dessus pour continuer.'
+                          : 'Complete the unmet conditions above to continue.',
+                      style:
+                          TextStyle(color: Theme.of(context).colorScheme.error),
+                    ),
+                  ),
+                FeaturePrimaryButton(
+                  label: _isFr
+                      ? 'Continuer vers le paiement'
+                      : 'Continue to payment',
+                  icon: FontAwesomeIcons.arrowRight,
+                  isLoading: _busy,
+                  onPressed:
+                      accountReady && _conditionsAccepted ? _activate : null,
+                ),
+              ],
+            )
+          : Text(
+              _isFr
+                  ? 'Le montant minimum de recharge n’est pas encore configuré. Contactez l’assistance par WhatsApp.'
+                  : 'The minimum recharge amount is not configured yet. Contact WhatsApp support.',
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    height: 1.4,
+                  ),
+            ),
+    );
+  }
 
   Widget _keysCard(bool isDark) {
     return _card(
@@ -341,14 +762,67 @@ class _EspaceDeveloppeurPageState extends State<EspaceDeveloppeurPage> {
     );
   }
 
-  String _statusLabel(dynamic value) => {'0': 'invalid_url', '1': 'pending', '2': 'in_progress', '3': 'completed'}['$value'] ?? 'unknown';
+  String _statusLabel(dynamic value) =>
+      {
+        '0': 'invalid_url',
+        '1': 'pending',
+        '2': 'in_progress',
+        '3': 'completed'
+      }['$value'] ??
+      'unknown';
 
-  Widget _field(String label, TextEditingController controller, TextInputType type, bool isDark) => Padding(padding: const EdgeInsets.only(top: 10), child: TextField(controller: controller, keyboardType: type, style: TextStyle(color: isDark ? Colors.white : Colors.black87), decoration: _inputDecoration(label, isDark)));
-  InputDecoration _inputDecoration(String label, bool isDark) => InputDecoration(labelText: label, labelStyle: TextStyle(color: isDark ? Colors.grey[300] : Colors.grey[700]), border: const OutlineInputBorder());
-  Widget _card(bool isDark, Widget child) => Container(padding: const EdgeInsets.all(16), decoration: BoxDecoration(color: isDark ? const Color(0xFF1E1E1E) : Colors.white, borderRadius: BorderRadius.circular(16), border: Border.all(color: isDark ? Colors.grey[800]! : Colors.grey[200]!)), child: child);
-  Widget _tag(String text, Color color) => Container(margin: const EdgeInsets.only(top: 8), padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4), decoration: BoxDecoration(color: color.withOpacity(.12), borderRadius: BorderRadius.circular(14)), child: Text(text, style: TextStyle(color: color, fontSize: 12, fontWeight: FontWeight.w600)));
+  Widget _field(String label, TextEditingController controller,
+          TextInputType type, bool isDark) =>
+      Padding(
+          padding: const EdgeInsets.only(top: 10),
+          child: TextField(
+              controller: controller,
+              keyboardType: type,
+              style: TextStyle(color: isDark ? Colors.white : Colors.black87),
+              decoration: _inputDecoration(label, isDark)));
+  InputDecoration _inputDecoration(String label, bool isDark) =>
+      InputDecoration(
+          labelText: label,
+          labelStyle:
+              TextStyle(color: isDark ? Colors.grey[300] : Colors.grey[700]),
+          border: const OutlineInputBorder());
+  Widget _card(bool isDark, Widget child) => Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+          color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+              color: isDark ? Colors.grey[800]! : Colors.grey[200]!)),
+      child: child);
+  Widget _tag(String text, Color color) => Container(
+      margin: const EdgeInsets.only(top: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+      decoration: BoxDecoration(
+          color: color.withValues(alpha: .12),
+          borderRadius: BorderRadius.circular(14)),
+      child: Text(text,
+          style: TextStyle(
+              color: color, fontSize: 12, fontWeight: FontWeight.w600)));
 
   Future<void> _showCreateKeyDialog(bool isDark) async {
-    await showDialog<void>(context: context, builder: (dialogContext) => AlertDialog(title: Text(_isFr ? 'Nouvelle clé API' : 'New API key'), content: TextField(controller: _keyLabelController, decoration: InputDecoration(labelText: _isFr ? 'Libellé' : 'Label')), actions: [TextButton(onPressed: () => Navigator.pop(dialogContext), child: Text(_isFr ? 'Annuler' : 'Cancel')), ElevatedButton(onPressed: () { Navigator.pop(dialogContext); _createKey(); }, child: Text(_isFr ? 'Créer' : 'Create'))]));
+    await showDialog<void>(
+        context: context,
+        builder: (dialogContext) => AlertDialog(
+                title: Text(_isFr ? 'Nouvelle clé API' : 'New API key'),
+                content: TextField(
+                    controller: _keyLabelController,
+                    decoration: InputDecoration(
+                        labelText: _isFr ? 'Libellé' : 'Label')),
+                actions: [
+                  TextButton(
+                      onPressed: () => Navigator.pop(dialogContext),
+                      child: Text(_isFr ? 'Annuler' : 'Cancel')),
+                  ElevatedButton(
+                      onPressed: () {
+                        Navigator.pop(dialogContext);
+                        _createKey();
+                      },
+                      child: Text(_isFr ? 'Créer' : 'Create'))
+                ]));
   }
 }
