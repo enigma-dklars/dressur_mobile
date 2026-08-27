@@ -188,6 +188,7 @@ class _RegisterForm3State extends State<RegisterForm3> {
   int qte = 0;
   int qteMin = 0;
   int qteMax = 0;
+  bool commentairesRequis = false;
   String description = (langUserPhone == "fr")
       ? "Veuillez choisir un réseau social puis un service."
       : "Please choose a social network then a service.";
@@ -197,6 +198,55 @@ class _RegisterForm3State extends State<RegisterForm3> {
   final quantityController = TextEditingController(text: "0");
   final priceController = TextEditingController();
   final telController = TextEditingController(text: tel);
+  final commentairesController = TextEditingController();
+
+  List<String> _lignesCommentaires() {
+    return commentairesController.text
+        .split(RegExp(r'\r?\n'))
+        .map((ligne) => ligne.trim())
+        .where((ligne) => ligne.isNotEmpty)
+        .toList();
+  }
+
+  void _limiterCommentaires() {
+    if (!commentairesRequis) return;
+    final lignes = _lignesCommentaires();
+    final quantiteDemandee = int.tryParse(quantityController.text) ?? 0;
+    if (lignes.length <= quantiteDemandee) return;
+    final texte = lignes.take(quantiteDemandee).join('\n');
+    commentairesController.value = TextEditingValue(
+      text: texte,
+      selection: TextSelection.collapsed(offset: texte.length),
+    );
+  }
+
+  bool _validerCommentaires() {
+    if (!commentairesRequis) return true;
+    _limiterCommentaires();
+    final lignes = _lignesCommentaires();
+    if (lignes.isEmpty) {
+      dangerNoti(
+        (langUserPhone == "fr") ? "Commentaires requis" : "Comments required",
+        (langUserPhone == "fr")
+            ? "Veuillez renseigner au moins un commentaire."
+            : "Please enter at least one comment.",
+        context,
+      );
+      return false;
+    }
+    final quantiteDemandee = int.tryParse(quantityController.text) ?? 0;
+    if (lignes.length > quantiteDemandee) {
+      dangerNoti(
+        (langUserPhone == "fr") ? "Attention" : "Attention",
+        (langUserPhone == "fr")
+            ? "Le nombre de commentaires ne peut pas dépasser la quantité demandée."
+            : "The number of comments cannot exceed the requested quantity.",
+        context,
+      );
+      return false;
+    }
+    return true;
+  }
 
   void onChangeService(val) async {
     for (var service in listServices) {
@@ -209,6 +259,8 @@ class _RegisterForm3State extends State<RegisterForm3> {
           qte = service['qte'];
           qteMin = service['qteMin'];
           qteMax = service['qteMax'];
+          commentairesRequis = service['commentairesRequis'] == true;
+          commentairesController.clear();
           description = service['description'];
 
           if (quantityController.text == "0" ||
@@ -309,6 +361,8 @@ class _RegisterForm3State extends State<RegisterForm3> {
         _message,
         context,
       );
+    } else if (!_validerCommentaires()) {
+      return;
     } else {
       setState(() {
         _desactive3 = true;
@@ -328,6 +382,7 @@ class _RegisterForm3State extends State<RegisterForm3> {
           'lien': linkController.text,
           'valueMethodePaiement': valueMethodePaiement,
           'tel': telController.text,
+          'commentaires': commentairesRequis ? commentairesController.text : '',
         });
 
         http.StreamedResponse response = await request.send();
@@ -426,6 +481,7 @@ class _RegisterForm3State extends State<RegisterForm3> {
   @override
   void dispose() {
     _scrollController.dispose();
+    commentairesController.dispose();
     super.dispose();
   }
 
@@ -490,6 +546,8 @@ class _RegisterForm3State extends State<RegisterForm3> {
                                 qte = 0;
                                 qteMin = 0;
                                 qteMax = 0;
+                                commentairesRequis = false;
+                                commentairesController.clear();
                                 quantityController.text = "0";
                                 priceController.clear();
                                 description = (langUserPhone == "fr")
@@ -565,7 +623,10 @@ class _RegisterForm3State extends State<RegisterForm3> {
                     helperText: "Min : $qteMin - Max : $qteMax",
                     border: const OutlineInputBorder(),
                   ),
-                  onChanged: (val) => calculerPrixTotal(),
+                  onChanged: (val) {
+                    calculerPrixTotal();
+                    _limiterCommentaires();
+                  },
                 ),
               ),
               SizedBox(
@@ -613,6 +674,25 @@ class _RegisterForm3State extends State<RegisterForm3> {
               });
             },
           ),
+          if (commentairesRequis) ...[
+            const SizedBox(height: 15),
+            TextField(
+              controller: commentairesController,
+              minLines: 4,
+              maxLines: 8,
+              decoration: InputDecoration(
+                labelText: (langUserPhone == "fr") ? "Commentaires" : "Comments",
+                hintText: (langUserPhone == "fr")
+                    ? "Un commentaire par ligne"
+                    : "One comment per line",
+                helperText: (langUserPhone == "fr")
+                    ? "Vous pouvez en saisir moins que la quantité demandée. Dressur complétera automatiquement."
+                    : "You may enter fewer than the requested quantity. Dressur will complete them automatically.",
+                border: const OutlineInputBorder(),
+              ),
+              onChanged: (_) => _limiterCommentaires(),
+            ),
+          ],
           const SizedBox(height: 15),
           _buildPaymentSummary(context),
           const SizedBox(height: 15),
