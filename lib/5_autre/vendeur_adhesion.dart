@@ -29,9 +29,7 @@ class _VendeurAdhesionPageState extends State<VendeurAdhesionPage> {
   @override
   void initState() {
     super.initState();
-    if (listeMethodePaiements.isEmpty) {
-      _chargerMethodesPaiement();
-    }
+    _chargerMethodesPaiement();
   }
 
   Future<void> _chargerMethodesPaiement() async {
@@ -44,12 +42,16 @@ class _VendeurAdhesionPageState extends State<VendeurAdhesionPage> {
       if (response.statusCode == 200) {
         var data1 = await response.stream.bytesToString();
         var data = convert.jsonDecode(data1);
+        if (!mounted) return;
         if (data["error"] == false) {
           setState(() {
             listeMethodePaiements =
                 (data["listeMethodePaiements"] as List<dynamic>)
                     .map((item) => item as Map<String, dynamic>)
                     .toList();
+            fraisAdhesionVendeur =
+                (data["fraisAdhesionVendeur"] as num?)?.toInt() ??
+                    fraisAdhesionVendeur;
           });
         }
       }
@@ -162,6 +164,11 @@ class _VendeurAdhesionPageState extends State<VendeurAdhesionPage> {
   Widget build(BuildContext context) {
     final bool isFr = langUserPhone == "fr";
     final theme = Theme.of(context);
+    final String fraisAdhesionText =
+        fraisAdhesionVendeur.toString().replaceAllMapped(
+              RegExp(r'(\d)(?=(\d{3})+$)'),
+              (m) => '${m[1]} ',
+            );
 
     return Scaffold(
       appBar: AppBar(
@@ -248,8 +255,8 @@ class _VendeurAdhesionPageState extends State<VendeurAdhesionPage> {
                     context,
                     "2",
                     isFr
-                        ? "Payez les frais d'adhésion de 2 000 FCFA (paiement unique)."
-                        : "Pay the 2,000 FCFA membership fee (one-time payment).",
+                        ? "Payez les frais d'adhésion de $fraisAdhesionText FCFA (paiement unique)."
+                        : "Pay the $fraisAdhesionText FCFA membership fee (one-time payment).",
                   ),
                   _stepItem(
                     context,
@@ -280,7 +287,7 @@ class _VendeurAdhesionPageState extends State<VendeurAdhesionPage> {
                     child: Column(
                       children: [
                         Text(
-                          "2 000 FCFA",
+                          "$fraisAdhesionText FCFA",
                           style: theme.textTheme.displaySmall?.copyWith(
                               fontWeight: FontWeight.w700, color: primaryColor),
                           textAlign: TextAlign.center,
@@ -402,8 +409,8 @@ class _VendeurAdhesionPageState extends State<VendeurAdhesionPage> {
                           builder: (context, value, _) {
                             final int recharge =
                                 int.tryParse(value.text.trim()) ?? 0;
-                            final int total =
-                                2000 + (recharge > 0 ? recharge : 0);
+                            final int total = fraisAdhesionVendeur +
+                                (recharge > 0 ? recharge : 0);
                             final String totalStr =
                                 total.toString().replaceAllMapped(
                                       RegExp(r'(\d)(?=(\d{3})+$)'),
