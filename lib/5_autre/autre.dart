@@ -35,6 +35,7 @@ import 'package:dressur/1_reception/recompense_dashboard.dart';
 import 'package:dressur/1_reception/recompense_start.dart';
 import 'package:dressur/5_autre/vendeur_adhesion.dart';
 import 'package:dressur/5_autre/vendeur_recharge.dart';
+import 'package:dressur/5_autre/espace_developpeur.dart';
 import 'package:dressur/1_reception/liste_notification.dart';
 
 class SettingPage extends StatefulWidget {
@@ -314,6 +315,12 @@ class _SettingPageState extends State<SettingPage>
                           : ProgrammeRecompensePage(optionPage: false),
                     ),
                   )),
+              _buildMenuRow(
+                  FontAwesomeIcons.code,
+                  (langUserPhone == "fr") ? "Espace développeur" : "Developer Space",
+                  () => Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const EspaceDeveloppeurPage()))),
               if (!isVendeur)
                 _buildMenuRow(
                     FontAwesomeIcons.store,
@@ -679,7 +686,8 @@ class _SettingPageState extends State<SettingPage>
               const Spacer(),
               if (isVendeur ||
                   estPartenaire ||
-                  isInscritProgrammeRecompense)
+                  isInscritProgrammeRecompense ||
+                  developpeur)
                 GestureDetector(
                   onTap: () => Navigator.push(
                     context,
@@ -737,6 +745,12 @@ class _SettingPageState extends State<SettingPage>
                 icon: FontAwesomeIcons.trophy,
                 label: isFr ? "Récompenses" : "Rewards",
                 active: isInscritProgrammeRecompense,
+              ),
+              const SizedBox(width: 8),
+              _buildStatusChip(
+                icon: FontAwesomeIcons.code,
+                label: isFr ? "Développeur" : "Developer",
+                active: developpeur,
               ),
             ],
           ),

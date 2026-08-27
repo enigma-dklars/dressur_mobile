@@ -94,6 +94,8 @@ bool mailIsVerified = false;
 bool ihaveConnexion = false;
 bool admin = false;
 bool isVendeur = false;
+bool developpeur = false;
+String developerProfileStatus = 'inactive';
 bool aUnPartenaire = false;
 String? monCodePartenaire;
 var estPartenaire = false;
@@ -133,6 +135,7 @@ var createdAt;
 var messageErreurPermissionAdd;
 var soldeDressur;
 int fraisAdhesionVendeur = 2000;
+int montantRechargeInitialeDeveloppeur = 0;
 
 Future<bool> isConnectedToInternet() async {
   try {
@@ -181,7 +184,10 @@ Future<void> initUserInformations(userInfos) async {
       userInfos["isInscritProgrammeRecompense"] ?? false;
   soldeDressur = userInfos["soldeDressur"] ?? 0;
   fraisAdhesionVendeur = (userInfos["fraisAdhesionVendeur"] as num?)?.toInt() ?? 2000;
+  montantRechargeInitialeDeveloppeur = (userInfos["montantRechargeInitialeDeveloppeur"] as num?)?.toInt() ?? 0;
   isVendeur = userInfos["vendeur"] ?? false;
+  developpeur = userInfos["developpeur"] ?? false;
+  developerProfileStatus = userInfos["developerProfileStatus"] ?? 'inactive';
   aUnPartenaire = userInfos["aUnPartenaire"] ?? false;
   monCodePartenaire = userInfos["codePartenaire"];
   estPartenaire = userInfos["estPartenaire"] ?? false;
@@ -235,7 +241,10 @@ void resetUserInformationState() {
   isInscritProgrammeRecompense = false;
   soldeDressur = 0;
   fraisAdhesionVendeur = 2000;
+  montantRechargeInitialeDeveloppeur = 0;
   isVendeur = false;
+  developpeur = false;
+  developerProfileStatus = 'inactive';
   aUnPartenaire = false;
   monCodePartenaire = null;
   estPartenaire = false;
