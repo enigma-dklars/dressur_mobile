@@ -222,9 +222,124 @@ class _EspaceDeveloppeurPageState extends State<EspaceDeveloppeurPage> {
 
   Widget _activationCard(bool isDark) => _card(isDark, Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(_conditions?['activationConfigured'] == true ? (_isFr ? 'Activer l’accès développeur' : 'Activate developer access') : (_isFr ? 'Activation indisponible' : 'Activation unavailable'), style: GoogleFonts.poppins(fontSize: 17, fontWeight: FontWeight.w700, color: isDark ? Colors.white : Colors.black87)), const SizedBox(height: 8), if (_conditions?['activationConfigured'] != true) Text(_isFr ? 'Le service est temporairement indisponible. Contactez l’assistance par WhatsApp.' : 'The service is temporarily unavailable. Contact WhatsApp support.', style: GoogleFonts.poppins(color: isDark ? Colors.grey[300] : Colors.grey[700])) else ...[_field(_isFr ? 'Montant minimum (FCFA)' : 'Minimum amount (FCFA)', _amountController, TextInputType.number, isDark), _field(_isFr ? 'Numéro de téléphone' : 'Phone number', _telController, TextInputType.phone, isDark), DropdownButtonFormField<dynamic>(value: _selectedMethod, decoration: _inputDecoration(_isFr ? 'Moyen de paiement' : 'Payment method', isDark), dropdownColor: isDark ? const Color(0xFF2A2A2A) : Colors.white, items: _methods.map((method) => DropdownMenuItem(value: method['value'], child: Text('${method['label'] ?? method['titre'] ?? method['value']}', style: TextStyle(color: isDark ? Colors.white : Colors.black87)))).toList(), onChanged: (value) => setState(() => _selectedMethod = value)), const SizedBox(height: 12), SizedBox(width: double.infinity, child: ElevatedButton(onPressed: _busy ? null : _activate, child: Text(_busy ? (_isFr ? 'Chargement…' : 'Loading…') : (_isFr ? 'Continuer vers le paiement' : 'Continue to payment'))))]]));
 
-  Widget _keysCard(bool isDark) => _card(isDark, Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Row(children: [Expanded(child: Text(_isFr ? 'Clés API privées' : 'Private API keys', style: GoogleFonts.poppins(fontSize: 17, fontWeight: FontWeight.w700, color: isDark ? Colors.white : Colors.black87))), IconButton(onPressed: _busy ? null : () => _showCreateKeyDialog(isDark), icon: const Icon(Icons.add_circle, color: primaryColor))]), Text(_isFr ? 'Le secret complet n’est affiché qu’une seule fois.' : 'The full secret is shown only once.', style: GoogleFonts.poppins(fontSize: 12, color: isDark ? Colors.grey[400] : Colors.grey[600])), const SizedBox(height: 8), if (_keys.isEmpty) Text(_isFr ? 'Aucune clé créée.' : 'No keys created.', style: GoogleFonts.poppins(color: isDark ? Colors.grey[300] : Colors.grey[700])) else ..._keys.map((key) => ListTile(contentPadding: EdgeInsets.zero, title: Text('${key['label']}', style: TextStyle(color: isDark ? Colors.white : Colors.black87)), subtitle: Text('${key['keyId']} · ${key['secretPrefix']}…', style: TextStyle(color: isDark ? Colors.grey[400] : Colors.grey[600])), trailing: key['revokedAt'] != null ? _tag(_isFr ? 'Révoquée' : 'Revoked', Colors.grey) : IconButton(onPressed: () => _revokeKey(key['keyId']), icon: const Icon(Icons.block, color: Colors.red)))]));
+  Widget _keysCard(bool isDark) {
+    return _card(
+      isDark,
+      Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  _isFr ? 'Clés API privées' : 'Private API keys',
+                  style: GoogleFonts.poppins(
+                    fontSize: 17,
+                    fontWeight: FontWeight.w700,
+                    color: isDark ? Colors.white : Colors.black87,
+                  ),
+                ),
+              ),
+              IconButton(
+                onPressed: _busy ? null : () => _showCreateKeyDialog(isDark),
+                icon: const Icon(Icons.add_circle, color: primaryColor),
+              ),
+            ],
+          ),
+          Text(
+            _isFr
+                ? 'Le secret complet n’est affiché qu’une seule fois.'
+                : 'The full secret is shown only once.',
+            style: GoogleFonts.poppins(
+              fontSize: 12,
+              color: isDark ? Colors.grey[400] : Colors.grey[600],
+            ),
+          ),
+          const SizedBox(height: 8),
+          if (_keys.isEmpty)
+            Text(
+              _isFr ? 'Aucune clé créée.' : 'No keys created.',
+              style: GoogleFonts.poppins(
+                color: isDark ? Colors.grey[300] : Colors.grey[700],
+              ),
+            )
+          else
+            ..._keys.map(
+              (key) => ListTile(
+                contentPadding: EdgeInsets.zero,
+                title: Text(
+                  "${key['label']}",
+                  style: TextStyle(
+                    color: isDark ? Colors.white : Colors.black87,
+                  ),
+                ),
+                subtitle: Text(
+                  "${key['keyId']} · ${key['secretPrefix']}…",
+                  style: TextStyle(
+                    color: isDark ? Colors.grey[400] : Colors.grey[600],
+                  ),
+                ),
+                trailing: key['revokedAt'] != null
+                    ? _tag(_isFr ? 'Révoquée' : 'Revoked', Colors.grey)
+                    : IconButton(
+                        onPressed: () => _revokeKey(key['keyId']),
+                        icon: const Icon(Icons.block, color: Colors.red),
+                      ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
 
-  Widget _ordersCard(bool isDark) => _card(isDark, Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(_isFr ? 'Historique API' : 'API history', style: GoogleFonts.poppins(fontSize: 17, fontWeight: FontWeight.w700, color: isDark ? Colors.white : Colors.black87)), const SizedBox(height: 8), if (_orders.isEmpty) Text(_isFr ? 'Aucune commande API.' : 'No API orders.', style: GoogleFonts.poppins(color: isDark ? Colors.grey[300] : Colors.grey[700])) else ..._orders.map((order) => ListTile(contentPadding: EdgeInsets.zero, title: Text('${order['reference']}', style: TextStyle(color: isDark ? Colors.white : Colors.black87)), subtitle: Text('${order['quantity']} · ${order['amount']} FCFA', style: TextStyle(color: isDark ? Colors.grey[400] : Colors.grey[600])), trailing: Text(_statusLabel(order['statusNumber']), style: TextStyle(color: primaryColor, fontSize: 12)))]));
+  Widget _ordersCard(bool isDark) {
+    return _card(
+      isDark,
+      Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            _isFr ? 'Historique API' : 'API history',
+            style: GoogleFonts.poppins(
+              fontSize: 17,
+              fontWeight: FontWeight.w700,
+              color: isDark ? Colors.white : Colors.black87,
+            ),
+          ),
+          const SizedBox(height: 8),
+          if (_orders.isEmpty)
+            Text(
+              _isFr ? 'Aucune commande API.' : 'No API orders.',
+              style: GoogleFonts.poppins(
+                color: isDark ? Colors.grey[300] : Colors.grey[700],
+              ),
+            )
+          else
+            ..._orders.map(
+              (order) => ListTile(
+                contentPadding: EdgeInsets.zero,
+                title: Text(
+                  "${order['reference']}",
+                  style: TextStyle(
+                    color: isDark ? Colors.white : Colors.black87,
+                  ),
+                ),
+                subtitle: Text(
+                  "${order['quantity']} · ${order['amount']} FCFA",
+                  style: TextStyle(
+                    color: isDark ? Colors.grey[400] : Colors.grey[600],
+                  ),
+                ),
+                trailing: Text(
+                  _statusLabel(order['statusNumber']),
+                  style: TextStyle(color: primaryColor, fontSize: 12),
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
 
   String _statusLabel(dynamic value) => {'0': 'invalid_url', '1': 'pending', '2': 'in_progress', '3': 'completed'}['$value'] ?? 'unknown';
 
