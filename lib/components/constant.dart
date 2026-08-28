@@ -21,7 +21,7 @@ import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:http/http.dart' as http;
 
-const versionApp = '1.3.13';
+const versionApp = '1.3.14';
 const oldDatabaseName = 'one_dressur.db';
 const nowDataBaseName = 'two_dressur.db';
 bool modeReconnaissanceContactArrierePlan = false;
@@ -120,7 +120,7 @@ var modeMotDePasseOublier = false;
 var mailConnexion = "";
 var textChargementEvolution = "Loading...";
 var addUserOnAutreProfilPage = "oui";
-var myDressurVersion = '1.3.13';
+var myDressurVersion = '1.3.14';
 var lesPublicites;
 var uidAutreUser;
 var uidUser;
@@ -217,7 +217,7 @@ Future<void> initUserInformations(userInfos) async {
 /// This is used before showing the unauthenticated entry point so a stale
 /// session cannot leak into the login or registration flow.
 void resetUserInformationState() {
-  myDressurVersion = '1.3.13';
+  myDressurVersion = '1.3.14';
   mailIsMaxxFire = false;
   uidUser = null;
   name_complete = null;
