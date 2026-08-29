@@ -120,10 +120,10 @@ class _BottomBarState extends State<BottomBar> with WidgetsBindingObserver {
 
   // Labels pour chaque onglet
   List<String> get _labelList => [
-    (langUserPhone == "fr") ? "Services" : "Services",
-    (langUserPhone == "fr") ? "Actu" : "News",
-    (langUserPhone == "fr") ? "Paramètres" : "Settings",
-  ];
+        (langUserPhone == "fr") ? "Services" : "Services",
+        (langUserPhone == "fr") ? "Actu" : "News",
+        (langUserPhone == "fr") ? "Paramètres" : "Settings",
+      ];
 
   // ── Enregistrement des contacts (miroir de actu.dart) ─────────────────────
   Future<void> _addTousLesContacts() async {
@@ -152,19 +152,16 @@ class _BottomBarState extends State<BottomBar> with WidgetsBindingObserver {
                   final String tel = (contactAdd['tel'] as String);
                   final String telSansPlus = tel.replaceAll('+', '');
                   final List<Phone> phonesList = [Phone(tel)];
-                  if (tel.startsWith('+229') &&
-                      !tel.startsWith('+22901')) {
+                  if (tel.startsWith('+229') && !tel.startsWith('+22901')) {
                     final String afterCode = tel.substring(4);
                     phonesList.add(Phone('+22901$afterCode'));
                   }
                   final String nom =
                       (contactAdd['nom'] ?? '').toString().trim();
                   final String pseudo = contactAdd['pseudo'] as String;
-                  final List<String> nameParts = [
-                    nom,
-                    pseudo,
-                    telSansPlus
-                  ].where((s) => s.isNotEmpty).toList();
+                  final List<String> nameParts = [nom, pseudo, telSansPlus]
+                      .where((s) => s.isNotEmpty)
+                      .toList();
                   final newContact = Contact()
                     ..name.first = '${nameParts.join(' - ')} #DS'
                     ..phones = phonesList;
@@ -174,10 +171,9 @@ class _BottomBarState extends State<BottomBar> with WidgetsBindingObserver {
               }
               if (mounted) {
                 setState(() {
-                  nombreContactDispo =
-                      (nombreContactDispo -
-                              (data['contactsAdd'] as List).length)
-                          .clamp(0, 9999);
+                  nombreContactDispo = (nombreContactDispo -
+                          (data['contactsAdd'] as List).length)
+                      .clamp(0, 9999);
                 });
               }
             }
@@ -273,6 +269,7 @@ class _BottomBarState extends State<BottomBar> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
+    unawaited(_runOptionalContactStartupTask(saveContactDsIfNotExiste));
     WidgetsBinding.instance.addObserver(this);
 
     // Charger les infos utilisateur depuis l'API au démarrage, puis vérifier
@@ -301,6 +298,7 @@ class _BottomBarState extends State<BottomBar> with WidgetsBindingObserver {
 
     _timerSync = Timer.periodic(const Duration(hours: 6), (timer) {
       if (!_isInBackground) {
+        unawaited(_runOptionalContactStartupTask(saveContactDsIfNotExiste));
         actualise(false);
       }
     });
@@ -326,6 +324,7 @@ class _BottomBarState extends State<BottomBar> with WidgetsBindingObserver {
           now.difference(_lastActualise!) > const Duration(minutes: 5)) {
         _lastActualise = now;
         actualise(false);
+        unawaited(_runOptionalContactStartupTask(saveContactDsIfNotExiste));
       }
     } else if (state == AppLifecycleState.paused) {
       _isInBackground = true;
@@ -365,9 +364,8 @@ class _BottomBarState extends State<BottomBar> with WidgetsBindingObserver {
         });
 
       final response = await request.send().timeout(_refreshTimeout);
-      final body = await response.stream
-          .bytesToString()
-          .timeout(_refreshTimeout);
+      final body =
+          await response.stream.bytesToString().timeout(_refreshTimeout);
       final data = _decodeRefreshResponse(body, response.statusCode);
 
       if (_isBlockedResponse(data)) {
