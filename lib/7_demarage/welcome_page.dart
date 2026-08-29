@@ -203,8 +203,7 @@ class _PageDepartState extends State<PageDepart> {
   Future<void> _clearCachedSessionSafely() async {
     uidUser = null;
     try {
-      await SQLHelper.clearCachedSession()
-          .timeout(const Duration(seconds: 6));
+      await SQLHelper.clearCachedSession().timeout(const Duration(seconds: 6));
     } catch (_) {
       // The recovery screen remains available even if local cleanup fails.
     }
@@ -261,6 +260,7 @@ class _PageDepartState extends State<PageDepart> {
           ? "Initialization complete"
           : "Initialisation terminée";
       _openHome();
+      unawaited(_runOptionalStartupReminder());
     } on TimeoutException {
       await _waitForMinimumSplash(startedAt);
       if (mounted) _openStartupRecovery(StartupFailure.networkTimeout);
@@ -280,6 +280,14 @@ class _PageDepartState extends State<PageDepart> {
     final elapsed = DateTime.now().difference(startedAt);
     final remaining = _splashMinimum - elapsed;
     if (remaining > Duration.zero) await Future<void>.delayed(remaining);
+  }
+
+  Future<void> _runOptionalStartupReminder() async {
+    try {
+      await _checkSynchroAvanceReminder();
+    } catch (_) {
+      // Notifications are optional and must never affect session restoration.
+    }
   }
 
   void _openHome() {
@@ -351,6 +359,23 @@ class _PageDepartState extends State<PageDepart> {
       ),
       (_) => false,
     );
+  }
+
+  Future<void> _checkSynchroAvanceReminder() async {
+    final prefs = await SharedPreferences.getInstance();
+    final String? lastDateStr = prefs.getString('lastSynchroAvanceDate');
+    final bool shouldNotify = lastDateStr == null ||
+        DateTime.now().difference(DateTime.parse(lastDateStr)).inDays >= 30;
+    if (shouldNotify) {
+      final bool isFr = langUserPhone == 'fr';
+      await showNotification(
+        isFr ? 'Synchronisation conseillée' : 'Sync recommended',
+        isFr
+            ? 'Mettez à jour vos contacts Dressur en lançant une Synchronisation Avancée.'
+            : 'Update your Dressur contacts by running an Advanced Synchronization.',
+        context: context,
+      );
+    }
   }
 
   @override
@@ -437,7 +462,9 @@ class StartupRecoveryPage extends StatelessWidget {
       case StartupFailure.networkUnavailable:
         return _isFr ? 'Connexion impossible' : 'Unable to connect';
       default:
-        return _isFr ? 'Dressur n’a pas pu démarrer' : 'Dressur could not start';
+        return _isFr
+            ? 'Dressur n’a pas pu démarrer'
+            : 'Dressur could not start';
     }
   }
 
@@ -478,7 +505,8 @@ class StartupRecoveryPage extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Image.asset('images/dressur_logo.png', width: 110, height: 110),
+                  Image.asset('images/dressur_logo.png',
+                      width: 110, height: 110),
                   const SizedBox(height: 28),
                   Text(
                     _title,
@@ -533,7 +561,8 @@ class StartupRecoveryPage extends StatelessWidget {
                     onPressed: () => Navigator.of(context).push(
                       MaterialPageRoute(builder: (_) => SupportPage()),
                     ),
-                    icon: const Icon(Icons.support_agent, color: Colors.white70),
+                    icon:
+                        const Icon(Icons.support_agent, color: Colors.white70),
                     label: Text(
                       _isFr ? 'Contacter l’assistance' : 'Contact support',
                       style: const TextStyle(color: Colors.white70),
