@@ -110,11 +110,11 @@ class _BottomBarState extends State<BottomBar> with WidgetsBindingObserver {
 
   // --- Listes pour la barre de navigation ---
   // "ActuPage" est maintenant au centre de la liste des écrans
-  final List<Widget> _screens = [
-    BoostPage(),
-    ActuPage(), // <--- PAGE "ACTU" INTÉGRÉE
-    SettingPage(),
-  ];
+  late final List<Widget> _screens;
+
+  Future<void> _refreshAllUserInformation() async {
+    await actualise(false);
+  }
 
   // Icônes pour chaque onglet
   final List<IconData> _iconList = [
@@ -440,6 +440,11 @@ class _BottomBarState extends State<BottomBar> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
+    _screens = [
+      BoostPage(),
+      ActuPage(),
+      SettingPage(onRefresh: _refreshAllUserInformation),
+    ];
     WidgetsBinding.instance.addObserver(this);
     if (widget.openAdvancedSyncOnLaunch) {
       WidgetsBinding.instance.addPostFrameCallback((_) {

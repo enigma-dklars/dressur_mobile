@@ -343,9 +343,7 @@ class _ActuPageState extends State<ActuPage>
   }
 
   Future<void> _refreshData() async {
-    setState(() {
-      actualise(true);
-    });
+    await actualise(true);
   }
 
   Future<File> _promoCacheFile() async {
@@ -404,9 +402,9 @@ class _ActuPageState extends State<ActuPage>
         final data = jsonDecode(data1) as Map<String, dynamic>;
         if (data['error'] == false) {
           final newPromos = (data['user']['lesPublicites'] as String?) ?? '';
+          await initUserInformations(data['user']);
           if (mounted) {
             setState(() {
-              initUserInformations(data['user']);
               if (newPromos.isNotEmpty) {
                 lesPublicites = newPromos;
                 _futureAdvertisements = fetchAdvertisements();
@@ -419,7 +417,7 @@ class _ActuPageState extends State<ActuPage>
     } catch (_) {}
   }
 
-  void actualise(affMessage) async {
+  Future<void> actualise(affMessage) async {
     setState(() {
       _loading = true;
     });
@@ -438,8 +436,9 @@ class _ActuPageState extends State<ActuPage>
         if (!mounted) return;
         var data = convert.jsonDecode(data1);
         if (data["error"] == false) {
+          await initUserInformations(data['user']);
+          if (!mounted) return;
           setState(() {
-            initUserInformations(data['user']);
             lesPublicites = data['user']["lesPublicites"];
             print(jsonDecode(lesPublicites).length);
             _futureAdvertisements = fetchAdvertisements();
@@ -451,9 +450,8 @@ class _ActuPageState extends State<ActuPage>
             _boostNbObtenus = int.tryParse(
                     data['user']['boostNbObtenus']?.toString() ?? '') ??
                 0;
-            _boostNbMax = int.tryParse(
-                    data['user']['boostNbMax']?.toString() ?? '') ??
-                0;
+            _boostNbMax =
+                int.tryParse(data['user']['boostNbMax']?.toString() ?? '') ?? 0;
             // Réafficher le bandeau si de nouveaux contacts sont disponibles
             if (nombreContactDispo > 0 &&
                 nombreContactDispo != _bandeauDismissedContactCount) {
@@ -669,7 +667,8 @@ class _ActuPageState extends State<ActuPage>
               if (data["permissionAdd"] == false) {
                 setState(() {
                   permissionAdd = false;
-                  messageErreurPermissionAdd = data["messageErreurPermissionAdd"];
+                  messageErreurPermissionAdd =
+                      data["messageErreurPermissionAdd"];
                 });
                 await saveContactsAddsIfExiste(data);
                 // tu a deja depasser
@@ -1111,8 +1110,7 @@ class _ActuPageState extends State<ActuPage>
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.white,
               foregroundColor: bgColor,
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               minimumSize: Size.zero,
               tapTargetSize: MaterialTapTargetSize.shrinkWrap,
               shape: RoundedRectangleBorder(
@@ -1410,10 +1408,10 @@ class _ActuPageState extends State<ActuPage>
                             itemBuilder: (context, index) {
                               Advertisement advertisement =
                                   snapshot.data![index];
-                             if (advertisement.typePromotionAffaire ==
-                                 "sites_applications") {
-                               return _buildSiteApplicationCard(advertisement);
-                             }
+                              if (advertisement.typePromotionAffaire ==
+                                  "sites_applications") {
+                                return _buildSiteApplicationCard(advertisement);
+                              }
                               return Container(
                                 margin: const EdgeInsets.only(
                                     left: 7, top: 0, right: 7, bottom: 0),
@@ -1545,36 +1543,38 @@ class _ActuPageState extends State<ActuPage>
   }
 
   String _siteApplicationTypeLabel(String subtype) {
-      switch (subtype) {
-        case "app_mobile":
-          return langUserPhone == "fr" ? "Application mobile" : "Mobile application";
-        case "logiciel_desktop":
-          return langUserPhone == "fr"
-              ? "Logiciel / application desktop"
-              : "Desktop software/application";
-        case "site_web":
-          return langUserPhone == "fr" ? "Site web" : "Website";
-        default:
-          return langUserPhone == "fr" ? "Type inconnu" : "Unknown type";
-      }
+    switch (subtype) {
+      case "app_mobile":
+        return langUserPhone == "fr"
+            ? "Application mobile"
+            : "Mobile application";
+      case "logiciel_desktop":
+        return langUserPhone == "fr"
+            ? "Logiciel / application desktop"
+            : "Desktop software/application";
+      case "site_web":
+        return langUserPhone == "fr" ? "Site web" : "Website";
+      default:
+        return langUserPhone == "fr" ? "Type inconnu" : "Unknown type";
     }
+  }
 
-    String _siteApplicationActionLabel(String subtype) {
-      switch (subtype) {
-        case "app_mobile":
-          return langUserPhone == "fr" ? "Télécharger" : "Download";
-        case "logiciel_desktop":
-          return langUserPhone == "fr" ? "En savoir plus" : "Learn more";
-        case "site_web":
-          return langUserPhone == "fr" ? "Ouvrir" : "Open";
-        default:
-          return langUserPhone == "fr"
-              ? "Action indisponible"
-              : "Action unavailable";
-      }
+  String _siteApplicationActionLabel(String subtype) {
+    switch (subtype) {
+      case "app_mobile":
+        return langUserPhone == "fr" ? "Télécharger" : "Download";
+      case "logiciel_desktop":
+        return langUserPhone == "fr" ? "En savoir plus" : "Learn more";
+      case "site_web":
+        return langUserPhone == "fr" ? "Ouvrir" : "Open";
+      default:
+        return langUserPhone == "fr"
+            ? "Action indisponible"
+            : "Action unavailable";
     }
+  }
 
-      Future<void> _openSiteApplicationUrl(
+  Future<void> _openSiteApplicationUrl(
       BuildContext context, String rawUrl) async {
     final normalizedUrl = rawUrl.trim();
     final uri = Uri.tryParse(normalizedUrl);
@@ -1629,210 +1629,212 @@ class _ActuPageState extends State<ActuPage>
     final iconUrl = siteApplicationInfo.iconUrl(advertisement.image);
     final displayName = nom.isNotEmpty
         ? nom
-        : (langUserPhone == "fr" ? "Site ou application" : "Site or application");
+        : (langUserPhone == "fr"
+            ? "Site ou application"
+            : "Site or application");
 
-      return Container(
-        margin: const EdgeInsets.only(left: 7, top: 0, right: 7, bottom: 0),
-        child: Column(
-          children: [
-            Card(
-              child: Column(
-                children: [
-                  Stack(
-                    children: [
-                      GestureDetector(
-                        onTap: () {
-                          setPromotionToWatch(advertisement);
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => AdvertisementDetailPage(
-                                advertisement: advertisement,
-                              ),
+    return Container(
+      margin: const EdgeInsets.only(left: 7, top: 0, right: 7, bottom: 0),
+      child: Column(
+        children: [
+          Card(
+            child: Column(
+              children: [
+                Stack(
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        setPromotionToWatch(advertisement);
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => AdvertisementDetailPage(
+                              advertisement: advertisement,
                             ),
-                          );
-                        },
-                        child: Padding(
-                          padding: const EdgeInsets.fromLTRB(12, 12, 56, 8),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Container(
-                                    width: 64,
-                                    height: 64,
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      border: Border.all(
-                                        color: primaryColor.withOpacity(0.35),
-                                        width: 2,
-                                      ),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.black.withOpacity(0.12),
-                                          blurRadius: 6,
-                                          offset: const Offset(0, 2),
-                                        ),
-                                      ],
+                          ),
+                        );
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(12, 12, 56, 8),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Container(
+                                  width: 64,
+                                  height: 64,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                      color: primaryColor.withOpacity(0.35),
+                                      width: 2,
                                     ),
-                                    child: ClipOval(
-                                      child: CachedNetworkImage(
-                                        imageUrl: iconUrl,
-                                        placeholder: (context, url) => Image.asset(
-                                          'images/placeholder.png',
-                                          fit: BoxFit.cover,
-                                        ),
-                                        errorWidget: (context, url, error) =>
-                                            Image.asset(
-                                          'images/error_image.png',
-                                          fit: BoxFit.cover,
-                                        ),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.12),
+                                        blurRadius: 6,
+                                        offset: const Offset(0, 2),
+                                      ),
+                                    ],
+                                  ),
+                                  child: ClipOval(
+                                    child: CachedNetworkImage(
+                                      imageUrl: iconUrl,
+                                      placeholder: (context, url) =>
+                                          Image.asset(
+                                        'images/placeholder.png',
                                         fit: BoxFit.cover,
                                       ),
+                                      errorWidget: (context, url, error) =>
+                                          Image.asset(
+                                        'images/error_image.png',
+                                        fit: BoxFit.cover,
+                                      ),
+                                      fit: BoxFit.cover,
                                     ),
                                   ),
-                                  const SizedBox(width: 12),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          displayName,
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                          style: GoogleFonts.poppins(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                        ),
-                                        const SizedBox(height: 8),
-                                        Divider(
-                                          height: 1,
-                                          thickness: 0.7,
-                                          color: Theme.of(context)
-                                              .dividerColor
-                                              .withOpacity(0.55),
-                                        ),
-                                        const SizedBox(height: 8),
-                                        Text(
-                                          _siteApplicationTypeLabel(sousType),
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                          style: GoogleFonts.poppins(
-                                            fontSize: 12,
-                                            color: primaryColor,
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 12),
-                              Text(
-                                advertisement.description,
-                                softWrap: true,
-                                style: GoogleFonts.poppins(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w400,
                                 ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        displayName,
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: GoogleFonts.poppins(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 8),
+                                      Divider(
+                                        height: 1,
+                                        thickness: 0.7,
+                                        color: Theme.of(context)
+                                            .dividerColor
+                                            .withOpacity(0.55),
+                                      ),
+                                      const SizedBox(height: 8),
+                                      Text(
+                                        _siteApplicationTypeLabel(sousType),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: GoogleFonts.poppins(
+                                          fontSize: 12,
+                                          color: primaryColor,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 12),
+                            Text(
+                              advertisement.description,
+                              softWrap: true,
+                              style: GoogleFonts.poppins(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w400,
                               ),
-                            ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    if (advertisement.inProgrammeRecompense)
+                      Positioned(
+                        top: 10,
+                        right: 10,
+                        child: AnimatedRewardBadge(
+                          onTap: () => _showRewardInfo(context),
+                        ),
+                      ),
+                  ],
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(12, 4, 12, 10),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: ElevatedButton.icon(
+                          onPressed: () => sharePromotion(
+                            context,
+                            advertisement.image,
+                            advertisement.imageName,
+                            advertisement.description,
+                          ),
+                          icon: const FaIcon(
+                            FontAwesomeIcons.shareNodes,
+                            size: 18,
+                          ),
+                          label: FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: Text(
+                              langUserPhone == "fr" ? "Partager" : "Share",
+                              maxLines: 1,
+                              style: GoogleFonts.poppins(
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: primaryColor.withOpacity(0.1),
+                            foregroundColor: primaryColor,
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            padding: const EdgeInsets.symmetric(vertical: 10),
                           ),
                         ),
                       ),
-                      if (advertisement.inProgrammeRecompense)
-                        Positioned(
-                          top: 10,
-                          right: 10,
-                          child: AnimatedRewardBadge(
-                            onTap: () => _showRewardInfo(context),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: () => _openSiteApplicationUrl(
+                            context,
+                            siteApplicationUrl,
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: primaryColor,
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            padding: const EdgeInsets.symmetric(vertical: 10),
+                          ),
+                          child: FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: Text(
+                              _siteApplicationActionLabel(sousType),
+                              maxLines: 1,
+                              style: GoogleFonts.poppins(
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
                           ),
                         ),
+                      ),
                     ],
                   ),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(12, 4, 12, 10),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: ElevatedButton.icon(
-                            onPressed: () => sharePromotion(
-                              context,
-                              advertisement.image,
-                              advertisement.imageName,
-                              advertisement.description,
-                            ),
-                            icon: const FaIcon(
-                              FontAwesomeIcons.shareNodes,
-                              size: 18,
-                            ),
-                            label: FittedBox(
-                              fit: BoxFit.scaleDown,
-                              child: Text(
-                                langUserPhone == "fr" ? "Partager" : "Share",
-                                maxLines: 1,
-                                style: GoogleFonts.poppins(
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: primaryColor.withOpacity(0.1),
-                              foregroundColor: primaryColor,
-                              elevation: 0,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              padding: const EdgeInsets.symmetric(vertical: 10),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: ElevatedButton(
-                            onPressed: () =>
-                                _openSiteApplicationUrl(
-                                  context,
-                                  siteApplicationUrl,
-                                ),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: primaryColor,
-                              foregroundColor: Colors.white,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              padding: const EdgeInsets.symmetric(vertical: 10),
-                            ),
-                            child: FittedBox(
-                              fit: BoxFit.scaleDown,
-                              child: Text(
-                                _siteApplicationActionLabel(sousType),
-                                maxLines: 1,
-                                style: GoogleFonts.poppins(
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
-            const SizedBox(height: 5),
-          ],
-        ),
-      );
-    }
+          ),
+          const SizedBox(height: 5),
+        ],
+      ),
+    );
+  }
 
-      Widget _buildActionChecklist({
+  Widget _buildActionChecklist({
     required BuildContext context,
     required bool showTel,
     required bool showMail,
@@ -2666,7 +2668,7 @@ class AdvertisementDetailPage extends StatelessWidget {
           ),
           SizedBox(height: 4),
           SelectableLinkify(
-             onOpen: (link) => _launchURL(context, link.url),
+            onOpen: (link) => _launchURL(context, link.url),
             text: value,
             style:
                 GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w500),

@@ -21,6 +21,7 @@ import 'package:dressur/5_autre/support_assistance.dart';
 import 'package:dressur/6_assistant/assistant_page.dart';
 import 'package:dressur/components/app_message_bottom_sheet.dart';
 import 'package:dressur/components/constant.dart';
+import 'package:dressur/components/noti.dart';
 import 'package:dressur/components/sql_helper.dart';
 import 'package:dressur/main.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -39,7 +40,9 @@ import 'package:dressur/5_autre/espace_developpeur.dart';
 import 'package:dressur/1_reception/liste_notification.dart';
 
 class SettingPage extends StatefulWidget {
-  SettingPage({Key? key}) : super(key: key);
+  SettingPage({this.onRefresh, Key? key}) : super(key: key);
+
+  final Future<void> Function()? onRefresh;
 
   @override
   State<SettingPage> createState() => _SettingPageState();
@@ -58,7 +61,18 @@ class _SettingPageState extends State<SettingPage>
   @override
   void initState() {
     super.initState();
+    userInformationRevision.addListener(_refreshUserInformation);
     _loadNotifCount();
+  }
+
+  void _refreshUserInformation() {
+    if (mounted) setState(() {});
+  }
+
+  @override
+  void dispose() {
+    userInformationRevision.removeListener(_refreshUserInformation);
+    super.dispose();
   }
 
   Future<void> _loadNotifCount() async {
@@ -93,6 +107,17 @@ class _SettingPageState extends State<SettingPage>
     } catch (_) {}
     if (!mounted) return;
     setState(() => _notifCount = 0);
+  }
+
+  Future<void> _refreshSettings() async {
+    await widget.onRefresh?.call();
+    await _loadNotifCount();
+    if (!mounted) return;
+    successNoti(
+      langUserPhone == "fr" ? "Succès" : "Success",
+      langUserPhone == "fr" ? "Actualisation terminée." : "Refresh complete.",
+      context,
+    );
   }
 
   void _openNotifications(BuildContext context) {
@@ -138,8 +163,7 @@ class _SettingPageState extends State<SettingPage>
   }
 
   void _handleLogout() async {
-    final shouldLogout =
-        await showAppMessageConfirmationBottomSheet(
+    final shouldLogout = await showAppMessageConfirmationBottomSheet(
       context,
       type: AppMessageType.question,
       title: (langUserPhone == "fr") ? "Déconnexion ?" : "Sign out?",
@@ -208,6 +232,20 @@ class _SettingPageState extends State<SettingPage>
                   ],
                 ),
               ),
+              PopupMenuItem(
+                value: 2,
+                child: Row(
+                  children: [
+                    Text(
+                      (langUserPhone == "fr") ? "Actualiser" : "Refresh",
+                      style: GoogleFonts.poppins(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ],
             offset: const Offset(0, 60),
             color: primaryColor,
@@ -223,234 +261,266 @@ class _SettingPageState extends State<SettingPage>
                   context,
                   MaterialPageRoute(builder: (context) => SupportPage()),
                 );
+              } else if (value == 2) {
+                _refreshSettings();
               }
             },
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        physics: BouncingScrollPhysics(),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // --- SECTION ADMINISTRATION (admins uniquement) ---
-            if (admin) ...[
-              _buildSectionTitle((langUserPhone == "fr") ? "Administration" : "Administration"),
+      body: RefreshIndicator(
+        onRefresh: _refreshSettings,
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(
+            parent: BouncingScrollPhysics(),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // --- SECTION ADMINISTRATION (admins uniquement) ---
+              if (admin) ...[
+                _buildSectionTitle((langUserPhone == "fr")
+                    ? "Administration"
+                    : "Administration"),
+                _buildMenuContainer(isDark, [
+                  _buildMenuRow(
+                      FontAwesomeIcons.userShield,
+                      (langUserPhone == "fr")
+                          ? "Panneau Administrateur"
+                          : "Admin Panel",
+                      () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => AdministrationPage()))),
+                ]),
+                SizedBox(height: 5),
+              ],
+
+              // --- CARTE SOLDE ---
+              const SizedBox(height: 10),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                child: _buildSoldeCard(context),
+              ),
+              const SizedBox(height: 2),
+
+              // --- SECTION MON COMPTE ---
+              _buildSectionTitle(
+                  (langUserPhone == "fr") ? "Mon Compte" : "My Account"),
+              _buildMenuContainer(isDark, [
+                // -- Identité & sécurité --
+                _buildMenuRow(
+                    FontAwesomeIcons.user,
+                    (langUserPhone == "fr")
+                        ? "Mes informations"
+                        : "Personal information",
+                    () => Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => ProfilPage()))),
+                _buildMenuRow(
+                    FontAwesomeIcons.shareNodes,
+                    (langUserPhone == "fr") ? "Mes réseaux" : "My networks",
+                    () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const MesReseauxPage(),
+                          ),
+                        )),
+                _buildMenuRow(
+                    FontAwesomeIcons.lock,
+                    (langUserPhone == "fr")
+                        ? "Modifier le mot de passe"
+                        : "Change Password",
+                    () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => ModifierMdpPage()))),
+                // -- Données principales --
+                _buildMenuRow(
+                    FontAwesomeIcons.solidAddressBook,
+                    (langUserPhone == "fr") ? "Contacts" : "Contacts",
+                    () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => ContactPage()))),
+                _buildMenuRow(
+                    FontAwesomeIcons.arrowsRotate,
+                    (langUserPhone == "fr")
+                        ? "Synchronisation avancée"
+                        : "Advanced Sync",
+                    () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const SynchroAvance()))),
+                // -- Développer son compte --
+                _buildMenuRow(
+                    FontAwesomeIcons.trophy,
+                    (langUserPhone == "fr")
+                        ? "Espace Récompense"
+                        : "Reward Space",
+                    () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => isInscritProgrammeRecompense
+                                ? ProgrammeRecompenseDashboard()
+                                : ProgrammeRecompensePage(optionPage: false),
+                          ),
+                        )),
+                _buildMenuRow(
+                    FontAwesomeIcons.code,
+                    (langUserPhone == "fr")
+                        ? "Espace développeur"
+                        : "Developer Space",
+                    () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                const EspaceDeveloppeurPage()))),
+                if (!isVendeur)
+                  _buildMenuRow(
+                      FontAwesomeIcons.store,
+                      (langUserPhone == "fr")
+                          ? "Devenir Vendeur"
+                          : "Become a Vendor",
+                      () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (_) => VendeurAdhesionPage()),
+                          ).then((_) => setState(() {}))),
+                // -- Partenariat --
+                if (!aUnPartenaire)
+                  _buildMenuRow(
+                      FontAwesomeIcons.handshake,
+                      (langUserPhone == "fr")
+                          ? "Code Partenaire"
+                          : "Partner Code",
+                      () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  UtiliserCodePartenairePage()))),
+                _buildMenuRow(
+                    FontAwesomeIcons.star,
+                    (langUserPhone == "fr")
+                        ? "Espace Partenaire"
+                        : "Partner Space",
+                    () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                const EspacePartenairePage()))),
+                // -- Personnalisation --
+                _buildMenuRow(
+                    FontAwesomeIcons.heart,
+                    (langUserPhone == "fr") ? "Préférences" : "Preferences",
+                    () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => PreferencePage()))),
+              ]),
+
+              // --- SECTION ASSISTANCE & FEEDBACK ---
+              _buildSectionTitle((langUserPhone == "fr")
+                  ? "Assistance & Avis"
+                  : "Support & Feedback"),
               _buildMenuContainer(isDark, [
                 _buildMenuRow(
-                    FontAwesomeIcons.userShield,
-                    (langUserPhone == "fr")
-                        ? "Panneau Administrateur"
-                        : "Admin Panel",
+                    FontAwesomeIcons.graduationCap,
+                    (langUserPhone == "fr") ? "Tutoriels" : "Tutorials",
                     () => Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => AdministrationPage()))),
+                            builder: (context) => const ListeTuto()))),
+                _buildMenuRow(
+                    FontAwesomeIcons.comments,
+                    (langUserPhone == "fr") ? "Assistant IA" : "AI Assistant",
+                    () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const AssistantPage()))),
+                _buildMenuRow(
+                    FontAwesomeIcons.headset,
+                    (langUserPhone == "fr")
+                        ? "Support Technique"
+                        : "Technical Support",
+                    () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => SupportPage()))),
+                _buildMenuRow(
+                    FontAwesomeIcons.lightbulb,
+                    (langUserPhone == "fr") ? "Suggestions" : "Suggestions",
+                    () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => SuggestionsPage()))),
+                _buildMenuRow(
+                    FontAwesomeIcons.triangleExclamation,
+                    (langUserPhone == "fr")
+                        ? "Signaler un utilisateur"
+                        : "Report a User",
+                    () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => SignalerPage()))),
               ]),
-            ],
 
-            // --- CARTE SOLDE ---
-            const SizedBox(height: 4),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10),
-              child: _buildSoldeCard(context),
-            ),
-            const SizedBox(height: 10),
-
-            // --- SECTION MON COMPTE ---
-            _buildSectionTitle(
-                (langUserPhone == "fr") ? "Mon Compte" : "My Account"),
-            _buildMenuContainer(isDark, [
-              // -- Identité & sécurité --
-              _buildMenuRow(
-                  FontAwesomeIcons.user,
+              // --- SECTION ACTIONS AVANCÉES ---
+              _buildSectionTitle((langUserPhone == "fr")
+                  ? "Actions Avancées"
+                  : "Advanced Actions"),
+              _buildMenuContainer(isDark, [
+                _buildMenuRow(
+                  FontAwesomeIcons.broom,
                   (langUserPhone == "fr")
-                      ? "Mes informations"
-                      : "Personal information",
-                  () => Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => ProfilPage()))),
-              _buildMenuRow(
-                  FontAwesomeIcons.shareNodes,
-                  (langUserPhone == "fr") ? "Mes réseaux" : "My networks",
-                  () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const MesReseauxPage(),
-                    ),
-                  )),
-              _buildMenuRow(
-                  FontAwesomeIcons.lock,
-                  (langUserPhone == "fr")
-                      ? "Modifier le mot de passe"
-                      : "Change Password",
+                      ? "Supprimer les contacts DS"
+                      : "Delete DS Contacts",
                   () => Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => ModifierMdpPage()))),
-              // -- Données principales --
-              _buildMenuRow(
-                  FontAwesomeIcons.solidAddressBook,
-                  (langUserPhone == "fr") ? "Contacts" : "Contacts",
-                  () => Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => ContactPage()))),
-              _buildMenuRow(
-                  FontAwesomeIcons.arrowsRotate,
+                          builder: (context) =>
+                              const SupprimerContactsDSPage())),
+                  color: Colors.orange[700],
+                ),
+                _buildMenuRow(
+                  FontAwesomeIcons.trash,
                   (langUserPhone == "fr")
-                      ? "Synchronisation avancée"
-                      : "Advanced Sync",
+                      ? "Supprimer mon compte"
+                      : "Delete My Account",
                   () => Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => const SynchroAvance()))),
-              // -- Développer son compte --
-              _buildMenuRow(
-                  FontAwesomeIcons.trophy,
-                  (langUserPhone == "fr") ? "Espace Récompense" : "Reward Space",
-                  () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => isInscritProgrammeRecompense
-                          ? ProgrammeRecompenseDashboard()
-                          : ProgrammeRecompensePage(optionPage: false),
-                    ),
-                  )),
-              _buildMenuRow(
-                  FontAwesomeIcons.code,
-                  (langUserPhone == "fr") ? "Espace développeur" : "Developer Space",
-                  () => Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const EspaceDeveloppeurPage()))),
-              if (!isVendeur)
+                          builder: (context) => DeletecomptePage())),
+                  color: Colors.red,
+                ),
+              ]),
+
+              // --- SECTION APPLICATION ---
+              _buildSectionTitle(
+                  (langUserPhone == "fr") ? "Application" : "Application"),
+              _buildMenuContainer(isDark, [
+                _buildLanguageSelector(isDark),
+                _buildThemeSelector(isDark),
                 _buildMenuRow(
-                    FontAwesomeIcons.store,
-                    (langUserPhone == "fr")
-                        ? "Devenir Vendeur"
-                        : "Become a Vendor",
-                    () => Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (_) => VendeurAdhesionPage()),
-                    ).then((_) => setState(() {}))),
-              // -- Partenariat --
-              if (!aUnPartenaire)
-                _buildMenuRow(
-                    FontAwesomeIcons.handshake,
-                    (langUserPhone == "fr")
-                        ? "Code Partenaire"
-                        : "Partner Code",
+                    FontAwesomeIcons.circleInfo,
+                    (langUserPhone == "fr") ? "À Propos" : "About Us",
                     () => Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => UtiliserCodePartenairePage()))),
-              _buildMenuRow(
-                  FontAwesomeIcons.star,
-                  (langUserPhone == "fr") ? "Espace Partenaire" : "Partner Space",
-                  () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const EspacePartenairePage()))),
-              // -- Personnalisation --
-              _buildMenuRow(
-                  FontAwesomeIcons.heart,
-                  (langUserPhone == "fr") ? "Préférences" : "Preferences",
-                  () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => PreferencePage()))),
-            ]),
+                            builder: (context) => AproposPage()))),
+                _buildMenuRow(
+                    FontAwesomeIcons.rightFromBracket,
+                    (langUserPhone == "fr") ? "Se déconnecter" : "Sign Out",
+                    _handleLogout,
+                    showChevron: false),
+              ]),
 
-            // --- SECTION ASSISTANCE & FEEDBACK ---
-            _buildSectionTitle((langUserPhone == "fr")
-                ? "Assistance & Avis"
-                : "Support & Feedback"),
-            _buildMenuContainer(isDark, [
-              _buildMenuRow(
-                  FontAwesomeIcons.graduationCap,
-                  (langUserPhone == "fr") ? "Tutoriels" : "Tutorials",
-                  () => Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => const ListeTuto()))),
-              _buildMenuRow(
-                  FontAwesomeIcons.comments,
-                  (langUserPhone == "fr")
-                      ? "Assistant IA"
-                      : "AI Assistant",
-                  () => Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => const AssistantPage()))),
-              _buildMenuRow(
-                  FontAwesomeIcons.headset,
-                  (langUserPhone == "fr")
-                      ? "Support Technique"
-                      : "Technical Support",
-                  () => Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => SupportPage()))),
-              _buildMenuRow(
-                  FontAwesomeIcons.lightbulb,
-                  (langUserPhone == "fr") ? "Suggestions" : "Suggestions",
-                  () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => SuggestionsPage()))),
-              _buildMenuRow(
-                  FontAwesomeIcons.triangleExclamation,
-                  (langUserPhone == "fr")
-                      ? "Signaler un utilisateur"
-                      : "Report a User",
-                  () => Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => SignalerPage()))),
-            ]),
+              // Espacement cohérent entre les sections Application et social.
+              const SizedBox(height: 15),
+              SociauxPage(),
 
-            // --- SECTION ACTIONS AVANCÉES ---
-            _buildSectionTitle((langUserPhone == "fr")
-                ? "Actions Avancées"
-                : "Advanced Actions"),
-            _buildMenuContainer(isDark, [
-              _buildMenuRow(
-                FontAwesomeIcons.broom,
-                (langUserPhone == "fr")
-                    ? "Supprimer les contacts DS"
-                    : "Delete DS Contacts",
-                () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const SupprimerContactsDSPage())),
-                color: Colors.orange[700],
-              ),
-              _buildMenuRow(
-                FontAwesomeIcons.trash,
-                (langUserPhone == "fr")
-                    ? "Supprimer mon compte"
-                    : "Delete My Account",
-                () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => DeletecomptePage())),
-                color: Colors.red,
-              ),
-            ]),
-
-            // --- SECTION APPLICATION ---
-            _buildSectionTitle((langUserPhone == "fr") ? "Application" : "Application"),
-            _buildMenuContainer(isDark, [
-              _buildLanguageSelector(isDark),
-              _buildThemeSelector(isDark),
-              _buildMenuRow(
-                  FontAwesomeIcons.circleInfo,
-                  (langUserPhone == "fr") ? "À Propos" : "About Us",
-                  () => Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => AproposPage()))),
-              _buildMenuRow(
-                  FontAwesomeIcons.rightFromBracket,
-                  (langUserPhone == "fr") ? "Se déconnecter" : "Sign Out",
-                  _handleLogout,
-                  showChevron: false),
-            ]),
-
-            // Espacement cohérent entre les sections Application et social.
-            const SizedBox(height: 20),
-            SociauxPage(),
-
-            const SizedBox(height: 20),
-          ],
+              const SizedBox(height: 20),
+            ],
+          ),
         ),
       ),
     );
@@ -694,8 +764,8 @@ class _SettingPageState extends State<SettingPage>
                     MaterialPageRoute(builder: (_) => VendeurRechargePage()),
                   ).then((_) => setState(() {})),
                   child: Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 12, vertical: 5),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
                     decoration: BoxDecoration(
                       color: primaryColor,
                       borderRadius: BorderRadius.circular(20),

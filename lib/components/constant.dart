@@ -82,6 +82,7 @@ const String createMessageTable = """
 int nbrAffichageAvertissement = 0;
 List<dynamic> userChatInfo = [];
 List<dynamic> contactsEnregistrer = [];
+final ValueNotifier<int> userInformationRevision = ValueNotifier<int>(0);
 String? langUserPhone = "fr";
 String preferencePaysText = "";
 int nombreContacts = 0;
@@ -209,6 +210,7 @@ Future<void> initUserInformations(userInfos) async {
     'id': 0,
     'uid': userInfos["uid"],
   });
+  userInformationRevision.value++;
 }
 
 /// Clears the in-memory authentication state without touching local contacts.
