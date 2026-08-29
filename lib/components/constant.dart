@@ -7,7 +7,6 @@ import 'package:animate_do/animate_do.dart';
 import 'package:dressur/components/111_generaleApiDomaine.dart';
 import 'package:dressur/components/app_theme.dart';
 import 'package:dressur/components/noti.dart';
-import 'package:dressur/components/noti_sys.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show ByteData, Uint8List, rootBundle;
 import 'package:flutter_contacts/flutter_contacts.dart';
@@ -1101,69 +1100,77 @@ Future<bool> _insertDressurContactSafely({
   }
 }
 
-Future<void> saveContactDsIfNotExiste() async {
+Future<int> saveContactDsIfNotExiste({
+  void Function(int count)? onContactsDetected,
+  void Function(int count)? onSavingContacts,
+  void Function(int current, int total)? onContactProgress,
+  void Function(String message)? onStatus,
+  void Function(int count)? onCompleted,
+}) async {
   final permission =
       await PermissionManager.instance.check(Permission.contacts);
-  if (!permission.canProceed) return;
+  if (!permission.canProceed) {
+    onStatus?.call("L'accès aux contacts n'est pas autorisé.");
+    return 0;
+  }
 
-  int nombreNewContact = 0;
   contactsEnregistrer = [];
   final url = Uri.parse('$generalRouteForApi/listContactDS/$uidUser/fr');
-  final response = await http.get(url);
-  if (response.statusCode == 200) {
-    final jsonData = jsonDecode(response.body) as List<dynamic>;
-    if (jsonData.isNotEmpty) {
-      for (var contact in jsonData) {
-        final String phone = (contact['tel'] ?? '').toString().trim();
-        if (phone.isEmpty) continue;
+  final response = await http.get(url).timeout(const Duration(seconds: 30));
+  if (response.statusCode != 200) {
+    onStatus?.call("Le serveur n'a pas pu fournir les contacts Dressur.");
+    return 0;
+  }
 
-        if (phone != "+22964044294" &&
-            phone != "22964044294" &&
-            phone != "64044294" &&
-            !contactsEnregistrer.contains(phone)) {
-          contactsEnregistrer.add(phone);
-        }
-        if ((await SQLHelper.getOneNumsTelUser(phone)).isEmpty) {
-          final String nomContact = (contact["nom"] ?? "").toString().trim();
-          final String pseudoContact = (contact["pseudo"] ?? "").toString();
-          final String telSansPlus = phone.replaceAll("+", "");
-          final List<String> nameParts = [
-            nomContact,
-            pseudoContact,
-            telSansPlus,
-          ].where((s) => s.isNotEmpty).toList();
-          final String expectedName = "${nameParts.join(" - ")} #DS";
-          final inserted = await _insertDressurContactSafely(
-            name: expectedName,
-            phone: phone,
-          );
-          if (!inserted) continue;
+  final jsonData = jsonDecode(response.body) as List<dynamic>;
+  final pendingContacts = <Map<String, dynamic>>[];
+  for (final contact in jsonData) {
+    final phone = (contact['tel'] ?? '').toString().trim();
+    if (phone.isEmpty) continue;
 
-          await insertNumTelUserIntoDataBase(phone);
-          nombreNewContact++;
-        }
-      }
-      if (nombreNewContact == 1) {
-        showNotification(
-          (langUserPhone == "fr")
-              ? "ADD Contacts Dressur"
-              : "ADD Dressur Contacts",
-          (langUserPhone == "fr")
-              ? "$nombreNewContact nouveau contact enregistré par Dressur."
-              : "$nombreNewContact new contact saved by Dressur.",
-        );
-      } else if (nombreNewContact > 1) {
-        showNotification(
-          (langUserPhone == "fr")
-              ? "ADD Contacts Dressur"
-              : "ADD Dressur Contacts",
-          (langUserPhone == "fr")
-              ? "$nombreNewContact nouveaux contacts enregistrés par Dressur."
-              : "$nombreNewContact new contacts saved by Dressur.",
-        );
-      }
+    if (phone != "+22964044294" &&
+        phone != "22964044294" &&
+        phone != "64044294" &&
+        !contactsEnregistrer.contains(phone)) {
+      contactsEnregistrer.add(phone);
+    }
+    if ((await SQLHelper.getOneNumsTelUser(phone)).isEmpty) {
+      pendingContacts.add({...contact, 'tel': phone});
     }
   }
+
+  onContactsDetected?.call(pendingContacts.length);
+  if (pendingContacts.isEmpty) return 0;
+  onSavingContacts?.call(pendingContacts.length);
+
+  var nombreNewContact = 0;
+  var processedContacts = 0;
+  for (final contact in pendingContacts) {
+    final phone = contact['tel'] as String;
+    final String nomContact = (contact["nom"] ?? "").toString().trim();
+    final String pseudoContact = (contact["pseudo"] ?? "").toString();
+    final String telSansPlus = phone.replaceAll("+", "");
+    final List<String> nameParts = [
+      nomContact,
+      pseudoContact,
+      telSansPlus,
+    ].where((s) => s.isNotEmpty).toList();
+    final String expectedName = "${nameParts.join(" - ")} #DS";
+    final inserted = await _insertDressurContactSafely(
+      name: expectedName,
+      phone: phone,
+    );
+    processedContacts++;
+    onContactProgress?.call(processedContacts, pendingContacts.length);
+    if (!inserted) continue;
+
+    await insertNumTelUserIntoDataBase(phone);
+    nombreNewContact++;
+  }
+
+  onCompleted?.call(nombreNewContact);
+
+  return nombreNewContact;
 }
 
 extension StringExtension on String {

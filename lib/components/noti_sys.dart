@@ -11,11 +11,13 @@ import 'package:dressur/components/permission_manager.dart';
 int id = 0;
 
 // ── IDs réservés ──────────────────────────────────────────────────────────────
-const int _boostReminderNotifId    = 99;
+const int _boostReminderNotifId = 99;
 const int _boostReminder48hNotifId = 100;
-const int _promoReminderNotifId    = 101;
+const int _promoReminderNotifId = 101;
 const int _promoReminder48hNotifId = 102;
-const int _dsDeletionNotifId       = 200;
+const int _dsDeletionNotifId = 200;
+const int _contactSyncNotifId = 201;
+Future<void> _contactSyncNotificationQueue = Future<void>.value();
 
 // ── Notifications immédiates ───────────────────────────────────────────────────
 
@@ -71,6 +73,70 @@ Future<bool> showNotification(
   }
 }
 
+Future<bool> showContactSyncNotification(
+  String title,
+  String body, {
+  BuildContext? context,
+  int? progress,
+  int? maxProgress,
+  bool silent = false,
+}) async {
+  final previous = _contactSyncNotificationQueue;
+  final current = previous.then(
+    (_) => _showContactSyncNotification(
+      title,
+      body,
+      context: context,
+      progress: progress,
+      maxProgress: maxProgress,
+      silent: silent,
+    ),
+  );
+  _contactSyncNotificationQueue = current.then<void>(
+    (_) {},
+    onError: (Object _, StackTrace __) {},
+  );
+  return current;
+}
+
+Future<bool> _showContactSyncNotification(
+  String title,
+  String body, {
+  BuildContext? context,
+  int? progress,
+  int? maxProgress,
+  required bool silent,
+}) async {
+  if (!await _ensureNotificationAccess(context: context)) return false;
+
+  final androidDetails = AndroidNotificationDetails(
+    silent ? 'contact_sync_cooldown_channel' : 'contact_sync_channel_v2',
+    silent ? 'Rappel de synchronisation' : 'Synchronisation des contacts',
+    channelDescription:
+        'Progression de la synchronisation des contacts Dressur',
+    importance: silent ? Importance.low : Importance.max,
+    priority: silent ? Priority.low : Priority.high,
+    onlyAlertOnce: silent,
+    playSound: !silent,
+    showProgress: progress != null && maxProgress != null,
+    progress: progress ?? 0,
+    maxProgress: maxProgress ?? 0,
+  );
+  final notificationDetails = NotificationDetails(android: androidDetails);
+  try {
+    await flutterLocalNotificationsPlugin.show(
+      _contactSyncNotifId,
+      title,
+      body,
+      notificationDetails,
+      payload: 'contact_sync',
+    );
+    return true;
+  } catch (_) {
+    return false;
+  }
+}
+
 Future<bool> showNotificationTimeOutAfter(
   String title,
   String body,
@@ -98,6 +164,39 @@ Future<bool> showNotificationTimeOutAfter(
       body,
       notificationDetails,
       payload: 'item x',
+    );
+    return true;
+  } catch (_) {
+    return false;
+  }
+}
+
+Future<bool> showStartupSyncReminderNotification(
+  String title,
+  String body, {
+  BuildContext? context,
+}) async {
+  if (!await _ensureNotificationAccess(context: context)) return false;
+
+  const androidDetails = AndroidNotificationDetails(
+    'startup_sync_reminder_channel_v2',
+    'Rappel de synchronisation',
+    channelDescription: 'Rappel pour lancer une synchronisation avancée',
+    importance: Importance.low,
+    priority: Priority.low,
+    playSound: false,
+    enableVibration: false,
+    onlyAlertOnce: true,
+    timeoutAfter: 15000,
+  );
+  const notificationDetails = NotificationDetails(android: androidDetails);
+  try {
+    await flutterLocalNotificationsPlugin.show(
+      202,
+      title,
+      body,
+      notificationDetails,
+      payload: 'startup_sync_reminder',
     );
     return true;
   } catch (_) {
@@ -210,7 +309,9 @@ Future<bool> schedulePromoReminderNotification({BuildContext? context}) async {
 
     await flutterLocalNotificationsPlugin.zonedSchedule(
       _promoReminderNotifId,
-      isFr ? '📣 Ta business n\'est pas encore visible !' : '📣 Your business isn\'t visible yet!',
+      isFr
+          ? '📣 Ta business n\'est pas encore visible !'
+          : '📣 Your business isn\'t visible yet!',
       isFr
           ? "Tu n'as pas encore créé de promotion ! Des milliers d'utilisateurs pourraient découvrir ta business dès aujourd'hui."
           : "You haven't created a promotion yet! Thousands of users could discover your business today.",
@@ -224,7 +325,9 @@ Future<bool> schedulePromoReminderNotification({BuildContext? context}) async {
 
     await flutterLocalNotificationsPlugin.zonedSchedule(
       _promoReminder48hNotifId,
-      isFr ? '🔥 2 jours sans promo, c\'est trop long !' : '🔥 2 days without a promo is too long!',
+      isFr
+          ? '🔥 2 jours sans promo, c\'est trop long !'
+          : '🔥 2 days without a promo is too long!',
       isFr
           ? "Des milliers d'utilisateurs ne te voient pas encore. Crée ta première promotion maintenant et booste ta visibilité 👇"
           : "Thousands of users still can't see you. Create your first promotion now and boost your visibility 👇",
@@ -262,8 +365,9 @@ Future<bool> showDSDeletionProgress(
   final AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
     'ds_deletion_channel',
     isFr ? 'Suppression contacts DS' : 'DS contact deletion',
-    channelDescription:
-        isFr ? 'Progression de la suppression des contacts DS' : 'DS contact deletion progress',
+    channelDescription: isFr
+        ? 'Progression de la suppression des contacts DS'
+        : 'DS contact deletion progress',
     importance: Importance.low,
     priority: Priority.low,
     showProgress: true,

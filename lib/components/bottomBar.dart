@@ -10,11 +10,11 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:dressur/6_login_register/connexion.dart';
 import 'package:dressur/2_promo/services.dart';
 import 'package:dressur/3_actu/actu.dart';
+import 'package:dressur/1_reception/synchronisation_avance.dart';
 import 'package:dressur/5_autre/autre.dart';
 import 'package:dressur/components/constant.dart';
 import 'package:dressur/components/contacts_pending_interrupt.dart';
@@ -75,7 +75,10 @@ class _AccountBlockedPage extends StatelessWidget {
 }
 
 class BottomBar extends StatefulWidget {
-  const BottomBar({Key? key}) : super(key: key);
+  const BottomBar({this.openAdvancedSyncOnLaunch = false, Key? key})
+      : super(key: key);
+
+  final bool openAdvancedSyncOnLaunch;
 
   @override
   State<BottomBar> createState() => _BottomBarState();
@@ -83,6 +86,8 @@ class BottomBar extends StatefulWidget {
 
 class _BottomBarState extends State<BottomBar> with WidgetsBindingObserver {
   static const _refreshTimeout = Duration(seconds: 24);
+  static const _contactSyncCooldown = Duration(minutes: 15);
+  static const _contactSyncCooldownKey = 'last_contact_sync_completed_at';
 
   // L'index 1 correspond à la page "Actu"
   int _selectedIndex = 1;
@@ -237,25 +242,191 @@ class _BottomBarState extends State<BottomBar> with WidgetsBindingObserver {
   /// Une permission refusée ne doit ni interrompre la restauration de session
   /// ni produire une Future non gérée depuis initState ou le lifecycle.
   Future<void> _runOptionalContactStartupTask(
-    Future<void> Function() task,
-  ) async {
+    Future<void> Function() task, {
+    VoidCallback? onFailure,
+    VoidCallback? onPermissionUnavailable,
+    Duration? timeout = _refreshTimeout,
+    Duration? cooldown,
+    String? cooldownKey,
+    void Function(Duration remaining)? onCooldown,
+  }) async {
     if (_contactStartupTaskInProgress) return;
     _contactStartupTaskInProgress = true;
 
     try {
+      if (cooldown != null && cooldownKey != null) {
+        final prefs = await SharedPreferences.getInstance();
+        final lastCompletedAt = prefs.getInt(cooldownKey);
+        if (lastCompletedAt != null) {
+          final elapsed = DateTime.now().difference(
+            DateTime.fromMillisecondsSinceEpoch(lastCompletedAt),
+          );
+          final remaining = cooldown - elapsed;
+          if (remaining > Duration.zero) {
+            onCooldown?.call(remaining);
+            return;
+          }
+        }
+      }
+
       final permission = await PermissionManager.instance
           .check(Permission.contacts)
           .timeout(const Duration(seconds: 6));
-      if (!permission.canProceed) return;
+      if (!permission.canProceed) {
+        onPermissionUnavailable?.call();
+        return;
+      }
 
-      await task().timeout(_refreshTimeout);
+      final taskFuture = task();
+      if (timeout == null) {
+        await taskFuture;
+      } else {
+        await taskFuture.timeout(timeout);
+      }
+      if (cooldown != null && cooldownKey != null) {
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setInt(
+          cooldownKey,
+          DateTime.now().millisecondsSinceEpoch,
+        );
+      }
     } catch (_) {
       // Les contacts ne doivent jamais empêcher l'utilisateur d'entrer dans
       // l'application. Les fonctionnalités concernées pourront réessayer
       // depuis leur écran dédié.
+      onFailure?.call();
     } finally {
       _contactStartupTaskInProgress = false;
     }
+  }
+
+  Future<void> _runContactStartupSync() async {
+    if (!mounted || _contactStartupTaskInProgress) return;
+    await _runOptionalContactStartupTask(
+      () {
+        showContactSyncNotification(
+          langUserPhone == "fr" ? "Synchronisation contacts" : "Contact sync",
+          langUserPhone == "fr"
+              ? "Vérification des contacts Dressur en cours..."
+              : "Checking Dressur contacts...",
+          context: context,
+        );
+        showContactSyncNotification(
+          langUserPhone == "fr" ? "Synchronisation contacts" : "Contact sync",
+          langUserPhone == "fr"
+              ? "Connexion au serveur pour rechercher les contacts..."
+              : "Connecting to the server to find contacts...",
+          context: context,
+        );
+        return saveContactDsIfNotExiste(
+          onStatus: (message) {
+            if (!mounted) return;
+            showContactSyncNotification(
+              langUserPhone == "fr"
+                  ? "Synchronisation contacts"
+                  : "Contact sync",
+              message,
+              context: context,
+            );
+          },
+          onContactsDetected: (count) {
+            if (!mounted) return;
+            showContactSyncNotification(
+              langUserPhone == "fr" ? "Contacts Dressur" : "Dressur contacts",
+              count == 0
+                  ? (langUserPhone == "fr"
+                      ? "Aucun nouveau contact à enregistrer."
+                      : "No new contacts to save.")
+                  : (langUserPhone == "fr"
+                      ? "$count contact(s) détecté(s) et absent(s) du téléphone."
+                      : "$count contact(s) detected and missing from the phone."),
+              context: context,
+            );
+          },
+          onSavingContacts: (count) {
+            if (!mounted) return;
+            showContactSyncNotification(
+              langUserPhone == "fr"
+                  ? "Enregistrement des contacts"
+                  : "Saving contacts",
+              langUserPhone == "fr"
+                  ? "Enregistrement de $count contact(s) en cours..."
+                  : "Saving $count contact(s)...",
+              progress: 0,
+              maxProgress: count,
+              context: context,
+            );
+          },
+          onContactProgress: (current, total) {
+            if (!mounted) return;
+            showContactSyncNotification(
+              langUserPhone == "fr"
+                  ? "Enregistrement des contacts"
+                  : "Saving contacts",
+              langUserPhone == "fr"
+                  ? "Enregistrement de $current/$total contact(s)..."
+                  : "Saving $current/$total contact(s)...",
+              progress: current,
+              maxProgress: total,
+              context: context,
+            );
+          },
+          onCompleted: (count) {
+            if (!mounted) return;
+            showContactSyncNotification(
+              langUserPhone == "fr"
+                  ? "Synchronisation terminée"
+                  : "Synchronization complete",
+              count == 0
+                  ? (langUserPhone == "fr"
+                      ? "Aucun nouveau contact enregistré."
+                      : "No new contacts saved.")
+                  : (langUserPhone == "fr"
+                      ? "$count contact(s) enregistré(s) avec succès."
+                      : "$count contact(s) saved successfully."),
+              context: context,
+            );
+          },
+        );
+      },
+      timeout: null,
+      cooldown: _contactSyncCooldown,
+      cooldownKey: _contactSyncCooldownKey,
+      onCooldown: (remaining) {
+        if (!mounted) return;
+        final minutes = (remaining.inSeconds / 60).ceil();
+        showContactSyncNotification(
+          langUserPhone == "fr"
+              ? "Synchronisation déjà effectuée"
+              : "Synchronization already completed",
+          langUserPhone == "fr"
+              ? "Prochaine synchronisation possible dans $minutes minute(s)."
+              : "Next synchronization available in $minutes minute(s).",
+          silent: true,
+          context: context,
+        );
+      },
+      onFailure: () {
+        if (!mounted) return;
+        showContactSyncNotification(
+          langUserPhone == "fr" ? "Synchronisation contacts" : "Contact sync",
+          langUserPhone == "fr"
+              ? "La synchronisation des contacts a échoué."
+              : "Contact synchronization failed.",
+          context: context,
+        );
+      },
+      onPermissionUnavailable: () {
+        if (!mounted) return;
+        showContactSyncNotification(
+          langUserPhone == "fr" ? "Synchronisation contacts" : "Contact sync",
+          langUserPhone == "fr"
+              ? "La permission d'accès aux contacts est refusée."
+              : "Contacts permission is denied.",
+          context: context,
+        );
+      },
+    );
   }
 
   Future<void> _runDeferredOptionalContactTask(
@@ -269,8 +440,15 @@ class _BottomBarState extends State<BottomBar> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
-    unawaited(_runOptionalContactStartupTask(saveContactDsIfNotExiste));
     WidgetsBinding.instance.addObserver(this);
+    if (widget.openAdvancedSyncOnLaunch) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        Navigator.of(context).push(
+          MaterialPageRoute(builder: (_) => const SynchroAvance()),
+        );
+      });
+    }
 
     // Charger les infos utilisateur depuis l'API au démarrage, puis vérifier
     // si des contacts sont disponibles. On passe par actualise() pour garantir
@@ -298,7 +476,7 @@ class _BottomBarState extends State<BottomBar> with WidgetsBindingObserver {
 
     _timerSync = Timer.periodic(const Duration(hours: 6), (timer) {
       if (!_isInBackground) {
-        unawaited(_runOptionalContactStartupTask(saveContactDsIfNotExiste));
+        unawaited(_runContactStartupSync());
         actualise(false);
       }
     });
@@ -324,7 +502,7 @@ class _BottomBarState extends State<BottomBar> with WidgetsBindingObserver {
           now.difference(_lastActualise!) > const Duration(minutes: 5)) {
         _lastActualise = now;
         actualise(false);
-        unawaited(_runOptionalContactStartupTask(saveContactDsIfNotExiste));
+        unawaited(_runContactStartupSync());
       }
     } else if (state == AppLifecycleState.paused) {
       _isInBackground = true;
@@ -384,6 +562,7 @@ class _BottomBarState extends State<BottomBar> with WidgetsBindingObserver {
           lesPublicites = data['user']["lesPublicites"];
         });
         await _maybeShowContactsInterrupt();
+        unawaited(_runContactStartupSync());
         if (affMessage && mounted) {
           _showRefreshSuccessMessage(
             (langUserPhone == "fr")
@@ -588,37 +767,19 @@ class _BottomBarState extends State<BottomBar> with WidgetsBindingObserver {
           },
           children: _screens,
         ),
-        // La barre de navigation n'a plus de bouton flottant ni d'encoche
-        // Alternative 1: Style "Indicateur Flottant"
-        bottomNavigationBar: AnimatedBottomNavigationBar.builder(
-          itemCount: _iconList.length,
-          tabBuilder: (int index, bool isActive) {
-            final color = isActive ? primaryColor : Colors.grey[500];
-
-            return Column(
-              mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                FaIcon(
-                  _iconList[index],
-                  size: isActive ? 22 : 18,
-                  color: color,
-                ),
-                SizedBox(height: 4),
-                Text(
-                  _labelList[index],
-                  style: GoogleFonts.poppins(
-                    fontSize: 10,
-                    fontWeight: isActive ? FontWeight.w600 : FontWeight.w400,
-                    color: color,
-                  ),
-                ),
-              ],
-            );
-          },
-          activeIndex: _selectedIndex,
-          gapLocation: GapLocation.none,
-          notchSmoothness: NotchSmoothness.softEdge,
+        bottomNavigationBar: BottomNavigationBar(
+          items: List.generate(
+            _iconList.length,
+            (index) => BottomNavigationBarItem(
+              icon: FaIcon(_iconList[index], size: 18),
+              activeIcon: FaIcon(_iconList[index], size: 22),
+              label: _labelList[index],
+            ),
+          ),
+          currentIndex: _selectedIndex,
+          type: BottomNavigationBarType.fixed,
+          selectedItemColor: primaryColor,
+          unselectedItemColor: Colors.grey[500],
           backgroundColor: Theme.of(context).brightness == Brightness.dark
               ? Color(0xFF1C1C1E)
               : Colors.white,

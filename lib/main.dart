@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:dressur/7_demarage/welcome_page.dart';
+import 'package:dressur/1_reception/synchronisation_avance.dart';
 import 'package:dressur/components/app_theme.dart';
 import 'package:dressur/components/constant.dart';
 import 'package:flutter/services.dart';
@@ -16,6 +17,7 @@ int id = 0;
 
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
+final GlobalKey<NavigatorState> appNavigatorKey = GlobalKey<NavigatorState>();
 
 NotificationAppLaunchDetails? notificationAppLaunchDetails;
 
@@ -210,6 +212,15 @@ Future<void> _initializeNotifications() async {
       initializationSettings,
       onDidReceiveNotificationResponse:
           (NotificationResponse notificationResponse) {
+        if (notificationResponse.payload == 'startup_sync_reminder') {
+          final navigator = appNavigatorKey.currentState;
+          if (navigator != null) {
+            navigator.push(
+              MaterialPageRoute(builder: (_) => const SynchroAvance()),
+            );
+          }
+          return;
+        }
         switch (notificationResponse.notificationResponseType) {
           case NotificationResponseType.selectedNotification:
             selectNotificationStream.add(notificationResponse.payload);
@@ -260,11 +271,11 @@ class MyApp extends StatelessWidget {
       valueListenable: themeNotifier,
       builder: (_, ThemeMode currentMode, __) {
         return MaterialApp(
+          navigatorKey: appNavigatorKey,
           initialRoute: '/',
           routes: <String, WidgetBuilder>{
-            WelcomePage.routeName: (_) =>
-                WelcomePage(
-                    notificationAppLaunchDetails: notificationAppLaunchDetails),
+            WelcomePage.routeName: (_) => WelcomePage(
+                notificationAppLaunchDetails: notificationAppLaunchDetails),
           },
           debugShowCheckedModeBanner: false,
           title: 'Dressur',

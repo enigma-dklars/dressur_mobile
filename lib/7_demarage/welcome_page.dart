@@ -28,15 +28,22 @@ class WelcomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
+    final launchPayload =
+        notificationAppLaunchDetails?.notificationResponse?.payload;
+    return Scaffold(
       backgroundColor: Colors.black,
-      body: PageDepart(),
+      body: PageDepart(
+        openAdvancedSyncOnLaunch: launchPayload == 'startup_sync_reminder',
+      ),
     );
   }
 }
 
 class PageDepart extends StatefulWidget {
-  const PageDepart({Key? key}) : super(key: key);
+  const PageDepart({this.openAdvancedSyncOnLaunch = false, Key? key})
+      : super(key: key);
+
+  final bool openAdvancedSyncOnLaunch;
 
   @override
   State<PageDepart> createState() => _PageDepartState();
@@ -294,7 +301,11 @@ class _PageDepartState extends State<PageDepart> {
     if (_navigationStarted || !mounted) return;
     _navigationStarted = true;
     Navigator.of(context).pushAndRemoveUntil(
-      MaterialPageRoute(builder: (_) => const BottomBar()),
+      MaterialPageRoute(
+        builder: (_) => BottomBar(
+          openAdvancedSyncOnLaunch: widget.openAdvancedSyncOnLaunch,
+        ),
+      ),
       (_) => false,
     );
   }
@@ -368,7 +379,7 @@ class _PageDepartState extends State<PageDepart> {
         DateTime.now().difference(DateTime.parse(lastDateStr)).inDays >= 30;
     if (shouldNotify) {
       final bool isFr = langUserPhone == 'fr';
-      await showNotification(
+      await showStartupSyncReminderNotification(
         isFr ? 'Synchronisation conseillée' : 'Sync recommended',
         isFr
             ? 'Mettez à jour vos contacts Dressur en lançant une Synchronisation Avancée.'
@@ -728,9 +739,8 @@ class _LogoAnimationState extends State<LogoAnimation>
                   ),
 
                   // Halo lumineux derrière le logo
-                  Opacity(
-                    opacity: _logoFade.value * 0.6,
-                    child: Container(
+                  if (_logoFade.value > 0.01)
+                    Container(
                       width: 150,
                       height: 150,
                       decoration: BoxDecoration(
@@ -744,12 +754,10 @@ class _LogoAnimationState extends State<LogoAnimation>
                         ],
                       ),
                     ),
-                  ),
 
                   // Logo avec fade + scale
-                  Opacity(
-                    opacity: _logoFade.value,
-                    child: Transform.scale(
+                  if (_logoFade.value > 0.01)
+                    Transform.scale(
                       scale: _logoScale.value,
                       child: Image.asset(
                         'images/dressur_logo.png',
@@ -757,7 +765,6 @@ class _LogoAnimationState extends State<LogoAnimation>
                         height: 170,
                       ),
                     ),
-                  ),
                 ],
               ),
             ),
@@ -765,9 +772,8 @@ class _LogoAnimationState extends State<LogoAnimation>
             const SizedBox(height: 28),
 
             // Nom de l'app
-            FadeTransition(
-              opacity: _nameFade,
-              child: SlideTransition(
+            if (_nameFade.value > 0.01)
+              SlideTransition(
                 position: _nameSlide,
                 child: Text(
                   'DRESSUR',
@@ -779,7 +785,6 @@ class _LogoAnimationState extends State<LogoAnimation>
                   ),
                 ),
               ),
-            ),
 
             const SizedBox(height: 14),
 
@@ -805,9 +810,8 @@ class _LogoAnimationState extends State<LogoAnimation>
             const SizedBox(height: 12),
 
             // Tagline
-            Opacity(
-              opacity: _taglineFade.value,
-              child: Text(
+            if (_taglineFade.value > 0.01)
+              Text(
                 langUserPhone == "fr"
                     ? 'Connecte · Booste · Grandit'
                     : 'Connect · Boost · Grow',
@@ -818,7 +822,6 @@ class _LogoAnimationState extends State<LogoAnimation>
                   fontWeight: FontWeight.w300,
                 ),
               ),
-            ),
           ],
         );
       },
