@@ -17,7 +17,8 @@ class PermissionsRequiredPage extends StatefulWidget {
   final VoidCallback? onContinue;
 
   @override
-  State<PermissionsRequiredPage> createState() => _PermissionsRequiredPageState();
+  State<PermissionsRequiredPage> createState() =>
+      _PermissionsRequiredPageState();
 }
 
 class _PermissionsRequiredPageState extends State<PermissionsRequiredPage>
@@ -135,122 +136,132 @@ class _PermissionsRequiredPageState extends State<PermissionsRequiredPage>
     return Scaffold(
       backgroundColor: primaryColor,
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Image.asset(
-                'images/dressur_logo.png',
-                width: 120,
-                height: 120,
-              ),
-              const SizedBox(height: 40),
-              Text(
-                langUserPhone == "fr"
-                    ? "Autorisations pour certaines fonctions"
-                    : "Permissions for some features",
-                style: GoogleFonts.poppins(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 20),
-              Text(
-                langUserPhone == "fr"
-                    ? "Ces autorisations permettent d'utiliser certaines fonctions de Dressur. "
-                        "Vous pouvez continuer à utiliser l'application sans les accorder.\n\n"
-                        "• Accès aux contacts\n"
-                        "• Notifications et alarmes exactes\n"
-                        "Les photos sont sélectionnées uniquement lorsque vous choisissez une image."
-                    : "These permissions enable some Dressur features. "
-                        "You can continue using the app without granting them.\n\n"
-                        "• Access to contacts\n"
-                        "• Notifications and exact alarms\n"
-                        "Photos are selected only when you choose an image.",
-                style: GoogleFonts.poppins(
-                  fontSize: 18,
-                  color: Colors.white70,
-                  height: 1.6,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 40),
-              ElevatedButton.icon(
-                onPressed: _checking ? null : _openSettings,
-                icon: const FaIcon(FontAwesomeIcons.gear, color: Colors.black),
-                label: Text(
-                  langUserPhone == "fr"
-                      ? "Ouvrir les paramètres"
-                      : "Open Settings",
-                  style: GoogleFonts.poppins(
-                      color: Colors.black, fontWeight: FontWeight.w600),
-                ),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.white,
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30)),
-                ),
-              ),
-              const SizedBox(height: 12),
-              TextButton(
-                onPressed: _checking ? null : _checkPermissions,
-                child: Text(
-                  langUserPhone == "fr"
-                      ? "Vérifier à nouveau"
-                      : "Check again",
-                  style: const TextStyle(color: Colors.white),
-                ),
-              ),
-              TextButton(
-                onPressed: _continueWithoutPermissions,
-                child: Text(
-                  langUserPhone == "fr"
-                      ? "Continuer sans ces autorisations"
-                      : "Continue without these permissions",
-                  style: const TextStyle(color: Colors.white70),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-              const SizedBox(height: 20),
-              if (_checking)
-                Text(
-                  langUserPhone == "fr"
-                      ? "Vérification en cours…"
-                      : "Checking permissions…",
-                  style: GoogleFonts.poppins(
-                    fontSize: 14,
-                    color: Colors.white70,
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return SingleChildScrollView(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                child: Padding(
+                  padding: const EdgeInsets.all(24.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Image.asset(
+                        'images/dressur_logo.png',
+                        width: 120,
+                        height: 120,
+                      ),
+                      const SizedBox(height: 40),
+                      Text(
+                        langUserPhone == "fr"
+                            ? "Autorisations pour certaines fonctions"
+                            : "Permissions for some features",
+                        style: GoogleFonts.poppins(
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 20),
+                      Text(
+                        langUserPhone == "fr"
+                            ? "Ces autorisations permettent d'utiliser certaines fonctions de Dressur. "
+                                "Vous pouvez continuer à utiliser l'application sans les accorder.\n\n"
+                                "• Accès aux contacts\n"
+                                "• Notifications et alarmes exactes\n"
+                                "Les photos sont sélectionnées uniquement lorsque vous choisissez une image."
+                            : "These permissions enable some Dressur features. "
+                                "You can continue using the app without granting them.\n\n"
+                                "• Access to contacts\n"
+                                "• Notifications and exact alarms\n"
+                                "Photos are selected only when you choose an image.",
+                        style: GoogleFonts.poppins(
+                          fontSize: 18,
+                          color: Colors.white70,
+                          height: 1.6,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 40),
+                      ElevatedButton.icon(
+                        onPressed: _checking ? null : _openSettings,
+                        icon: const FaIcon(FontAwesomeIcons.gear,
+                            color: Colors.black),
+                        label: Text(
+                          langUserPhone == "fr"
+                              ? "Ouvrir les paramètres"
+                              : "Open Settings",
+                          style: GoogleFonts.poppins(
+                              color: Colors.black, fontWeight: FontWeight.w600),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 32, vertical: 16),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(30)),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      TextButton(
+                        onPressed: _checking ? null : _checkPermissions,
+                        child: Text(
+                          langUserPhone == "fr"
+                              ? "Vérifier à nouveau"
+                              : "Check again",
+                          style: const TextStyle(color: Colors.white),
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: _continueWithoutPermissions,
+                        child: Text(
+                          langUserPhone == "fr"
+                              ? "Continuer sans ces autorisations"
+                              : "Continue without these permissions",
+                          style: const TextStyle(color: Colors.white70),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      if (_checking)
+                        Text(
+                          langUserPhone == "fr"
+                              ? "Vérification en cours…"
+                              : "Checking permissions…",
+                          style: GoogleFonts.poppins(
+                            fontSize: 14,
+                            color: Colors.white70,
+                          ),
+                          textAlign: TextAlign.center,
+                        )
+                      else if (_checkMessage != null)
+                        Text(
+                          _checkMessage!,
+                          style: GoogleFonts.poppins(
+                            fontSize: 14,
+                            color: Colors.white70,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      if (_checking || _checkMessage != null)
+                        const SizedBox(height: 12),
+                      Text(
+                        langUserPhone == "fr"
+                            ? "Après votre retour des paramètres, les autorisations seront vérifiées automatiquement."
+                            : "When you return from Settings, permissions will be checked automatically.",
+                        style: GoogleFonts.poppins(
+                          fontSize: 16,
+                          color: Colors.white60,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
                   ),
-                  textAlign: TextAlign.center,
-                )
-              else if (_checkMessage != null)
-                Text(
-                  _checkMessage!,
-                  style: GoogleFonts.poppins(
-                    fontSize: 14,
-                    color: Colors.white70,
-                  ),
-                  textAlign: TextAlign.center,
                 ),
-              if (_checking || _checkMessage != null)
-                const SizedBox(height: 12),
-              Text(
-                langUserPhone == "fr"
-                    ? "Après votre retour des paramètres, les autorisations seront vérifiées automatiquement."
-                    : "When you return from Settings, permissions will be checked automatically.",
-                style: GoogleFonts.poppins(
-                  fontSize: 16,
-                  color: Colors.white60,
-                ),
-                textAlign: TextAlign.center,
               ),
-            ],
-          ),
+            );
+          },
         ),
       ),
     );
