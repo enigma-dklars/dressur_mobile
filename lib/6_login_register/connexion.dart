@@ -1,5 +1,7 @@
 // ignore_for_file: use_build_context_synchronously, prefer_const_constructors
 
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -90,6 +92,39 @@ class _LoginFormState extends State<LoginForm> {
     super.dispose();
   }
 
+  String _loginErrorMessage(Object error) {
+    final errorText = error.toString().toLowerCase();
+    final isNetworkError = error is SocketException ||
+        error is http.ClientException ||
+        errorText.contains('socketexception') ||
+        errorText.contains('clientexception') ||
+        errorText.contains('network is unreachable') ||
+        errorText.contains('failed host lookup') ||
+        errorText.contains('connection refused') ||
+        errorText.contains('timed out');
+
+    if (isNetworkError) {
+      return (langUserPhone == "fr")
+          ? "Impossible de contacter Dressur. Vérifiez votre connexion Internet puis réessayez."
+          : "Unable to reach Dressur. Check your Internet connection and try again.";
+    }
+
+    if (error is FormatException) {
+      return (langUserPhone == "fr")
+          ? "Le serveur a renvoyé une réponse invalide. Veuillez réessayer."
+          : "The server returned an invalid response. Please try again.";
+    }
+
+    final message = error.toString().replaceFirst(RegExp(r'^Exception:\s*'), '').trim();
+    if (message.isNotEmpty && !message.contains('ClientException')) {
+      return message;
+    }
+
+    return (langUserPhone == "fr")
+        ? "Une erreur est survenue. Veuillez réessayer."
+        : "Something went wrong. Please try again.";
+  }
+
   Future<void> _login() async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -129,8 +164,11 @@ class _LoginFormState extends State<LoginForm> {
         throw Exception(data["message"] ?? ((langUserPhone == "fr") ? "Une erreur est survenue." : "An error occurred."));
       }
     } catch (e) {
-      dangerNoti((langUserPhone == "fr") ? "Erreur" : "Error",
-          e.toString().replaceAll("Exception: ", ""), context);
+      dangerNoti(
+        (langUserPhone == "fr") ? "Erreur" : "Error",
+        _loginErrorMessage(e),
+        context,
+      );
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
