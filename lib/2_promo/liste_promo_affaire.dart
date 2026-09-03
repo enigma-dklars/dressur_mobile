@@ -76,6 +76,28 @@ class _PromotionListPageState extends State<PromotionListPage> {
   bool _loading = false;
   List<Promotion> _promotions = [];
 
+  String _stringValue(dynamic value) => value?.toString() ?? "";
+
+  bool _boolValue(dynamic value) {
+    return value == true || value == 1 || value == "1" || value == "true";
+  }
+
+  String _serializeAdditionalInfo(dynamic value) {
+    if (value == null) return "";
+    if (value is Map) return jsonEncode(value);
+    if (value is! String) return "";
+
+    final rawValue = value.trim();
+    if (rawValue.isEmpty) return "";
+
+    try {
+      final decoded = jsonDecode(rawValue);
+      return decoded is Map ? jsonEncode(decoded) : "";
+    } catch (_) {
+      return "";
+    }
+  }
+
   Future<void> fetchPromotions() async {
     setState(() {
       _loading = true;
@@ -88,27 +110,30 @@ class _PromotionListPageState extends State<PromotionListPage> {
         final jsonData = jsonDecode(response.body) as List<dynamic>;
         final promotions = jsonData.map((data) {
           return Promotion(
-            id: data['id'],
-            image: generalRouteForPromotionImage + data['image'],
-            nombreDeVues: data['nombreDeVues'],
-            nombreImpression: data['nombreImpression'],
-            description: data['description'],
-            status: data['status'],
-            dateDebut: data['dateDebut'],
-            dateExp: data['dateExp'],
-            formulePromotion: data['formulePromotion'],
-            peutPayer: data['peutPayer'],
-            motif: data['motif'],
-            typePromotionAffaire: data['typePromotionAffaire'],
-            annotherInfo: data['annotherInfo'] != null
-                ? jsonEncode(data['annotherInfo'])
-                : "",
-            inProgrammeRecompense: data['inProgrammeRecompense'] == 1,
-            publishOnDressurStatus: data['publishOnDressurStatus'] == 1,
-            whatsappContact: data['whatsappContact'] ?? '',
-            motifsRefus: (data['motifsRefus'] as List<dynamic>? ?? [])
-                .map((e) => MotifRefus.fromJson(e as Map<String, dynamic>))
-                .toList(),
+            id: _stringValue(data['id']),
+            image: generalRouteForPromotionImage + _stringValue(data['image']),
+            nombreDeVues: _stringValue(data['nombreDeVues']),
+            nombreImpression: _stringValue(data['nombreImpression']),
+            description: _stringValue(data['description']),
+            status: _stringValue(data['status']),
+            dateDebut: _stringValue(data['dateDebut']),
+            dateExp: _stringValue(data['dateExp']),
+            formulePromotion: _stringValue(data['formulePromotion']),
+            peutPayer: _boolValue(data['peutPayer']),
+            motif: _stringValue(data['motif']),
+            typePromotionAffaire: _stringValue(data['typePromotionAffaire']),
+            annotherInfo: _serializeAdditionalInfo(data['annotherInfo']),
+            inProgrammeRecompense: _boolValue(data['inProgrammeRecompense']),
+            publishOnDressurStatus: _boolValue(data['publishOnDressurStatus']),
+            whatsappContact: _stringValue(data['whatsappContact']),
+            motifsRefus: (data['motifsRefus'] is List)
+                ? (data['motifsRefus'] as List)
+                    .whereType<Map>()
+                    .map((e) => MotifRefus.fromJson(
+                        Map<String, dynamic>.from(e),
+                      ))
+                    .toList()
+                : [],
           );
         }).toList();
 
@@ -817,9 +842,22 @@ class PromotionDetailPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Map<String, dynamic> infoMap = (promotion.annotherInfo != "")
-        ? jsonDecode(promotion.annotherInfo)
-        : {};
+    Map<String, dynamic> infoMap = {};
+    final rawAdditionalInfo = promotion.annotherInfo.trim();
+    if (rawAdditionalInfo.isNotEmpty) {
+      try {
+        final decoded = jsonDecode(rawAdditionalInfo);
+        if (decoded is Map) {
+          infoMap = decoded.map(
+            (key, value) => MapEntry(key.toString(), value?.toString() ?? ""),
+          );
+        }
+      } catch (_) {
+        // Une information supplémentaire invalide ne doit pas empêcher
+        // l’affichage du reste de la page de détails.
+        infoMap = {};
+      }
+    }
 
     return Scaffold(
       appBar: AppBar(
