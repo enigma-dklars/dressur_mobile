@@ -82,20 +82,28 @@ class _PromotionListPageState extends State<PromotionListPage> {
     return value == true || value == 1 || value == "1" || value == "true";
   }
 
+  Map<String, dynamic> _parseAdditionalInfo(String value) {
+    final rawValue = value.trim();
+    if (rawValue.isEmpty) return {};
+
+    try {
+      final decoded = jsonDecode(rawValue);
+      if (decoded is Map) {
+        return Map<String, dynamic>.from(decoded);
+      }
+    } catch (_) {
+      // Les informations facultatives invalides sont ignorées.
+    }
+    return {};
+  }
+
   String _serializeAdditionalInfo(dynamic value) {
     if (value == null) return "";
     if (value is Map) return jsonEncode(value);
     if (value is! String) return "";
 
-    final rawValue = value.trim();
-    if (rawValue.isEmpty) return "";
-
-    try {
-      final decoded = jsonDecode(rawValue);
-      return decoded is Map ? jsonEncode(decoded) : "";
-    } catch (_) {
-      return "";
-    }
+    final info = _parseAdditionalInfo(value);
+    return info.isEmpty ? "" : jsonEncode(info);
   }
 
   Future<void> fetchPromotions() async {
@@ -400,13 +408,16 @@ class _PromotionListPageState extends State<PromotionListPage> {
   }
 
   Widget _buildSiteAppActiveContent(Promotion promotion) {
-    final Map<String, dynamic> info = promotion.annotherInfo.isNotEmpty
-        ? jsonDecode(promotion.annotherInfo) as Map<String, dynamic>
-        : {};
-    final String nom = info['nom'] ?? info['nomSiteApp'] ?? "";
+    final info = _parseAdditionalInfo(promotion.annotherInfo);
+    final String nom =
+        _stringValue(info['nom'] ?? info['nomSiteApp']);
     final String sousType =
-        info['sousType'] ?? info['sousTypeSiteApp'] ?? "site_web";
-    final String url = info['url'] ?? info['urlSiteApp'] ?? "";
+        _stringValue(info['sousType'] ?? info['sousTypeSiteApp'])
+                .isNotEmpty
+            ? _stringValue(info['sousType'] ?? info['sousTypeSiteApp'])
+            : "site_web";
+    final String url =
+        _stringValue(info['url'] ?? info['urlSiteApp']);
 
     String sousTypeLabel;
     if (sousType == "app_mobile") {
@@ -665,13 +676,16 @@ class _PromotionListPageState extends State<PromotionListPage> {
   }
 
   void _showRenewSiteAppModal(BuildContext context, Promotion promotion) {
-    final Map<String, dynamic> info = promotion.annotherInfo.isNotEmpty
-        ? jsonDecode(promotion.annotherInfo) as Map<String, dynamic>
-        : {};
-    final String nom = info['nom'] ?? info['nomSiteApp'] ?? "";
+    final info = _parseAdditionalInfo(promotion.annotherInfo);
+    final String nom =
+        _stringValue(info['nom'] ?? info['nomSiteApp']);
     final String sousType =
-        info['sousType'] ?? info['sousTypeSiteApp'] ?? "site_web";
-    final String url = info['url'] ?? info['urlSiteApp'] ?? "";
+        _stringValue(info['sousType'] ?? info['sousTypeSiteApp'])
+                .isNotEmpty
+            ? _stringValue(info['sousType'] ?? info['sousTypeSiteApp'])
+            : "site_web";
+    final String url =
+        _stringValue(info['url'] ?? info['urlSiteApp']);
 
     String sousTypeLabel;
     if (sousType == "app_mobile") {
@@ -842,22 +856,9 @@ class PromotionDetailPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Map<String, dynamic> infoMap = {};
-    final rawAdditionalInfo = promotion.annotherInfo.trim();
-    if (rawAdditionalInfo.isNotEmpty) {
-      try {
-        final decoded = jsonDecode(rawAdditionalInfo);
-        if (decoded is Map) {
-          infoMap = decoded.map(
-            (key, value) => MapEntry(key.toString(), value?.toString() ?? ""),
-          );
-        }
-      } catch (_) {
-        // Une information supplémentaire invalide ne doit pas empêcher
-        // l’affichage du reste de la page de détails.
-        infoMap = {};
-      }
-    }
+    final infoMap = _parseAdditionalInfo(promotion.annotherInfo).map(
+      (key, value) => MapEntry(key.toString(), value?.toString() ?? ""),
+    );
 
     return Scaffold(
       appBar: AppBar(
