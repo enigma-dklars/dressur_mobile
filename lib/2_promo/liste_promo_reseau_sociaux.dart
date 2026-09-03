@@ -7,6 +7,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:dressur/components/constant.dart';
+import 'package:dressur/components/noti.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -412,6 +413,8 @@ class _PromotionReseauSociauxListePageState
                 icon: FontAwesomeIcons.tag,
                 label: (langUserPhone == "fr") ? "Référence" : "Reference",
                 value: promo.reference,
+                copyable: true,
+                onCopy: () => _copyReference(context, promo.reference),
               ),
               _buildUrlItem(promo.url),
               SizedBox(height: 15),
@@ -444,8 +447,25 @@ class _PromotionReseauSociauxListePageState
     );
   }
 
-  Widget _buildDetailRow(
-      {required IconData icon, required String label, required String value}) {
+  Future<void> _copyReference(BuildContext context, String reference) async {
+    await Clipboard.setData(ClipboardData(text: reference));
+    if (!context.mounted) return;
+    successNoti(
+      (langUserPhone == "fr") ? "Référence copiée" : "Reference copied",
+      (langUserPhone == "fr")
+          ? "La référence a été copiée dans le presse-papiers."
+          : "The reference has been copied to the clipboard.",
+      context,
+    );
+  }
+
+  Widget _buildDetailRow({
+    required IconData icon,
+    required String label,
+    required String value,
+    bool copyable = false,
+    VoidCallback? onCopy,
+  }) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6.0),
       child: Row(
@@ -459,8 +479,19 @@ class _PromotionReseauSociauxListePageState
               value,
               style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
               textAlign: TextAlign.end,
+              maxLines: copyable ? 2 : null,
+              overflow: copyable ? TextOverflow.ellipsis : TextOverflow.visible,
             ),
           ),
+          if (copyable)
+            IconButton(
+              onPressed: onCopy,
+              icon: const FaIcon(FontAwesomeIcons.copy, size: 15),
+              tooltip: (langUserPhone == "fr") ? "Copier" : "Copy",
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
+              visualDensity: VisualDensity.compact,
+            ),
         ],
       ),
     );
