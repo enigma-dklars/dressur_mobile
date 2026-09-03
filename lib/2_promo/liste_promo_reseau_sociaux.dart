@@ -286,42 +286,59 @@ class _PromotionReseauSociauxListePageState
               ] else ...[
                 // Message alternatif si pas de progression
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      "${(langUserPhone == "fr") ? "Référence" : "Reference"}: ${promo.reference}",
-                      style: GoogleFonts.poppins(
-                          fontSize: 13, color: Colors.grey[600]),
+                    Expanded(
+                      child: Text(
+                        "${(langUserPhone == "fr") ? "Référence" : "Reference"}: ${promo.reference}",
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: GoogleFonts.poppins(
+                            fontSize: 13, color: Colors.grey[600]),
+                      ),
                     ),
-                    // Option 3: Style "Bouton Discret"
-
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        FaIcon(
-                          FontAwesomeIcons.circleInfo,
-                          size: 14,
-                          color:
-                              primaryColor, // Utilise la couleur principale de votre app
-                        ),
-                        SizedBox(width: 8),
-                        Text(
-                          (langUserPhone == "fr") ? "Autres Détails" : "Other Details",
-                          style: GoogleFonts.poppins(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            color: primaryColor,
+                    const SizedBox(width: 8),
+                    Flexible(
+                      fit: FlexFit.loose,
+                      child: InkWell(
+                        onTap: () => _showDetailsModal(context, promo),
+                        borderRadius: BorderRadius.circular(8),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 4, vertical: 4),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              FaIcon(
+                                FontAwesomeIcons.circleInfo,
+                                size: 14,
+                                color: primaryColor,
+                              ),
+                              const SizedBox(width: 6),
+                              Flexible(
+                                child: Text(
+                                  (langUserPhone == "fr")
+                                      ? "Autres Détails"
+                                      : "Other Details",
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                    color: primaryColor,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 6),
+                              FaIcon(
+                                FontAwesomeIcons.chevronRight,
+                                size: 12,
+                                color: primaryColor,
+                              ),
+                            ],
                           ),
                         ),
-                        SizedBox(width: 8),
-                        FaIcon(
-                          FontAwesomeIcons
-                              .chevronRight, // Flèche pour indiquer une action
-                          size: 12,
-                          color: primaryColor,
-                        )
-                      ],
-                    )
+                      ),
+                    ),
                   ],
                 )
               ],
