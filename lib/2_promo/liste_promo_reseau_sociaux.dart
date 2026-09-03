@@ -367,10 +367,16 @@ class _PromotionReseauSociauxListePageState
               left: 20,
               right: 20,
               bottom: MediaQuery.of(context).viewInsets.bottom + 30),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.of(context).size.height * 0.82,
+            ),
+            child: SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
               Center(
                 child: Container(
                   width: 40,
@@ -430,7 +436,9 @@ class _PromotionReseauSociauxListePageState
                 label: (langUserPhone == "fr") ? "Modifié le" : "Updated on",
                 value: promo.updatedAt,
               ),
-            ],
+                ],
+              ),
+            ),
           ),
         );
       },
@@ -480,17 +488,17 @@ class _PromotionReseauSociauxListePageState
               value,
               style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
               textAlign: TextAlign.end,
-              maxLines: copyable ? 2 : null,
+              maxLines: copyable ? 1 : null,
               overflow: copyable ? TextOverflow.ellipsis : TextOverflow.visible,
             ),
           ),
           if (copyable)
             IconButton(
               onPressed: onCopy,
-              icon: const FaIcon(FontAwesomeIcons.copy, size: 15),
+              icon: const FaIcon(FontAwesomeIcons.copy, size: 13),
               tooltip: (langUserPhone == "fr") ? "Copier" : "Copy",
               padding: EdgeInsets.zero,
-              constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
+              constraints: const BoxConstraints.tightFor(width: 22, height: 22),
               visualDensity: VisualDensity.compact,
             ),
         ],
