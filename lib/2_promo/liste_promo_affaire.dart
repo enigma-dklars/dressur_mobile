@@ -17,6 +17,21 @@ import 'package:dressur/2_promo/boost_billing.dart';
 import 'package:select_form_field/select_form_field.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+Map<String, dynamic> _parseAdditionalInfo(String value) {
+  final rawValue = value.trim();
+  if (rawValue.isEmpty) return {};
+
+  try {
+    final decoded = jsonDecode(rawValue);
+    if (decoded is Map) {
+      return Map<String, dynamic>.from(decoded);
+    }
+  } catch (_) {
+    // Les informations facultatives invalides sont ignorées.
+  }
+  return {};
+}
+
 class MotifRefus {
   final String motif;
   final String dateRefus;
@@ -80,21 +95,6 @@ class _PromotionListPageState extends State<PromotionListPage> {
 
   bool _boolValue(dynamic value) {
     return value == true || value == 1 || value == "1" || value == "true";
-  }
-
-  Map<String, dynamic> _parseAdditionalInfo(String value) {
-    final rawValue = value.trim();
-    if (rawValue.isEmpty) return {};
-
-    try {
-      final decoded = jsonDecode(rawValue);
-      if (decoded is Map) {
-        return Map<String, dynamic>.from(decoded);
-      }
-    } catch (_) {
-      // Les informations facultatives invalides sont ignorées.
-    }
-    return {};
   }
 
   String _serializeAdditionalInfo(dynamic value) {
