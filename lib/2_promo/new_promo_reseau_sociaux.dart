@@ -432,7 +432,33 @@ class _RegisterForm3State extends State<RegisterForm3> {
             });
           }
         } else {
-          dangerNoti("ERROR", "ERROR", context);
+          String errorTitle = (langUserPhone == "fr") ? "Erreur" : "Error";
+          String errorMessage = (langUserPhone == "fr")
+              ? "La promotion n'a pas pu être enregistrée. Vérifiez les informations saisies puis réessayez."
+              : "The promotion could not be registered. Check the entered information and try again.";
+
+          try {
+            final errorBody = await response.stream.bytesToString();
+            final decodedError = convert.jsonDecode(errorBody);
+            if (decodedError is Map<String, dynamic> &&
+                decodedError['error'] == true &&
+                decodedError['message'] is String &&
+                (decodedError['message'] as String).trim().isNotEmpty) {
+              final apiMessage = (decodedError['message'] as String).trim();
+              if (apiMessage.length <= 500) {
+                errorMessage = apiMessage;
+              }
+              if (decodedError['titre'] is String &&
+                  (decodedError['titre'] as String).trim().isNotEmpty &&
+                  (decodedError['titre'] as String).length <= 80) {
+                errorTitle = (decodedError['titre'] as String).trim();
+              }
+            }
+          } catch (_) {
+            // Ne jamais exposer le contenu brut d'une réponse invalide ou technique.
+          }
+
+          dangerNoti(errorTitle, errorMessage, context);
           setState(() {
             _desactive3 = false;
           });
